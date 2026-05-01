@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Athletic / Cooper Delo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,300..900,30..100,0..1;1,9..144,300..900,30..100,0..1&family=Geist+Mono:wght@400;500&family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="shell.css" />
+</head>
+<body class="grain">
+
+<div class="loader" id="loader">
+  <div class="label">Athletic / Course & Iron</div>
+  <div class="name">Off the<br/>clock.</div>
+  <div class="progress"></div>
+</div>
+<div class="transition-veil out" id="veil"><span class="label"></span></div>
+<canvas class="scene-canvas" id="scene-canvas"></canvas>
+<div class="cursor" id="cursor"></div>
+
+<nav class="top" id="topnav">
+  <a href="index.html" class="nav-logo" data-cursor="HOME" data-transition="HOME">Cooper Delo</a>
+  <div class="nav-pill">
+    <div class="nav-links" id="navLinks">
+      <span class="nav-indicator" id="navIndicator"></span>
+      <a href="index.html" class="nav-link" data-cursor="VIEW" data-transition="HOME">Home</a>
+      <a href="plugverse.html" class="nav-link" data-cursor="VIEW" data-transition="PLUGVERSE">Plugverse</a>
+      <a href="rubber-band.html" class="nav-link" data-cursor="VIEW" data-transition="MUSIC">Rubber Band</a>
+      <a href="builder.html" class="nav-link" data-cursor="VIEW" data-transition="BUILDER">Builder</a>
+      <a href="athletic.html" class="nav-link active" data-cursor="VIEW" data-no-transition>Athletic</a>
+      <a href="now.html" class="nav-link" data-cursor="VIEW" data-transition="NOW">Now</a>
+    </div>
+  </div>
+  <button class="nav-cta" data-cursor="OPEN" data-contact>Get in touch</button>
+</nav>
+<div class="nav-progress-track"><div class="nav-progress" id="navProgress"></div></div>
+
+<main>
+
+<header class="page-head world-athletic">
+  <div class="inner">
+    <span class="eyebrow">Athletic / Iron and Course</span>
+    <h1 class="poster reveal in" style="margin-top: 1.5rem;">Discipline first,<br/><span class="accent">hobby second.</span></h1>
+  </div>
+</header>
+
+<div class="marquee-band">
+  <div class="marquee-track">
+    <span>5 days a week</span><span>PPL split</span><span>168 lbs cutting</span><span>12% body fat</span><span>Golf for fun</span>
+    <span>5 days a week</span><span>PPL split</span><span>168 lbs cutting</span><span>12% body fat</span><span>Golf for fun</span>
+  </div>
+</div>
+
+<!-- 01 / Fitness (lead) -->
+<section class="block world-athletic">
+  <div class="fx-ekg">
+    <svg viewBox="0 0 1400 800" preserveAspectRatio="none">
+      <line class="ekg-baseline" x1="0" y1="400" x2="1400" y2="400" />
+      <path class="ekg-line" d="M 0 400 L 100 400 L 130 400 L 145 240 L 160 580 L 175 400 L 220 400 L 290 400 L 320 400 L 335 220 L 350 600 L 365 400 L 430 400 L 510 400 L 540 400 L 555 260 L 570 560 L 585 400 L 660 400 L 740 400 L 770 400 L 785 200 L 800 620 L 815 400 L 880 400 L 970 400 L 1000 400 L 1015 240 L 1030 580 L 1045 400 L 1110 400 L 1200 400 L 1230 400 L 1245 220 L 1260 600 L 1275 400 L 1400 400" />
+      <circle class="ekg-blip" cx="0" cy="400" r="6" />
+    </svg>
+  </div>
+  <div class="fx-barbell">
+    <svg viewBox="0 0 1000 240">
+      <rect class="bar" x="120" y="110" width="760" height="20" rx="4" />
+      <rect class="plate-outer" x="100" y="60" width="60" height="120" rx="6" />
+      <rect class="plate-inner" x="125" y="100" width="10" height="40" rx="2" />
+      <rect class="plate-outer" x="60"  y="80" width="40" height="80" rx="4" />
+      <rect class="plate-outer" x="840" y="60" width="60" height="120" rx="6" />
+      <rect class="plate-inner" x="865" y="100" width="10" height="40" rx="2" />
+      <rect class="plate-outer" x="900" y="80" width="40" height="80" rx="4" />
+    </svg>
+  </div>
+  <div class="grid">
+    <div class="col-12 reveal">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <span class="plate glass"><span class="num">01</span><span class="eyebrow" style="margin:0;">The discipline</span></span>
+        <span class="eyebrow">5 days a week, no skipping</span>
+      </div>
+      <h2 class="section-poster">Iron<span class="accent">.</span></h2>
+    </div>
+  </div>
+  <div class="grid" style="margin-top: 3rem;">
+    <div class="col-7">
+      <div class="reveal">
+        <p class="lede">PPL split, five days a week, no skipping. I lift to stay lean, not bulk. Currently cutting from 168 to 162 at around 12 percent body fat. Discipline is the input, aesthetics is just the output. The real product is the version of me that shows up to everything else with a clear head.</p>
+      </div>
+      <div class="stats" style="margin-top: 2.5rem;">
+        <div class="stat-card glass"><span class="label">Split</span><span class="value">Push Pull Legs</span></div>
+        <div class="stat-card glass"><span class="label">Frequency</span><span class="value">5 days / wk</span></div>
+        <div class="stat-card glass"><span class="label">Current</span><span class="value">168 lbs cutting</span></div>
+        <div class="stat-card glass"><span class="label">Target</span><span class="value">162 / 12% BF</span></div>
+      </div>
+    </div>
+    <div class="col-5">
+      <div class="reveal"><div class="photo-frame">
+        <div class="photo has-media portrait-tall" data-world="athletic">
+          <span>Photo: Gym / lifting / progress shot — drop here</span>
+        </div>
+        <div class="caption-shard">Iron / TBD</div>
+      </div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 02 / Why it matters -->
+<section class="block">
+  <div class="grid">
+    <div class="col-4"><span class="eyebrow">Why it matters</span></div>
+    <div class="col-8">
+      <div class="reveal">
+        <p class="lede">The body is the operating system everything else runs on. Plugverse, classes, music, social, none of it works on no sleep, no protein, no movement. Five sessions a week is the minimum tax I pay to keep the rest functional. The aesthetics are a side effect. The clarity is the point.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 03 / Golf (the hobby) -->
+<section class="block world-athletic">
+  <div class="fx-athletic">
+    <svg viewBox="0 0 1400 800" preserveAspectRatio="none">
+      <path class="arc" d="M 80 700 Q 600 100 1300 580" />
+      <path class="arc" d="M 0 740 Q 700 240 1400 700" />
+      <circle class="ball" cx="0" cy="0" r="6" />
+    </svg>
+  </div>
+  <div class="grid">
+    <div class="col-12 reveal">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <span class="plate glass"><span class="num">03</span><span class="eyebrow" style="margin:0;">The hobby</span></span>
+        <span class="eyebrow">For fun</span>
+      </div>
+      <h2 class="section-poster">Golf<span class="accent">.</span></h2>
+    </div>
+  </div>
+  <div class="grid" style="margin-top: 3rem;">
+    <div class="col-4">
+      <div class="reveal"><div class="photo-frame">
+        <div class="photo has-media portrait-tall" data-world="athletic">
+          <span>Photo: Cooper at the course / drop a tee box or fairway shot</span>
+        </div>
+        <div class="caption-shard">Course / TBD</div>
+      </div></div>
+    </div>
+    <div class="col-8">
+      <div class="reveal">
+        <p class="lede">Golf is the hobby. Three or four rounds a month when school and Plugverse let me. I am not chasing scratch, I am chasing four hours of being completely off the clock with my phone in the cart. It clears my head better than anything else.</p>
+      </div>
+      <div class="stats" style="margin-top: 2.5rem;">
+        <div class="stat-card glass"><span class="label">Rounds / month</span><span class="value">3 to 4</span></div>
+        <div class="stat-card glass"><span class="label">Why</span><span class="value">Head reset</span></div>
+        <div class="stat-card glass"><span class="label">Stakes</span><span class="value">None</span></div>
+        <div class="stat-card glass"><span class="label">Bag</span><span class="value">Mixed</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="block">
+  <div class="grid">
+    <div class="col-12" style="text-align: center;">
+      <div class="reveal">
+        <span class="eyebrow">Continue reading</span>
+        <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; margin-top: 2rem;">
+          <a href="plugverse.html" data-cursor="NEXT" data-transition="PLUGVERSE" class="stat-card glass" style="padding: 1rem 1.4rem; font-family: 'Geist Mono', monospace; text-transform: uppercase; letter-spacing: 0.22em; font-size: 0.78rem;">Plugverse</a>
+          <a href="rubber-band.html" data-cursor="NEXT" data-transition="MUSIC" class="stat-card glass" style="padding: 1rem 1.4rem; font-family: 'Geist Mono', monospace; text-transform: uppercase; letter-spacing: 0.22em; font-size: 0.78rem;">Music</a>
+          <a href="now.html" data-cursor="NEXT" data-transition="NOW" class="stat-card glass" style="padding: 1rem 1.4rem; font-family: 'Geist Mono', monospace; text-transform: uppercase; letter-spacing: 0.22em; font-size: 0.78rem;">What I am working on now</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="site">
+  <div style="max-width: 1600px; margin: 0 auto; display: grid; gap: 2.5rem; position: relative;">
+    <div>
+      <span class="eyebrow">Get in touch</span>
+      <button class="under" data-contact data-cursor="OPEN" style="display: block; margin-top: 1rem; text-align: left; font-family: 'Anton', Impact, sans-serif; font-size: clamp(2.6rem, 7vw, 6rem); line-height: 0.95; text-transform: uppercase; color: var(--ink);">cooperdelo6@gmail.com</button>
+    </div>
+    <div class="massive">cooperdelo</div>
+    <div style="display: flex; justify-content: space-between; font-family: 'Geist Mono', monospace; text-transform: uppercase; letter-spacing: 0.22em; font-size: 0.72rem; opacity: 0.7;">
+      <span>Chapel Hill, NC</span><span>2026</span>
+    </div>
+  </div>
+</footer>
+
+<div class="modal-backdrop" id="modal">
+  <div class="modal">
+    <h3>Get in touch.</h3>
+    <p style="font-family: 'Geist Mono', monospace; text-transform: uppercase; letter-spacing: 0.22em; font-size: 0.7rem; color: var(--muted); margin-bottom: 1.4rem;">Email is the fastest way</p>
+    <div class="email-row">
+      <span>cooperdelo6@gmail.com</span>
+      <button class="copy-btn" data-cursor="COPY" id="copyBtn">Copy</button>
+    </div>
+    <div class="options">
+      <a href="https://mail.google.com/mail/?view=cm&fs=1&to=cooperdelo6@gmail.com" target="_blank" rel="noreferrer" data-no-transition data-cursor="OPEN" onclick="window.open(this.href, '_blank'); return false;">Gmail</a>
+      <a href="https://www.linkedin.com/in/cooperdelo/" target="_blank" rel="noreferrer" data-no-transition data-cursor="OPEN" onclick="window.open(this.href, '_blank'); return false;">LinkedIn</a>
+      <a href="https://instagram.com/cooperdelo" target="_blank" rel="noreferrer" data-no-transition data-cursor="OPEN" onclick="window.open(this.href, '_blank'); return false;">Instagram</a>
+    </div>
+    <div style="display: flex; justify-content: flex-end; align-items: center; padding-top: 0.6rem;">
+      <button class="close under" data-cursor="CLOSE" id="closeModal">Close</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast">Copied to clipboard</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="shell.js"></script>
+</body>
+</html>
