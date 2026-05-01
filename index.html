@@ -6,6 +6,8 @@
 <title>Cooper Delo</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="preload" as="image" href="photos/hero.jpeg" fetchpriority="high" />
+<link rel="preload" as="style" href="shell.css" />
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,300..900,30..100,0..1;1,9..144,300..900,30..100,0..1&family=Geist+Mono:wght@400;500&family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="shell.css" />
 <style>
@@ -114,7 +116,7 @@
 
 <section class="hero">
   <div class="hero-bg">
-    <img src="photos/hero.jpeg" alt="Cooper Delo pitching Plugverse at UNC Innovate Carolina Junction" />
+    <img src="photos/hero.jpeg" alt="Cooper Delo pitching Plugverse at UNC Innovate Carolina Junction" fetchpriority="high" />
   </div>
 
   <div class="hero-meta">
@@ -201,12 +203,26 @@
       </div>
     </div>
     <div class="col-5">
-      <div class="reveal"><div class="photo-frame">
-        <div class="photo has-media">
-          <img src="photos/Plugverse_picture.jpeg" alt="Plugverse brand: PLUG IN. guitar plug visual" />
+      <div class="reveal">
+        <!-- Plugverse app mockup card — drop a screenshot at photos/plugverse_app_mockup.jpg or video/plugverse_app_mockup.mp4 -->
+        <div class="mockup-card">
+          <div class="mockup-bar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="url">plugverse.app</span>
+          </div>
+          <div class="mockup-body">
+            <video autoplay muted loop playsinline preload="metadata" poster="photos/Plugverse_picture.jpeg">
+              <source src="videos/plugverse_ui.mp4" type="video/mp4" />
+            </video>
+          </div>
         </div>
-        <div class="caption-shard glass-light">Plugverse / brand / 2026</div>
-      </div></div>
+        <div style="margin-top: 1.6rem;"><div class="photo-frame">
+          <div class="photo has-media">
+            <img src="photos/Plugverse_picture.jpeg" alt="Plugverse brand: PLUG IN. guitar plug visual" loading="lazy" />
+          </div>
+          <div class="caption-shard glass-light">Plugverse / brand / 2026</div>
+        </div></div>
+      </div>
     </div>
   </div>
 </section>
@@ -220,7 +236,7 @@
 <!-- Drag-able gallery section -->
 <section class="drag-section">
   <div class="drag-bg">
-    <img src="photos/front-page-hero.jpg" alt="Cooper at Carmel California coast" />
+    <img src="photos/front-page-hero.jpg" alt="Cooper at Carmel California coast" loading="lazy" />
   </div>
   <div style="padding: 0 2.4rem;">
     <div class="grid">
@@ -233,23 +249,18 @@
     </div>
     <div id="drag-gallery" class="drag-gallery" data-cursor="DRAG">
       <div class="drag-track" id="dragTrack">
-        <div class="drag-card"><img src="photos/Plugverse_picture.jpeg" alt="Plugverse brand" /><div class="card-grain"></div><div class="card-meta"><span class="title">Plugverse</span><span class="year">2024</span></div></div>
-        <div class="drag-card"><img src="photos/hero.jpeg" alt="Cooper pitching at Innovate Carolina" /><div class="card-grain"></div><div class="card-meta"><span class="title">Pitching</span><span class="year">2026</span></div></div>
-        <div class="drag-card"><img src="photos/luby_pic_with_check.jpeg" alt="Luby Pitch Competition $20k win" /><div class="card-grain"></div><div class="card-meta"><span class="title">Luby Win</span><span class="year">2026</span></div></div>
-        <div class="drag-card"><img src="photos/rubber_band_full_pic.jpeg" alt="Rubber Band full lineup" /><div class="card-grain"></div><div class="card-meta"><span class="title">Rubber Band</span><span class="year">2025</span></div></div>
-        <div class="drag-card"><img src="photos/bobs_bar_gig_pic.jpeg" alt="Cooper at Bob's Bar" /><div class="card-grain"></div><div class="card-meta"><span class="title">Bob's Bar</span><span class="year">2026</span></div></div>
-        <div class="drag-card"><img src="photos/solo_cooper_bass.jpeg" alt="Cooper performing under stage lights" /><div class="card-grain"></div><div class="card-meta"><span class="title">Stage Lit</span><span class="year">2026</span></div></div>
-        <div class="drag-card"><img src="photos/guitar_portrait_playing.jpeg" alt="Cooper Delo with bass" /><div class="card-grain"></div><div class="card-meta"><span class="title">Cooper Delo</span><span class="year">2026</span></div></div>
-        <div class="drag-card"><img src="photos/shirtless_guitar.jpeg" alt="Cooper at outdoor day gig" /><div class="card-grain"></div><div class="card-meta"><span class="title">Day Gig</span><span class="year">2025</span></div></div>
-        <!-- Duplicate set for seamless infinite loop -->
-        <div class="drag-card" aria-hidden="true"><img src="photos/Plugverse_picture.jpeg" alt="" /><div class="card-grain"></div><div class="card-meta"><span class="title">Plugverse</span><span class="year">2024</span></div></div>
-        <div class="drag-card" aria-hidden="true"><img src="photos/hero.jpeg" alt="" /><div class="card-grain"></div><div class="card-meta"><span class="title">Pitching</span><span class="year">2026</span></div></div>
-        <div class="drag-card" aria-hidden="true"><img src="photos/luby_pic_with_check.jpeg" alt="" /><div class="card-grain"></div><div class="card-meta"><span class="title">Luby Win</span><span class="year">2026</span></div></div>
-        <div class="drag-card" aria-hidden="true"><img src="photos/rubber_band_full_pic.jpeg" alt="" /><div class="card-grain"></div><div class="card-meta"><span class="title">Rubber Band</span><span class="year">2025</span></div></div>
-        <div class="drag-card" aria-hidden="true"><img src="photos/bobs_bar_gig_pic.jpeg" alt="" /><div class="card-grain"></div><div class="card-meta"><span class="title">Bob's Bar</span><span class="year">2026</span></div></div>
-        <div class="drag-card" aria-hidden="true"><img src="photos/solo_cooper_bass.jpeg" alt="" /><div class="card-grain"></div><div class="card-meta"><span class="title">Stage Lit</span><span class="year">2026</span></div></div>
-        <div class="drag-card" aria-hidden="true"><img src="photos/guitar_portrait_playing.jpeg" alt="" /><div class="card-grain"></div><div class="card-meta"><span class="title">Cooper Delo</span><span class="year">2026</span></div></div>
-        <div class="drag-card" aria-hidden="true"><img src="photos/shirtless_guitar.jpeg" alt="" /><div class="card-grain"></div><div class="card-meta"><span class="title">Day Gig</span><span class="year">2025</span></div></div>
+        <!-- Note: do NOT duplicate cards in HTML — shell.js clones them at runtime for seamless looping. -->
+        <!-- Optional video card slot: change <img> to <video autoplay muted loop playsinline> + add class="is-video" to .drag-card -->
+        <div class="drag-card"><img src="photos/Plugverse_picture.jpeg" alt="Plugverse brand" loading="lazy" /><div class="card-grain"></div><div class="card-meta"><span class="title">Plugverse</span><span class="year">2024</span></div></div>
+        <div class="drag-card"><img src="photos/hero.jpeg" alt="Cooper pitching at Innovate Carolina" loading="lazy" /><div class="card-grain"></div><div class="card-meta"><span class="title">Pitching</span><span class="year">2026</span></div></div>
+        <div class="drag-card is-video"><video autoplay muted loop playsinline preload="metadata" poster="photos/rubber_band_full_pic.jpeg"><source src="videos/whole%20band%20rubber%20vid.MOV" type="video/mp4" /></video><img src="photos/rubber_band_full_pic.jpeg" alt="Rubber Band live clip" loading="lazy" /><div class="card-grain"></div><div class="card-meta"><span class="title">Live Clip</span><span class="year">2025</span></div></div>
+        <div class="drag-card"><img src="photos/luby_pic_with_check.jpeg" alt="Luby Pitch Competition $20k win" loading="lazy" /><div class="card-grain"></div><div class="card-meta"><span class="title">Luby Win</span><span class="year">2026</span></div></div>
+        <div class="drag-card"><img src="photos/rubber_band_full_pic.jpeg" alt="Rubber Band full lineup" loading="lazy" /><div class="card-grain"></div><div class="card-meta"><span class="title">Rubber Band</span><span class="year">2025</span></div></div>
+        <div class="drag-card"><img src="photos/bobs_bar_gig_pic.jpeg" alt="Cooper at Bob's Bar" loading="lazy" /><div class="card-grain"></div><div class="card-meta"><span class="title">Bob's Bar</span><span class="year">2026</span></div></div>
+        <div class="drag-card is-video"><video autoplay muted loop playsinline preload="metadata" poster="photos/Plugverse_picture.jpeg"><source src="videos/plugverse_ui.mp4" type="video/mp4" /></video><img src="photos/Plugverse_picture.jpeg" alt="Plugverse UI demo" loading="lazy" /><div class="card-grain"></div><div class="card-meta"><span class="title">App Demo</span><span class="year">2026</span></div></div>
+        <div class="drag-card"><img src="photos/solo_cooper_bass.jpeg" alt="Cooper performing under stage lights" loading="lazy" /><div class="card-grain"></div><div class="card-meta"><span class="title">Stage Lit</span><span class="year">2026</span></div></div>
+        <div class="drag-card"><img src="photos/guitar_portrait_playing.jpeg" alt="Cooper Delo with bass" loading="lazy" /><div class="card-grain"></div><div class="card-meta"><span class="title">Cooper Delo</span><span class="year">2026</span></div></div>
+        <div class="drag-card"><img src="photos/shirtless_guitar.jpeg" alt="Cooper at outdoor day gig" loading="lazy" /><div class="card-grain"></div><div class="card-meta"><span class="title">Day Gig</span><span class="year">2025</span></div></div>
       </div>
       <div class="drag-hint">Auto scrolling. Hover to slow. Drag to take control.</div>
     </div>
@@ -299,7 +310,7 @@
     <div class="col-5">
       <div class="reveal"><div class="photo-frame">
         <div class="photo has-media portrait-tall" data-world="rubber">
-          <img src="photos/rubber_band_full_pic.jpeg" alt="Rubber Band performing outdoors, full lineup" />
+          <img src="photos/rubber_band_full_pic.jpeg" alt="Rubber Band performing outdoors, full lineup" loading="lazy" />
         </div>
         <div class="caption-shard">Full lineup / open-air gig / 2025</div>
       </div></div>
@@ -368,7 +379,7 @@
     <div class="col-5">
       <div class="reveal"><div class="photo-frame">
         <div class="photo has-media portrait-tall" data-world="cooper">
-          <img src="photos/guitar_portrait_playing.jpeg" alt="Cooper Delo with bass, motion blur stage" />
+          <img src="photos/guitar_portrait_playing.jpeg" alt="Cooper Delo with bass, motion blur stage" loading="lazy" />
         </div>
         <div class="caption-shard">Cooper Delo / 2026</div>
       </div></div>
@@ -473,9 +484,8 @@
 </div>
 <div class="toast" id="toast">Copied to clipboard</div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="shell.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" defer></script>
+<script src="shell.js" defer></script>
 </body>
 </html>
-      <div class="meta">2024 to now</div>
       
