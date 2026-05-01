@@ -13,30 +13,58 @@
    - Hero video loader
    =========================================================== */
 
-/* ── 1. Smart loader ─────────────────────────────────────── */
+/* ── 1. Smart loader (with debug logs) ───────────────────── */
+const DEBUG = true;
+const dlog = (...args) => { if (DEBUG) console.log("[shell]", ...args); };
 (function () {
+  const t0 = performance.now();
+  dlog("loader: script executed at", t0.toFixed(0) + "ms", "readyState=" + document.readyState);
   const loader = document.getElementById("loader");
-  if (!loader) return;
+  if (!loader) { dlog("loader: no #loader element on this page"); return; }
   let dismissed = false;
-  function dismiss() {
-    if (dismissed) return;
+  function dismiss(reason) {
+    if (dismissed) { dlog("loader: dismiss() ignored —", reason, "(already dismissed)"); return; }
     dismissed = true;
+    const elapsed = (performance.now() - t0).toFixed(0);
+    dlog("loader: DISMISSING after", elapsed + "ms —", reason);
     loader.classList.add("done");
-    setTimeout(() => { loader.style.display = "none"; }, 1300);
+    setTimeout(() => {
+      loader.style.display = "none";
+      dlog("loader: display:none applied (animation complete)");
+    }, 1300);
   }
   // Max wait: 2.2s regardless of assets
-  const maxTimer = setTimeout(dismiss, 2200);
-  // Fast path: fire as soon as window is fully loaded + 200ms
+  const maxTimer = setTimeout(() => dismiss("max-wait timer (2.2s)"), 2200);
+  // Fast path: window.load + 200ms
   window.addEventListener("load", () => {
+    const elapsed = (performance.now() - t0).toFixed(0);
+    dlog("loader: window.load fired at", elapsed + "ms");
     clearTimeout(maxTimer);
-    setTimeout(dismiss, 200);
+    setTimeout(() => dismiss("window.load + 200ms"), 200);
   });
-  // Bonus: also watch for hero image to load
+  // Bonus: also watch for hero image
   const heroImg = document.querySelector(".hero-bg img");
   if (heroImg) {
-    if (heroImg.complete) { clearTimeout(maxTimer); setTimeout(dismiss, 300); }
-    else heroImg.addEventListener("load", () => { clearTimeout(maxTimer); setTimeout(dismiss, 300); }, { once: true });
+    if (heroImg.complete) {
+      dlog("loader: hero image was already complete at script start");
+      clearTimeout(maxTimer);
+      setTimeout(() => dismiss("hero image already complete"), 300);
+    } else {
+      heroImg.addEventListener("load", () => {
+        const elapsed = (performance.now() - t0).toFixed(0);
+        dlog("loader: hero image loaded at", elapsed + "ms");
+        clearTimeout(maxTimer);
+        setTimeout(() => dismiss("hero image load"), 300);
+      }, { once: true });
+      heroImg.addEventListener("error", () => dlog("loader: hero image FAILED to load"));
+    }
+  } else {
+    dlog("loader: no .hero-bg img on this page");
   }
+  // Catch errors that might block things
+  window.addEventListener("error", (e) => {
+    dlog("WINDOW ERROR:", e.message, "@", e.filename + ":" + e.lineno);
+  });
 })();
 
 /* ── 2. Custom cursor ────────────────────────────────────── */
@@ -589,24 +617,43 @@
   loop();
 })();
 
-/* ── 12. Page transition veil ─────────────────────────────── */
+/* ── 12. Page transition veil — cinematic flash ─────────── */
 (function () {
   const veil = document.getElementById("veil"); if (!veil) return;
   const label = veil.querySelector(".label");
   const internal = (href) => /^[a-z0-9\-]+\.html(\#.*)?$/i.test(href) || href === "/" || href.startsWith("./");
+
+  // Inject extra layers for the multi-stage flash if not present
+  if (!veil.querySelector(".veil-flash")) {
+    const flash = document.createElement("div"); flash.className = "veil-flash"; veil.appendChild(flash);
+    const slabs = document.createElement("div"); slabs.className = "veil-slabs";
+    slabs.innerHTML = '<span></span><span></span><span></span><span></span><span></span>';
+    veil.appendChild(slabs);
+  }
+
   document.querySelectorAll("a").forEach((a) => {
     const href = a.getAttribute("href"); if (!href || !internal(href) || a.dataset.noTransition) return;
     a.addEventListener("click", (e) => {
       e.preventDefault();
-      label.textContent = (a.dataset.transition || a.textContent || "").trim().toUpperCase();
+      const text = (a.dataset.transition || a.textContent || "").trim().toUpperCase();
+      dlog("transition: navigating to", href, "label=" + text);
+      label.textContent = text;
+      veil.classList.remove("out");
       veil.classList.add("in");
-      setTimeout(() => { window.location.href = href; }, 700);
+      // Navigate after the slab animation completes
+      setTimeout(() => { window.location.href = href; }, 750);
     });
   });
-  window.addEventListener("pageshow", () => {
-    veil.classList.remove("in"); veil.classList.add("out");
-    setTimeout(() => veil.classList.remove("out"), 800);
-  });
+
+  // On arrival: play the exit flash
+  function playExit() {
+    veil.classList.remove("in");
+    veil.classList.add("out");
+    setTimeout(() => veil.classList.remove("out"), 1100);
+  }
+  window.addEventListener("pageshow", playExit);
+  // Belt-and-suspenders if pageshow doesn't fire
+  if (document.readyState !== "loading") setTimeout(playExit, 50);
 })();
 
 /* ── 13. Contact modal ───────────────────────────────────── */
