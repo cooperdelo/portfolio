@@ -29,8 +29,9 @@ img, video, iframe { max-width: 100%; }
 a, button { cursor: none; color: inherit; text-decoration: none; background: transparent; border: 0; font: inherit; }
 ::selection { background: var(--rust); color: var(--bg); }
 
-/* Three.js canvas (scroll-locked morphing scene) */
+/* Three.js canvas — hidden (was distracting) */
 .scene-canvas {
+  display: none !important;
   position: fixed; inset: 0; z-index: 0; pointer-events: none;
   width: 100vw; height: 100vh;
 }
@@ -909,11 +910,9 @@ body.has-page-bg .ambient { display: none; }
   height: 580px;
   width: 100%;
   overflow: hidden;
-  cursor: grab;
   user-select: none;
   margin-top: 3rem;
 }
-.drag-gallery.grabbing { cursor: grabbing; }
 
 .drag-track {
   position: absolute;
