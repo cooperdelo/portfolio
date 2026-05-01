@@ -65,6 +65,33 @@ main, footer { position: relative; z-index: 1; }
   font-size: 0.72rem; color: var(--muted);
 }
 
+/* Loader */
+.loader {
+  position: fixed; inset: 0; z-index: 8000;
+  background: var(--bg); color: var(--ink);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 2rem; transition: transform 1.4s cubic-bezier(0.85,0,0.15,1), opacity 0.4s 1s;
+}
+.loader.done { transform: translateY(-100%); }
+.loader .label {
+  font-family: "Geist Mono", monospace; text-transform: uppercase;
+  letter-spacing: 0.3em; font-size: 0.78rem; color: var(--muted);
+}
+.loader .name {
+  font-family: "Anton", Impact, sans-serif;
+  font-size: clamp(3rem, 11vw, 11rem); line-height: 0.85; text-transform: uppercase; letter-spacing: -0.01em;
+  text-align: center;
+}
+.loader .progress {
+  width: 220px; height: 1px; background: rgba(244,239,230,0.18); position: relative; overflow: hidden;
+}
+.loader .progress::before {
+  content: ""; position: absolute; inset: 0; background: var(--rust);
+  transform: scaleX(0); transform-origin: left;
+  animation: load 1.6s cubic-bezier(0.85,0,0.15,1) forwards;
+}
+@keyframes load { to { transform: scaleX(1); } }
+
 /* Custom cursor */
 .cursor {
   position: fixed; width: 8px; height: 8px; border-radius: 50%;
@@ -931,6 +958,81 @@ body.has-page-bg .ambient { display: none; }
   position: absolute; inset: 0; z-index: 4;
   opacity: 0.18; mix-blend-mode: overlay; pointer-events: none;
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' seed='2'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+}
+
+/* ── Lineup cards (Rubber Band) ── */
+.lineup-stage {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  border-top: 1px solid rgba(244,239,230,0.14);
+  margin-top: 2.5rem;
+}
+@media (max-width: 800px) {
+  .lineup-stage { grid-template-columns: repeat(2, 1fr); }
+  .lineup-stage .member-card:nth-child(5) { border-right: none; }
+}
+.member-card {
+  padding: 3rem 1.5rem 2.5rem;
+  border-right: 1px solid rgba(244,239,230,0.1);
+  position: relative; overflow: hidden;
+  transition: background 0.5s ease;
+}
+.member-card:last-child { border-right: none; }
+.member-card::after {
+  content: "";
+  position: absolute; bottom: 0; left: 0; right: 0; height: 2px;
+  background: var(--crimson);
+  transform: scaleX(0); transform-origin: left;
+  transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.member-card:hover::after { transform: scaleX(1); }
+.member-card::before {
+  content: "";
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 50% 100%, rgba(200,16,46,0.12) 0%, transparent 70%);
+  opacity: 0; transition: opacity 0.5s ease;
+  pointer-events: none;
+}
+.member-card:hover::before { opacity: 1; }
+.member-card .member-role {
+  font-family: "Geist Mono", monospace; text-transform: uppercase;
+  letter-spacing: 0.25em; font-size: 0.66rem; color: var(--crimson);
+  margin-bottom: 1.2rem;
+}
+.member-card .member-name {
+  font-family: "Anton", Impact, sans-serif;
+  font-size: clamp(2.4rem, 4vw, 4.2rem); line-height: 0.9;
+  text-transform: uppercase; color: var(--ink);
+  transition: color 0.3s;
+}
+.member-card:hover .member-name { color: #fff; }
+.member-card .member-detail {
+  font-family: "Geist Mono", monospace; font-size: 0.7rem;
+  color: var(--muted); margin-top: 1rem; letter-spacing: 0.1em;
+}
+.member-card.is-you .member-name { color: var(--crimson); }
+.member-card.is-you:hover .member-name { color: var(--crimson); }
+
+/* ── Spotify setlist embed ── */
+.setlist-wrap {
+  margin-top: 3rem;
+  perspective: 1200px;
+}
+.setlist-tilt {
+  transform: rotateX(4deg) rotateY(-2deg) scale(0.98);
+  transform-style: preserve-3d;
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  border-radius: 12px; overflow: hidden;
+  box-shadow:
+    0 40px 80px rgba(0,0,0,0.55),
+    0 0 0 1px rgba(244,239,230,0.08),
+    inset 0 1px 0 rgba(255,255,255,0.06);
+}
+.setlist-tilt:hover {
+  transform: rotateX(0deg) rotateY(0deg) scale(1);
+}
+.setlist-tilt iframe {
+  display: block; width: 100%; border: none;
 }
 .drag-card .card-meta {
   position: absolute; left: 1rem; bott
