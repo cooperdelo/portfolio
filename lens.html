@@ -345,34 +345,69 @@
   </div>
 </section>
 
-<!-- 05 — Apple Music rotation -->
+<!-- 05 — In rotation: live curated playlist + monthly Replay archive -->
 <section class="block">
   <div class="grid">
     <div class="col-12 reveal">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
         <span class="plate glass"><span class="num">05</span><span class="eyebrow" style="margin:0;">In rotation</span></span>
-        <span class="eyebrow">Apple Music · Replay</span>
+        <span class="eyebrow">Apple Music · live + archive</span>
       </div>
       <h2 class="section-poster">What I<br/><span class="accent">listen to.</span></h2>
-      <p class="body-prose" style="margin-top: 1rem; max-width: 38rem;">A live feed of what's actually on. Apple Music Replay updates this automatically — the songs that survive the year, in the order they were played.</p>
+      <p class="body-prose" style="margin-top: 1rem; max-width: 42rem;">Two views. The first is a curated playlist of what's currently on. The second is the monthly Replay archive — Apple's algorithmic snapshot of the songs I actually played that month.</p>
     </div>
   </div>
+
+  <!-- Live playlist — embedded curated rotation -->
   <div class="grid" style="margin-top: 1.5rem;">
     <div class="col-12 reveal">
+      <span class="eyebrow" style="display: block; margin-bottom: 0.8rem;">Now playing</span>
       <div class="rotation-wrap">
         <div class="rotation-tilt">
-          <!-- TODO: paste your Apple Music Replay playlist embed URL.
-               How: open Apple Music → Listen Now → scroll to "Replay" →
-               share → "Copy Link". The URL looks like:
-                 https://music.apple.com/us/playlist/replay-2025/pl.u-XXXXXXXXX
-               Swap that into the embed URL below (just change "music.apple.com" to "embed.music.apple.com"). -->
+          <!-- TODO: paste your curated public playlist URL.
+               How: build a public Apple Music playlist (call it "Rotation 2026" or similar) →
+               Share → Copy Link. URL looks like:
+                 https://music.apple.com/us/playlist/rotation-2026/pl.u-XXXXXXXX
+               Convert to embed by adding "embed." after "https://" — that goes in the src below. -->
           <iframe
             allow="autoplay *; encrypted-media *; fullscreen *; clipboard-write"
             frameborder="0" height="450"
             sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation allow-popups-to-escape-sandbox"
-            src="https://embed.music.apple.com/us/playlist/replay-2025/pl.u-PLACEHOLDER">
+            src="https://embed.music.apple.com/us/playlist/rotation-2026/pl.u-PLACEHOLDER">
           </iframe>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Monthly Replay archive — image drops -->
+  <div class="grid" style="margin-top: 3rem;">
+    <div class="col-12 reveal">
+      <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 1rem;">
+        <span class="eyebrow">Replay archive</span>
+        <span class="eyebrow" style="color: var(--rust);">Updated monthly</span>
+      </div>
+      <p class="body-prose" style="max-width: 42rem; margin-bottom: 1.4rem;">Each month, the Apple Music Replay share card. Snapshot of what actually got played.</p>
+      <div class="replay-grid">
+        <!-- TODO: each month, save the Apple Music Replay share image as
+             photos/replay/replay-YYYY-MM.jpg and uncomment / update the matching tile.
+             The newest month goes first. -->
+        <figure class="replay-card">
+          <img src="photos/replay/replay-2026-04.jpg" alt="April 2026 Replay" onerror="this.parentElement.classList.add('placeholder')" />
+          <figcaption>April 2026</figcaption>
+        </figure>
+        <figure class="replay-card">
+          <img src="photos/replay/replay-2026-03.jpg" alt="March 2026 Replay" onerror="this.parentElement.classList.add('placeholder')" />
+          <figcaption>March 2026</figcaption>
+        </figure>
+        <figure class="replay-card">
+          <img src="photos/replay/replay-2026-02.jpg" alt="February 2026 Replay" onerror="this.parentElement.classList.add('placeholder')" />
+          <figcaption>February 2026</figcaption>
+        </figure>
+        <figure class="replay-card">
+          <img src="photos/replay/replay-2026-01.jpg" alt="January 2026 Replay" onerror="this.parentElement.classList.add('placeholder')" />
+          <figcaption>January 2026</figcaption>
+        </figure>
       </div>
     </div>
   </div>

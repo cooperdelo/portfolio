@@ -1064,6 +1064,10 @@ body.has-page-bg .ambient { display: none; }
   perspective: 1800px;
   margin-top: 1.5rem;
 }
+.gear-card.gear-card-wide { grid-column: span 2; }
+@media (max-width: 900px) {
+  .gear-card.gear-card-wide { grid-column: span 1; }
+}
 .gear-card {
   position: relative;
   background: rgba(244,239,230,0.04);
@@ -1340,6 +1344,61 @@ body.has-page-bg .ambient { display: none; }
 .rotation-tilt iframe {
   display: block; width: 100%; border: none;
   background: #0a0908;
+}
+
+/* ───────────────────────────────────────────────────────
+   REPLAY ARCHIVE — monthly image drops, glass tiles
+   ─────────────────────────────────────────────────────── */
+.replay-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.9rem;
+  margin-top: 1rem;
+}
+.replay-card {
+  position: relative;
+  border-radius: 14px;
+  overflow: hidden;
+  background: rgba(244,239,230,0.04);
+  border: 1px solid rgba(244,239,230,0.08);
+  transition: transform 0.5s cubic-bezier(0.22,1,0.36,1), border-color 0.4s, box-shadow 0.5s;
+}
+.replay-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(255,77,46,0.4);
+  box-shadow: 0 30px 60px rgba(0,0,0,0.5), 0 0 50px rgba(255,77,46,0.1);
+}
+.replay-card img {
+  display: block; width: 100%; aspect-ratio: 1/1;
+  object-fit: cover;
+  transition: transform 0.7s, filter 0.4s;
+  filter: saturate(0.95);
+}
+.replay-card:hover img { transform: scale(1.04); filter: saturate(1); }
+.replay-card figcaption {
+  padding: 0.7rem 0.9rem;
+  font-family: "Geist Mono", monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  font-size: 0.6rem;
+  color: var(--ink-2);
+  border-top: 1px solid rgba(244,239,230,0.06);
+}
+.replay-card.placeholder img { display: none; }
+.replay-card.placeholder::before {
+  content: "Awaiting drop";
+  display: flex; align-items: center; justify-content: center;
+  aspect-ratio: 1/1;
+  font-family: "Geist Mono", monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: linear-gradient(135deg, rgba(255,77,46,0.04), rgba(10,9,8,0.6));
+  border-bottom: 1px solid rgba(244,239,230,0.06);
+}
+@media (max-width: 900px) {
+  .replay-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
 /* Page-head static photo (used on Lens hero) */
