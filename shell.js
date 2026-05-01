@@ -174,7 +174,7 @@
 })();
 
 /* ----------------------------
-   Three.js morphing scene
+   Three.js morphing scene — section-aware
 ---------------------------- */
 (function () {
   if (!window.THREE) return;
@@ -189,33 +189,57 @@
   const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 100);
   camera.position.z = 5;
 
-  // Three large, distorted icosahedrons drift behind the content
-  const palette = [
-    new THREE.Color(0xFF4D2E),
-    new THREE.Color(0x6B3FA0),
-    new THREE.Color(0xC9BEE6),
-    new THREE.Color(0xB2E3E1)
-  ];
+  // Per-world configs: [color0, color1, color2, opacity, glowColor, glowOpacity, scale]
+  const WORLDS = {
+    default:         { c: [0xFF4D2E, 0xFF4D2E, 0xC8102E], op: 0.10, gc: 0xFF4D2E, go: 0.04, sc: 1.0 },
+    "world-plugverse":{ c: [0xFF4D2E, 0xC8102E, 0xFF4D2E], op: 0.13, gc: 0xC8102E, go: 0.06, sc: 1.1 },
+    "world-rubber":  { c: [0xC8102E, 0x6B3FA0, 0xC8102E], op: 0.11, gc: 0x6B3FA0, go: 0.05, sc: 0.95 },
+    "world-cooper":  { c: [0xF2C1D1, 0xC9BEE6, 0xB2E3E1], op: 0.10, gc: 0xC9BEE6, go: 0.04, sc: 1.05 },
+    "world-builder": { c: [0xF2EDE4, 0xC2B7A4, 0xF2EDE4], op: 0.06, gc: 0xF2EDE4, go: 0.02, sc: 0.85 },
+    "world-athletic":{ c: [0x2C4F3A, 0x5A9DC4, 0x2C4F3A], op: 0.09, gc: 0x5A9DC4, go: 0.04, sc: 1.0 },
+  };
+
+  let target = { ...WORLDS.default };
+  let current = {
+    c: WORLDS.default.c.map(h => new THREE.Color(h)),
+    op: WORLDS.default.op,
+    gc: new THREE.Color(WORLDS.default.gc),
+    go: WORLDS.default.go,
+    sc: WORLDS.default.sc,
+  };
+
+  // Watch which section world is most in view
+  const worldSections = document.querySelectorAll("[class*='world-']");
+  if (worldSections.length) {
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (!e.isIntersecting) return;
+        const cls = [...e.target.classList].find(c => c.startsWith("world-"));
+        target = WORLDS[cls] || WORLDS.default;
+      });
+    }, { threshold: 0.35 });
+    worldSections.forEach(s => io.observe(s));
+  }
 
   const meshes = [];
+  const BASE_POS = [[-2.8, 0.4, -2], [0, -0.4, -3], [2.8, 0.4, -4]];
   for (let i = 0; i < 3; i++) {
     const geo = new THREE.IcosahedronGeometry(1.4, 32);
     const mat = new THREE.MeshBasicMaterial({
-      color: palette[i % palette.length],
+      color: new THREE.Color(WORLDS.default.c[i]),
       transparent: true,
-      opacity: 0.55,
+      opacity: WORLDS.default.op,
       wireframe: true
     });
     const m = new THREE.Mesh(geo, mat);
-    m.position.set((i - 1) * 2.8, (i % 2 === 0 ? 0.4 : -0.4), -2 - i);
-    m.userData.basePos = m.position.clone();
+    m.position.set(...BASE_POS[i]);
+    m.userData.base = { x: BASE_POS[i][0], y: BASE_POS[i][1] };
     scene.add(m);
     meshes.push(m);
   }
 
-  // Soft glow plane (gradient sphere)
   const glowGeo = new THREE.SphereGeometry(2.4, 32, 32);
-  const glowMat = new THREE.MeshBasicMaterial({ color: 0xFF4D2E, transparent: true, opacity: 0.08 });
+  const glowMat = new THREE.MeshBasicMaterial({ color: 0xFF4D2E, transparent: true, opacity: 0.04 });
   const glow = new THREE.Mesh(glowGeo, glowMat);
   glow.position.set(0, 0, -3);
   scene.add(glow);
@@ -226,42 +250,36 @@
     my = -((e.clientY / window.innerHeight) * 2 - 1);
   });
 
-  let scrollY = 0;
-  window.addEventListener("scroll", () => { scrollY = window.scrollY; });
-
-  function colorForScroll(p) {
-    // p is 0..1 across page
-    const stops = [0xFF4D2E, 0xC8102E, 0x6B3FA0, 0xC9BEE6, 0xF2EDE4];
-    const idx = Math.min(stops.length - 2, Math.floor(p * (stops.length - 1)));
-    const t = (p * (stops.length - 1)) - idx;
-    const a = new THREE.Color(stops[idx]);
-    const b = new THREE.Color(stops[idx + 1]);
-    return a.lerp(b, t);
-  }
+  const lerp = (a, b, t) => a + (b - a) * t;
 
   function animate(time) {
-    sx += (mx - sx) * 0.05;
-    sy += (my - sy) * 0.05;
-    const t = time * 0.0004;
+    const t = time * 0.0003;
+    sx += (mx - sx) * 0.04;
+    sy += (my - sy) * 0.04;
 
-    const docH = document.documentElement.scrollHeight - window.innerHeight;
-    const p = docH > 0 ? Math.min(1, scrollY / docH) : 0;
-    const c = colorForScroll(p);
+    // Smoothly interpolate toward target world
+    const speed = 0.018;
+    current.op  = lerp(current.op,  target.op,  speed);
+    current.go  = lerp(current.go,  target.go,  speed);
+    current.sc  = lerp(current.sc,  target.sc,  speed);
+    current.gc.lerp(new THREE.Color(target.gc), speed);
+    current.c.forEach((col, i) => col.lerp(new THREE.Color(target.c[i]), speed));
 
     meshes.forEach((m, i) => {
-      m.rotation.x = t * (0.4 + i * 0.1);
-      m.rotation.y = t * (0.6 + i * 0.08);
-      m.position.x = m.userData.basePos.x + sx * 0.4;
-      m.position.y = m.userData.basePos.y + sy * 0.4 + Math.sin(t * 2 + i) * 0.2;
-      const hue = c.clone().lerp(palette[i % palette.length], 0.5);
-      m.material.color.copy(hue);
+      m.rotation.x = t * (0.35 + i * 0.09);
+      m.rotation.y = t * (0.55 + i * 0.07);
+      m.position.x = m.userData.base.x + sx * 0.35;
+      m.position.y = m.userData.base.y + sy * 0.35 + Math.sin(t * 1.8 + i) * 0.18;
+      m.scale.setScalar(current.sc);
+      m.material.color.copy(current.c[i]);
+      m.material.opacity = current.op;
     });
 
-    glow.material.color.copy(c);
-    glow.material.opacity = 0.08 + p * 0.06;
+    glow.material.color.copy(current.gc);
+    glow.material.opacity = current.go;
 
-    camera.position.x += (sx * 0.3 - camera.position.x) * 0.04;
-    camera.position.y += (sy * 0.3 - camera.position.y) * 0.04;
+    camera.position.x += (sx * 0.25 - camera.position.x) * 0.04;
+    camera.position.y += (sy * 0.25 - camera.position.y) * 0.04;
     camera.lookAt(0, 0, 0);
 
     renderer.render(scene, camera);
