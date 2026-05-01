@@ -208,7 +208,7 @@ const dlog = (...args) => { if (DEBUG) console.log("[shell]", ...args); };
   const navDefs = [
     { href: "index.html",       label: "Home",        tr: "HOME"      },
     { href: "plugverse.html",   label: "Plugverse",   tr: "PLUGVERSE" },
-    { href: "rubber-band.html", label: "Rubber Band", tr: "MUSIC"     },
+    { href: "rubber-band.html", label: "Music",       tr: "MUSIC"     },
     { href: "builder.html",     label: "Builder",     tr: "BUILDER"   },
     { href: "athletic.html",    label: "Athletic",    tr: "ATHLETIC"  },
     { href: "lens.html",        label: "Lens",        tr: "LENS"      },
