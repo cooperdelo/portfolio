@@ -1053,6 +1053,421 @@ body.has-page-bg .ambient { display: none; }
   display: block; width: 100%; border: none;
 }
 
+/* ───────────────────────────────────────────────────────
+   GEAR SHOWCASE — used on Lens (camera kit) and
+   Rubber Band (music rig). Cards float in 3D space.
+   ─────────────────────────────────────────────────────── */
+.gear-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  perspective: 1800px;
+  margin-top: 1.5rem;
+}
+.gear-card {
+  position: relative;
+  background: rgba(244,239,230,0.04);
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  border: 1px solid rgba(244,239,230,0.1);
+  border-radius: 18px;
+  padding: 1.4rem;
+  transform-style: preserve-3d;
+  transition:
+    transform 0.7s cubic-bezier(0.22,1,0.36,1),
+    box-shadow 0.6s, border-color 0.4s, background 0.4s;
+  box-shadow:
+    0 24px 60px rgba(0,0,0,0.45),
+    inset 0 1px 0 rgba(244,239,230,0.06);
+  overflow: hidden;
+}
+.gear-card::before {
+  /* Hairline grid backdrop for the "blueprint" feel */
+  content: "";
+  position: absolute; inset: 0; z-index: 0;
+  background-image:
+    linear-gradient(rgba(244,239,230,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(244,239,230,0.025) 1px, transparent 1px);
+  background-size: 24px 24px;
+  pointer-events: none;
+  opacity: 0.6;
+}
+.gear-card > * { position: relative; z-index: 1; }
+.gear-card:hover {
+  transform: translateZ(20px) rotateX(-2deg) rotateY(2deg);
+  border-color: rgba(255,77,46,0.35);
+  background: rgba(244,239,230,0.06);
+  box-shadow:
+    0 40px 80px rgba(0,0,0,0.6),
+    0 0 60px rgba(255,77,46,0.18),
+    inset 0 1px 0 rgba(244,239,230,0.1);
+}
+.gear-card .gear-img {
+  position: relative;
+  width: 100%; aspect-ratio: 4/3;
+  background: linear-gradient(135deg, #1a1815 0%, #0a0908 100%);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 1.2rem;
+  border: 1px solid rgba(244,239,230,0.08);
+}
+.gear-card .gear-img img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  transition: transform 0.9s cubic-bezier(0.22,1,0.36,1);
+}
+.gear-card:hover .gear-img img {
+  transform: scale(1.05);
+}
+.gear-card .gear-img::after {
+  /* Top-left rust glow on hover */
+  content: ""; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 0% 0%, rgba(255,77,46,0.15), transparent 60%);
+  opacity: 0; transition: opacity 0.5s;
+  pointer-events: none;
+}
+.gear-card:hover .gear-img::after { opacity: 1; }
+.gear-card .gear-badge {
+  position: absolute; top: 0.8rem; left: 0.8rem;
+  font-family: "Geist Mono", monospace;
+  font-size: 0.58rem; letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--rust);
+  background: rgba(10,9,8,0.7);
+  border: 1px solid rgba(255,77,46,0.4);
+  padding: 0.3rem 0.55rem; border-radius: 4px;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 2;
+}
+.gear-card h4 {
+  font-family: "Anton", Impact, sans-serif;
+  font-size: clamp(1.5rem, 2.4vw, 2rem); line-height: 1;
+  text-transform: uppercase; letter-spacing: -0.005em;
+  margin-bottom: 0.4rem; color: var(--ink);
+}
+.gear-card .gear-desc {
+  font-family: "Fraunces", Georgia, serif;
+  font-style: italic; font-size: 0.95rem;
+  color: var(--ink-2); margin-bottom: 0.9rem;
+  line-height: 1.4;
+}
+.gear-card .gear-specs {
+  list-style: none;
+  font-family: "Geist Mono", monospace;
+  font-size: 0.7rem;
+  border-top: 1px solid rgba(244,239,230,0.08);
+}
+.gear-card .gear-specs li {
+  display: flex; justify-content: space-between; align-items: baseline;
+  padding: 0.55rem 0;
+  border-bottom: 1px solid rgba(244,239,230,0.06);
+  gap: 1rem;
+}
+.gear-card .gear-specs li:last-child { border-bottom: 0; }
+.gear-card .gear-specs .key {
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  font-size: 0.58rem;
+  white-space: nowrap;
+}
+.gear-card .gear-specs .val {
+  color: var(--ink);
+  text-align: right;
+  font-weight: 500;
+  font-size: 0.72rem;
+}
+
+/* ───────────────────────────────────────────────────────
+   TRAVEL GRID — magazine-style place cards with caption
+   ─────────────────────────────────────────────────────── */
+.travel-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-top: 2rem;
+}
+.travel-card {
+  position: relative;
+  aspect-ratio: 4/5;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--bg-2);
+  cursor: none;
+  transition: transform 0.7s cubic-bezier(0.22,1,0.36,1);
+}
+.travel-card:hover { transform: translateY(-6px); }
+.travel-card img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  transition: transform 1.4s cubic-bezier(0.22,1,0.36,1), filter 0.6s;
+  filter: saturate(0.85) contrast(1.04);
+}
+.travel-card:hover img {
+  transform: scale(1.06);
+  filter: saturate(1) contrast(1.1);
+}
+.travel-card::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,0) 35%, rgba(0,0,0,0.85) 100%);
+  pointer-events: none;
+}
+.travel-card .travel-meta {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  padding: 1.1rem 1.2rem;
+  z-index: 2;
+}
+.travel-card .travel-date {
+  font-family: "Geist Mono", monospace;
+  font-size: 0.6rem;
+  color: var(--rust);
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  margin-bottom: 0.35rem;
+}
+.travel-card .travel-place {
+  font-family: "Anton", Impact, sans-serif;
+  font-size: clamp(1.2rem, 2vw, 1.6rem); line-height: 1;
+  text-transform: uppercase; letter-spacing: -0.005em;
+  color: var(--ink);
+}
+
+/* ───────────────────────────────────────────────────────
+   REEL GRID — vertical 9:16 video tiles for socials
+   ─────────────────────────────────────────────────────── */
+.reel-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.8rem;
+  margin-top: 2rem;
+}
+.reel-card {
+  position: relative;
+  aspect-ratio: 9/16;
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--bg-2);
+  border: 1px solid rgba(244,239,230,0.08);
+  transition: transform 0.5s, border-color 0.4s, box-shadow 0.5s;
+}
+.reel-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(255,77,46,0.4);
+  box-shadow: 0 24px 50px rgba(0,0,0,0.5), 0 0 40px rgba(255,77,46,0.1);
+}
+.reel-card video, .reel-card img {
+  width: 100%; height: 100%; object-fit: cover;
+  display: block;
+}
+.reel-card .reel-platform {
+  position: absolute; top: 0.6rem; right: 0.6rem;
+  font-family: "Geist Mono", monospace;
+  font-size: 0.5rem; letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink);
+  padding: 0.25rem 0.5rem;
+  background: rgba(10,9,8,0.7);
+  border: 1px solid rgba(244,239,230,0.15);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  border-radius: 3px;
+  z-index: 2;
+}
+.reel-card::after {
+  /* Subtle bottom gradient so any title would read */
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,0) 60%, rgba(0,0,0,0.5) 100%);
+  pointer-events: none;
+}
+
+/* ───────────────────────────────────────────────────────
+   APPLE MUSIC ROTATION — embed wrapper with subtle tilt
+   ─────────────────────────────────────────────────────── */
+.rotation-wrap {
+  margin-top: 2rem;
+  perspective: 1400px;
+}
+.rotation-tilt {
+  transform: rotateX(2deg) scale(0.99);
+  transform-style: preserve-3d;
+  transition: transform 0.6s cubic-bezier(0.22,1,0.36,1);
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid rgba(244,239,230,0.1);
+  box-shadow:
+    0 36px 80px rgba(0,0,0,0.55),
+    0 0 60px rgba(255,77,46,0.05),
+    inset 0 1px 0 rgba(244,239,230,0.06);
+  position: relative;
+}
+.rotation-tilt:hover { transform: rotateX(0deg) scale(1); }
+.rotation-tilt iframe {
+  display: block; width: 100%; border: none;
+  background: #0a0908;
+}
+
+/* Page-head static photo (used on Lens hero) */
+.page-head .page-cover {
+  position: absolute; inset: 0; z-index: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  filter: brightness(0.55) contrast(1.05) saturate(0.92);
+}
+
+/* ───────────────────────────────────────────────────────
+   TRIP MODAL — glassmorphic popup with gallery + journal
+   Triggered when a .travel-card is clicked. Pulls the
+   <template class="trip-detail"> content from the card.
+   ─────────────────────────────────────────────────────── */
+.travel-card { cursor: none; }
+.trip-modal {
+  position: fixed; inset: 0; z-index: 1000;
+  background: rgba(10,9,8,0.78);
+  backdrop-filter: blur(40px) saturate(1.5);
+  -webkit-backdrop-filter: blur(40px) saturate(1.5);
+  display: flex; align-items: flex-start; justify-content: center;
+  padding: 4rem 1.5rem 3rem;
+  opacity: 0; pointer-events: none;
+  overflow-y: auto;
+  transition: opacity 0.45s cubic-bezier(0.22,1,0.36,1);
+}
+.trip-modal::before {
+  content: ""; position: fixed; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,77,46,0.8) 40%, rgba(255,77,46,1) 50%, rgba(255,77,46,0.8) 60%, transparent);
+  box-shadow: 0 0 24px 2px rgba(255,77,46,0.35);
+  opacity: 0;
+  transition: opacity 0.5s 0.1s;
+  pointer-events: none;
+}
+.trip-modal.open { opacity: 1; pointer-events: auto; }
+.trip-modal.open::before { opacity: 1; }
+.trip-modal-content {
+  width: 100%; max-width: 980px;
+  background: rgba(20,17,15,0.86);
+  backdrop-filter: blur(40px) saturate(1.6);
+  -webkit-backdrop-filter: blur(40px) saturate(1.6);
+  border: 1px solid rgba(244,239,230,0.12);
+  border-radius: 24px;
+  padding: 2.6rem 2.2rem;
+  box-shadow:
+    0 50px 120px rgba(0,0,0,0.7),
+    0 0 80px rgba(255,77,46,0.06),
+    inset 0 1px 0 rgba(244,239,230,0.08);
+  transform: translateY(28px) scale(0.97);
+  transition: transform 0.55s cubic-bezier(0.22,1,0.36,1);
+  position: relative;
+}
+.trip-modal.open .trip-modal-content { transform: translateY(0) scale(1); }
+.trip-close {
+  position: fixed; top: 1.4rem; right: 1.4rem;
+  width: 46px; height: 46px;
+  background: rgba(10,9,8,0.65);
+  backdrop-filter: blur(24px) saturate(1.4);
+  -webkit-backdrop-filter: blur(24px) saturate(1.4);
+  border: 1px solid rgba(244,239,230,0.15);
+  border-radius: 999px;
+  color: var(--ink); font-size: 1.6rem; line-height: 1;
+  display: flex; align-items: center; justify-content: center;
+  z-index: 5;
+  transition: background 0.3s, transform 0.4s, border-color 0.3s;
+  cursor: pointer;
+}
+.trip-close:hover {
+  background: rgba(255,77,46,0.22);
+  border-color: rgba(255,77,46,0.5);
+  transform: rotate(90deg) scale(1.05);
+}
+
+.trip-detail h3 {
+  font-family: "Anton", Impact, sans-serif;
+  font-size: clamp(2.4rem, 7vw, 5rem);
+  line-height: 0.95;
+  text-transform: uppercase; letter-spacing: -0.015em;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(170deg, #fff 0%, var(--ink) 55%, rgba(244,239,230,0.55) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.trip-detail .trip-meta-row {
+  display: flex; gap: 1.5rem; align-items: center;
+  flex-wrap: wrap;
+  font-family: "Geist Mono", monospace;
+  text-transform: uppercase; letter-spacing: 0.22em;
+  font-size: 0.7rem;
+  margin-bottom: 1.8rem;
+}
+.trip-detail .trip-meta-row .accent { color: var(--rust); }
+.trip-detail .trip-meta-row span { color: var(--muted); }
+.trip-detail .trip-blurb {
+  font-family: "Fraunces", Georgia, serif;
+  font-size: clamp(1.05rem, 1.6vw, 1.3rem);
+  line-height: 1.55;
+  color: var(--ink-2);
+  margin-bottom: 2rem;
+  max-width: 62ch;
+}
+.trip-detail .trip-blurb p + p { margin-top: 1rem; }
+.trip-detail .trip-gallery {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.6rem;
+  margin-top: 1.4rem;
+}
+.trip-detail .trip-gallery img {
+  width: 100%; aspect-ratio: 4/5;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid rgba(244,239,230,0.08);
+  transition: transform 0.7s cubic-bezier(0.22,1,0.36,1), border-color 0.3s, filter 0.4s;
+  filter: saturate(0.88) contrast(1.04);
+  cursor: pointer;
+}
+.trip-detail .trip-gallery img:hover {
+  transform: scale(1.04);
+  border-color: rgba(255,77,46,0.45);
+  filter: saturate(1) contrast(1.08);
+}
+.trip-detail .trip-gallery img.wide {
+  grid-column: span 2;
+  aspect-ratio: 16/9;
+}
+
+@media (max-width: 900px) {
+  .trip-modal { padding: 2rem 0.8rem; }
+  .trip-modal-content { padding: 1.8rem 1.2rem; border-radius: 18px; }
+  .trip-detail .trip-gallery { grid-template-columns: repeat(2, 1fr); }
+  .trip-detail .trip-gallery img.wide { grid-column: span 2; }
+  .trip-close { top: 0.9rem; right: 0.9rem; width: 40px; height: 40px; font-size: 1.4rem; }
+}
+@media (max-width: 480px) {
+  .trip-detail .trip-gallery { grid-template-columns: 1fr; }
+  .trip-detail .trip-gallery img.wide { grid-column: span 1; }
+}
+
+/* ── Mobile responsive for new components ── */
+@media (max-width: 900px) {
+  .gear-grid { grid-template-columns: 1fr !important; gap: 1rem; }
+  .gear-card { padding: 1rem; }
+  .gear-card:hover { transform: none; }
+  .gear-card h4 { font-size: 1.3rem; }
+  .gear-card .gear-desc { font-size: 0.85rem; }
+  .gear-card .gear-specs li { padding: 0.4rem 0; }
+
+  .travel-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 0.6rem; }
+  .travel-card .travel-place { font-size: 1.05rem !important; }
+  .travel-card .travel-meta { padding: 0.8rem 0.9rem; }
+
+  .reel-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 0.6rem; }
+
+  .rotation-tilt { transform: none !important; border-radius: 12px; }
+  .rotation-tilt iframe { height: 380px !important; }
+}
+@media (max-width: 480px) {
+  .travel-grid { grid-template-columns: 1fr !important; }
+  .reel-grid { grid-template-columns: repeat(2, 1fr) !important; }
+}
+
 /* ── Mobile hamburger button ── */
 .mob-menu-btn {
   display: none;

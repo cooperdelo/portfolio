@@ -30,6 +30,7 @@
       <a href="rubber-band.html" class="nav-link" data-cursor="VIEW" data-transition="MUSIC">Rubber Band</a>
       <a href="builder.html" class="nav-link" data-cursor="VIEW" data-transition="BUILDER">Builder</a>
       <a href="athletic.html" class="nav-link" data-cursor="VIEW" data-transition="ATHLETIC">Athletic</a>
+      <a href="lens.html" class="nav-link" data-cursor="VIEW" data-transition="LENS">Lens</a>
       <a href="now.html" class="nav-link active" data-cursor="VIEW" data-no-transition>Now</a>
     </div>
   </div>
@@ -40,6 +41,10 @@
 <main>
 
 <header class="page-head">
+  <!-- Workspace photo backdrop — drop photos/workspace.jpg (heavily darkened CSS handles the rest) -->
+  <div class="now-workspace-bg">
+    <img src="photos/workspace.jpg" alt="" loading="lazy" onerror="this.style.display='none';" />
+  </div>
   <div class="inner">
     <span class="eyebrow">Live page / agent updated</span>
     <h1 class="poster reveal in" style="margin-top: 1.5rem;">Now<span class="accent">.</span></h1>
@@ -51,12 +56,22 @@
   <div class="grid">
     <div class="col-7">
       <div class="reveal">
-        <p class="lede">Building toward the Plugverse launch on April 30.</p>
+        <p class="lede">Truist internship starts May 27. Plugverse v2 push and SOC II prep through summer.</p>
+
+        <!-- Countdown timer — change data-target to your next launch / deadline -->
+        <span class="countdown-target">Truist start · May 27, 2026</span>
+        <div id="countdown" class="countdown-block" data-target="2026-05-27T09:00:00">
+          <div class="countdown-unit"><span class="num" id="cd-days">00</span><span class="lbl">Days</span></div>
+          <div class="countdown-unit"><span class="num" id="cd-hrs">00</span><span class="lbl">Hours</span></div>
+          <div class="countdown-unit"><span class="num" id="cd-mins">00</span><span class="lbl">Min</span></div>
+          <div class="countdown-unit"><span class="num" id="cd-secs">00</span><span class="lbl">Sec</span></div>
+        </div>
       </div>
       <ul class="now-list reveal">
-        <li><span class="tag">this wk</span><span>Closing the last P1 bugs in the booking flow</span></li>
-        <li><span class="tag">this wk</span><span>Stripe Connect going live before launch</span></li>
-        <li><span class="tag">this wk</span><span>Truist internship prep, starts May 27</span></li>
+        <li><span class="tag">this wk</span><span>Plugverse v2: search ranking + organizer dashboard</span></li>
+        <li><span class="tag">this wk</span><span>Stripe Connect dispute flow + escrow edge cases</span></li>
+        <li><span class="tag">this wk</span><span>Truist onboarding prep, starts May 27</span></li>
+        <li><span class="tag">soon</span><span>Rubber Band summer setlist refresh — 8 new songs</span></li>
       </ul>
     </div>
 
@@ -131,4 +146,7 @@
 </div>
 <div class="toast" id="toast">Copied to clipboard</div>
 
-<script src="https://cdnjs.cloudf
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" defer></script>
+<script src="shell.js" defer></script>
+</body>
+</html>

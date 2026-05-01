@@ -6,8 +6,13 @@
 <title>Rubber Band & Cooper Delo</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="preload" as="image" href="photos/rubber_band_full_pic.jpeg" fetchpriority="high" />
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,300..900,30..100,0..1;1,9..144,300..900,30..100,0..1&family=Geist+Mono:wght@400;500&family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="shell.css" />
+<style>
+  /* Full-viewport rubber band header — drop the existing .MOV, video element fills the entire page-head */
+  .page-head.video-cover-wrap { min-height: 100vh; padding: 8rem 2.4rem 4rem; }
+</style>
 </head>
 <body class="grain">
 
@@ -30,6 +35,7 @@
       <a href="rubber-band.html" class="nav-link active" data-cursor="VIEW" data-no-transition>Rubber Band</a>
       <a href="builder.html" class="nav-link" data-cursor="VIEW" data-transition="BUILDER">Builder</a>
       <a href="athletic.html" class="nav-link" data-cursor="VIEW" data-transition="ATHLETIC">Athletic</a>
+      <a href="lens.html" class="nav-link" data-cursor="VIEW" data-transition="LENS">Lens</a>
       <a href="now.html" class="nav-link" data-cursor="VIEW" data-transition="NOW">Now</a>
     </div>
   </div>
@@ -40,7 +46,7 @@
 <main>
 
 <header class="page-head world-rubber video-cover-wrap">
-  <video class="video-cover" autoplay muted loop playsinline preload="metadata">
+  <video class="video-cover" autoplay muted loop playsinline preload="metadata" poster="photos/rubber_band_full_pic.jpeg">
     <source src="videos/whole%20band%20rubber%20vid.MOV" type="video/mp4" />
     <source src="videos/whole%20band%20rubber%20vid.MOV" type="video/quicktime" />
   </video>
@@ -68,7 +74,7 @@
     <div class="col-4">
       <div class="reveal"><div class="photo-frame">
         <div class="photo has-media portrait-tall">
-          <img src="photos/shirtless_guitar.jpeg" alt="Cooper with green bass at an outdoor Rubber Band gig" />
+          <img src="photos/shirtless_guitar.jpeg" loading="lazy" alt="Cooper with green bass at an outdoor Rubber Band gig" />
         </div>
         <div class="caption-shard glass-light" style="transform: rotate(-2deg);">Day gig / 2025</div>
       </div></div>
@@ -89,7 +95,7 @@
 
 <!-- Full-bleed banner photo -->
 <section style="position: relative; padding: 0; height: 70vh; min-height: 520px; overflow: hidden;">
-  <img src="photos/rubber_band_full_pic.jpeg" alt="Rubber Band performing outdoors, full lineup" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0;" />
+  <img src="photos/rubber_band_full_pic.jpeg" loading="lazy" alt="Rubber Band performing outdoors, full lineup" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0;" />
   <div style="position: absolute; inset: 0; z-index: 1; background: linear-gradient(180deg, rgba(10,9,8,0.4) 0%, rgba(10,9,8,0.05) 30%, rgba(10,9,8,0.5) 100%); pointer-events: none;"></div>
   <div style="position: absolute; inset: 0; z-index: 2; display: flex; align-items: flex-end; padding: 3rem 2.4rem;">
     <div class="caption-shard glass-light" style="position: static; transform: rotate(-1deg);">Full lineup / open-air gig / 2025</div>
@@ -154,13 +160,13 @@
     <div class="col-5">
       <div class="reveal"><div class="photo-frame">
         <div class="photo has-media portrait-tall">
-          <img src="photos/solo_cooper_bass.jpeg" alt="Cooper performing live, lit by stage lights" />
+          <img src="photos/solo_cooper_bass.jpeg" loading="lazy" alt="Cooper performing live, lit by stage lights" />
         </div>
         <div class="caption-shard glass-light">Bob's Bar / Rubber Band / 2026</div>
       </div></div>
       <div class="reveal" style="margin-top: 1.4rem;"><div class="photo-frame">
         <div class="photo has-media landscape">
-          <img src="photos/bobs_bar_gig_pic.jpeg" alt="Cooper playing bass at Bob's Bar with crowd visible" />
+          <img src="photos/bobs_bar_gig_pic.jpeg" loading="lazy" alt="Cooper playing bass at Bob's Bar with crowd visible" />
         </div>
         <div class="caption-shard glass-light" style="transform: rotate(1.4deg);">Crowd shot / 2026</div>
       </div></div>
@@ -179,7 +185,7 @@
     <div class="col-4">
       <div class="reveal"><div class="photo-frame">
         <div class="photo has-media portrait-tall">
-          <img src="photos/guitar_portrait_playing.jpeg" alt="Cooper Delo playing bass with motion blur background" />
+          <img src="photos/guitar_portrait_playing.jpeg" loading="lazy" alt="Cooper Delo playing bass with motion blur background" />
         </div>
         <div class="caption-shard glass-light" style="transform: rotate(-2deg);">Cooper Delo / 2026</div>
       </div></div>
@@ -196,6 +202,91 @@
       <div style="display: flex; gap: 0.6rem; margin-top: 2rem; flex-wrap: wrap;">
         <a href="https://open.spotify.com" target="_blank" rel="noreferrer" data-cursor="LISTEN" data-no-transition onclick="window.open(this.href,'_blank');return false;" class="stat-card glass" style="padding: 0.7rem 1rem; font-family: 'Geist Mono', monospace; text-transform: uppercase; letter-spacing: 0.18em; font-size: 0.72rem;">Listen on Spotify</a>
         <a href="https://music.apple.com" target="_blank" rel="noreferrer" data-cursor="LISTEN" data-no-transition onclick="window.open(this.href,'_blank');return false;" class="stat-card glass" style="padding: 0.7rem 1rem; font-family: 'Geist Mono', monospace; text-transform: uppercase; letter-spacing: 0.18em; font-size: 0.72rem;">Apple Music</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 06 — The rig (music gear in same 3D treatment as the Lens kit section) -->
+<section class="block world-rubber">
+  <div class="grid">
+    <div class="col-12 reveal">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <span class="plate glass"><span class="num">06</span><span class="eyebrow" style="margin:0;">The rig</span></span>
+        <span class="eyebrow">Bass + studio</span>
+      </div>
+      <h2 class="section-poster">Tools<br/>of the <span class="accent">trade.</span></h2>
+    </div>
+  </div>
+  <div class="grid" style="margin-top: 1.5rem;">
+    <div class="col-12 reveal">
+      <div class="gear-grid">
+
+        <!-- Bass -->
+        <div class="gear-card">
+          <div class="gear-img">
+            <span class="gear-badge">Live</span>
+            <!-- TODO: photos/PLACEHOLDER-rig-bass.jpg -->
+            <img src="photos/PLACEHOLDER-rig-bass.jpg" alt="Bass" />
+          </div>
+          <h4>The bass</h4>
+          <p class="gear-desc">[Brand and model]</p>
+          <ul class="gear-specs">
+            <li><span class="key">Body</span><span class="val">[model]</span></li>
+            <li><span class="key">Pickups</span><span class="val">[type]</span></li>
+            <li><span class="key">Strings</span><span class="val">[brand · gauge]</span></li>
+            <li><span class="key">Tuning</span><span class="val">Standard E</span></li>
+          </ul>
+        </div>
+
+        <!-- Amp -->
+        <div class="gear-card">
+          <div class="gear-img">
+            <span class="gear-badge">Stage</span>
+            <img src="photos/PLACEHOLDER-rig-amp.jpg" alt="Amp" />
+          </div>
+          <h4>The amp</h4>
+          <p class="gear-desc">[Brand and model]</p>
+          <ul class="gear-specs">
+            <li><span class="key">Head</span><span class="val">[model]</span></li>
+            <li><span class="key">Cab</span><span class="val">[model]</span></li>
+            <li><span class="key">Power</span><span class="val">[wattage]</span></li>
+            <li><span class="key">DI</span><span class="val">[brand]</span></li>
+          </ul>
+        </div>
+
+        <!-- Pedalboard -->
+        <div class="gear-card">
+          <div class="gear-img">
+            <span class="gear-badge">Sound</span>
+            <img src="photos/PLACEHOLDER-rig-pedals.jpg" alt="Pedalboard" />
+          </div>
+          <h4>Pedalboard</h4>
+          <p class="gear-desc">Compressor, drive, the basics. Live signal stays simple.</p>
+          <ul class="gear-specs">
+            <li><span class="key">Comp</span><span class="val">[pedal]</span></li>
+            <li><span class="key">OD</span><span class="val">[pedal]</span></li>
+            <li><span class="key">Tuner</span><span class="val">[pedal]</span></li>
+            <li><span class="key">Power</span><span class="val">[supply]</span></li>
+          </ul>
+        </div>
+
+        <!-- Studio -->
+        <div class="gear-card">
+          <div class="gear-img">
+            <span class="gear-badge">Studio</span>
+            <img src="photos/PLACEHOLDER-rig-studio.jpg" alt="Home studio" />
+          </div>
+          <h4>Home studio</h4>
+          <p class="gear-desc">Where the Cooper Delo songs get cut. Bedroom turned tracking room.</p>
+          <ul class="gear-specs">
+            <li><span class="key">DAW</span><span class="val">Ableton Live</span></li>
+            <li><span class="key">Interface</span><span class="val">[brand · model]</span></li>
+            <li><span class="key">Monitors</span><span class="val">[brand · size]</span></li>
+            <li><span class="key">Mic</span><span class="val">[brand · model]</span></li>
+          </ul>
+        </div>
+
       </div>
     </div>
   </div>
@@ -251,4 +342,7 @@
 </div>
 <div class="toast" id="toast">Copied to clipboard</div>
 
-<script src="https://cdnjs.cloudf
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" defer></script>
+<script src="shell.js" defer></script>
+</body>
+</html>

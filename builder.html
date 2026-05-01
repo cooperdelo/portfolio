@@ -9,7 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,300..900,30..100,0..1;1,9..144,300..900,30..100,0..1&family=Geist+Mono:wght@400;500&family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="shell.css" />
 </head>
-<body class="grain has-page-bg">
+<body class="grain">
 
 <div class="loader" id="loader">
   <div class="label">The Builder Log</div>
@@ -18,10 +18,8 @@
 </div>
 <div class="transition-veil out" id="veil"><span class="label"></span></div>
 
-<!-- Persistent atmospheric backdrop -->
-<div class="page-bg">
-  <img src="photos/front-page-hero.jpg" alt="Cooper at Carmel California coast" />
-</div>
+<!-- Code-grid backdrop — pure CSS, no image needed -->
+<div class="code-backdrop"></div>
 
 <canvas class="scene-canvas" id="scene-canvas"></canvas>
 <div class="cursor" id="cursor"></div>
@@ -36,6 +34,7 @@
       <a href="rubber-band.html" class="nav-link" data-cursor="VIEW" data-transition="MUSIC">Rubber Band</a>
       <a href="builder.html" class="nav-link active" data-cursor="VIEW" data-no-transition>Builder</a>
       <a href="athletic.html" class="nav-link" data-cursor="VIEW" data-transition="ATHLETIC">Athletic</a>
+      <a href="lens.html" class="nav-link" data-cursor="VIEW" data-transition="LENS">Lens</a>
       <a href="now.html" class="nav-link" data-cursor="VIEW" data-transition="NOW">Now</a>
     </div>
   </div>
@@ -45,7 +44,7 @@
 
 <main>
 
-<header class="page-head">
+<header class="page-head world-builder">
   <div class="inner">
     <span class="eyebrow">The builder log</span>
     <h1 class="poster reveal in" style="margin-top: 1.5rem;">I make things.<br/><span class="accent">A lot of them.</span></h1>
@@ -56,42 +55,74 @@
   <div style="max-width: 1600px; margin: 0 auto; border-top: 1px solid rgba(244,239,230,0.18);">
     <div class="project-row reveal">
       <div class="meta">2024 to now</div>
-      <div><h3 class="row-poster">Plugverse</h3><p class="body-prose" style="margin-top: 0.6rem;">Marketplace for booking local music. Built end to end. Stripe Connect, Supabase auth and RLS, Next.js, generated contracts, escrow payouts. The first commercial product I have shipped that is actually mine.</p></div>
+      <div>
+        <h3 class="row-poster">Plugverse</h3>
+        <p class="body-prose" style="margin-top: 0.6rem;">Marketplace for booking local music. Built end to end. Stripe Connect, Supabase auth and RLS, Next.js, generated contracts, escrow payouts. The first commercial product I have shipped that is actually mine.</p>
+        <div><span class="tech-tag">Next.js</span><span class="tech-tag">Supabase</span><span class="tech-tag">Stripe Connect</span><span class="tech-tag">Postgres RLS</span></div>
+      </div>
       <div class="meta">Solo founder, technical lead</div>
     </div>
     <div class="project-row reveal">
       <div class="meta">2026</div>
-      <div><h3 class="row-poster">Personal AI Operating System</h3><p class="body-prose" style="margin-top: 0.6rem;">A 329-file vault that runs my life. Twelve advisor agents (CEO, CFO, mindset, health, etc.), scheduled briefings, automatic financial logging across Supabase plus Notion plus Excel. The system that helped write half of this site.</p></div>
+      <div>
+        <h3 class="row-poster">Personal AI Operating System</h3>
+        <p class="body-prose" style="margin-top: 0.6rem;">A 329-file vault that runs my life. Twelve advisor agents (CEO, CFO, mindset, health, etc.), scheduled briefings, automatic financial logging across Supabase plus Notion plus Excel. The system that helped write half of this site.</p>
+        <div><span class="tech-tag">Claude Agent SDK</span><span class="tech-tag">Notion API</span><span class="tech-tag">Supabase</span><span class="tech-tag">Cron</span></div>
+      </div>
       <div class="meta">Designer / operator</div>
     </div>
     <div class="project-row reveal">
       <div class="meta">2026</div>
-      <div><h3 class="row-poster">Resume Generator</h3><p class="body-prose" style="margin-top: 0.6rem;">Got tired of re-typing my resume into every portal. Built the version that does it for me. Supabase plus GPT, fine-tuned on my own writing voice.</p></div>
+      <div>
+        <h3 class="row-poster">Resume Generator</h3>
+        <p class="body-prose" style="margin-top: 0.6rem;">Got tired of re-typing my resume into every portal. Built the version that does it for me. Supabase plus GPT, fine-tuned on my own writing voice.</p>
+        <div><span class="tech-tag">GPT</span><span class="tech-tag">Supabase</span><span class="tech-tag">Tailwind</span></div>
+      </div>
       <div class="meta">Full stack</div>
     </div>
     <div class="project-row reveal">
       <div class="meta">Summer 2025</div>
-      <div><h3 class="row-poster">CleverCX</h3><p class="body-prose" style="margin-top: 0.6rem;">Built AI features for a fintech serving advisors and enterprise clients. Got the full stack of testing, feature development, and product strategy in a small team.</p></div>
+      <div>
+        <h3 class="row-poster">CleverCX</h3>
+        <p class="body-prose" style="margin-top: 0.6rem;">Built AI features for a fintech serving advisors and enterprise clients. Got the full stack of testing, feature development, and product strategy in a small team.</p>
+        <div><span class="tech-tag">React</span><span class="tech-tag">LLM eval</span><span class="tech-tag">Fintech</span></div>
+      </div>
       <div class="meta">Fintech intern</div>
     </div>
     <div class="project-row reveal">
       <div class="meta">Summer 2025</div>
-      <div><h3 class="row-poster">Tootle</h3><p class="body-prose" style="margin-top: 0.6rem;">Worked on AI product development inside a startup environment. Shipped, broke things, fixed them.</p></div>
+      <div>
+        <h3 class="row-poster">Tootle</h3>
+        <p class="body-prose" style="margin-top: 0.6rem;">Worked on AI product development inside a startup environment. Shipped, broke things, fixed them.</p>
+        <div><span class="tech-tag">AI / Product</span><span class="tech-tag">Startup</span></div>
+      </div>
       <div class="meta">AI / Product intern</div>
     </div>
     <div class="project-row reveal">
       <div class="meta">Fall 2025</div>
-      <div><h3 class="row-poster">AI Research at UNC</h3><p class="body-prose" style="margin-top: 0.6rem;">Working with Professor Shimul Melwani on applied AI research at the Kenan-Flagler Business School.</p></div>
+      <div>
+        <h3 class="row-poster">AI Research at UNC</h3>
+        <p class="body-prose" style="margin-top: 0.6rem;">Working with Professor Shimul Melwani on applied AI research at the Kenan-Flagler Business School.</p>
+        <div><span class="tech-tag">Research</span><span class="tech-tag">Applied AI</span></div>
+      </div>
       <div class="meta">Research assistant</div>
     </div>
     <div class="project-row reveal">
       <div class="meta">2025</div>
-      <div><h3 class="row-poster">Carolina Data Challenge</h3><p class="body-prose" style="margin-top: 0.6rem;">Space economy data analysis. Pulled patent and SBIR data, mapped the supplier graph, presented to a panel of judges who definitely did not expect a sophomore on the mic.</p></div>
+      <div>
+        <h3 class="row-poster">Carolina Data Challenge</h3>
+        <p class="body-prose" style="margin-top: 0.6rem;">Space economy data analysis. Pulled patent and SBIR data, mapped the supplier graph, presented to a panel of judges who definitely did not expect a sophomore on the mic.</p>
+        <div><span class="tech-tag">Python</span><span class="tech-tag">Data viz</span><span class="tech-tag">Graph analysis</span></div>
+      </div>
       <div class="meta">Analyst</div>
     </div>
     <div class="project-row reveal">
       <div class="meta">2025</div>
-      <div><h3 class="row-poster">EY Expedition</h3><p class="body-prose" style="margin-top: 0.6rem;">Selected for EY's national virtual learning program. Completed at the advanced level, top 100 nationally.</p></div>
+      <div>
+        <h3 class="row-poster">EY Expedition</h3>
+        <p class="body-prose" style="margin-top: 0.6rem;">Selected for EY's national virtual learning program. Completed at the advanced level, top 100 nationally.</p>
+        <div><span class="tech-tag">Top 100 nationally</span><span class="tech-tag">Advanced</span></div>
+      </div>
       <div class="meta">National recognition</div>
     </div>
   </div>
@@ -148,4 +179,7 @@
 </div>
 <div class="toast" id="toast">Copied to clipboard</div>
 
-<script src="https://cdnjs.cloudf
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" defer></script>
+<script src="shell.js" defer></script>
+</body>
+</html>

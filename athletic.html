@@ -30,6 +30,7 @@
       <a href="rubber-band.html" class="nav-link" data-cursor="VIEW" data-transition="MUSIC">Rubber Band</a>
       <a href="builder.html" class="nav-link" data-cursor="VIEW" data-transition="BUILDER">Builder</a>
       <a href="athletic.html" class="nav-link active" data-cursor="VIEW" data-no-transition>Athletic</a>
+      <a href="lens.html" class="nav-link" data-cursor="VIEW" data-transition="LENS">Lens</a>
       <a href="now.html" class="nav-link" data-cursor="VIEW" data-transition="NOW">Now</a>
     </div>
   </div>
@@ -97,11 +98,21 @@
     <div class="col-5">
       <div class="reveal"><div class="photo-frame">
         <div class="photo has-media portrait-tall" data-world="athletic">
-          <span>Photo: Gym / lifting / progress shot — drop here</span>
+          <!-- Drop a real gym/lifting/progress photo at photos/gym_portrait.jpg -->
+          <img src="photos/gym_portrait.jpg" alt="Cooper lifting / gym progress" loading="lazy" onerror="this.style.display='none';this.parentElement.querySelector('.photo-fallback').style.display='flex';" />
+          <span class="photo-fallback" style="display:none;align-items:center;justify-content:center;text-align:center;padding:2rem;">photos/gym_portrait.jpg<br/>(see AI guide)</span>
         </div>
-        <div class="caption-shard">Iron / TBD</div>
+        <div class="caption-shard">Iron / 2026</div>
       </div></div>
     </div>
+  </div>
+</section>
+
+<!-- Parallax photo divider — full-bleed gym shot — drop photos/gym_floor.jpg -->
+<section class="parallax-divider">
+  <img class="para-img" src="photos/gym_floor.jpg" alt="Gym floor / discipline" loading="lazy" onerror="this.style.opacity='0.15';this.src='photos/front-page-hero.jpg';" />
+  <div class="para-label">
+    <span class="eyebrow">Five sessions, every week. No skipping.</span>
   </div>
 </section>
 
@@ -114,6 +125,14 @@
         <p class="lede">The body is the operating system everything else runs on. Plugverse, classes, music, social, none of it works on no sleep, no protein, no movement. Five sessions a week is the minimum tax I pay to keep the rest functional. The aesthetics are a side effect. The clarity is the point.</p>
       </div>
     </div>
+  </div>
+</section>
+
+<!-- Parallax photo divider — golf course aerial — drop photos/golf_course.jpg -->
+<section class="parallax-divider">
+  <img class="para-img" src="photos/golf_course.jpg" alt="Golf course / fairway aerial" loading="lazy" onerror="this.style.opacity='0.15';this.src='photos/front-page-hero.jpg';" />
+  <div class="para-label">
+    <span class="eyebrow">Four hours, phone in the cart, head clear.</span>
   </div>
 </section>
 
@@ -139,9 +158,11 @@
     <div class="col-4">
       <div class="reveal"><div class="photo-frame">
         <div class="photo has-media portrait-tall" data-world="athletic">
-          <span>Photo: Cooper at the course / drop a tee box or fairway shot</span>
+          <!-- Drop a tee-box or fairway photo at photos/golf_portrait.jpg -->
+          <img src="photos/golf_portrait.jpg" alt="Cooper at the golf course" loading="lazy" onerror="this.style.display='none';this.parentElement.querySelector('.photo-fallback').style.display='flex';" />
+          <span class="photo-fallback" style="display:none;align-items:center;justify-content:center;text-align:center;padding:2rem;">photos/golf_portrait.jpg<br/>(see AI guide)</span>
         </div>
-        <div class="caption-shard">Course / TBD</div>
+        <div class="caption-shard">Course / 2026</div>
       </div></div>
     </div>
     <div class="col-8">
@@ -208,7 +229,7 @@
 </div>
 <div class="toast" id="toast">Copied to clipboard</div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="shell.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" defer></script>
+<script src="shell.js" defer></script>
 </body>
 </html>

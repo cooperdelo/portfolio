@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Lens / Cooper Delo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,300..900,30..100,0..1;1,9..144,300..900,30..100,0..1&family=Geist+Mono:wght@400;500&family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="shell.css" />
+</head>
+<body class="grain">
+
+<div class="loader" id="loader">
+  <div class="label">Lens / Through the Frame</div>
+  <div class="name">Through<br/>the lens.</div>
+  <div class="progress"></div>
+</div>
+<div class="transition-veil out" id="veil"><span class="label"></span></div>
+<canvas class="scene-canvas" id="scene-canvas"></canvas>
+<div class="cursor" id="cursor"></div>
+
+<nav class="top" id="topnav">
+  <a href="index.html" class="nav-logo" data-cursor="HOME" data-transition="HOME">Cooper Delo</a>
+  <div class="nav-pill">
+    <div class="nav-links" id="navLinks">
+      <span class="nav-indicator" id="navIndicator"></span>
+      <a href="index.html" class="nav-link" data-cursor="VIEW" data-transition="HOME">Home</a>
+      <a href="plugverse.html" class="nav-link" data-cursor="VIEW" data-transition="PLUGVERSE">Plugverse</a>
+      <a href="rubber-band.html" class="nav-link" data-cursor="VIEW" data-transition="MUSIC">Rubber Band</a>
+      <a href="builder.html" class="nav-link" data-cursor="VIEW" data-transition="BUILDER">Builder</a>
+      <a href="athletic.html" class="nav-link" data-cursor="VIEW" data-transition="ATHLETIC">Athletic</a>
+      <a href="lens.html" class="nav-link active" data-cursor="VIEW" data-no-transition>Lens</a>
+      <a href="now.html" class="nav-link" data-cursor="VIEW" data-transition="NOW">Now</a>
+    </div>
+  </div>
+  <button class="nav-cta" data-cursor="OPEN" data-contact>Get in touch</button>
+</nav>
+<div class="nav-progress-track"><div class="nav-progress" id="navProgress"></div></div>
+
+<main>
+
+<!-- Hero -->
+<header class="page-head world-cooper">
+  <!-- TODO: drop a 16:9 hero photo at photos/PLACEHOLDER-lens-hero.jpg -->
+  <img class="page-cover" src="photos/PLACEHOLDER-lens-hero.jpg" alt="" onerror="this.style.display='none'" />
+  <div class="inner">
+    <span class="eyebrow">Lens / The visual log</span>
+    <h1 class="poster reveal in" style="margin-top: 1.5rem;">Through<br/><span class="accent">the frame.</span></h1>
+  </div>
+</header>
+
+<div class="marquee-band">
+  <div class="marquee-track">
+    <span>iPhone 17 Pro</span><span>Canon</span><span>Moment lens kit</span><span>VND filter</span><span>Apple Music Replay</span><span>The reel</span>
+    <span>iPhone 17 Pro</span><span>Canon</span><span>Moment lens kit</span><span>VND filter</span><span>Apple Music Replay</span><span>The reel</span>
+  </div>
+</div>
+
+<!-- 01 — Manifesto -->
+<section class="block">
+  <div class="grid">
+    <div class="col-3"><span class="plate glass"><span class="num">01</span><span class="eyebrow" style="margin:0;">Manifesto</span></span></div>
+    <div class="col-9">
+      <p class="lede reveal">I shoot what I want to remember. The songs, the places, the rooms before they emptied. Same instinct that ships the apps. Capture it while it's hot. Cut it before it cools. Run it back.</p>
+      <p class="body-prose reveal" style="margin-top: 1.2rem; max-width: 38rem;">A lens is just a tool for paying attention. The phone in my pocket, the Canon for the slow stuff, the playlist that scored every drive. This page is the visual half of the same loop running everywhere else.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 02 — Travel -->
+<section class="block world-cooper">
+  <div class="grid">
+    <div class="col-12 reveal">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <span class="plate glass"><span class="num">02</span><span class="eyebrow" style="margin:0;">Where I went</span></span>
+        <span class="eyebrow">Tap any tile</span>
+      </div>
+      <h2 class="section-poster">Some<br/><span class="accent">places.</span></h2>
+    </div>
+  </div>
+  <div class="grid" style="margin-top: 1.5rem;">
+    <div class="col-12 reveal">
+      <div class="travel-grid">
+
+        <!-- TRIP CARD: Carmel -->
+        <article class="travel-card" data-cursor="OPEN" data-trip="carmel">
+          <img src="photos/front-page-hero.jpg" alt="Carmel coast" />
+          <div class="travel-meta">
+            <div class="travel-date">Spring 2025</div>
+            <div class="travel-place">Carmel, CA</div>
+          </div>
+          <template class="trip-detail">
+            <h3>Carmel, California</h3>
+            <div class="trip-meta-row">
+              <span class="accent">March 2025</span>
+              <span>4 days</span>
+              <span>36.55N / 121.92W</span>
+            </div>
+            <div class="trip-blurb">
+              <p>TODO: write 2-3 short paragraphs about the trip. Who you went with, why you went, the moment that made it worth photographing. Replace this whole block.</p>
+              <p>Keep it specific. The detail that you remember. Not "it was beautiful" — the cold morning the elephant seals were on the beach, or the diner where the waitress said something you're still thinking about.</p>
+            </div>
+            <div class="trip-gallery">
+              <!-- TODO: add 3-9 trip photos. Add class="wide" to span 2 columns. -->
+              <img src="photos/PLACEHOLDER-trip-carmel-1.jpg" alt="" />
+              <img src="photos/PLACEHOLDER-trip-carmel-2.jpg" alt="" />
+              <img src="photos/PLACEHOLDER-trip-carmel-3.jpg" alt="" />
+              <img src="photos/PLACEHOLDER-trip-carmel-4.jpg" alt="" class="wide" />
+              <img src="photos/PLACEHOLDER-trip-carmel-5.jpg" alt="" />
+            </div>
+          </template>
+        </article>
+
+        <!-- TRIP CARD 2: TODO -->
+        <article class="travel-card" data-cursor="OPEN" data-trip="trip-2">
+          <img src="photos/PLACEHOLDER-trip-2-cover.jpg" alt="" />
+          <div class="travel-meta">
+            <div class="travel-date">[Date]</div>
+            <div class="travel-place">[Place 2]</div>
+          </div>
+          <template class="trip-detail">
+            <h3>[Place name]</h3>
+            <div class="trip-meta-row">
+              <span class="accent">[Month Year]</span>
+              <span>[N days]</span>
+              <span>[lat / lng]</span>
+            </div>
+            <div class="trip-blurb">
+              <p>TODO: short journal entry — who, what, why it mattered.</p>
+            </div>
+            <div class="trip-gallery">
+              <img src="photos/PLACEHOLDER-trip-2-1.jpg" alt="" />
+              <img src="photos/PLACEHOLDER-trip-2-2.jpg" alt="" />
+              <img src="photos/PLACEHOLDER-trip-2-3.jpg" alt="" />
+            </div>
+          </template>
+        </article>
+
+        <!-- TRIP CARD 3: TODO -->
+        <article class="travel-card" data-cursor="OPEN" data-trip="trip-3">
+          <img src="photos/PLACEHOLDER-trip-3-cover.jpg" alt="" />
+          <div class="travel-meta">
+            <div class="travel-date">[Date]</div>
+            <div class="travel-place">[Place 3]</div>
+          </div>
+          <template class="trip-detail">
+            <h3>[Place name]</h3>
+            <div class="trip-meta-row">
+              <span class="accent">[Month Year]</span>
+              <span>[N days]</span>
+              <span>[lat / lng]</span>
+            </div>
+            <div class="trip-blurb">
+              <p>TODO: short journal entry.</p>
+            </div>
+            <div class="trip-gallery">
+              <img src="photos/PLACEHOLDER-trip-3-1.jpg" alt="" />
+              <img src="photos/PLACEHOLDER-trip-3-2.jpg" alt="" />
+              <img src="photos/PLACEHOLDER-trip-3-3.jpg" alt="" />
+            </div>
+          </template>
+        </article>
+
+        <!-- TRIP CARD 4: TODO -->
+        <article class="travel-card" data-cursor="OPEN" data-trip="trip-4">
+          <img src="photos/PLACEHOLDER-trip-4-cover.jpg" alt="" />
+          <div class="travel-meta">
+            <div class="travel-date">[Date]</div>
+            <div class="travel-place">[Place 4]</div>
+          </div>
+          <template class="trip-detail">
+            <h3>[Place name]</h3>
+            <div class="trip-meta-row">
+              <span class="accent">[Month Year]</span>
+              <span>[N days]</span>
+              <span>[lat / lng]</span>
+            </div>
+            <div class="trip-blurb">
+              <p>TODO: short journal entry.</p>
+            </div>
+            <div class="trip-gallery">
+              <img src="photos/PLACEHOLDER-trip-4-1.jpg" alt="" />
+              <img src="photos/PLACEHOLDER-trip-4-2.jpg" alt="" />
+              <img src="photos/PLACEHOLDER-trip-4-3.jpg" alt="" />
+            </div>
+          </template>
+        </article>
+
+        <!-- TRIP CARD 5: TODO -->
+        <article class="travel-card" data-cursor="OPEN" data-trip="trip-5">
+          <img src="photos/PLACEHOLDER-trip-5-cover.jpg" alt="" />
+          <div class="travel-meta">
+            <div class="travel-date">[Date]</div>
+            <div class="travel-place">[Place 5]</div>
+          </div>
+          <template class="trip-detail">
+            <h3>[Place name]</h3>
+            <div class="trip-meta-row">
+              <span class="accent">[Month Year]</span>
+              <span>[N days]</span>
+              <span>[lat / lng]</span>
+            </div>
+            <div class="trip-blurb">
+              <p>TODO: short journal entry.</p>
+            </div>
+            <div class="trip-gallery">
+              <img src="photos/PLACEHOLDER-trip-5-1.jpg" alt="" />
+              <img src="photos/PLACEHOLDER-trip-5-2.jpg" alt="" />
+              <img src="photos/PLACEHOLDER-trip-5-3.jpg" alt="" />
+            </div>
+          </template>
+        </article>
+
+        <!-- TRIP CARD 6: TODO -->
+        <article class="travel-card" data-cursor="OPEN" data-trip="trip-6">
+          <img src="photos/PLACEHOLDER-trip-6-cover.jpg" alt="" />
+          <div class="travel-meta">
+            <div class="travel-date">[Date]</div>
+            <div class="travel-place">[Place 6]</div>
+          </div>
+          <template class="trip-detail">
+            <h3>[Place name]</h3>
+            <div class="trip-meta-row">
+              <span class="accent">[Month Year]</span>
+              <span>[N days]</span>
+              <span>[lat / lng]</span>
+            </div>
+            <div class="trip-blurb">
+              <p>TODO: short journal entry.</p>
+            </div>
+            <div class="trip-gallery">
+              <img src="photos/PLACEHOLDER-trip-6-1.jpg" alt="" />
+              <img src="photos/PLACEHOLDER-trip-6-2.jpg" alt="" />
+              <img src="photos/PLACEHOLDER-trip-6-3.jpg" alt="" />
+            </div>
+          </template>
+        </article>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 03 — Lifestyle / Reels -->
+<section class="block">
+  <div class="grid">
+    <div class="col-12 reveal">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <span class="plate glass"><span class="num">03</span><span class="eyebrow" style="margin:0;">On screen</span></span>
+        <span class="eyebrow">@cooperdelo</span>
+      </div>
+      <h2 class="section-poster">The <span class="accent">reel.</span></h2>
+      <p class="body-prose" style="margin-top: 1rem; max-width: 38rem;">Pulling the camera out doubles as the practice. Cuts edited the night they happened. Same loop as code: build, ship, learn what hit.</p>
+    </div>
+  </div>
+  <div class="grid" style="margin-top: 1.5rem;">
+    <div class="col-12 reveal">
+      <div class="reel-grid">
+        <!-- TODO: drop your vertical 9:16 clips at videos/PLACEHOLDER-reel-N.mp4 -->
+        <div class="reel-card">
+          <video autoplay muted loop playsinline preload="metadata">
+            <source src="videos/PLACEHOLDER-reel-1.mp4" type="video/mp4" />
+          </video>
+          <span class="reel-platform">REEL</span>
+        </div>
+        <div class="reel-card">
+          <video autoplay muted loop playsinline preload="metadata">
+            <source src="videos/PLACEHOLDER-reel-2.mp4" type="video/mp4" />
+          </video>
+          <span class="reel-platform">TIKTOK</span>
+        </div>
+        <div class="reel-card">
+          <video autoplay muted loop playsinline preload="metadata">
+            <source src="videos/PLACEHOLDER-reel-3.mp4" type="video/mp4" />
+          </video>
+          <span class="reel-platform">REEL</span>
+        </div>
+        <div class="reel-card">
+          <video autoplay muted loop playsinline preload="metadata">
+            <source src="videos/PLACEHOLDER-reel-4.mp4" type="video/mp4" />
+          </video>
+          <span class="reel-platform">TIKTOK</span>
+        </div>
+      </div>
+      <div style="display: flex; gap: 0.6rem; margin-top: 2rem; flex-wrap: wrap;">
+        <a href="https://instagram.com/cooperdelo" target="_blank" rel="noreferrer" data-cursor="OPEN" data-no-transition onclick="window.open(this.href,'_blank');return false;" class="stat-card glass" style="padding: 0.7rem 1rem; font-family: 'Geist Mono', monospace; text-transform: uppercase; letter-spacing: 0.18em; font-size: 0.72rem; color: var(--rust);">@cooperdelo on Instagram</a>
+        <a href="https://tiktok.com/@cooperdelo" target="_blank" rel="noreferrer" data-cursor="OPEN" data-no-transition onclick="window.open(this.href,'_blank');return false;" class="stat-card glass" style="padding: 0.7rem 1rem; font-family: 'Geist Mono', monospace; text-transform: uppercase; letter-spacing: 0.18em; font-size: 0.72rem;">on TikTok</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 04 — Camera kit -->
+<section class="block world-cooper">
+  <div class="grid">
+    <div class="col-12 reveal">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <span class="plate glass"><span class="num">04</span><span class="eyebrow" style="margin:0;">The kit</span></span>
+        <span class="eyebrow">Capture stack</span>
+      </div>
+      <h2 class="section-poster">Cameras &<br/><span class="accent">glass.</span></h2>
+    </div>
+  </div>
+  <div class="grid" style="margin-top: 1.5rem;">
+    <div class="col-12 reveal">
+      <div class="gear-grid">
+
+        <!-- iPhone 17 Pro -->
+        <div class="gear-card">
+          <div class="gear-img">
+            <span class="gear-badge">Daily carry</span>
+            <!-- TODO: drop your iPhone setup photo at photos/PLACEHOLDER-gear-iphone.jpg -->
+            <img src="photos/PLACEHOLDER-gear-iphone.jpg" alt="iPhone 17 Pro setup" />
+          </div>
+          <h4>iPhone 17 Pro</h4>
+          <p class="gear-desc">Always in pocket. Most of the reels live here.</p>
+          <ul class="gear-specs">
+            <li><span class="key">Body</span><span class="val">iPhone 17 Pro</span></li>
+            <li><span class="key">Case</span><span class="val">Moment</span></li>
+            <li><span class="key">Filter</span><span class="val">Moment VND</span></li>
+            <li><span class="key">Format</span><span class="val">ProRAW · 4K60</span></li>
+          </ul>
+        </div>
+
+        <!-- Canon -->
+        <div class="gear-card">
+          <div class="gear-img">
+            <span class="gear-badge">The big one</span>
+            <!-- TODO: drop your Canon body photo at photos/PLACEHOLDER-gear-canon.jpg -->
+            <img src="photos/PLACEHOLDER-gear-canon.jpg" alt="Canon body" />
+          </div>
+          <!-- TODO: confirm the model — R100 mirrorless or 100D / SL1 DSLR? -->
+          <h4>Canon EOS [model]</h4>
+          <p class="gear-desc">When the shot deserves it. Trips, portraits, the slow stuff.</p>
+          <ul class="gear-specs">
+            <li><span class="key">Body</span><span class="val">[Canon EOS]</span></li>
+            <li><span class="key">Sensor</span><span class="val">APS-C</span></li>
+            <li><span class="key">Mount</span><span class="val">[RF / EF]</span></li>
+            <li><span class="key">Lenses</span><span class="val">[your kit]</span></li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 05 — Apple Music rotation -->
+<section class="block">
+  <div class="grid">
+    <div class="col-12 reveal">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <span class="plate glass"><span class="num">05</span><span class="eyebrow" style="margin:0;">In rotation</span></span>
+        <span class="eyebrow">Apple Music · Replay</span>
+      </div>
+      <h2 class="section-poster">What I<br/><span class="accent">listen to.</span></h2>
+      <p class="body-prose" style="margin-top: 1rem; max-width: 38rem;">A live feed of what's actually on. Apple Music Replay updates this automatically — the songs that survive the year, in the order they were played.</p>
+    </div>
+  </div>
+  <div class="grid" style="margin-top: 1.5rem;">
+    <div class="col-12 reveal">
+      <div class="rotation-wrap">
+        <div class="rotation-tilt">
+          <!-- TODO: paste your Apple Music Replay playlist embed URL.
+               How: open Apple Music → Listen Now → scroll to "Replay" →
+               share → "Copy Link". The URL looks like:
+                 https://music.apple.com/us/playlist/replay-2025/pl.u-XXXXXXXXX
+               Swap that into the embed URL below (just change "music.apple.com" to "embed.music.apple.com"). -->
+          <iframe
+            allow="autoplay *; encrypted-media *; fullscreen *; clipboard-write"
+            frameborder="0" height="450"
+            sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation allow-popups-to-escape-sandbox"
+            src="https://embed.music.apple.com/us/playlist/replay-2025/pl.u-PLACEHOLDER">
+          </iframe>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Continue reading -->
+<section class="block">
+  <div class="grid">
+    <div class="col-12" style="text-align: center;">
+      <div class="reveal">
+        <span class="eyebrow">Continue reading</span>
+        <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; margin-top: 2rem;">
+          <a href="rubber-band.html" data-cursor="NEXT" data-transition="MUSIC" class="stat-card glass" style="padding: 1rem 1.4rem; font-family: 'Geist Mono', monospace; text-transform: uppercase; letter-spacing: 0.22em; font-size: 0.78rem;">Music</a>
+          <a href="athletic.html" data-cursor="NEXT" data-transition="ATHLETIC" class="stat-card glass" style="padding: 1rem 1.4rem; font-family: 'Geist Mono', monospace; text-transform: uppercase; letter-spacing: 0.22em; font-size: 0.78rem;">Athletic</a>
+          <a href="now.html" data-cursor="NEXT" data-transition="NOW" class="stat-card glass" style="padding: 1rem 1.4rem; font-family: 'Geist Mono', monospace; text-transform: uppercase; letter-spacing: 0.22em; font-size: 0.78rem; color: var(--rust);">Now-page</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="site">
+  <div style="max-width: 1600px; margin: 0 auto; display: grid; grid-template-columns: 1fr; gap: 2.5rem; position: relative;">
+    <div>
+      <span class="eyebrow">Get in touch</span>
+      <button class="under" data-contact data-cursor="OPEN" style="display: block; margin-top: 1rem; text-align: left; font-family: 'Anton', Impact, sans-serif; font-size: clamp(2.6rem, 7vw, 6rem); line-height: 0.95; text-transform: uppercase; color: var(--ink);">cooperdelo6@gmail.com</button>
+    </div>
+    <div class="massive">cooperdelo</div>
+    <div style="display: flex; justify-content: space-between; font-family: 'Geist Mono', monospace; text-transform: uppercase; letter-spacing: 0.22em; font-size: 0.72rem; opacity: 0.7;">
+      <span>Chapel Hill, NC</span><span>2026</span>
+    </div>
+  </div>
+</footer>
+
+<!-- Trip modal — populated dynamically when a travel-card is clicked -->
+<div class="trip-modal" id="trip-modal">
+  <button class="trip-close" data-cursor="CLOSE" aria-label="Close">×</button>
+  <div class="trip-modal-content"></div>
+</div>
+
+<!-- Contact modal -->
+<div class="modal-backdrop" id="modal">
+  <div class="modal">
+    <h3>Get in touch.</h3>
+    <p style="font-family: 'Geist Mono', monospace; text-transform: uppercase; letter-spacing: 0.22em; font-size: 0.7rem; color: var(--muted); margin-bottom: 1.4rem;">Email is the fastest way</p>
+    <div class="email-row">
+      <span>cooperdelo6@gmail.com</span>
+      <button class="copy-btn" data-cursor="COPY" id="copyBtn">Copy</button>
+    </div>
+    <div class="options">
+      <a href="https://mail.google.com/mail/?view=cm&fs=1&to=cooperdelo6@gmail.com" target="_blank" rel="noreferrer" data-cursor="OPEN" data-no-transition onclick="window.open(this.href, '_blank'); return false;">Gmail</a>
+      <a href="https://www.linkedin.com/in/cooperdelo/" target="_blank" rel="noreferrer" data-cursor="OPEN" data-no-transition onclick="window.open(this.href, '_blank'); return false;">LinkedIn</a>
+      <a href="https://instagram.com/cooperdelo" target="_blank" rel="noreferrer" data-cursor="OPEN" data-no-transition onclick="window.open(this.href, '_blank'); return false;">Instagram</a>
+    </div>
+    <div style="display: flex; justify-content: flex-end; align-items: center; padding-top: 0.6rem;">
+      <button class="close under" data-cursor="CLOSE" id="closeModal">Close</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast">Copied to clipboard</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="shell.js"></script>
+</body>
+</html>

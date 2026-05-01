@@ -211,6 +211,7 @@ const dlog = (...args) => { if (DEBUG) console.log("[shell]", ...args); };
     { href: "rubber-band.html", label: "Rubber Band", tr: "MUSIC"     },
     { href: "builder.html",     label: "Builder",     tr: "BUILDER"   },
     { href: "athletic.html",    label: "Athletic",    tr: "ATHLETIC"  },
+    { href: "lens.html",        label: "Lens",        tr: "LENS"      },
     { href: "now.html",         label: "Now",         tr: "NOW"       },
   ];
   const page = location.pathname.split("/").pop() || "index.html";
@@ -644,6 +645,41 @@ const dlog = (...args) => { if (DEBUG) console.log("[shell]", ...args); };
       setTimeout(() => { window.location.href = href; }, 550);
     });
   });
+})();
+
+/* ── 12.5. Trip modal — click a travel-card to read the journal ── */
+(function () {
+  const modal = document.getElementById("trip-modal");
+  if (!modal) return;
+  const content = modal.querySelector(".trip-modal-content");
+  const closeBtn = modal.querySelector(".trip-close");
+  if (!content || !closeBtn) return;
+
+  function open(card) {
+    const tpl = card.querySelector("template.trip-detail, .trip-detail");
+    if (!tpl) { dlog("trip-modal: card has no .trip-detail content"); return; }
+    content.innerHTML = "";
+    // Wrap in a div so styling targets work consistently
+    const wrapper = document.createElement("div");
+    wrapper.className = "trip-detail";
+    wrapper.appendChild(tpl.content ? tpl.content.cloneNode(true) : tpl.cloneNode(true).firstElementChild || tpl.cloneNode(true));
+    content.appendChild(wrapper);
+    modal.classList.add("open");
+    document.body.style.overflow = "hidden";
+    dlog("trip-modal: opened for", card.dataset.trip || "(unknown)");
+  }
+  function close() {
+    modal.classList.remove("open");
+    document.body.style.overflow = "";
+    setTimeout(() => { content.innerHTML = ""; }, 500);
+  }
+
+  document.querySelectorAll(".travel-card").forEach(card => {
+    card.addEventListener("click", () => open(card));
+  });
+  closeBtn.addEventListener("click", close);
+  modal.addEventListener("click", (e) => { if (e.target === modal) close(); });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && modal.classList.contains("open")) close(); });
 })();
 
 /* ── 13. Contact modal ───────────────────────────────────── */

@@ -30,6 +30,7 @@
       <a href="rubber-band.html" class="nav-link" data-cursor="VIEW" data-transition="MUSIC">Rubber Band</a>
       <a href="builder.html" class="nav-link" data-cursor="VIEW" data-transition="BUILDER">Builder</a>
       <a href="athletic.html" class="nav-link" data-cursor="VIEW" data-transition="ATHLETIC">Athletic</a>
+      <a href="lens.html" class="nav-link" data-cursor="VIEW" data-transition="LENS">Lens</a>
       <a href="now.html" class="nav-link" data-cursor="VIEW" data-transition="NOW">Now</a>
     </div>
   </div>
@@ -93,18 +94,25 @@
   <div class="grid">
     <div class="col-7"><div class="reveal"><div class="photo-frame">
       <div class="photo has-media landscape" data-world="plugverse">
-        <img src="photos/hero.jpeg" alt="Cooper pitching Plugverse at UNC Innovate Carolina Junction" />
+        <img src="photos/hero.jpeg" alt="Cooper pitching Plugverse at UNC Innovate Carolina Junction" loading="lazy" />
       </div>
       <div class="caption-shard glass-light">Pitching at Innovate Carolina / 2026</div>
     </div></div></div>
-    <div class="col-5"><div class="reveal" style="margin-top: 4rem;"><div class="photo-frame">
-      <div class="photo has-media portrait-tall" data-world="plugverse">
-        <video autoplay muted loop playsinline preload="metadata">
-          <source src="videos/plugverse_ui.mp4" type="video/mp4" />
-        </video>
+    <div class="col-5"><div class="reveal" style="margin-top: 4rem;">
+      <!-- App mockup card with browser chrome — already wired to the existing UI demo video -->
+      <div class="mockup-card">
+        <div class="mockup-bar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="url">plugverse.app/dashboard</span>
+        </div>
+        <div class="mockup-body">
+          <video autoplay muted loop playsinline preload="metadata" poster="photos/Plugverse_picture.jpeg">
+            <source src="videos/plugverse_ui.mp4" type="video/mp4" />
+          </video>
+        </div>
       </div>
-      <div class="caption-shard glass-light" style="transform: rotate(1.4deg);">Plugverse / live UI / 2026</div>
-    </div></div></div>
+      <div class="caption-shard glass-light" style="position: relative; left: 0; bottom: 0; margin-top: 1rem; transform: rotate(1.4deg);">Plugverse / live UI / 2026</div>
+    </div></div>
   </div>
 </section>
 
@@ -123,7 +131,7 @@
     <div class="col-7">
       <div class="reveal"><div class="photo-frame">
         <div class="photo has-media landscape" data-world="plugverse">
-          <img src="photos/luby_pic_with_check.jpeg" alt="Cooper Delo accepting the Luby Pitch Competition $20,000 check for Plugverse" />
+          <img src="photos/luby_pic_with_check.jpeg" alt="Cooper Delo accepting the Luby Pitch Competition $20,000 check for Plugverse" loading="lazy" />
         </div>
         <div class="caption-shard glass-light">Luby Pitch Competition / Apr 2026</div>
       </div></div>
@@ -214,4 +222,7 @@
 </div>
 <div class="toast" id="toast">Copied to clipboard</div>
 
-<script src="https://cdnjs.cloudf
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" defer></script>
+<script src="shell.js" defer></script>
+</body>
+</html>
