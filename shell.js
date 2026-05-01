@@ -9,10 +9,21 @@
    =========================================================== */
 
 (function () {
-  // shell.js runs after <body> is parsed — no need to wait for window.load,
-  // which gets blocked by large video files (.MOV) on music pages.
   const loader = document.getElementById("loader");
-  if (loader) setTimeout(() => loader.classList.add("done"), 1800);
+  if (!loader) return;
+  let dismissed = false;
+  function dismiss() {
+    if (dismissed) return;
+    dismissed = true;
+    loader.classList.add("done");
+    // Pull element out of rendering pipeline after transition so
+    // backdrop-filter stops blurring the page underneath.
+    setTimeout(() => { loader.style.display = "none"; }, 1300);
+  }
+  // Primary: fire 1.8s after script executes — never blocked by videos.
+  setTimeout(dismiss, 1800);
+  // Secondary: also catch window.load for fast connections where it fires sooner.
+  window.addEventListener("load", () => setTimeout(dismiss, 300));
 })();
 
 // Cursor (tight tracking)
