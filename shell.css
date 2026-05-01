@@ -1281,6 +1281,42 @@ body.has-page-bg .ambient { display: none; }
 }
 
 /* ───────────────────────────────────────────────────────
+   RELEASE GRID — Spotify album / artist embeds, side-by-side
+   ─────────────────────────────────────────────────────── */
+.release-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  perspective: 1600px;
+}
+.release-card {
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(244,239,230,0.08);
+  box-shadow:
+    0 30px 60px rgba(0,0,0,0.5),
+    0 0 50px rgba(255,77,46,0.04);
+  transform: rotateX(2deg) scale(0.99);
+  transform-style: preserve-3d;
+  transition: transform 0.6s cubic-bezier(0.22,1,0.36,1), box-shadow 0.5s, border-color 0.4s;
+  background: #0a0908;
+}
+.release-card:hover {
+  transform: rotateX(0deg) scale(1) translateY(-4px);
+  border-color: rgba(255,77,46,0.3);
+  box-shadow: 0 40px 80px rgba(0,0,0,0.6), 0 0 80px rgba(255,77,46,0.08);
+}
+.release-card iframe {
+  display: block; width: 100%; border: 0;
+  background: #0a0908;
+}
+@media (max-width: 900px) {
+  .release-grid { grid-template-columns: 1fr; }
+  .release-card { transform: none; border-radius: 10px; }
+  .release-card:hover { transform: translateY(-2px); }
+}
+
+/* ───────────────────────────────────────────────────────
    APPLE MUSIC ROTATION — embed wrapper with subtle tilt
    ─────────────────────────────────────────────────────── */
 .rotation-wrap {
