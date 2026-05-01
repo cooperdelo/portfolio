@@ -9,11 +9,10 @@
    =========================================================== */
 
 (function () {
-  // Loader fade out
-  window.addEventListener("load", () => {
-    const loader = document.getElementById("loader");
-    if (loader) setTimeout(() => loader.classList.add("done"), 1700);
-  });
+  // shell.js runs after <body> is parsed — no need to wait for window.load,
+  // which gets blocked by large video files (.MOV) on music pages.
+  const loader = document.getElementById("loader");
+  if (loader) setTimeout(() => loader.classList.add("done"), 1800);
 })();
 
 // Cursor (tight tracking)
@@ -171,6 +170,50 @@
     i = (i + 1) % count;
     roleInner.style.transform = "translateY(-" + (i * 2.4) + "rem)";
   }, 2200);
+})();
+
+/* ----------------------------
+   Mobile hamburger nav
+---------------------------- */
+(function () {
+  const nav = document.getElementById("topnav");
+  if (!nav) return;
+
+  // Inject hamburger button
+  const btn = document.createElement("button");
+  btn.className = "mob-menu-btn";
+  btn.setAttribute("aria-label", "Menu");
+  btn.innerHTML = "<span></span><span></span><span></span>";
+  nav.appendChild(btn);
+
+  // Inject full-screen overlay with links matching every page's nav
+  const links = [
+    { href: "index.html",       label: "Home",        tr: "HOME"      },
+    { href: "plugverse.html",   label: "Plugverse",   tr: "PLUGVERSE" },
+    { href: "rubber-band.html", label: "Rubber Band", tr: "MUSIC"     },
+    { href: "builder.html",     label: "Builder",     tr: "BUILDER"   },
+    { href: "athletic.html",    label: "Athletic",    tr: "ATHLETIC"  },
+    { href: "now.html",         label: "Now",         tr: "NOW"       },
+  ];
+  const page = location.pathname.split("/").pop() || "index.html";
+  const overlay = document.createElement("div");
+  overlay.className = "mob-nav-overlay";
+  overlay.innerHTML = links.map(l =>
+    `<a href="${l.href}" data-transition="${l.tr}" class="${l.href === page ? "active" : ""}">${l.label}</a>`
+  ).join("") + `<button class="mob-cta" data-contact>Get in touch</button>`;
+  document.body.appendChild(overlay);
+
+  function close() {
+    btn.classList.remove("open");
+    overlay.classList.remove("open");
+    document.body.style.overflow = "";
+  }
+  btn.addEventListener("click", () => {
+    const open = btn.classList.toggle("open");
+    overlay.classList.toggle("open", open);
+    document.body.style.overflow = open ? "hidden" : "";
+  });
+  overlay.querySelectorAll("a, .mob-cta").forEach(el => el.addEventListener("click", close));
 })();
 
 /* ----------------------------
