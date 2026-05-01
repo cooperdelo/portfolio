@@ -1375,78 +1375,54 @@ body.has-page-bg .ambient { display: none; }
   pointer-events: none; white-space: nowrap; z-index: 3;
 }
 
-/* ── Page transition veil — cinematic slab sweep + flash on click ── */
+/* ── Page transition veil — matches the loader exactly so the
+   handoff to the next page's loader feels like ONE screen ── */
 .transition-veil {
-  position: fixed; inset: 0; z-index: 800;
+  position: fixed; inset: 0; z-index: 8001; /* sits ABOVE the loader (8000) */
   display: flex; align-items: center; justify-content: center;
   pointer-events: none;
-  overflow: hidden;
-  background: transparent;
+  background: rgba(10,9,8,0.68);
+  backdrop-filter: blur(48px) saturate(1.6);
+  -webkit-backdrop-filter: blur(48px) saturate(1.6);
+  opacity: 0;
+  transition: opacity 0.5s cubic-bezier(0.85,0,0.15,1);
+}
+/* Rust accent line at the top — same as the loader */
+.transition-veil::before {
+  content: "";
+  position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,77,46,0.8) 40%, rgba(255,77,46,1) 50%, rgba(255,77,46,0.8) 60%, transparent);
+  box-shadow: 0 0 24px 2px rgba(255,77,46,0.35);
+  opacity: 0;
+  transition: opacity 0.4s 0.05s;
 }
 .transition-veil .label {
-  position: relative; z-index: 4;
   font-family: "Anton", Impact, sans-serif;
-  font-size: clamp(2.4rem, 9vw, 7rem); text-transform: uppercase;
-  letter-spacing: -0.015em; color: var(--ink);
-  filter: drop-shadow(0 0 50px rgba(255,77,46,0.5));
-  opacity: 0; transform: translateY(40px) scale(0.92);
-  transition: opacity 0.45s cubic-bezier(0.22,1,0.36,1), transform 0.55s cubic-bezier(0.22,1,0.36,1);
-  text-align: center; padding: 0 1rem;
+  font-size: clamp(4rem, 13vw, 13rem); line-height: 0.88;
+  text-transform: uppercase; letter-spacing: -0.02em; text-align: center;
+  background: linear-gradient(170deg, #fff 0%, var(--ink) 55%, rgba(244,239,230,0.45) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 32px rgba(255,77,46,0.18));
+  opacity: 0;
+  transform: translateY(30px) scale(0.94);
+  transition: opacity 0.45s 0.15s cubic-bezier(0.22,1,0.36,1),
+              transform 0.55s 0.15s cubic-bezier(0.22,1,0.36,1);
+  padding: 0 1.5rem;
 }
-
-/* Rust flash burst */
-.transition-veil .veil-flash {
-  position: absolute; inset: 0; z-index: 2;
-  background: radial-gradient(ellipse at center, rgba(255,77,46,0.7) 0%, rgba(200,16,46,0.5) 35%, rgba(10,9,8,0) 70%);
-  opacity: 0; pointer-events: none;
+.transition-veil.in {
+  opacity: 1;
+  pointer-events: auto;
 }
-
-/* Slabs — five vertical bars that drop from above */
-.transition-veil .veil-slabs {
-  position: absolute; inset: 0; z-index: 3;
-  display: grid; grid-template-columns: repeat(5, 1fr);
-  pointer-events: none;
-}
-.transition-veil .veil-slabs span {
-  display: block; height: 100%; background: var(--bg);
-  transform: translateY(-101%);
-  border-right: 1px solid rgba(255,77,46,0.08);
-  box-shadow: 0 0 40px rgba(255,77,46,0.15);
-}
-.transition-veil .veil-slabs span:last-child { border-right: 0; }
-
-/* OUT (default & after arrival) — everything hidden */
-.transition-veil.out .veil-slabs span { transform: translateY(-101%); transition: transform 0.5s cubic-bezier(0.65,0,0.2,1); }
-.transition-veil.out .veil-flash { opacity: 0; transition: opacity 0.4s; }
-.transition-veil.out .label { opacity: 0; transform: translateY(-30px) scale(1.05); }
-
-/* IN — click animation: slabs drop, flash bursts, label kicks up */
-.transition-veil.in { pointer-events: auto; }
-.transition-veil.in .veil-flash {
-  animation: veil-flash 0.7s cubic-bezier(0.16,1,0.3,1) forwards;
-}
-.transition-veil.in .veil-slabs span {
-  animation: slab-down 0.7s cubic-bezier(0.65,0,0.2,1) forwards;
-}
-.transition-veil.in .veil-slabs span:nth-child(1) { animation-delay: 0.00s; }
-.transition-veil.in .veil-slabs span:nth-child(2) { animation-delay: 0.07s; }
-.transition-veil.in .veil-slabs span:nth-child(3) { animation-delay: 0.14s; }
-.transition-veil.in .veil-slabs span:nth-child(4) { animation-delay: 0.05s; }
-.transition-veil.in .veil-slabs span:nth-child(5) { animation-delay: 0.11s; }
+.transition-veil.in::before { opacity: 1; }
 .transition-veil.in .label {
-  opacity: 1; transform: translateY(0) scale(1);
-  transition-delay: 0.22s;
+  opacity: 1;
+  transform: translateY(0) scale(1);
 }
-
-@keyframes slab-down {
-  0%   { transform: translateY(-101%); }
-  100% { transform: translateY(0); }
-}
-@keyframes veil-flash {
-  0%   { opacity: 0; }
-  20%  { opacity: 1; }
-  60%  { opacity: 0.4; }
-  100% { opacity: 0; }
+.transition-veil.out {
+  opacity: 0;
+  pointer-events: none;
 }
 
 /* ── Page head (inner pages: athletic, builder, now, plugverse, rubber-band) ── */

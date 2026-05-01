@@ -617,19 +617,18 @@ const dlog = (...args) => { if (DEBUG) console.log("[shell]", ...args); };
   loop();
 })();
 
-/* ── 12. Page transition veil — cinematic flash ─────────── */
+/* ── 12. Page transition veil — matches loader for seamless handoff ── */
 (function () {
   const veil = document.getElementById("veil"); if (!veil) return;
   const label = veil.querySelector(".label");
   const internal = (href) => /^[a-z0-9\-]+\.html(\#.*)?$/i.test(href) || href === "/" || href.startsWith("./");
 
-  // Inject extra layers for the multi-stage flash if not present
-  if (!veil.querySelector(".veil-flash")) {
-    const flash = document.createElement("div"); flash.className = "veil-flash"; veil.appendChild(flash);
-    const slabs = document.createElement("div"); slabs.className = "veil-slabs";
-    slabs.innerHTML = '<span></span><span></span><span></span><span></span><span></span>';
-    veil.appendChild(slabs);
-  }
+  // Strip any old slab/flash injectors from previous version (in case they're cached in HTML)
+  veil.querySelectorAll(".veil-flash, .veil-slabs").forEach(el => el.remove());
+
+  // Make sure veil starts fully hidden on arrival
+  veil.classList.remove("in");
+  veil.classList.add("out");
 
   document.querySelectorAll("a").forEach((a) => {
     const href = a.getAttribute("href"); if (!href || !internal(href) || a.dataset.noTransition) return;
@@ -640,20 +639,11 @@ const dlog = (...args) => { if (DEBUG) console.log("[shell]", ...args); };
       label.textContent = text;
       veil.classList.remove("out");
       veil.classList.add("in");
-      // Navigate after the slab animation completes
-      setTimeout(() => { window.location.href = href; }, 750);
+      // Wait for fade-in to complete before navigating, so the loader on the next page
+      // takes over from a screen that already looks identical (no visible swap).
+      setTimeout(() => { window.location.href = href; }, 550);
     });
   });
-
-  // On arrival: play the exit flash
-  function playExit() {
-    veil.classList.remove("in");
-    veil.classList.add("out");
-    setTimeout(() => veil.classList.remove("out"), 1100);
-  }
-  window.addEventListener("pageshow", playExit);
-  // Belt-and-suspenders if pageshow doesn't fire
-  if (document.readyState !== "loading") setTimeout(playExit, 50);
 })();
 
 /* ── 13. Contact modal ───────────────────────────────────── */
