@@ -1236,6 +1236,16 @@ body.has-page-bg .ambient { display: none; }
   text-transform: uppercase; letter-spacing: -0.005em;
   color: var(--ink);
 }
+.travel-card .travel-venue {
+  font-family: "Geist Mono", monospace;
+  font-size: 0.62rem; letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  margin-top: 0.5rem;
+  opacity: 0.85;
+}
+/* Show cards (concerts) — visual-only, no pointer cursor */
+.show-card { cursor: default !important; }
 
 /* ───────────────────────────────────────────────────────
    REEL GRID — vertical 9:16 video tiles for socials

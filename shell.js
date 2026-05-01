@@ -674,7 +674,11 @@ const dlog = (...args) => { if (DEBUG) console.log("[shell]", ...args); };
     setTimeout(() => { content.innerHTML = ""; }, 500);
   }
 
+  // Only bind click on cards that actually have detail templates.
+  // Cards without a template (e.g. concert tiles) stay purely visual.
   document.querySelectorAll(".travel-card").forEach(card => {
+    if (!card.querySelector("template.trip-detail, .trip-detail")) return;
+    card.style.cursor = "pointer";
     card.addEventListener("click", () => open(card));
   });
   closeBtn.addEventListener("click", close);
