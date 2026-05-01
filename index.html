@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Cooper Delo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,300..900,30..100,0..1;1,9..144,300..900,30..100,0..1&family=Geist+Mono:wght@400;500&family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="shell.css" />
+<style>
+  /* Hero (page-specific) */
+  section.hero { min-height: 100vh; padding: 6rem 2.4rem 3rem; display: flex; flex-direction: column; justify-content: flex-end; position: relative; perspective: 1600px; }
+  .hero-meta { position: absolute; top: 6.4rem; left: 2.4rem; right: 2.4rem; display: flex; justify-content: space-between; opacity: 0.85; font-family: "Geist Mono", monospace; text-transform: uppercase; letter-spacing: 0.2em; font-size: 0.72rem; color: var(--ink); text-shadow: 0 1px 8px rgba(0,0,0,0.5); }
+  .hero h1 {
+    margin-top: 1.6rem;
+    transform-style: preserve-3d;
+    will-change: transform;
+    transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+    filter:
+      drop-shadow(0 1px 0 rgba(255,255,255,0.18))
+      drop-shadow(0 30px 60px rgba(0,0,0,0.55))
+      drop-shadow(0 6px 14px rgba(255,77,46,0.15));
+  }
+  .hero h1 .row { display: block; overflow: hidden; }
+  .hero h1 .row span { display: inline-block; transform: translateY(110%); transition: transform 1.2s cubic-bezier(0.22, 1, 0.36, 1); }
+  .hero h1.in .row span { transform: translateY(0); }
+  .hero h1 .row > span {
+    background: linear-gradient(180deg, #FFF8EC 0%, #F4EFE6 45%, #C2B7A4 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+  .hero h1 .row.delo > span,
+  .hero h1 .row > span.accent {
+    background: linear-gradient(180deg, #FFAA8C 0%, #FF6A47 45%, #B8442B 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .hero-bottom { margin-top: 3.5rem; display: flex; flex-direction: column; gap: 2rem; }
+  @media (min-width: 900px) { .hero-bottom { flex-direction: row; justify-content: space-between; align-items: flex-end; } }
+  .hero-bottom .lead-glass {
+    max-width: 34rem;
+    padding: 1.4rem 1.6rem;
+    border-radius: 22px;
+    background: rgba(244,239,230,0.06);
+    backdrop-filter: blur(26px) saturate(160%);
+    -webkit-backdrop-filter: blur(26px) saturate(160%);
+    border: 1px solid rgba(244,239,230,0.18);
+    box-shadow:
+      0 1px 0 rgba(244,239,230,0.22) inset,
+      0 -1px 0 rgba(0,0,0,0.4) inset,
+      0 32px 80px -28px rgba(0,0,0,0.7);
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-bottom .lead-glass::before {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0) 60%);
+  }
+  .hero-bottom .lead {
+    font-family: "Fraunces", Georgia, serif;
+    font-size: clamp(1.3rem, 1.9vw, 1.9rem);
+    line-height: 1.22; color: var(--ink);
+    text-shadow: 0 1px 12px rgba(0,0,0,0.5);
+  }
+
+  .role-glass { padding: 0.5rem 0.9rem 0.5rem 1.2rem; border-radius: 999px; display: inline-flex; align-items: center; gap: 1.1rem; }
+  .role-track { height: 2.4rem; overflow: hidden; font-family: "Anton", Impact, sans-serif; font-size: 1.9rem; line-height: 2.4rem; color: var(--rust); text-transform: uppercase; }
+  .role-track .inner { transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1); }
+  .role-track .inner span { display: block; height: 2.4rem; }
+  .scroll-cue { position: absolute; bottom: 1.5rem; left: 50%; transform: translateX(-50%); color: var(--ink); font-family: "Geist Mono", monospace; text-transform: uppercase; letter-spacing: 0.3em; font-size: 0.7rem; text-shadow: 0 1px 8px rgba(0,0,0,0.5); }
+</style>
+</head>
+<body class="grain">
+
+<!-- Loader -->
+<div class="loader" id="loader">
+  <div class="label">Cooper Delo / Portfolio 2026</div>
+  <div class="name">Cooper<br/>Delo.</div>
+  <div class="progress"></div>
+</div>
+
+<!-- Page transition veil -->
+<div class="transition-veil" id="veil"><span class="label"></span></div>
+
+<!-- Three.js background -->
+<canvas class="scene-canvas" id="scene-canvas"></canvas>
+
+<!-- Custom cursor -->
+<div class="cursor" id="cursor"></div>
+
+<nav class="top" id="topnav">
+  <a href="index.html" class="nav-logo" data-cursor="HOME" data-no-transition>Cooper Delo</a>
+  <div class="nav-pill">
+    <div class="nav-links" id="navLinks">
+      <span class="nav-indicator" id="navIndicator"></span>
+      <a href="index.html" class="nav-link active" data-cursor="VIEW" data-no-transition>Home</a>
+      <a href="plugverse.html" class="nav-link" data-cursor="VIEW" data-transition="PLUGVERSE">Plugverse</a>
+      <a href="rubber-band.html" class="nav-link" data-cursor="VIEW" data-transition="MUSIC">Rubber Band</a>
+      <a href="builder.html" class="nav-link" data-cursor="VIEW" data-transition="BUILDER">Builder</a>
+      <a href="now.html" class="nav-link" data-cursor="VIEW" data-transition="NOW">Now</a>
+    </div>
+  </div>
+  <button class="nav-cta" data-cursor="OPEN" data-contact>Get in touch</button>
+</nav>
+<div class="nav-progress-track"><div class="nav-progress" id="navProgress"></div></div>
+
+<main>
+
+<section class="hero">
+  <div class="hero-bg">
+    <img src="photos/hero.jpeg" alt="Cooper Delo pitching Plugverse at UNC Innovate Carolina Junction" />
+  </div>
+
+  <div class="hero-meta">
+    <span>Portfolio / 2026</span><span>35.913N / 79.056W</span><span>Vol. 01</span>
+  </div>
+
+  <h1 id="hero-title" class="poster">
+    <span class="row"><span>Cooper</span></span>
+    <span class="row"><span class="accent">Delo.</span></span>
+  </h1>
+
+  <div class="hero-bottom">
+    <div class="lead-glass">
+      <p class="lead">Building Plugverse, the booking layer for local music. Bass in Rubber Band. Writing original songs as Cooper Delo.</p>
+    </div>
+    <div class="role-glass glass">
+      <span class="eyebrow">Role</span>
+      <div class="role-track"><div class="inner" id="roleInner">
+        <span>Builder.</span><span>Founder.</span><span>Musician.</span><span>Student.</span><span>Writer.</span>
+      </div></div>
+    </div>
+  </div>
+
+  <div class="scroll-cue">Scroll</div>
+</section>
+
+<div class="marquee-band">
+  <div class="marquee-track">
+    <span>Plugverse</span><span>Rubber Band</span><span>Cooper Delo</span><span>UNC Chapel Hill</span><span>Truist 2026</span><span>1789 Fund</span><span>Chi Phi</span>
+    <span>Plugverse</span><span>Rubber Band</span><span>Cooper Delo</span><span>UNC Chapel Hill</span><span>Truist 2026</span><span>1789 Fund</span><span>Chi Phi</span>
+  </div>
+</div>
+
+<!-- Manifesto -->
+<section class="block">
+  <div class="grid">
+    <div class="col-3"><span class="plate glass"><span class="num">01</span><span class="eyebrow" style="margin:0;">Manifesto</span></span></div>
+    <div class="col-9">
+      <div class="reveal">
+        <p class="lede">I make things. A booking platform for local music. Songs in my bedroom. A cover band that plays sorority houses for rent money. Code that ships before I sleep. The throughline is the same. Build, ship, learn what hit, do it again.</p>
+      </div>
+      <div class="reveal" style="margin-top: 2.4rem;">
+        <p class="body-prose">I am a sophomore at UNC studying computer science and business with a music minor in everything but the paperwork. I run on autonomy and short deadlines. I would rather own one thing than be a piece of ten.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Plugverse -->
+<section class="block world-plugverse">
+  <div class="grid">
+    <div class="col-12 reveal">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <span class="plate glass"><span class="num">02</span><span class="eyebrow" style="margin:0;">The headline project</span></span>
+        <span class="eyebrow">Live at plugverse.app</span>
+      </div>
+      <h2 class="section-poster" style="display: block;">PLUG<span class="accent">verse.</span></h2>
+    </div>
+  </div>
+  <div class="grid" style="margin-top: 4rem;">
+    <div class="col-7">
+      <div class="reveal">
+        <p class="lede">Every time a local artist gets a gig, they start from scratch. Rewrite the bio. Resend the setlist. Re-explain the rate. Copy-paste a contract from a Google Doc they found in 2023. There is no LinkedIn for this. There is no Airbnb listing that just exists and says here is who I am, what I charge, when I am free, here is the contract. That is what I am building.</p>
+        <div class="stats">
+          <div class="stat-card glass"><span class="label">Founded</span><span class="value">Nov 2024</span></div>
+          <div class="stat-card glass"><span class="label">Funding</span><span class="value">$1,850</span></div>
+          <div class="stat-card glass"><span class="label">Built by</span><span class="value">One person</span></div>
+          <div class="stat-card glass"><span class="label">Status</span><span class="value">Apr 30 launch</span></div>
+        </div>
+        <a href="plugverse.html" class="under" data-cursor="DEEP DIVE" data-transition="PLUGVERSE" style="display: inline-block; margin-top: 2.5rem; font-family: 'Geist Mono', monospace; text-transform: uppercase; letter-spacing: 0.22em; font-size: 0.78rem; color: var(--rust);">Read the full story</a>
+      </div>
+    </div>
+    <div class="col-5">
+      <div class="reveal"><div class="photo-frame">
+        <div class="photo has-media">
+          <img src="photos/Plugverse_picture.jpeg" alt="Plugverse brand: PLUG IN. guitar plug visual" />
+        </div>
+        <div class="caption-shard glass-light">Plugverse / brand / 2026</div>
+      </div></div>
+    </div>
+  </div>
+</section>
+
+<div class="marquee-band accent">
+  <div class="marquee-track">
+    <span>Where local music gets booked</span><span>Built by a musician</span><span>Where local music gets booked</span><span>Built by a musician</span>
+  </div>
+</div>
+
+<!-- Drag-able gallery section -->
+<section class="drag-section">
+  <div class="drag-bg">
+    <img src="photos/front-page-hero.jpg" alt="Cooper at Carmel California coast" />
+  </div>
+  <div style="padding: 0 2.4rem;">
+    <div class="grid">
+      <div class="col-12 reveal">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span class="plate glass"><span class="num">03</span><span class="eyebrow" style="margin:0;">The work, dragged</span></span>
+          <span class="eyebrow">Click and drag</span>
+        </div>
+      </div>
+    </div>
+    <div id="drag-gallery" class="drag-gallery" data-cursor="DRAG">
+      <div class="drag-track" id="dragTrack">
+        <div class="drag-card"><img src="photos/Plugverse_picture.jpeg" alt="Plugverse brand" /><div class="card-grain"></div><div class="card-meta"><span class="title">Plugverse</span><span class="year">2024</span></div></div>
+        <div class="drag-card"><img src="photos/hero.jpeg" alt="Cooper pitching at Innovate Carolina" /><div class="card-grain"></div><div class="card-meta"><span class="title">Pitching</span><span class="year">2026</span></div></div>
+        <div class="drag-card"><img src="photos/luby_pic_with_check.jpeg" alt="Luby Pitch Competition $20k win" /><div class="card-grain"></div><div class="card-meta"><span class="title">Luby Win</span><span class="year">2026</span></div></div>
+        <div class="drag-card"><img src="photos/rubber_band_full_pic.jpeg" alt="Rubber Band full lineup" /><div class="card-grain"></div><div class="card-meta"><span class="title">Rubber Band</span><span class="year">2025</span></div></div>
+        <div class="drag-card"><img src="photos/bobs_bar_gig_pic.jpeg" alt="Cooper at Bob's Bar" /><div class="card-grain"></div><div class="card-meta"><span class="title">Bob's Bar</span><span class="year">2026</span></div></div>
+        <div class="drag-card"><img src="photos/solo_cooper_bass.jpeg" alt="Cooper performing under stage lights" /><div class="card-grain"></div><div class="card-meta"><span class="title">Stage Lit</span><span class="year">2026</span></div></div>
+        <div class="drag-card"><img src="photos/guitar_portrait_playing.jpeg" alt="Cooper Delo with bass" /><div class="card-grain"></div><div class="card-meta"><span class="title">Cooper Delo</span><span class="year">2026</span></div></div>
+        <div class="drag-card"><img src="photos/shirtless_guitar.jpeg" alt="Cooper at outdoor day gig" /><div class="card-grain"></div><div class="card-meta"><span class="title">Day Gig</span><span class="year">2025</span></div></div>
+        <!-- Duplicate set for seamless infinite loop -->
+        <div class="drag-card" aria-hidden="true"><img src="photos/Plugverse_picture.jpeg" alt="" /><div class="card-grain"></div><div class="card-meta"><span class="title">Plugverse</span><span class="year">2024</span></div></div>
+        <div class="drag-card" aria-hidden="true"><img src="photos/hero.jpeg" alt="" /><div class="card-grain"></div><div class="card-meta"><span class="title">Pitching</span><span class="year">2026</span></div></div>
+        <div class="drag-card" aria-hidden="true"><img src="photos/luby_pic_with_check.jpeg" alt="" /><div class="card-grain"></div><div class="card-meta"><span class="title">Luby Win</span><span class="year">2026</span></div></div>
+        <div class="drag-card" aria-hidden="true"><img src="photos/rubber_band_full_pic.jpeg" alt="" /><div class="card-grain"></div><div class="card-meta"><span class="title">Rubber Band</span><span class="year">2025</span></div></div>
+        <div class="drag-card" aria-hidden="true"><img src="photos/bobs_bar_gig_pic.jpeg" alt="" /><div class="card-grain"></div><div class="card-meta"><span class="title">Bob's Bar</span><span class="year">2026</span></div></div>
+        <div class="drag-card" aria-hidden="true"><img src="photos/solo_cooper_bass.jpeg" alt="" /><div class="card-grain"></div><div class="card-meta"><span class="title">Stage Lit</span><span class="year">2026</span></div></div>
+        <div class="drag-card" aria-hidden="true"><img src="photos/guitar_portrait_playing.jpeg" alt="" /><div class="card-grain"></div><div class="card-meta"><span class="title">Cooper Delo</span><span class="year">2026</span></div></div>
+        <div class="drag-card" aria-hidden="true"><img src="photos/shirtless_guitar.jpeg" alt="" /><div class="card-grain"></div><div class="card-meta"><span class="title">Day Gig</span><span class="year">2025</span></div></div>
+      </div>
+      <div class="drag-hint">Auto scrolling. Hover to slow. Drag to take control.</div>
+    </div>
+  </div>
+</section>
+
+<!-- Rubber Band + Cooper Delo -->
+<section class="block world-rubber">
+  <div class="grid">
+    <div class="col-12 reveal">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <span class="plate glass"><span class="num">04</span><span class="eyebrow" style="margin:0;">Music</span></span>
+        <span class="eyebrow">34,000+ streams</span>
+      </div>
+      <h2 class="section-poster">RUBBER BAND<br/><span class="accent">& Cooper Delo.</span></h2>
+    </div>
+  </div>
+  <div class="grid" style="margin-top: 4rem;">
+    <div class="col-5">
+      <div class="reveal"><div class="photo-frame">
+        <div class="photo has-media" style="aspect-ratio: 3 / 4;">
+          <img src="photos/rubber_band_full_pic.jpeg" alt="Rubber Band performing outdoors, full lineup" />
+        </div>
+        <div class="caption-shard glass-light" style="transform: rotate(1.4deg);">Rubber Band / Chapel Hill, 2026</div>
+      </div></div>
+    </div>
+    <div class="col-7">
+      <div class="reveal">
+        <span class="eyebrow">The cover band</span>
+        <p class="lede" style="margin-top: 1rem;">Rubber Band is the cover band I play bass in at UNC. Five guys, mostly Chi Phi and one drummer who got pulled in from Pi Kapp. Sorority houses, frat houses, Chapel Hill bars, sometimes NC State or ECU. About $3K a semester. I learned bass the summer I joined and ran 45 songs in eight weeks.</p>
+        <div class="stats">
+          <div class="stat-card glass"><span class="label">Per gig</span><span class="value">$1k to $1.8k</span></div>
+          <div class="stat-card glass"><span class="label">Take</span><span class="value">$200 to $360</span></div>
+          <div class="stat-card glass"><span class="label">Circuit</span><span class="value">UNC NCSU ECU</span></div>
+          <div class="stat-card glass"><span class="label">Role</span><span class="value">Bass</span></div>
+        </div>
+        <div style="height: 1px; background: rgba(244,239,230,0.18); margin: 4rem 0;"></div>
+        <span class="eyebrow">The solo project</span>
+        <p class="lede" style="margin-top: 1rem;">Cooper Delo is the solo identity. Original songs across alt-rock, dream pop, and indie rap. 34,000+ streams. Influences run through Smashing Pumpkins, Tame Impala, Dominic Fike, Phoebe Bridgers, Radiohead, Beabadoobee. Recorded in Ableton.</p>
+        <div style="display: flex; gap: 0.6rem; margin-top: 1.6rem; flex-wrap: wrap;">
+          <a href="https://open.spotify.com" target="_blank" rel="noreferrer" data-cursor="LISTEN" data-no-transition onclick="window.open(this.href,'_blank');return false;" class="stat-card glass" style="padding: 0.7rem 1rem; font-family: 'Geist Mono', monospace; text-transform: uppercase; letter-spacing: 0.18em; font-size: 0.72rem;">Listen on Spotify</a>
+          <a href="https://music.apple.com" target="_blank" rel="noreferrer" data-cursor="LISTEN" data-no-transition onclick="window.open(this.href,'_blank');return false;" class="stat-card glass" style="padding: 0.7rem 1rem; font-family: 'Geist Mono', monospace; text-transform: uppercase; letter-spacing: 0.18em; font-size: 0.72rem;">Apple Music</a>
+          <a href="rubber-band.html" data-cursor="DEEP DIVE" data-transition="MUSIC" class="stat-card glass" style="padding: 0.7rem 1rem; font-family: 'Geist Mono', monospace; text-transform: uppercase; letter-spacing: 0.18em; font-size: 0.72rem; color: var(--rust);">The music page</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Builder (cream insert) -->
+<section class="block world-builder">
+  <div class="grid">
+    <div class="col-12 reveal">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <span class="plate" style="background: rgba(10,9,8,0.08); border: 1px solid rgba(10,9,8,0.12);"><span class="num">05</span><span class="eyebrow" style="margin:0;">Builder</span></span>
+        <span class="eyebrow">Selected work</span>
+      </div>
+      <h2 class="section-poster" style="color: var(--bg);">Other things I have <span class="accent">shipped.</span></h2>
+    </div>
+  </div>
+  <div style="max-width: 1600px; margin: 4rem auto 0; border-top: 1px solid rgba(10,9,8,0.18);">
+    <div class="project-row reveal">
+      <div class="meta">2024 to now</div>
+      <div><h3 class="row-poster" style="color: var(--bg);">Plugverse</h3><p class="body-prose" style="margin-top: 0.6rem;">Marketplace for booking local music. Stripe Connect, Supabase auth, generated contracts, escrow payouts.</p></div>
+      <div class="meta">Solo founder</div>
+    </div>
+    <div class="project-row reveal">
+      <div class="meta">2026</div>
+      <div><h3 class="row-poster" style="color: var(--bg);">Personal AI Operating System</h3><p class="body-prose" style="margin-top: 0.6rem;">A 329-file vault that runs my life. Twelve advisor agents, scheduled briefings, automatic financial logging.</p></div>
+      <div class="meta">Designer / operator</div>
+    </div>
+    <div class="project-row reveal">
+      <div class="meta">2026</div>
+      <div><h3 class="row-poster" style="color: var(--bg);">Resume Generator</h3><p class="body-prose" style="margin-top: 0.6rem;">Got tired of re-typing my resume into every portal. Built the version that does it for me.</p></div>
+      <div class="meta">Full stack</div>
+    </div>
+    <div class="project-row reveal">
+      <div class="meta">Summer 2025</div>
+      <div><h3 class="row-poster" style="color: var(--bg);">CleverCX</h3><p class="body-prose" style="margin-top: 0.6rem;">Built AI features for a fintech serving advisors and enterprise clients.</p></div>
+      <div class="meta">Fintech intern</div>
+    </div>
+  </div>
+  <div style="max-width: 1600px; margin: 0 auto;"><a href="builder.html" data-cursor="VIEW ALL" data-transition="BUILDER" class="under" style="display: inline-block; margin-top: 3rem; font-family: 'Geist Mono', monospace; text-transform: uppercase; letter-spacing: 0.22em; font-size: 0.78rem; color: var(--bg);">The full builder log</a></div>
+</section>
+
+<!-- Now -->
+<section class="block">
+  <div class="grid">
+    <div class="col-12 reveal">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <span class="plate glass"><span class="num">06</span><span class="eyebrow" style="margin:0;">Live</span></span>
+        <span class="eyebrow">Updated April 27, 2026</span>
+      </div>
+      <h2 class="section-poster">Now<span class="accent">.</span></h2>
+    </div>
+  </div>
+  <div class="grid" style="margin-top: 3rem;">
+    <div class="col-9">
+      <ul class="now-list reveal">
+        <li><span class="tag">this wk</span><span>Closing the last P1 bugs in the booking flow</span></li>
+        <li><span class="tag">this wk</span><span>Stripe Connect going live before launch</span></li>
+        <li><span class="tag">this wk</span><span>Truist internship prep, starts May 27</span></li>
+      </ul>
+    </div>
+    <div class="col-3">
+      <a href="now.html" class="under" data-cursor="ENTER" data-transition="NOW" style="display: inline-block; margin-top: 2rem; font-family: 'Geist Mono', monospace; text-transform: uppercase; letter-spacing: 0.22em; font-size: 0.78rem; color: var(--rust);">Open the now-page</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="site">
+  <div style="max-width: 1600px; margin: 0 auto; display: grid; grid-template-columns: 1fr; gap: 2.5rem; position: relative;">
+    <div>
+      <span class="eyebrow">Get in touch</span>
+      <button class="under" data-contact data-cursor="OPEN" style="display: block; margin-top: 1rem; text-align: left; font-family: 'Anton', Impact, sans-serif; font-size: clamp(2.6rem, 7vw, 6rem); line-height: 0.95; text-transform: uppercase; color: var(--ink);">cooperdelo6@gmail.com</button>
+    </div>
+    <div class="massive">cooperdelo</div>
+    <div style="display: flex; justify-content: space-between; font-family: 'Geist Mono', monospace; text-transform: uppercase; letter-spacing: 0.22em; font-size: 0.72rem; opacity: 0.7;">
+      <span>Chapel Hill, NC</span><span>2026</span>
+    </div>
+  </div>
+</footer>
+
+<!-- Modal -->
+<div class="modal-backdrop" id="modal">
+  <div class="modal">
+    <h3>Get in touch.</h3>
+    <p style="font-family: 'Geist Mono', monospace; text-transform: uppercase; letter-spacing: 0.22em; font-size: 0.7rem; color: var(--muted); margin-bottom: 1.4rem;">Email is the fastest way</p>
+    <div class="email-row">
+      <span>cooperdelo6@gmail.com</span>
+      <button class="copy-btn" data-cursor="COPY" id="copyBtn">Copy</button>
+    </div>
+    <div class="options">
+      <a href="https://mail.google.com/mail/?view=cm&fs=1&to=cooperdelo6@gmail.com" target="_blank" rel="noreferrer" data-cursor="OPEN" data-no-transition onclick="window.open(this.href, '_blank'); return false;">Gmail</a>
+      <a href="https://www.linkedin.com/in/cooperdelo/" target="_blank" rel="noreferrer" data-cursor="OPEN" data-no-transition onclick="window.open(this.href, '_blank'); return false;">LinkedIn</a>
+      <a href="https://instagram.com/cooperdelo" target="_blank" rel="noreferrer" data-cursor="OPEN" data-no-transition onclick="window.open(this.href, '_blank'); return false;">Instagram</a>
+    </div>
+    <div style="display: flex; justify-content: flex-end; align-items: center; padding-top: 0.6rem;">
+      <button class="close under" data-cursor="CLOSE" id="closeModal">Close</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast">Copied to clipboard</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="shell.js"></script>
+</body>
+</html>

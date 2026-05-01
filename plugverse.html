@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Plugverse / Cooper Delo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,300..900,30..100,0..1;1,9..144,300..900,30..100,0..1&family=Geist+Mono:wght@400;500&family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="shell.css" />
+</head>
+<body class="grain">
+
+<div class="loader" id="loader">
+  <div class="label">Plugverse / Founder Story</div>
+  <div class="name">Plug<br/>verse.</div>
+  <div class="progress"></div>
+</div>
+<div class="transition-veil out" id="veil"><span class="label"></span></div>
+<canvas class="scene-canvas" id="scene-canvas"></canvas>
+<div class="cursor" id="cursor"></div>
+
+<nav class="top" id="topnav">
+  <a href="index.html" class="nav-logo" data-cursor="HOME" data-transition="HOME">Cooper Delo</a>
+  <div class="nav-pill">
+    <div class="nav-links" id="navLinks">
+      <span class="nav-indicator" id="navIndicator"></span>
+      <a href="index.html" class="nav-link" data-cursor="VIEW" data-transition="HOME">Home</a>
+      <a href="plugverse.html" class="nav-link active" data-cursor="VIEW" data-no-transition>Plugverse</a>
+      <a href="rubber-band.html" class="nav-link" data-cursor="VIEW" data-transition="MUSIC">Rubber Band</a>
+      <a href="builder.html" class="nav-link" data-cursor="VIEW" data-transition="BUILDER">Builder</a>
+      <a href="now.html" class="nav-link" data-cursor="VIEW" data-transition="NOW">Now</a>
+    </div>
+  </div>
+  <button class="nav-cta" data-cursor="OPEN" data-contact>Get in touch</button>
+</nav>
+<div class="nav-progress-track"><div class="nav-progress" id="navProgress"></div></div>
+
+<main>
+
+<header class="page-head world-plugverse">
+  <div class="inner">
+    <span class="eyebrow">Project / 2024 to now</span>
+    <h1 class="poster reveal in" style="margin-top: 1.5rem;">Plug<span class="accent">verse.</span></h1>
+    <p class="lede reveal" style="margin-top: 2.4rem; max-width: 50rem;">Where local music gets booked.</p>
+  </div>
+</header>
+
+<div class="marquee-band">
+  <div class="marquee-track">
+    <span>Booking infrastructure</span><span>Built solo</span><span>1789 Fund 2025</span><span>Launching April 30</span><span>plugverse.app</span>
+    <span>Booking infrastructure</span><span>Built solo</span><span>1789 Fund 2025</span><span>Launching April 30</span><span>plugverse.app</span>
+  </div>
+</div>
+
+<section class="block">
+  <div class="grid">
+    <div class="col-4"><span class="eyebrow">The problem</span></div>
+    <div class="col-8">
+      <div class="reveal">
+        <p class="lede">A local band gets a text. You guys available April 12th? They spend twenty minutes writing a bio they have written forty times. Attach a setlist from the camera roll. Copy a contract from a Google Doc they found in 2023. Send their Venmo. Two weeks later, same thing. Different venue. Same twenty minutes.</p>
+      </div>
+      <div class="reveal" style="margin-top: 2rem;">
+        <p class="body-prose">The problem is not payment. Artists get paid. The problem is that there is no professional identity layer for independent artists. No persistent profile. No searchable availability. No standard contract. Every booking is cold and manual and starts at zero.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="block world-plugverse">
+  <div class="grid">
+    <div class="col-4"><span class="eyebrow">What I built</span></div>
+    <div class="col-8">
+      <div class="reveal">
+        <p class="lede">One profile that does the work for them. Get discovered. Get booked. Contract auto-generated. Payment held in escrow until the gig is done. Free for organizers. Marketplace fee on artist payout. Built with Stripe Connect, Supabase, Next.js, and a lot of late nights.</p>
+      </div>
+      <div class="stats" style="margin-top: 3rem;">
+        <div class="stat-card glass"><span class="label">Founded</span><span class="value">Nov 2024</span></div>
+        <div class="stat-card glass"><span class="label">Form</span><span class="value">NC LLC</span></div>
+        <div class="stat-card glass"><span class="label">Built by</span><span class="value">Cooper</span></div>
+        <div class="stat-card glass"><span class="label">Stack</span><span class="value">Next, Supa, Stripe</span></div>
+        <div class="stat-card glass"><span class="label">Funding</span><span class="value">$1,850</span></div>
+        <div class="stat-card glass"><span class="label">Equity given</span><span class="value">0%</span></div>
+        <div class="stat-card glass"><span class="label">Status</span><span class="value">Apr 30 launch</span></div>
+        <div class="stat-card glass"><span class="label">Live at</span><span class="value">plugverse.app</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="block">
+  <div class="grid">
+    <div class="col-7"><div class="reveal"><div class="photo-frame">
+      <div class="photo has-media landscape" data-world="plugverse">
+        <img src="photos/hero.jpeg" alt="Cooper pitching Plugverse at UNC Innovate Carolina Junction" />
+      </div>
+      <div class="caption-shard glass-light">Pitching at Innovate Carolina / 2026</div>
+    </div></div></div>
+    <div class="col-5"><div class="reveal" style="margin-top: 4rem;"><div class="photo-frame">
+      <div class="photo has-media portrait-tall" data-world="plugverse">
+        <video autoplay muted loop playsinline preload="metadata">
+          <source src="videos/plugverse_ui.mp4" type="video/mp4" />
+        </video>
+      </div>
+      <div class="caption-shard glass-light" style="transform: rotate(1.4deg);">Plugverse / live UI / 2026</div>
+    </div></div></div>
+  </div>
+</section>
+
+<!-- Wins / Recognition -->
+<section class="block world-plugverse">
+  <div class="grid">
+    <div class="col-12 reveal">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <span class="plate glass"><span class="num">04</span><span class="eyebrow" style="margin:0;">Recognition</span></span>
+        <span class="eyebrow">$21,850 raised, zero equity given</span>
+      </div>
+      <h2 class="section-poster">Wins<span class="accent">.</span></h2>
+    </div>
+  </div>
+  <div class="grid" style="margin-top: 3rem;">
+    <div class="col-7">
+      <div class="reveal"><div class="photo-frame">
+        <div class="photo has-media landscape" data-world="plugverse">
+          <img src="photos/luby_pic_with_check.jpeg" alt="Cooper Delo accepting the Luby Pitch Competition $20,000 check for Plugverse" />
+        </div>
+        <div class="caption-shard glass-light">Luby Pitch Competition / Apr 2026</div>
+      </div></div>
+    </div>
+    <div class="col-5">
+      <div class="reveal">
+        <ul class="wins-list">
+          <li>
+            <span class="amount">$20K</span>
+            <span class="title">Luby Pitch Competition</span>
+            <span class="when">Apr 2026</span>
+          </li>
+          <li>
+            <span class="amount">$1.85K</span>
+            <span class="title">1789 Student Venture Fund</span>
+            <span class="when">2025</span>
+          </li>
+          <li>
+            <span class="amount">LLC</span>
+            <span class="title">Plugverse LLC formed in NC</span>
+            <span class="when">Mar 2026</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="block world-plugverse">
+  <div class="grid">
+    <div class="col-4"><span class="eyebrow">Why I am the one building it</span></div>
+    <div class="col-8">
+      <div class="reveal">
+        <p class="lede">I play in a band. I plan events for my fraternity. I am a CS and business student building the product myself with Claude Code. I am not guessing at the problem. I live on all three sides of the marketplace.</p>
+        <a href="https://plugverse.app" target="_blank" rel="noreferrer" data-no-transition onclick="window.open(this.href,'_blank');return false;" class="under" data-cursor="VISIT" style="display: inline-block; margin-top: 2.5rem; font-family: 'Geist Mono', monospace; text-transform: uppercase; letter-spacing: 0.22em; font-size: 0.78rem; color: var(--rust);">plugverse.app</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="block">
+  <div class="grid">
+    <div class="col-12" style="text-align: center;">
+      <div class="reveal">
+        <span class="eyebrow">Continue reading</span>
+        <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; margin-top: 2rem;">
+          <a href="rubber-band.html" data-cursor="NEXT" data-transition="MUSIC" class="stat-card glass" style="padding: 1rem 1.4rem; font-family: 'Geist Mono', monospace; text-transform: uppercase; letter-spacing: 0.22em; font-size: 0.78rem;">Rubber Band & music</a>
+          <a href="builder.html" data-cursor="NEXT" data-transition="BUILDER" class="stat-card glass" style="padding: 1rem 1.4rem; font-family: 'Geist Mono', monospace; text-transform: uppercase; letter-spacing: 0.22em; font-size: 0.78rem;">Builder log</a>
+          <a href="now.html" data-cursor="NEXT" data-transition="NOW" class="stat-card glass" style="padding: 1rem 1.4rem; font-family: 'Geist Mono', monospace; text-transform: uppercase; letter-spacing: 0.22em; font-size: 0.78rem;">What I am working on now</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="site">
+  <div style="max-width: 1600px; margin: 0 auto; display: grid; gap: 2.5rem; position: relative;">
+    <div>
+      <span class="eyebrow">Get in touch</span>
+      <button class="under" data-contact data-cursor="OPEN" style="display: block; margin-top: 1rem; text-align: left; font-family: 'Anton', Impact, sans-serif; font-size: clamp(2.6rem, 7vw, 6rem); line-height: 0.95; text-transform: uppercase; color: var(--ink);">cooperdelo6@gmail.com</button>
+    </div>
+    <div class="massive">cooperdelo</div>
+    <div style="display: flex; justify-content: space-between; font-family: 'Geist Mono', monospace; text-transform: uppercase; letter-spacing: 0.22em; font-size: 0.72rem; opacity: 0.7;">
+      <span>Chapel Hill, NC</span><span>2026</span>
+    </div>
+  </div>
+</footer>
+
+<div class="modal-backdrop" id="modal">
+  <div class="modal">
+    <h3>Get in touch.</h3>
+    <p style="font-family: 'Geist Mono', monospace; text-transform: uppercase; letter-spacing: 0.22em; font-size: 0.7rem; color: var(--muted); margin-bottom: 1.4rem;">Email is the fastest way</p>
+    <div class="email-row">
+      <span>cooperdelo6@gmail.com</span>
+      <button class="copy-btn" data-cursor="COPY" id="copyBtn">Copy</button>
+    </div>
+    <div class="options">
+      <a href="https://mail.google.com/mail/?view=cm&fs=1&to=cooperdelo6@gmail.com" target="_blank" rel="noreferrer" data-no-transition data-cursor="OPEN" onclick="window.open(this.href, '_blank'); return false;">Gmail</a>
+      <a href="https://www.linkedin.com/in/cooperdelo/" target="_blank" rel="noreferrer" data-no-transition data-cursor="OPEN" onclick="window.open(this.href, '_blank'); return false;">LinkedIn</a>
+      <a href="https://instagram.com/cooperdelo" target="_blank" rel="noreferrer" data-no-transition data-cursor="OPEN" onclick="window.open(this.href, '_blank'); return false;">Instagram</a>
+    </div>
+    <div style="display: flex; justify-content: flex-end; align-items: center; padding-top: 0.6rem;">
+      <button class="close under" data-cursor="CLOSE" id="closeModal">Close</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast">Copied to clipboard</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="shell.js"></script>
+</body>
+</html>

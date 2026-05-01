@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Builder Log / Cooper Delo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,300..900,30..100,0..1;1,9..144,300..900,30..100,0..1&family=Geist+Mono:wght@400;500&family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="shell.css" />
+</head>
+<body class="grain has-page-bg">
+
+<div class="loader" id="loader">
+  <div class="label">The Builder Log</div>
+  <div class="name">I make<br/>things.</div>
+  <div class="progress"></div>
+</div>
+<div class="transition-veil out" id="veil"><span class="label"></span></div>
+
+<!-- Persistent atmospheric backdrop -->
+<div class="page-bg">
+  <img src="photos/front-page-hero.jpg" alt="Cooper at Carmel California coast" />
+</div>
+
+<canvas class="scene-canvas" id="scene-canvas"></canvas>
+<div class="cursor" id="cursor"></div>
+
+<nav class="top" id="topnav">
+  <a href="index.html" class="nav-logo" data-cursor="HOME" data-transition="HOME">Cooper Delo</a>
+  <div class="nav-pill">
+    <div class="nav-links" id="navLinks">
+      <span class="nav-indicator" id="navIndicator"></span>
+      <a href="index.html" class="nav-link" data-cursor="VIEW" data-transition="HOME">Home</a>
+      <a href="plugverse.html" class="nav-link" data-cursor="VIEW" data-transition="PLUGVERSE">Plugverse</a>
+      <a href="rubber-band.html" class="nav-link" data-cursor="VIEW" data-transition="MUSIC">Rubber Band</a>
+      <a href="builder.html" class="nav-link active" data-cursor="VIEW" data-no-transition>Builder</a>
+      <a href="now.html" class="nav-link" data-cursor="VIEW" data-transition="NOW">Now</a>
+    </div>
+  </div>
+  <button class="nav-cta" data-cursor="OPEN" data-contact>Get in touch</button>
+</nav>
+<div class="nav-progress-track"><div class="nav-progress" id="navProgress"></div></div>
+
+<main>
+
+<header class="page-head">
+  <div class="inner">
+    <span class="eyebrow">The builder log</span>
+    <h1 class="poster reveal in" style="margin-top: 1.5rem;">I make things.<br/><span class="accent">A lot of them.</span></h1>
+  </div>
+</header>
+
+<section class="block">
+  <div style="max-width: 1600px; margin: 0 auto; border-top: 1px solid rgba(244,239,230,0.18);">
+    <div class="project-row reveal">
+      <div class="meta">2024 to now</div>
+      <div><h3 class="row-poster">Plugverse</h3><p class="body-prose" style="margin-top: 0.6rem;">Marketplace for booking local music. Built end to end. Stripe Connect, Supabase auth and RLS, Next.js, generated contracts, escrow payouts. The first commercial product I have shipped that is actually mine.</p></div>
+      <div class="meta">Solo founder, technical lead</div>
+    </div>
+    <div class="project-row reveal">
+      <div class="meta">2026</div>
+      <div><h3 class="row-poster">Personal AI Operating System</h3><p class="body-prose" style="margin-top: 0.6rem;">A 329-file vault that runs my life. Twelve advisor agents (CEO, CFO, mindset, health, etc.), scheduled briefings, automatic financial logging across Supabase plus Notion plus Excel. The system that helped write half of this site.</p></div>
+      <div class="meta">Designer / operator</div>
+    </div>
+    <div class="project-row reveal">
+      <div class="meta">2026</div>
+      <div><h3 class="row-poster">Resume Generator</h3><p class="body-prose" style="margin-top: 0.6rem;">Got tired of re-typing my resume into every portal. Built the version that does it for me. Supabase plus GPT, fine-tuned on my own writing voice.</p></div>
+      <div class="meta">Full stack</div>
+    </div>
+    <div class="project-row reveal">
+      <div class="meta">Summer 2025</div>
+      <div><h3 class="row-poster">CleverCX</h3><p class="body-prose" style="margin-top: 0.6rem;">Built AI features for a fintech serving advisors and enterprise clients. Got the full stack of testing, feature development, and product strategy in a small team.</p></div>
+      <div class="meta">Fintech intern</div>
+    </div>
+    <div class="project-row reveal">
+      <div class="meta">Summer 2025</div>
+      <div><h3 class="row-poster">Tootle</h3><p class="body-prose" style="margin-top: 0.6rem;">Worked on AI product development inside a startup environment. Shipped, broke things, fixed them.</p></div>
+      <div class="meta">AI / Product intern</div>
+    </div>
+    <div class="project-row reveal">
+      <div class="meta">Fall 2025</div>
+      <div><h3 class="row-poster">AI Research at UNC</h3><p class="body-prose" style="margin-top: 0.6rem;">Working with Professor Shimul Melwani on applied AI research at the Kenan-Flagler Business School.</p></div>
+      <div class="meta">Research assistant</div>
+    </div>
+    <div class="project-row reveal">
+      <div class="meta">2025</div>
+      <div><h3 class="row-poster">Carolina Data Challenge</h3><p class="body-prose" style="margin-top: 0.6rem;">Space economy data analysis. Pulled patent and SBIR data, mapped the supplier graph, presented to a panel of judges who definitely did not expect a sophomore on the mic.</p></div>
+      <div class="meta">Analyst</div>
+    </div>
+    <div class="project-row reveal">
+      <div class="meta">2025</div>
+      <div><h3 class="row-poster">EY Expedition</h3><p class="body-prose" style="margin-top: 0.6rem;">Selected for EY's national virtual learning program. Completed at the advanced level, top 100 nationally.</p></div>
+      <div class="meta">National recognition</div>
+    </div>
+  </div>
+</section>
+
+<section class="block">
+  <div class="grid">
+    <div class="col-4"><span class="eyebrow">Where to find more</span></div>
+    <div class="col-8">
+      <div class="reveal">
+        <p class="lede">If you want the full code log, my GitHub is the cleanest place. If you want the founder narrative, hit Plugverse. If you want a sense of how I think out loud, the now-page is rewritten every week.</p>
+        <div style="display: flex; gap: 0.6rem; margin-top: 2rem; flex-wrap: wrap;">
+          <a href="https://github.com/" target="_blank" rel="noreferrer" data-no-transition data-cursor="OPEN" onclick="window.open(this.href,'_blank');return false;" class="stat-card glass" style="padding: 0.85rem 1.1rem; font-family: 'Geist Mono', monospace; text-transform: uppercase; letter-spacing: 0.18em; font-size: 0.72rem;">GitHub</a>
+          <a href="plugverse.html" data-cursor="NEXT" data-transition="PLUGVERSE" class="stat-card glass" style="padding: 0.85rem 1.1rem; font-family: 'Geist Mono', monospace; text-transform: uppercase; letter-spacing: 0.18em; font-size: 0.72rem;">Plugverse story</a>
+          <a href="now.html" data-cursor="NEXT" data-transition="NOW" class="stat-card glass" style="padding: 0.85rem 1.1rem; font-family: 'Geist Mono', monospace; text-transform: uppercase; letter-spacing: 0.18em; font-size: 0.72rem;">Now-page</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="site">
+  <div style="max-width: 1600px; margin: 0 auto; display: grid; gap: 2.5rem; position: relative;">
+    <div>
+      <span class="eyebrow">Get in touch</span>
+      <button class="under" data-contact data-cursor="OPEN" style="display: block; margin-top: 1rem; text-align: left; font-family: 'Anton', Impact, sans-serif; font-size: clamp(2.6rem, 7vw, 6rem); line-height: 0.95; text-transform: uppercase; color: var(--ink);">cooperdelo6@gmail.com</button>
+    </div>
+    <div class="massive">cooperdelo</div>
+    <div style="display: flex; justify-content: space-between; font-family: 'Geist Mono', monospace; text-transform: uppercase; letter-spacing: 0.22em; font-size: 0.72rem; opacity: 0.7;">
+      <span>Chapel Hill, NC</span><span>2026</span>
+    </div>
+  </div>
+</footer>
+
+<div class="modal-backdrop" id="modal">
+  <div class="modal">
+    <h3>Get in touch.</h3>
+    <p style="font-family: 'Geist Mono', monospace; text-transform: uppercase; letter-spacing: 0.22em; font-size: 0.7rem; color: var(--muted); margin-bottom: 1.4rem;">Email is the fastest way</p>
+    <div class="email-row">
+      <span>cooperdelo6@gmail.com</span>
+      <button class="copy-btn" data-cursor="COPY" id="copyBtn">Copy</button>
+    </div>
+    <div class="options">
+      <a href="https://mail.google.com/mail/?view=cm&fs=1&to=cooperdelo6@gmail.com" target="_blank" rel="noreferrer" data-no-transition data-cursor="OPEN" onclick="window.open(this.href, '_blank'); return false;">Gmail</a>
+      <a href="https://www.linkedin.com/in/cooperdelo/" target="_blank" rel="noreferrer" data-no-transition data-cursor="OPEN" onclick="window.open(this.href, '_blank'); return false;">LinkedIn</a>
+      <a href="https://instagram.com/cooperdelo" target="_blank" rel="noreferrer" data-no-transition data-cursor="OPEN" onclick="window.open(this.href, '_blank'); return false;">Instagram</a>
+    </div>
+    <div style="display: flex; justify-content: flex-end; align-items: center; padding-top: 0.6rem;">
+      <button class="close under" data-cursor="CLOSE" id="closeModal">Close</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast">Copied to clipboard</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="shell.js"></script>
+</body>
+</html>

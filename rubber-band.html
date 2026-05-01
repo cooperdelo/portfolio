@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Rubber Band & Cooper Delo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,300..900,30..100,0..1;1,9..144,300..900,30..100,0..1&family=Geist+Mono:wght@400;500&family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="shell.css" />
+</head>
+<body class="grain">
+
+<div class="loader" id="loader">
+  <div class="label">Music / Rubber Band & Cooper Delo</div>
+  <div class="name">Loud rooms<br/>quiet songs.</div>
+  <div class="progress"></div>
+</div>
+<div class="transition-veil out" id="veil"><span class="label"></span></div>
+<canvas class="scene-canvas" id="scene-canvas"></canvas>
+<div class="cursor" id="cursor"></div>
+
+<nav class="top" id="topnav">
+  <a href="index.html" class="nav-logo" data-cursor="HOME" data-transition="HOME">Cooper Delo</a>
+  <div class="nav-pill">
+    <div class="nav-links" id="navLinks">
+      <span class="nav-indicator" id="navIndicator"></span>
+      <a href="index.html" class="nav-link" data-cursor="VIEW" data-transition="HOME">Home</a>
+      <a href="plugverse.html" class="nav-link" data-cursor="VIEW" data-transition="PLUGVERSE">Plugverse</a>
+      <a href="rubber-band.html" class="nav-link active" data-cursor="VIEW" data-no-transition>Rubber Band</a>
+      <a href="builder.html" class="nav-link" data-cursor="VIEW" data-transition="BUILDER">Builder</a>
+      <a href="now.html" class="nav-link" data-cursor="VIEW" data-transition="NOW">Now</a>
+    </div>
+  </div>
+  <button class="nav-cta" data-cursor="OPEN" data-contact>Get in touch</button>
+</nav>
+<div class="nav-progress-track"><div class="nav-progress" id="navProgress"></div></div>
+
+<main>
+
+<header class="page-head world-rubber video-cover-wrap">
+  <video class="video-cover" autoplay muted loop playsinline preload="metadata">
+    <source src="videos/whole%20band%20rubber%20vid.MOV" type="video/mp4" />
+    <source src="videos/whole%20band%20rubber%20vid.MOV" type="video/quicktime" />
+  </video>
+  <div class="inner">
+    <span class="eyebrow">Music / Rubber Band & Cooper Delo</span>
+    <h1 class="poster reveal in" style="margin-top: 1.5rem;">Loud rooms,<br/><span class="accent">quiet songs.</span></h1>
+  </div>
+</header>
+
+<div class="marquee-band">
+  <div class="marquee-track">
+    <span>Bass in Rubber Band</span><span>34,000+ streams</span><span>Ableton Live</span><span>Alt-rock dream pop indie rap</span><span>UNC NCSU ECU</span>
+    <span>Bass in Rubber Band</span><span>34,000+ streams</span><span>Ableton Live</span><span>Alt-rock dream pop indie rap</span><span>UNC NCSU ECU</span>
+  </div>
+</div>
+
+<section class="block world-rubber">
+  <div class="grid">
+    <div class="col-12 reveal">
+      <span class="eyebrow">The cover band</span>
+      <h2 class="section-poster" style="margin-top: 0.6rem;">Rubber Band.</h2>
+    </div>
+  </div>
+  <div class="grid" style="margin-top: 3rem;">
+    <div class="col-4">
+      <div class="reveal"><div class="photo-frame">
+        <div class="photo has-media portrait-tall">
+          <img src="photos/shirtless_guitar.jpeg" alt="Cooper with green bass at an outdoor Rubber Band gig" />
+        </div>
+        <div class="caption-shard glass-light" style="transform: rotate(-2deg);">Day gig / 2025</div>
+      </div></div>
+    </div>
+    <div class="col-8">
+      <div class="reveal">
+        <p class="lede">Rubber Band is the cover band I play bass in at UNC. Five guys, mostly Chi Phi and one drummer who got pulled in from Pi Kapp. Sorority houses, frat houses, Chapel Hill bars, sometimes NC State or ECU. About $3K a semester. I learned bass the summer I joined and ran 45 songs in eight weeks.</p>
+      </div>
+      <div class="stats" style="margin-top: 2.5rem;">
+        <div class="stat-card glass"><span class="label">Per gig</span><span class="value">$1k to $1.8k</span></div>
+        <div class="stat-card glass"><span class="label">Per member</span><span class="value">$200 to $360</span></div>
+        <div class="stat-card glass"><span class="label">Cooper</span><span class="value">Bass</span></div>
+        <div class="stat-card glass"><span class="label">Circuit</span><span class="value">UNC NCSU ECU</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Full-bleed banner photo -->
+<section style="position: relative; padding: 0; height: 70vh; min-height: 520px; overflow: hidden;">
+  <img src="photos/rubber_band_full_pic.jpeg" alt="Rubber Band performing outdoors, full lineup" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0;" />
+  <div style="position: absolute; inset: 0; z-index: 1; background: linear-gradient(180deg, rgba(10,9,8,0.4) 0%, rgba(10,9,8,0.05) 30%, rgba(10,9,8,0.5) 100%); pointer-events: none;"></div>
+  <div style="position: absolute; inset: 0; z-index: 2; display: flex; align-items: flex-end; padding: 3rem 2.4rem;">
+    <div class="caption-shard glass-light" style="position: static; transform: rotate(-1deg);">Full lineup / open-air gig / 2025</div>
+  </div>
+</section>
+
+<section class="block">
+  <div class="grid">
+    <div class="col-12">
+      <span class="eyebrow">The lineup</span>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0; border-top: 1px solid rgba(244,239,230,0.18); margin-top: 2rem;">
+        <div style="padding: 2rem 0.5rem; border-right: 1px solid rgba(244,239,230,0.18);">
+          <span class="eyebrow">Bass</span>
+          <div class="row-poster" style="margin-top: 0.5rem;">Cooper</div>
+          <div style="font-size: 0.9rem; color: var(--ink-2); margin-top: 0.5rem;">Sophomore, Chi Phi</div>
+        </div>
+        <div style="padding: 2rem 0.5rem; border-right: 1px solid rgba(244,239,230,0.18);">
+          <span class="eyebrow">Lead Guitar</span>
+          <div class="row-poster" style="margin-top: 0.5rem;">Jackson</div>
+          <div style="font-size: 0.9rem; color: var(--ink-2); margin-top: 0.5rem;">Senior, Sig Chi</div>
+        </div>
+        <div style="padding: 2rem 0.5rem; border-right: 1px solid rgba(244,239,230,0.18);">
+          <span class="eyebrow">Vocals</span>
+          <div class="row-poster" style="margin-top: 0.5rem;">Stewart</div>
+          <div style="font-size: 0.9rem; color: var(--ink-2); margin-top: 0.5rem;">Senior, Chi Phi</div>
+        </div>
+        <div style="padding: 2rem 0.5rem; border-right: 1px solid rgba(244,239,230,0.18);">
+          <span class="eyebrow">Rhythm</span>
+          <div class="row-poster" style="margin-top: 0.5rem;">Nick</div>
+          <div style="font-size: 0.9rem; color: var(--ink-2); margin-top: 0.5rem;">Senior, Chi Phi</div>
+        </div>
+        <div style="padding: 2rem 0.5rem;">
+          <span class="eyebrow">Drums</span>
+          <div class="row-poster" style="margin-top: 0.5rem;">Ben</div>
+          <div style="font-size: 0.9rem; color: var(--ink-2); margin-top: 0.5rem;">Senior, Pi Kapp</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="block">
+  <div class="grid">
+    <div class="col-7">
+      <span class="eyebrow">Setlist sample</span>
+      <ul style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.6rem 1.5rem; list-style: none; margin-top: 1.5rem;">
+        <li class="row-poster" style="border-top: 1px solid rgba(244,239,230,0.18); padding-top: 0.7rem; font-size: 1.6rem;">Mr. Brightside</li>
+        <li class="row-poster" style="border-top: 1px solid rgba(244,239,230,0.18); padding-top: 0.7rem; font-size: 1.6rem;">Last Nite</li>
+        <li class="row-poster" style="border-top: 1px solid rgba(244,239,230,0.18); padding-top: 0.7rem; font-size: 1.6rem;">Jane</li>
+        <li class="row-poster" style="border-top: 1px solid rgba(244,239,230,0.18); padding-top: 0.7rem; font-size: 1.6rem;">Wagon Wheel</li>
+        <li class="row-poster" style="border-top: 1px solid rgba(244,239,230,0.18); padding-top: 0.7rem; font-size: 1.6rem;">Sex on Fire</li>
+        <li class="row-poster" style="border-top: 1px solid rgba(244,239,230,0.18); padding-top: 0.7rem; font-size: 1.6rem;">Closing Time</li>
+        <li class="row-poster" style="border-top: 1px solid rgba(244,239,230,0.18); padding-top: 0.7rem; font-size: 1.6rem;">Mary Jane's Last Dance</li>
+        <li class="row-poster" style="border-top: 1px solid rgba(244,239,230,0.18); padding-top: 0.7rem; font-size: 1.6rem;">Dancing in the Dark</li>
+        <li class="row-poster" style="border-top: 1px solid rgba(244,239,230,0.18); padding-top: 0.7rem; font-size: 1.6rem;">American Pie</li>
+      </ul>
+    </div>
+    <div class="col-5">
+      <div class="reveal"><div class="photo-frame">
+        <div class="photo has-media portrait-tall">
+          <img src="photos/solo_cooper_bass.jpeg" alt="Cooper performing live, lit by stage lights" />
+        </div>
+        <div class="caption-shard glass-light">Bob's Bar / Rubber Band / 2026</div>
+      </div></div>
+      <div class="reveal" style="margin-top: 1.4rem;"><div class="photo-frame">
+        <div class="photo has-media landscape">
+          <img src="photos/bobs_bar_gig_pic.jpeg" alt="Cooper playing bass at Bob's Bar with crowd visible" />
+        </div>
+        <div class="caption-shard glass-light" style="transform: rotate(1.4deg);">Crowd shot / 2026</div>
+      </div></div>
+    </div>
+  </div>
+</section>
+
+<section class="block world-cooper">
+  <div class="grid">
+    <div class="col-12 reveal">
+      <span class="eyebrow">The solo project</span>
+      <h2 class="section-poster" style="margin-top: 0.6rem;">Cooper <span class="accent">Delo.</span></h2>
+    </div>
+  </div>
+  <div class="grid" style="margin-top: 3rem;">
+    <div class="col-4">
+      <div class="reveal"><div class="photo-frame">
+        <div class="photo has-media portrait-tall">
+          <img src="photos/guitar_portrait_playing.jpeg" alt="Cooper Delo playing bass with motion blur background" />
+        </div>
+        <div class="caption-shard glass-light" style="transform: rotate(-2deg);">Cooper Delo / 2026</div>
+      </div></div>
+    </div>
+    <div class="col-8">
+      <div class="reveal">
+        <p class="lede">Original songs across alt-rock, dream pop, and indie rap. 34,000+ streams across the catalog. Influences run through Smashing Pumpkins, Tame Impala, Dominic Fike, Phoebe Bridgers, Radiohead, Beabadoobee. Recorded in Ableton.</p>
+      </div>
+      <div class="stats" style="margin-top: 2.5rem;">
+        <div class="stat-card glass"><span class="label">DAW</span><span class="value">Ableton Live</span></div>
+        <div class="stat-card glass"><span class="label">Streams</span><span class="value">34,000+</span></div>
+        <div class="stat-card glass"><span class="label">Sound</span><span class="value">Alt rock dream pop</span></div>
+      </div>
+      <div style="display: flex; gap: 0.6rem; margin-top: 2rem; flex-wrap: wrap;">
+        <a href="https://open.spotify.com" target="_blank" rel="noreferrer" data-cursor="LISTEN" data-no-transition onclick="window.open(this.href,'_blank');return false;" class="stat-card glass" style="padding: 0.7rem 1rem; font-family: 'Geist Mono', monospace; text-transform: uppercase; letter-spacing: 0.18em; font-size: 0.72rem;">Listen on Spotify</a>
+        <a href="https://music.apple.com" target="_blank" rel="noreferrer" data-cursor="LISTEN" data-no-transition onclick="window.open(this.href,'_blank');return false;" class="stat-card glass" style="padding: 0.7rem 1rem; font-family: 'Geist Mono', monospace; text-transform: uppercase; letter-spacing: 0.18em; font-size: 0.72rem;">Apple Music</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="block">
+  <div class="grid">
+    <div class="col-12" style="text-align: center;">
+      <div class="reveal">
+        <span class="eyebrow">Continue reading</span>
+        <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; margin-top: 2rem;">
+          <a href="plugverse.html" data-cursor="NEXT" data-transition="PLUGVERSE" class="stat-card glass" style="padding: 1rem 1.4rem; font-family: 'Geist Mono', monospace; text-transform: uppercase; letter-spacing: 0.22em; font-size: 0.78rem;">Plugverse</a>
+          <a href="builder.html" data-cursor="NEXT" data-transition="BUILDER" class="stat-card glass" style="padding: 1rem 1.4rem; font-family: 'Geist Mono', monospace; text-transform: uppercase; letter-spacing: 0.22em; font-size: 0.78rem;">Builder log</a>
+          <a href="now.html" data-cursor="NEXT" data-transition="NOW" class="stat-card glass" style="padding: 1rem 1.4rem; font-family: 'Geist Mono', monospace; text-transform: uppercase; letter-spacing: 0.22em; font-size: 0.78rem;">What I am working on now</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="site">
+  <div style="max-width: 1600px; margin: 0 auto; display: grid; gap: 2.5rem; position: relative;">
+    <div>
+      <span class="eyebrow">Get in touch</span>
+      <button class="under" data-contact data-cursor="OPEN" style="display: block; margin-top: 1rem; text-align: left; font-family: 'Anton', Impact, sans-serif; font-size: clamp(2.6rem, 7vw, 6rem); line-height: 0.95; text-transform: uppercase; color: var(--ink);">cooperdelo6@gmail.com</button>
+    </div>
+    <div class="massive">cooperdelo</div>
+    <div style="display: flex; justify-content: space-between; font-family: 'Geist Mono', monospace; text-transform: uppercase; letter-spacing: 0.22em; font-size: 0.72rem; opacity: 0.7;">
+      <span>Chapel Hill, NC</span><span>2026</span>
+    </div>
+  </div>
+</footer>
+
+<div class="modal-backdrop" id="modal">
+  <div class="modal">
+    <h3>Get in touch.</h3>
+    <p style="font-family: 'Geist Mono', monospace; text-transform: uppercase; letter-spacing: 0.22em; font-size: 0.7rem; color: var(--muted); margin-bottom: 1.4rem;">Email is the fastest way</p>
+    <div class="email-row">
+      <span>cooperdelo6@gmail.com</span>
+      <button class="copy-btn" data-cursor="COPY" id="copyBtn">Copy</button>
+    </div>
+    <div class="options">
+      <a href="https://mail.google.com/mail/?view=cm&fs=1&to=cooperdelo6@gmail.com" target="_blank" rel="noreferrer" data-no-transition data-cursor="OPEN" onclick="window.open(this.href, '_blank'); return false;">Gmail</a>
+      <a href="https://www.linkedin.com/in/cooperdelo/" target="_blank" rel="noreferrer" data-no-transition data-cursor="OPEN" onclick="window.open(this.href, '_blank'); return false;">LinkedIn</a>
+      <a href="https://instagram.com/cooperdelo" target="_blank" rel="noreferrer" data-no-transition data-cursor="OPEN" onclick="window.open(this.href, '_blank'); return false;">Instagram</a>
+    </div>
+    <div style="display: flex; justify-content: flex-end; align-items: center; padding-top: 0.6rem;">
+      <button class="close under" data-cursor="CLOSE" id="closeModal">Close</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast">Copied to clipboard</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="shell.js"></script>
+</body>
+</html>
