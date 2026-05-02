@@ -1361,8 +1361,8 @@ body.has-page-bg .ambient { display: none; }
    ─────────────────────────────────────────────────────── */
 .replay-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 0.9rem;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
   margin-top: 1rem;
 }
 .replay-card {
@@ -1379,8 +1379,8 @@ body.has-page-bg .ambient { display: none; }
   box-shadow: 0 30px 60px rgba(0,0,0,0.5), 0 0 50px rgba(255,77,46,0.1);
 }
 .replay-card img {
-  display: block; width: 100%; aspect-ratio: 1/1;
-  object-fit: cover;
+  display: block; width: 100%; aspect-ratio: 9 / 16;
+  object-fit: cover; object-position: center top;
   transition: transform 0.7s, filter 0.4s;
   filter: saturate(0.95);
 }
@@ -1398,7 +1398,7 @@ body.has-page-bg .ambient { display: none; }
 .replay-card.placeholder::before {
   content: "Awaiting drop";
   display: flex; align-items: center; justify-content: center;
-  aspect-ratio: 1/1;
+  aspect-ratio: 9 / 16;
   font-family: "Geist Mono", monospace;
   font-size: 0.6rem;
   letter-spacing: 0.22em;
@@ -2846,3 +2846,42 @@ section.world-builder.has-bg {
 @media (max-width: 720px) {
   .strip-grid.cols-4 { grid-template-columns: 1fr 1fr; }
 }
+
+/* ============================================================
+   v4 — performance overrides for low-power devices and slow nets
+   - prefers-reduced-data: drop hero videos to poster-only,
+     simplify backdrop-filters, hide grain layer
+   - small-viewport heuristic: lower blur radius
+   ============================================================ */
+@media (prefers-reduced-data: reduce) {
+  .video-cover, .lineup-video, video.video-cover { display: none !important; }
+  .page-head.video-cover-wrap { background: #14110F; }
+  .grain::after, body.grain::after { display: none !important; }
+  /* Soften backdrop-filters that hammer the GPU */
+  .gear-card,
+  .photo-frame .photo,
+  .stat-card.glass,
+  .nav-pill {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+}
+
+/* Below 720px the canvas-based scene + heavy blurs aren't worth the
+   battery. Keep a reduced version. */
+@media (max-width: 720px) {
+  .scene-canvas { opacity: 0.4; }
+  .gear-card, .stat-card.glass, .photo-frame .photo, .nav-pill {
+    backdrop-filter: blur(8px) saturate(120%) !important;
+    -webkit-backdrop-filter: blur(8px) saturate(120%) !important;
+  }
+  .manifesto-glass {
+    backdrop-filter: blur(14px) saturate(140%) !important;
+    -webkit-backdrop-filter: blur(14px) saturate(140%) !important;
+  }
+}
+
+/* GPU-friendly: kill expensive will-change on hover-out states */
+.gear-card,
+.travel-card,
+.drag-card { contain: layout paint; }
