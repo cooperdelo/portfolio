@@ -2621,18 +2621,18 @@ section.world-builder.has-bg {
   color: var(--ink) !important;
 }
 .block.world-builder.has-bg .project-row {
-  background: rgba(10,9,8,0.38);
-  backdrop-filter: blur(22px) saturate(140%);
-  -webkit-backdrop-filter: blur(22px) saturate(140%);
-  border: 1px solid rgba(244,239,230,0.12);
+  background: rgba(10,9,8,0.28);
+  backdrop-filter: blur(8px) saturate(125%);
+  -webkit-backdrop-filter: blur(8px) saturate(125%);
+  border: 1px solid rgba(244,239,230,0.14);
   border-radius: 18px;
   margin-bottom: 1rem;
   padding: 1.6rem 2rem;
   transition: transform 0.4s cubic-bezier(0.22,1,0.36,1), background 0.4s ease, border-color 0.4s ease;
 }
 .block.world-builder.has-bg .project-row:hover {
-  background: rgba(10,9,8,0.5);
-  border-color: rgba(244,239,230,0.22);
+  background: rgba(10,9,8,0.4);
+  border-color: rgba(244,239,230,0.24);
   transform: translateY(-2px);
 }
 .block.world-builder.has-bg .project-row .meta { color: rgba(244,239,230,0.6) !important; }
