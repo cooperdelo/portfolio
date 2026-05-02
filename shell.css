@@ -3190,3 +3190,17 @@ section.world-builder.has-bg {
 .section-bg::after {
   background: linear-gradient(180deg, rgba(10,9,8,0.45) 0%, rgba(10,9,8,0.15) 30%, rgba(10,9,8,0.6) 100%);
 }
+
+/* ============================================================
+   v6.3 — heavier tint on the home Now section so the now-list
+   text is fully readable over the gig backdrop.
+   ============================================================ */
+.now-section .section-bg img,
+.now-section .section-bg video {
+  filter: brightness(0.42) saturate(0.78) contrast(1.05) sepia(0.14);
+}
+.now-section .section-bg::after {
+  background:
+    radial-gradient(ellipse at center, rgba(10,9,8,0.35) 0%, rgba(10,9,8,0.75) 100%),
+    linear-gradient(180deg, rgba(10,9,8,0.55) 0%, rgba(10,9,8,0.35) 35%, rgba(10,9,8,0.75) 100%);
+}
