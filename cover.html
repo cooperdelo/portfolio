@@ -24,6 +24,10 @@
     padding: 2rem;
     font-family: "Geist Mono", monospace;
   }
+  /* ?capture=1 — headless capture mode: fill viewport, drop chrome */
+  body.capture { padding: 0; background: var(--bg); }
+  body.capture .cover { box-shadow: none; }
+  body.capture .meta { display: none; }
 
   /* The canvas — exact dimensions for capture */
   .cover {
@@ -199,6 +203,7 @@
 </style>
 </head>
 <body>
+<script>if (location.search.includes("capture")) document.body.classList.add("capture");</script>
 <div class="meta">cover · 1200 × 1200 · screenshot the inner frame</div>
 
 <div class="cover" id="cover">
