@@ -2613,16 +2613,50 @@ footer.site {
 .block.has-bg > div:not(.section-bg) { position: relative; z-index: 1; }
 .block.has-bg > .section-bg { z-index: 0; }
 
-/* When the .block.world-builder gets a backdrop, ensure the cream
-   project rows have a backing so they read against the photo */
+/* When the .block.world-builder gets a backdrop, drop the cream
+   block entirely and turn each project row into a dark glassmorphic
+   card so the Vegas backdrop bleeds through. Light text on dark glass. */
+section.world-builder.has-bg {
+  background: transparent !important;
+  color: var(--ink) !important;
+}
 .block.world-builder.has-bg .project-row {
-  background: rgba(244,239,230,0.94);
-  backdrop-filter: blur(6px);
-  border-bottom-color: rgba(10,9,8,0.12);
+  background: rgba(10,9,8,0.38);
+  backdrop-filter: blur(22px) saturate(140%);
+  -webkit-backdrop-filter: blur(22px) saturate(140%);
+  border: 1px solid rgba(244,239,230,0.12);
+  border-radius: 18px;
+  margin-bottom: 1rem;
+  padding: 1.6rem 2rem;
+  transition: transform 0.4s cubic-bezier(0.22,1,0.36,1), background 0.4s ease, border-color 0.4s ease;
 }
-.block.world-builder.has-bg [style*="border-top"] {
-  border-top-color: rgba(10,9,8,0.18) !important;
+.block.world-builder.has-bg .project-row:hover {
+  background: rgba(10,9,8,0.5);
+  border-color: rgba(244,239,230,0.22);
+  transform: translateY(-2px);
 }
+.block.world-builder.has-bg .project-row .meta { color: rgba(244,239,230,0.6) !important; }
+.block.world-builder.has-bg .project-row h3,
+.block.world-builder.has-bg .project-row h3.row-poster { color: var(--ink) !important; }
+.block.world-builder.has-bg .project-row .body-prose { color: rgba(244,239,230,0.78) !important; }
+.block.world-builder.has-bg .project-row:hover h3 { color: var(--rust) !important; }
+.block.world-builder.has-bg .section-poster { color: var(--ink) !important; }
+.block.world-builder.has-bg .section-poster .accent { color: var(--rust) !important; }
+.block.world-builder.has-bg .plate {
+  background: rgba(244,239,230,0.06) !important;
+  border-color: rgba(244,239,230,0.16) !important;
+  color: var(--ink) !important;
+}
+.block.world-builder.has-bg .plate .num { color: var(--rust) !important; }
+.block.world-builder.has-bg .plate .eyebrow { color: rgba(244,239,230,0.7) !important; }
+.block.world-builder.has-bg .eyebrow { color: rgba(244,239,230,0.7) !important; }
+.block.world-builder.has-bg .tech-tag {
+  background: rgba(244,239,230,0.06) !important;
+  border-color: rgba(244,239,230,0.18) !important;
+  color: rgba(244,239,230,0.72) !important;
+}
+.block.world-builder.has-bg .under { color: var(--ink) !important; }
+.block.world-builder.has-bg [style*="border-top"] { border-top-color: rgba(244,239,230,0.18) !important; }
 
 /* ============================================================
    v3 — vintage section backdrops, square gear cards, manifesto
