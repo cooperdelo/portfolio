@@ -564,8 +564,8 @@ h1.poster .accent {
 }
 h2.section-poster {
   font-family: "Anton", Impact, sans-serif;
-  font-size: clamp(4rem, 14vw, 18rem);
-  line-height: 0.85; letter-spacing: -0.015em;
+  font-size: clamp(3rem, 7vw, 7rem);
+  line-height: 0.88; letter-spacing: -0.015em;
   text-transform: uppercase;
 }
 h2.section-poster .accent {
@@ -3502,10 +3502,10 @@ footer.site > div {
    ============================================================ */
 @media (max-width: 1500px) {
   /* Section poster — was clamp(4, 14vw, 18rem) which hits ~200px on a
-     14" laptop. Clamp to roughly half that. */
+     14" laptop. Tightened to match the plugverse/laptop scale. */
   h2.section-poster, .section-poster {
-    font-size: clamp(3rem, 8vw, 6.5rem) !important;
-    line-height: 0.9 !important;
+    font-size: clamp(2.4rem, 5.5vw, 5rem) !important;
+    line-height: 0.92 !important;
   }
   h1.poster {
     font-size: clamp(3.6rem, 9vw, 7.5rem) !important;
@@ -3545,7 +3545,7 @@ footer.site > div {
 
 @media (max-width: 1280px) {
   h2.section-poster, .section-poster {
-    font-size: clamp(2.4rem, 7.5vw, 4.8rem) !important;
+    font-size: clamp(2.2rem, 5vw, 4rem) !important;
   }
   h1.poster {
     font-size: clamp(3rem, 8vw, 5.6rem) !important;
