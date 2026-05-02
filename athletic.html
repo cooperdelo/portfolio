@@ -160,10 +160,11 @@
   <div class="grid" style="margin-top: 3rem;">
     <div class="col-4">
       <div class="reveal"><div class="photo-frame">
-        <div class="photo has-media portrait-tall" data-world="athletic">
-          <!-- Drop a tee-box or fairway photo at photos/golf_portrait.jpg -->
-          <img src="photos/golf_portrait.jpg" alt="Cooper at the golf course" loading="lazy" onerror="this.style.display='none';this.parentElement.querySelector('.photo-fallback').style.display='flex';" />
-          <span class="photo-fallback" style="display:none;align-items:center;justify-content:center;text-align:center;padding:2rem;">photos/golf_portrait.jpg<br/>(see AI guide)</span>
+        <div class="photo has-media portrait-tall golf-video-frame" data-world="athletic">
+          <video id="golf-chained" autoplay muted playsinline preload="metadata" poster="photos/golf_portrait.jpg">
+            <source src="videos/golf_swing_iron.mov" type="video/mp4" />
+            <source src="videos/golf_swing_iron.mov" type="video/quicktime" />
+          </video>
         </div>
         <div class="caption-shard">Course / 2026</div>
       </div></div>
@@ -177,6 +178,32 @@
         <div class="stat-card glass"><span class="label">Why</span><span class="value">Head reset</span></div>
         <div class="stat-card glass"><span class="label">Stakes</span><span class="value">None</span></div>
         <div class="stat-card glass"><span class="label">Bag</span><span class="value">Titleist</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Golf gallery: every shot in the bag, dressed for the course -->
+  <div class="grid" style="margin-top: 2.5rem;">
+    <div class="col-12 reveal">
+      <div class="golf-gallery">
+        <div class="photo-frame">
+          <div class="photo has-media">
+            <img src="photos/golf_course.jpg" alt="Cooper standing with driver, fairway behind" loading="lazy" />
+          </div>
+          <div class="caption-shard glass-light" style="position: static; margin-top: 0.6rem; transform: rotate(-1deg); font-size: 0.62rem;">Drive / fairway</div>
+        </div>
+        <div class="photo-frame">
+          <div class="photo has-media">
+            <img src="photos/golf_portrait.jpg" alt="Cooper mid-backswing in golden hour" loading="lazy" />
+          </div>
+          <div class="caption-shard glass-light" style="position: static; margin-top: 0.6rem; transform: rotate(1deg); font-size: 0.62rem;">Tee box / golden hour</div>
+        </div>
+        <div class="photo-frame">
+          <div class="photo has-media">
+            <img src="photos/golf_swing_finish.jpg" alt="Cooper finishing swing on the green" loading="lazy" />
+          </div>
+          <div class="caption-shard glass-light" style="position: static; margin-top: 0.6rem; transform: rotate(-0.6deg); font-size: 0.62rem;">Finish / approach</div>
+        </div>
       </div>
     </div>
   </div>
@@ -326,5 +353,19 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" defer></script>
 <script src="shell.js" defer></script>
+<script>
+  // Chain the two golf swing videos: alternate iron → driver → iron → driver
+  (function chainGolfVideos() {
+    const v = document.getElementById('golf-chained');
+    if (!v) return;
+    const clips = ['videos/golf_swing_iron.mov', 'videos/golf_swing_driver.mov'];
+    let i = 0;
+    v.addEventListener('ended', function () {
+      i = (i + 1) % clips.length;
+      v.src = clips[i];
+      v.play().catch(function () { /* silent — autoplay policy might block */ });
+    });
+  })();
+</script>
 </body>
 </html>

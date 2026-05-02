@@ -94,47 +94,43 @@
 </section>
 
 <!-- Full-bleed banner photo -->
-<section style="position: relative; padding: 0; height: 70vh; min-height: 520px; overflow: hidden;">
-  <img src="photos/rubber_band_full_pic.jpeg" loading="lazy" alt="Rubber Band performing outdoors, full lineup" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0;" />
-  <div style="position: absolute; inset: 0; z-index: 1; background: linear-gradient(180deg, rgba(10,9,8,0.4) 0%, rgba(10,9,8,0.05) 30%, rgba(10,9,8,0.5) 100%); pointer-events: none;"></div>
-  <div style="position: absolute; inset: 0; z-index: 2; display: flex; align-items: flex-end; padding: 3rem 2.4rem;">
-    <div class="caption-shard glass-light" style="position: static; transform: rotate(-1deg);">Full lineup / open-air gig / 2025</div>
-  </div>
-</section>
-
-<!-- Lineup -->
-<section class="block world-rubber">
-  <div class="grid">
-    <div class="col-12 reveal">
+<!-- Banner: full-bleed live video with The Lineup overlaid -->
+<section class="lineup-banner">
+  <video class="lineup-video" autoplay muted loop playsinline preload="metadata" poster="photos/rubber_band_full_pic.jpeg">
+    <source src="videos/rubber_band_live_4.mov" type="video/mp4" />
+    <source src="videos/rubber_band_live_4.mov" type="video/quicktime" />
+  </video>
+  <div class="lineup-overlay">
+    <div class="reveal" style="max-width: 1600px; margin: 0 auto; padding: 0 2.4rem;">
       <span class="eyebrow">The lineup</span>
-      <p class="body-prose" style="margin-top: 0.8rem; max-width: 480px; color: var(--muted);">Five guys. One Pi Kapp drummer the rest of us inherited. Mostly Chi Phi.</p>
+      <p class="body-prose" style="margin-top: 0.6rem; max-width: 520px; color: rgba(244,239,230,0.78);">Five guys. One Pi Kapp drummer the rest of us inherited. Mostly Chi Phi.</p>
     </div>
-  </div>
-  <div class="lineup-stage reveal">
-    <div class="member-card is-you">
-      <div class="member-role">Bass</div>
-      <div class="member-name">Cooper</div>
-      <div class="member-detail">Sophomore · Chi Phi</div>
-    </div>
-    <div class="member-card">
-      <div class="member-role">Lead Guitar</div>
-      <div class="member-name">Jackson</div>
-      <div class="member-detail">Senior · Sig Chi</div>
-    </div>
-    <div class="member-card">
-      <div class="member-role">Vocals</div>
-      <div class="member-name">Stewart</div>
-      <div class="member-detail">Senior · Chi Phi</div>
-    </div>
-    <div class="member-card">
-      <div class="member-role">Rhythm Guitar</div>
-      <div class="member-name">Nick</div>
-      <div class="member-detail">Senior · Chi Phi</div>
-    </div>
-    <div class="member-card">
-      <div class="member-role">Drums</div>
-      <div class="member-name">Ben</div>
-      <div class="member-detail">Senior · Pi Kapp</div>
+    <div class="lineup-stage reveal">
+      <div class="member-card is-you">
+        <div class="member-role">Bass</div>
+        <div class="member-name">Cooper</div>
+        <div class="member-detail">Sophomore · Chi Phi</div>
+      </div>
+      <div class="member-card">
+        <div class="member-role">Lead Guitar</div>
+        <div class="member-name">Jackson</div>
+        <div class="member-detail">Senior · Sig Chi</div>
+      </div>
+      <div class="member-card">
+        <div class="member-role">Vocals</div>
+        <div class="member-name">Stewart</div>
+        <div class="member-detail">Senior · Chi Phi</div>
+      </div>
+      <div class="member-card">
+        <div class="member-role">Rhythm Guitar</div>
+        <div class="member-name">Nick</div>
+        <div class="member-detail">Senior · Chi Phi</div>
+      </div>
+      <div class="member-card">
+        <div class="member-role">Drums</div>
+        <div class="member-name">Ben</div>
+        <div class="member-detail">Senior · Pi Kapp</div>
+      </div>
     </div>
   </div>
 </section>
@@ -150,7 +146,7 @@
         <div class="setlist-tilt">
           <iframe
             src="https://open.spotify.com/embed/playlist/1e8B61S0vylDgN4fsHrl3K?utm_source=generator&theme=0"
-            height="480"
+            height="720"
             allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
             loading="lazy">
           </iframe>
@@ -202,6 +198,26 @@
       <div style="display: flex; gap: 0.6rem; margin-top: 2rem; flex-wrap: wrap;">
         <a href="https://open.spotify.com/artist/5ADdu7EYmsFlIUPrH5azhc" target="_blank" rel="noreferrer" data-cursor="LISTEN" data-no-transition onclick="window.open(this.href,'_blank');return false;" class="stat-card glass" style="padding: 0.7rem 1rem; font-family: 'Geist Mono', monospace; text-transform: uppercase; letter-spacing: 0.18em; font-size: 0.72rem; color: var(--rust);">Artist on Spotify</a>
         <a href="https://music.apple.com/artist/cooper-delo" target="_blank" rel="noreferrer" data-cursor="LISTEN" data-no-transition onclick="window.open(this.href,'_blank');return false;" class="stat-card glass" style="padding: 0.7rem 1rem; font-family: 'Geist Mono', monospace; text-transform: uppercase; letter-spacing: 0.18em; font-size: 0.72rem;">Apple Music</a>
+      </div>
+      <div class="reveal" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.9rem; margin-top: 2.4rem;">
+        <div class="photo-frame" style="margin: 0;">
+          <div class="photo has-media square">
+            <img src="photos/flicker_of_time_ep_cover.jpg" alt="Flicker of Time EP cover art" loading="lazy" />
+          </div>
+          <div class="caption-shard glass-light" style="position: static; margin-top: 0.5rem; transform: rotate(-1deg); font-size: 0.62rem;">Flicker of Time / EP</div>
+        </div>
+        <div class="photo-frame" style="margin: 0;">
+          <div class="photo has-media square">
+            <img src="photos/studio_recording_session.jpg" alt="Studio session: Pro Tools, MIDI, acoustic" loading="lazy" />
+          </div>
+          <div class="caption-shard glass-light" style="position: static; margin-top: 0.5rem; transform: rotate(1deg); font-size: 0.62rem;">Tracking / studio</div>
+        </div>
+        <div class="photo-frame" style="margin: 0;">
+          <div class="photo has-media square">
+            <img src="photos/gig_rubber_bass_bw.jpg" alt="Cooper with bass, formal, B&W" loading="lazy" />
+          </div>
+          <div class="caption-shard glass-light" style="position: static; margin-top: 0.5rem; transform: rotate(-0.8deg); font-size: 0.62rem;">Live / B&W</div>
+        </div>
       </div>
     </div>
   </div>

@@ -2622,3 +2622,161 @@ footer.site {
 .block.world-builder.has-bg [style*="border-top"] {
   border-top-color: rgba(10,9,8,0.18) !important;
 }
+
+/* ============================================================
+   v3 — vintage section backdrops, square gear cards, manifesto
+   glass, lineup-banner video overlay, golf gallery polish
+   ============================================================ */
+
+/* Make every gear card image square — the AI-generated isolated
+   shots are 1:1, this stops cropping. */
+.gear-card .gear-img,
+.gear-card.gear-card-wide .gear-img {
+  aspect-ratio: 1 / 1;
+  max-height: none;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 14px;
+}
+.gear-card .gear-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Section backdrop — vintage filter (warm sepia + faded contrast),
+   not raw exposure reduction. */
+.section-bg img,
+.section-bg video {
+  filter: brightness(0.55) saturate(0.78) contrast(1.04) sepia(0.18) hue-rotate(-4deg);
+}
+.section-bg::after {
+  background:
+    radial-gradient(ellipse at center, rgba(10,9,8,0.25) 0%, rgba(10,9,8,0.7) 100%),
+    linear-gradient(180deg, rgba(10,9,8,0.55) 0%, rgba(10,9,8,0.18) 35%, rgba(10,9,8,0.7) 100%);
+}
+
+/* Manifesto glassmorphic card — text floats over the landscape */
+.manifesto-section {
+  position: relative;
+  min-height: 80vh;
+  padding: 8rem 2.4rem 6rem;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+.manifesto-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+.manifesto-bg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.55) saturate(0.82) contrast(1.05) sepia(0.18);
+}
+.manifesto-bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(10,9,8,0.5) 0%, rgba(10,9,8,0.18) 40%, rgba(10,9,8,0.7) 100%);
+}
+.manifesto-section > .grid {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+.manifesto-glass {
+  padding: 2.4rem 2.8rem;
+  border-radius: 26px;
+  background: rgba(244,239,230,0.04);
+  backdrop-filter: blur(28px) saturate(160%);
+  -webkit-backdrop-filter: blur(28px) saturate(160%);
+  border: 1px solid rgba(244,239,230,0.14);
+  box-shadow:
+    0 32px 80px -28px rgba(0,0,0,0.7),
+    0 1px 0 rgba(244,239,230,0.18) inset;
+  max-width: 64rem;
+  position: relative;
+  overflow: hidden;
+}
+.manifesto-glass::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0) 60%);
+  pointer-events: none;
+}
+@media (max-width: 720px) {
+  .manifesto-section { min-height: 70vh; padding: 5rem 1.4rem 4rem; }
+  .manifesto-glass { padding: 1.6rem 1.4rem; }
+}
+
+/* Lineup banner — video full-bleed with member cards overlaid */
+.lineup-banner {
+  position: relative;
+  height: 88vh;
+  min-height: 640px;
+  overflow: hidden;
+  padding: 0;
+}
+.lineup-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+  filter: brightness(0.45) saturate(0.95) contrast(1.05);
+}
+.lineup-banner::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(180deg, rgba(10,9,8,0.45) 0%, rgba(10,9,8,0.05) 30%, rgba(10,9,8,0.85) 100%);
+  pointer-events: none;
+}
+.lineup-overlay {
+  position: relative;
+  z-index: 2;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 7rem 0 4rem;
+}
+.lineup-banner .lineup-stage {
+  margin: 0 auto;
+  max-width: 1600px;
+  width: 100%;
+  padding: 0 2.4rem;
+}
+@media (max-width: 720px) {
+  .lineup-banner { height: auto; min-height: 0; padding: 6rem 0 3rem; }
+  .lineup-overlay { padding: 0; gap: 2.4rem; }
+}
+
+/* Golf videos — chained loop container in the photo-frame */
+.golf-video-frame video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Golf gallery — small triptych below the section */
+.golf-gallery {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.8rem;
+  margin-top: 2.4rem;
+}
+.golf-gallery .photo-frame { margin: 0; }
+.golf-gallery .photo { aspect-ratio: 4 / 3; }
+@media (max-width: 720px) {
+  .golf-gallery { grid-template-columns: 1fr; }
+}
