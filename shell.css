@@ -1568,8 +1568,10 @@ body.has-page-bg .ambient { display: none; }
   .gear-card .gear-specs li { padding: 0.4rem 0; }
 
   .travel-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 0.6rem; }
-  /* Concert show-cards must override their default 340px min on mobile */
-  .travel-grid:has(.show-card) { grid-template-columns: repeat(2, 1fr) !important; gap: 0.6rem; }
+  /* Concert show-cards: collapse to single column on mobile so each card
+     gets full width and the artist headline doesn't crush. */
+  .travel-grid:has(.show-card) { grid-template-columns: 1fr !important; gap: 0.7rem; }
+  .travel-card.show-card { aspect-ratio: 16 / 11; max-width: 480px; margin-left: auto; margin-right: auto; }
   .travel-card .travel-place { font-size: 1.05rem !important; }
   .travel-card .travel-meta { padding: 0.8rem 0.9rem; }
 
@@ -1866,7 +1868,7 @@ body.has-page-bg .ambient { display: none; }
   .page-head { padding: 4.5rem 0.9rem 1.8rem; min-height: 50vh; }
   .video-cover-wrap { min-height: 50vh; }
 
-  .poster, h1.poster { font-size: clamp(2.2rem, 13vw, 4.5rem) !important; }
+  .poster, h1.poster { font-size: clamp(3.2rem, 18vw, 6.5rem) !important; }
   .section-poster, h2.section-poster { font-size: clamp(1.9rem, 11vw, 3.5rem) !important; }
 
   .lede { font-size: 1rem !important; }
