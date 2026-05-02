@@ -2261,3 +2261,144 @@ footer.site {
 
 /* ── Body prose link ── */
 .body-prose a { color: var(--rust); text-decoration: underline; text-underline-offset: 3px; }
+/* ============================================================
+   v2 polish — added during the asset triage / wiring pass
+   Concert cards (rubber-band) — meta over a darkened image
+   3D tilt accents on gear-cards
+   Parallax depth + perf-friendly motion
+   Mobile responsive guards on the new sections
+   ============================================================ */
+
+/* Concert card — has show-card class, no modal, just date + artist + venue */
+.travel-card.show-card { cursor: default; }
+.travel-card.show-card .travel-meta { padding-bottom: 1.4rem; }
+.travel-card.show-card .travel-venue {
+  font-family: 'Geist Mono', monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 0.66rem;
+  color: rgba(244,239,230,0.72);
+  margin-top: 0.3rem;
+  display: block;
+}
+.travel-card.show-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(10,9,8,0) 30%, rgba(10,9,8,0.45) 65%, rgba(10,9,8,0.85) 100%);
+  z-index: 1;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+.travel-card.show-card .travel-meta { z-index: 2; position: relative; }
+
+/* Gear-card 3D tilt — pure CSS, GPU-accelerated, respects prefers-reduced-motion */
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .gear-card {
+    transform-style: preserve-3d;
+    perspective: 900px;
+    will-change: transform;
+  }
+  .gear-card .gear-img {
+    transition: transform 0.6s cubic-bezier(0.22,1,0.36,1);
+    transform: translateZ(0);
+  }
+  .gear-card:hover .gear-img {
+    transform: translateZ(20px) rotateX(2deg) rotateY(-3deg);
+  }
+  .gear-card .gear-img img {
+    transition: transform 0.8s cubic-bezier(0.22,1,0.36,1), filter 0.6s ease;
+  }
+  .gear-card:hover .gear-img img {
+    transform: scale(1.08);
+    filter: brightness(1.1) saturate(1.1);
+  }
+  .gear-card h4 {
+    transition: transform 0.5s cubic-bezier(0.22,1,0.36,1);
+  }
+  .gear-card:hover h4 {
+    transform: translateZ(8px);
+  }
+}
+
+/* Cinematic page-cover treatment — subtle radial vignette + film grain layer */
+.page-head .page-cover {
+  filter: brightness(0.55) saturate(1.05) contrast(1.05);
+}
+.page-head::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at center, transparent 30%, rgba(10,9,8,0.35) 100%),
+    linear-gradient(180deg, rgba(10,9,8,0.45) 0%, rgba(10,9,8,0) 25%, rgba(10,9,8,0.6) 100%);
+  pointer-events: none;
+  z-index: 0;
+}
+.page-head .inner { position: relative; z-index: 1; }
+
+/* Trip-gallery — hover: slow Ken Burns scale */
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .trip-gallery img {
+    transition: transform 1.2s cubic-bezier(0.22,1,0.36,1), filter 0.6s ease;
+  }
+  .trip-gallery img:hover {
+    transform: scale(1.06);
+    filter: saturate(1.15) brightness(1.05);
+  }
+}
+
+/* Replay grid placeholders — soft loading shimmer when image fails (lens.html) */
+.replay-card.placeholder {
+  background: linear-gradient(110deg, rgba(244,239,230,0.04) 35%, rgba(244,239,230,0.10) 50%, rgba(244,239,230,0.04) 65%);
+  background-size: 200% 100%;
+  animation: shimmer 2.4s linear infinite;
+}
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Concert grid mobile responsiveness — keep 1 col below 640px */
+@media (max-width: 640px) {
+  .travel-card.show-card .travel-place { font-size: 1.4rem; }
+  .travel-card.show-card .travel-venue { font-size: 0.6rem; }
+}
+
+/* Lens hero — special treatment for the cooper_tux_with_canon photo (portrait subject) */
+.world-cooper.page-head .page-cover {
+  object-position: center 30%;
+}
+
+/* Athletic golf-bag section — match existing world-athletic gear-grid spacing */
+.world-athletic .gear-grid { margin-top: 2rem; }
+
+/* Parallax-divider — subtle scale on intersect (still GPU friendly) */
+.parallax-divider .para-img {
+  transition: transform 1.4s cubic-bezier(0.22,1,0.36,1);
+}
+.parallax-divider:hover .para-img { transform: scale(1.04); }
+
+/* Reduced motion — kill scale and tilt animations entirely */
+@media (prefers-reduced-motion: reduce) {
+  .gear-card:hover .gear-img,
+  .gear-card:hover .gear-img img,
+  .gear-card:hover h4,
+  .trip-gallery img:hover,
+  .parallax-divider:hover .para-img {
+    transform: none !important;
+    filter: none !important;
+  }
+}
+
+/* Mobile ergonomics — tighter padding on rubber band gear-grid (12 cards now) */
+@media (max-width: 720px) {
+  .gear-grid { gap: 1.2rem; }
+  .gear-card { padding: 1rem; }
+  .gear-card .gear-img { aspect-ratio: 1 / 1; }
+}
+
+/* Now-page workspace backdrop — heavy darkening so the foreground text reads */
+.now-workspace-bg img {
+  filter: brightness(0.35) saturate(0.85) contrast(1.05);
+}

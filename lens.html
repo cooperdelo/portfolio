@@ -6,6 +6,7 @@
 <title>Lens / Cooper Delo</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="preload" as="image" href="photos/cooper_tux_with_canon.jpg" fetchpriority="high" />
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,300..900,30..100,0..1;1,9..144,300..900,30..100,0..1&family=Geist+Mono:wght@400;500&family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="shell.css" />
 </head>
@@ -42,8 +43,7 @@
 
 <!-- Hero -->
 <header class="page-head world-cooper">
-  <!-- TODO: drop a 16:9 hero photo at photos/PLACEHOLDER-lens-hero.jpg -->
-  <img class="page-cover" src="photos/PLACEHOLDER-lens-hero.jpg" alt="" onerror="this.style.display='none'" />
+  <img class="page-cover" src="photos/cooper_tux_with_canon.jpg" alt="Cooper holding the Canon S100, mid-frame" loading="eager" fetchpriority="high" onerror="this.style.display='none'" />
   <div class="inner">
     <span class="eyebrow">Lens / The visual log</span>
     <h1 class="poster reveal in" style="margin-top: 1.5rem;">Through<br/><span class="accent">the frame.</span></h1>
@@ -98,141 +98,142 @@
               <span>36.55N / 121.92W</span>
             </div>
             <div class="trip-blurb">
-              <p>TODO: write 2-3 short paragraphs about the trip. Who you went with, why you went, the moment that made it worth photographing. Replace this whole block.</p>
-              <p>Keep it specific. The detail that you remember. Not "it was beautiful" — the cold morning the elephant seals were on the beach, or the diner where the waitress said something you're still thinking about.</p>
+              <p>Drove down the Pacific Coast on a stretch off school. Carmel-by-the-Sea, the Big Sur cliff turn, the redwoods just up the road. Everything that gets called "the California postcard" but actually earns it.</p>
+              <p>The cold morning we caught the fog rolling over the rocks. The hollow tree off the 17-mile drive that I tucked myself into for a photo. The kind of trip that resets the way you frame everything else.</p>
             </div>
             <div class="trip-gallery">
-              <!-- TODO: add 3-9 trip photos. Add class="wide" to span 2 columns. -->
-              <img src="photos/PLACEHOLDER-trip-carmel-1.jpg" alt="" />
-              <img src="photos/PLACEHOLDER-trip-carmel-2.jpg" alt="" />
-              <img src="photos/PLACEHOLDER-trip-carmel-3.jpg" alt="" />
-              <img src="photos/PLACEHOLDER-trip-carmel-4.jpg" alt="" class="wide" />
-              <img src="photos/PLACEHOLDER-trip-carmel-5.jpg" alt="" />
+              <img src="photos/carmel_trip_2.jpg" alt="Cooper on Carmel waterfront" loading="lazy" />
+              <img src="photos/carmel_trip_3.jpg" alt="Carmel coastline portrait" loading="lazy" />
+              <img src="photos/santa_cruz_coast.jpg" alt="Santa Cruz / NorCal coast" loading="lazy" class="wide" />
+              <img src="photos/carmel_trip_4.jpg" alt="Inside a redwood near Carmel" loading="lazy" />
+              <img src="photos/front-page-hero.jpg" alt="Carmel cliffs" loading="lazy" />
             </div>
           </template>
         </article>
 
-        <!-- TRIP CARD 2: TODO -->
-        <article class="travel-card" data-cursor="OPEN" data-trip="trip-2">
-          <img src="photos/PLACEHOLDER-trip-2-cover.jpg" alt="" />
+        <!-- TRIP CARD 2: Thailand -->
+        <article class="travel-card" data-cursor="OPEN" data-trip="thailand">
+          <img src="photos/thailand_trip_3.jpg" alt="Thailand cover" loading="lazy" />
           <div class="travel-meta">
-            <div class="travel-date">[Date]</div>
-            <div class="travel-place">[Place 2]</div>
+            <div class="travel-date">December 2024</div>
+            <div class="travel-place">Bangkok, Thailand</div>
           </div>
           <template class="trip-detail">
-            <h3>[Place name]</h3>
+            <h3>Bangkok, Thailand</h3>
             <div class="trip-meta-row">
-              <span class="accent">[Month Year]</span>
-              <span>[N days]</span>
-              <span>[lat / lng]</span>
+              <span class="accent">December 2024</span>
+              <span>10 days</span>
+              <span>13.75N / 100.50E</span>
             </div>
             <div class="trip-blurb">
-              <p>TODO: short journal entry — who, what, why it mattered.</p>
+              <p>The longest haul flight I've taken. Bangkok by canal boat, temples that are older than anything I'd walked through, the kind of street food that recalibrates what a meal is worth.</p>
+              <p>Half the photos came off a CPM35 film camera — dated stamps and grain baked in. Wat Arun's spires from below. The skyline through tinted glass on a sky train. Houses on stilts where the river had taken the road.</p>
             </div>
             <div class="trip-gallery">
-              <img src="photos/PLACEHOLDER-trip-2-1.jpg" alt="" />
-              <img src="photos/PLACEHOLDER-trip-2-2.jpg" alt="" />
-              <img src="photos/PLACEHOLDER-trip-2-3.jpg" alt="" />
+              <img src="photos/thailand_trip_1.jpg" alt="Thailand wide" loading="lazy" />
+              <img src="photos/thailand_trip_2.jpg" alt="Thailand scene" loading="lazy" />
+              <img src="photos/thailand_trip_canal_house.jpg" alt="Bangkok canal house, on film" loading="lazy" />
+              <img src="photos/thailand_trip_wat_arun.jpg" alt="Wat Arun temple" loading="lazy" class="wide" />
+              <img src="photos/thailand_trip_canal_water.jpg" alt="Bangkok canal water level" loading="lazy" />
+              <img src="photos/thailand_trip_bangkok_skyline.jpg" alt="Bangkok skyline through glass" loading="lazy" />
+              <img src="photos/thailand_trip_4.jpg" alt="Thailand atmosphere" loading="lazy" />
             </div>
           </template>
         </article>
 
-        <!-- TRIP CARD 3: TODO -->
-        <article class="travel-card" data-cursor="OPEN" data-trip="trip-3">
-          <img src="photos/PLACEHOLDER-trip-3-cover.jpg" alt="" />
+        <!-- TRIP CARD 3: Ireland -->
+        <article class="travel-card" data-cursor="OPEN" data-trip="ireland">
+          <img src="photos/ireland_trip_1.jpg" alt="Ireland cover" loading="lazy" />
           <div class="travel-meta">
-            <div class="travel-date">[Date]</div>
-            <div class="travel-place">[Place 3]</div>
+            <div class="travel-date">Summer 2023</div>
+            <div class="travel-place">Ireland</div>
           </div>
           <template class="trip-detail">
-            <h3>[Place name]</h3>
+            <h3>Ireland</h3>
             <div class="trip-meta-row">
-              <span class="accent">[Month Year]</span>
-              <span>[N days]</span>
-              <span>[lat / lng]</span>
+              <span class="accent">Summer 2023</span>
+              <span>9 days</span>
+              <span>53.41N / 8.24W</span>
             </div>
             <div class="trip-blurb">
-              <p>TODO: short journal entry.</p>
+              <p>Loop drive — Cliffs of Moher, the Burren, west to Galway. Pubs that didn't bother with menus and a coastline that does the talking.</p>
+              <p>The way the weather turned every twenty minutes. Old stone everywhere. Sheep on the road like a punchline.</p>
             </div>
             <div class="trip-gallery">
-              <img src="photos/PLACEHOLDER-trip-3-1.jpg" alt="" />
-              <img src="photos/PLACEHOLDER-trip-3-2.jpg" alt="" />
-              <img src="photos/PLACEHOLDER-trip-3-3.jpg" alt="" />
+              <img src="photos/ireland_trip_2.jpg" alt="Ireland coast" loading="lazy" />
+              <img src="photos/ireland_trip_3.jpg" alt="Ireland landscape" loading="lazy" />
+              <img src="photos/ireland_trip_4.jpg" alt="Ireland countryside" loading="lazy" class="wide" />
+              <img src="photos/ireland_trip_5.jpg" alt="Ireland scene" loading="lazy" />
+              <img src="photos/ireland_trip_6.jpg" alt="Ireland atmosphere" loading="lazy" />
             </div>
           </template>
         </article>
 
-        <!-- TRIP CARD 4: TODO -->
-        <article class="travel-card" data-cursor="OPEN" data-trip="trip-4">
-          <img src="photos/PLACEHOLDER-trip-4-cover.jpg" alt="" />
+        <!-- TRIP CARD 4: Cancún -->
+        <article class="travel-card" data-cursor="OPEN" data-trip="cancun">
+          <img src="photos/cancun_trip_1.jpg" alt="Cancún cover" loading="lazy" />
           <div class="travel-meta">
-            <div class="travel-date">[Date]</div>
-            <div class="travel-place">[Place 4]</div>
+            <div class="travel-date">Spring 2024</div>
+            <div class="travel-place">Cancún, Mexico</div>
           </div>
           <template class="trip-detail">
-            <h3>[Place name]</h3>
+            <h3>Cancún, Mexico</h3>
             <div class="trip-meta-row">
-              <span class="accent">[Month Year]</span>
-              <span>[N days]</span>
-              <span>[lat / lng]</span>
+              <span class="accent">Spring 2024</span>
+              <span>5 days</span>
+              <span>21.16N / 86.85W</span>
             </div>
             <div class="trip-blurb">
-              <p>TODO: short journal entry.</p>
+              <p>Spring break with friends. Caribbean blue that you don't believe is real until your feet are in it. Long pool days, late dinners, the kind of week that resets the calendar.</p>
             </div>
             <div class="trip-gallery">
-              <img src="photos/PLACEHOLDER-trip-4-1.jpg" alt="" />
-              <img src="photos/PLACEHOLDER-trip-4-2.jpg" alt="" />
-              <img src="photos/PLACEHOLDER-trip-4-3.jpg" alt="" />
+              <img src="photos/cancun_trip_2.jpg" alt="Cancún beach" loading="lazy" class="wide" />
             </div>
           </template>
         </article>
 
-        <!-- TRIP CARD 5: TODO -->
-        <article class="travel-card" data-cursor="OPEN" data-trip="trip-5">
-          <img src="photos/PLACEHOLDER-trip-5-cover.jpg" alt="" />
+        <!-- TRIP CARD 5: London -->
+        <article class="travel-card" data-cursor="OPEN" data-trip="london">
+          <img src="photos/london_trip_1.jpg" alt="London cover" loading="lazy" />
           <div class="travel-meta">
-            <div class="travel-date">[Date]</div>
-            <div class="travel-place">[Place 5]</div>
+            <div class="travel-date">2023</div>
+            <div class="travel-place">London, UK</div>
           </div>
           <template class="trip-detail">
-            <h3>[Place name]</h3>
+            <h3>London, UK</h3>
             <div class="trip-meta-row">
-              <span class="accent">[Month Year]</span>
-              <span>[N days]</span>
-              <span>[lat / lng]</span>
+              <span class="accent">2023</span>
+              <span>6 days</span>
+              <span>51.51N / 0.13W</span>
             </div>
             <div class="trip-blurb">
-              <p>TODO: short journal entry.</p>
+              <p>Walked it more than rode it. The Thames at dusk, the tube map memorized by day three, the kind of city where you can stack four neighborhoods into one afternoon.</p>
             </div>
             <div class="trip-gallery">
-              <img src="photos/PLACEHOLDER-trip-5-1.jpg" alt="" />
-              <img src="photos/PLACEHOLDER-trip-5-2.jpg" alt="" />
-              <img src="photos/PLACEHOLDER-trip-5-3.jpg" alt="" />
+              <img src="photos/london_trip_2.jpg" alt="London scene" loading="lazy" class="wide" />
             </div>
           </template>
         </article>
 
-        <!-- TRIP CARD 6: TODO -->
-        <article class="travel-card" data-cursor="OPEN" data-trip="trip-6">
-          <img src="photos/PLACEHOLDER-trip-6-cover.jpg" alt="" />
+        <!-- TRIP CARD 6: Panama -->
+        <article class="travel-card" data-cursor="OPEN" data-trip="panama">
+          <img src="photos/panama_trip_1.jpg" alt="Panama cover" loading="lazy" />
           <div class="travel-meta">
-            <div class="travel-date">[Date]</div>
-            <div class="travel-place">[Place 6]</div>
+            <div class="travel-date">2024</div>
+            <div class="travel-place">Panama</div>
           </div>
           <template class="trip-detail">
-            <h3>[Place name]</h3>
+            <h3>Panama</h3>
             <div class="trip-meta-row">
-              <span class="accent">[Month Year]</span>
-              <span>[N days]</span>
-              <span>[lat / lng]</span>
+              <span class="accent">2024</span>
+              <span>7 days</span>
+              <span>8.98N / 79.51W</span>
             </div>
             <div class="trip-blurb">
-              <p>TODO: short journal entry.</p>
+              <p>Panama City and out toward the coast. The canal at full scale once you're standing next to it. Rooftops, jungle, and a humidity that doesn't negotiate.</p>
             </div>
             <div class="trip-gallery">
-              <img src="photos/PLACEHOLDER-trip-6-1.jpg" alt="" />
-              <img src="photos/PLACEHOLDER-trip-6-2.jpg" alt="" />
-              <img src="photos/PLACEHOLDER-trip-6-3.jpg" alt="" />
+              <img src="photos/panama_trip_2.jpg" alt="Panama scene" loading="lazy" class="wide" />
             </div>
           </template>
         </article>
@@ -257,30 +258,33 @@
   <div class="grid" style="margin-top: 1.5rem;">
     <div class="col-12 reveal">
       <div class="reel-grid">
-        <!-- TODO: drop your vertical 9:16 clips at videos/PLACEHOLDER-reel-N.mp4 -->
         <div class="reel-card">
-          <video autoplay muted loop playsinline preload="metadata">
-            <source src="videos/PLACEHOLDER-reel-1.mp4" type="video/mp4" />
+          <video autoplay muted loop playsinline preload="metadata" poster="photos/cooper_laughing_with_bass.jpg">
+            <source src="videos/cat_cradle_performance.mov" type="video/quicktime" />
+            <source src="videos/cat_cradle_performance.mov" type="video/mp4" />
           </video>
-          <span class="reel-platform">REEL</span>
+          <span class="reel-platform">LIVE</span>
         </div>
         <div class="reel-card">
-          <video autoplay muted loop playsinline preload="metadata">
-            <source src="videos/PLACEHOLDER-reel-2.mp4" type="video/mp4" />
+          <video autoplay muted loop playsinline preload="metadata" poster="photos/concert_coldplay.jpg">
+            <source src="videos/coldplay_crowd.mov" type="video/quicktime" />
+            <source src="videos/coldplay_crowd.mov" type="video/mp4" />
           </video>
-          <span class="reel-platform">TIKTOK</span>
+          <span class="reel-platform">CROWD</span>
         </div>
         <div class="reel-card">
-          <video autoplay muted loop playsinline preload="metadata">
-            <source src="videos/PLACEHOLDER-reel-3.mp4" type="video/mp4" />
+          <video autoplay muted loop playsinline preload="metadata" poster="photos/golf_portrait.jpg">
+            <source src="videos/golf_swing_iron.mov" type="video/quicktime" />
+            <source src="videos/golf_swing_iron.mov" type="video/mp4" />
           </video>
-          <span class="reel-platform">REEL</span>
+          <span class="reel-platform">SWING</span>
         </div>
         <div class="reel-card">
-          <video autoplay muted loop playsinline preload="metadata">
-            <source src="videos/PLACEHOLDER-reel-4.mp4" type="video/mp4" />
+          <video autoplay muted loop playsinline preload="metadata" poster="photos/recording_studio.jpg">
+            <source src="videos/studio_overview.mov" type="video/quicktime" />
+            <source src="videos/studio_overview.mov" type="video/mp4" />
           </video>
-          <span class="reel-platform">TIKTOK</span>
+          <span class="reel-platform">STUDIO</span>
         </div>
       </div>
       <div style="display: flex; gap: 0.6rem; margin-top: 2rem; flex-wrap: wrap;">
@@ -310,8 +314,7 @@
         <div class="gear-card">
           <div class="gear-img">
             <span class="gear-badge">Daily carry</span>
-            <!-- TODO: drop your iPhone setup photo at photos/PLACEHOLDER-gear-iphone.jpg -->
-            <img src="photos/PLACEHOLDER-gear-iphone.jpg" alt="iPhone 17 Pro setup" />
+            <img src="photos/gear-camera-iphone.jpg" alt="iPhone 17 Pro in Moment case" loading="lazy" />
           </div>
           <h4>iPhone 17 Pro</h4>
           <p class="gear-desc">Always in pocket. Most of the reels live here.</p>
@@ -327,8 +330,7 @@
         <div class="gear-card">
           <div class="gear-img">
             <span class="gear-badge">Pocket digital</span>
-            <!-- TODO: drop your Canon S100 photo at photos/PLACEHOLDER-gear-canon.jpg -->
-            <img src="photos/PLACEHOLDER-gear-canon.jpg" alt="Canon PowerShot S100" />
+            <img src="photos/gear-camera-canon.jpg" alt="Canon PowerShot S100" loading="lazy" />
           </div>
           <h4>Canon S100</h4>
           <p class="gear-desc">The compact that lives in the jacket pocket. Pulled out for the unposed stuff.</p>
@@ -337,6 +339,38 @@
             <li><span class="key">Sensor</span><span class="val">12.1 MP CMOS</span></li>
             <li><span class="key">Lens</span><span class="val">f/2.0 5.2-26mm</span></li>
             <li><span class="key">Mode</span><span class="val">RAW · 1080p</span></li>
+          </ul>
+        </div>
+
+        <!-- Moment VND filter -->
+        <div class="gear-card">
+          <div class="gear-img">
+            <span class="gear-badge">Glass</span>
+            <img src="photos/gear-camera-vnd-filter.jpg" alt="Moment Variable ND filter" loading="lazy" />
+          </div>
+          <h4>Moment VND</h4>
+          <p class="gear-desc">Variable ND on the front of the iPhone. Keeps shutter at 1/48 in daylight so motion blurs the way film does.</p>
+          <ul class="gear-specs">
+            <li><span class="key">Type</span><span class="val">Variable ND 2-5</span></li>
+            <li><span class="key">Mount</span><span class="val">M-Series</span></li>
+            <li><span class="key">Glass</span><span class="val">Cinema-grade</span></li>
+            <li><span class="key">Use</span><span class="val">4K60 / cinematic</span></li>
+          </ul>
+        </div>
+
+        <!-- DJI Mic -->
+        <div class="gear-card">
+          <div class="gear-img">
+            <span class="gear-badge">Audio</span>
+            <img src="photos/gear-camera-dji-mic.jpg" alt="DJI Mic system" loading="lazy" />
+          </div>
+          <h4>DJI Mic</h4>
+          <p class="gear-desc">Wireless lavs that just work. The reel sounds half as good without it.</p>
+          <ul class="gear-specs">
+            <li><span class="key">Channels</span><span class="val">2 transmitters</span></li>
+            <li><span class="key">Range</span><span class="val">250m line of sight</span></li>
+            <li><span class="key">Recording</span><span class="val">Onboard 8GB</span></li>
+            <li><span class="key">Output</span><span class="val">USB-C / Lightning / 3.5mm</span></li>
           </ul>
         </div>
 
