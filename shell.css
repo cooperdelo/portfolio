@@ -2977,3 +2977,130 @@ section.world-builder.has-bg {
   .glass-section { min-height: 60vh; padding: 4rem 1.2rem 3rem; }
   .glass-card { padding: 1.6rem 1.4rem; }
 }
+
+/* ============================================================
+   v6 — broken-apart glass pattern
+   Inside a .glass-section, instead of one big .glass-card you
+   can scatter individual floating glass elements. The photo
+   reads through the gaps. Each piece has its own depth shadow.
+   ============================================================ */
+
+/* Heading sits directly on the photo, no card. Strong text-shadow
+   for legibility, light cream/rust gradient text. */
+.glass-section .gs-poster {
+  position: relative;
+  z-index: 2;
+  text-shadow:
+    0 2px 30px rgba(0,0,0,0.75),
+    0 1px 6px rgba(0,0,0,0.55);
+  filter:
+    drop-shadow(0 30px 60px rgba(0,0,0,0.45))
+    drop-shadow(0 6px 14px rgba(255,77,46,0.12));
+}
+
+/* Tight glass card — smaller, more padding control for floating use */
+.glass-card-tight {
+  padding: 1.4rem 1.6rem;
+  border-radius: 18px;
+  background: rgba(244,239,230,0.05);
+  backdrop-filter: blur(22px) saturate(160%);
+  -webkit-backdrop-filter: blur(22px) saturate(160%);
+  border: 1px solid rgba(244,239,230,0.14);
+  box-shadow:
+    0 24px 60px -22px rgba(0,0,0,0.65),
+    0 1px 0 rgba(244,239,230,0.18) inset;
+  position: relative;
+  overflow: hidden;
+  display: inline-block;
+  max-width: 100%;
+}
+.glass-card-tight::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0) 60%);
+}
+.glass-card-tight .lede,
+.glass-card-tight .body-prose,
+.glass-card-tight p { color: var(--ink); }
+.glass-card-tight .body-prose { color: rgba(244,239,230,0.78); }
+
+/* Floating pill row (eyebrow strip with optional right meta) */
+.glass-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.6rem;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+}
+.glass-row .eyebrow,
+.glass-section .eyebrow {
+  color: rgba(244,239,230,0.85);
+  text-shadow: 0 1px 8px rgba(0,0,0,0.55);
+}
+
+/* Glass plate inside .glass-section — readable contrast */
+.glass-section .plate.glass {
+  background: rgba(244,239,230,0.10);
+  border-color: rgba(244,239,230,0.28);
+  color: var(--ink);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+}
+.glass-section .plate.glass .num { color: var(--rust); }
+.glass-section .plate.glass .eyebrow { color: rgba(244,239,230,0.85); }
+
+/* Stat cards inside .glass-section — get individual depth, 3D-ish */
+.glass-section .stat-card.glass {
+  background: rgba(10,9,8,0.32);
+  border: 1px solid rgba(244,239,230,0.14);
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  box-shadow:
+    0 18px 36px -16px rgba(0,0,0,0.55),
+    0 1px 0 rgba(244,239,230,0.16) inset;
+  transition: transform 0.4s cubic-bezier(0.22,1,0.36,1), background 0.4s ease, box-shadow 0.4s ease;
+  color: var(--ink);
+}
+.glass-section .stat-card.glass:hover {
+  transform: translateY(-3px);
+  background: rgba(10,9,8,0.42);
+  box-shadow:
+    0 24px 50px -16px rgba(0,0,0,0.7),
+    0 1px 0 rgba(244,239,230,0.22) inset;
+}
+.glass-section .stat-card.glass .label { color: rgba(244,239,230,0.6); }
+.glass-section .stat-card.glass .value { color: var(--ink); }
+
+/* Floating link/button glass pill */
+.glass-section .glass-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.85rem 1.2rem;
+  font-family: 'Geist Mono', monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  font-size: 0.78rem;
+  color: var(--rust);
+  background: rgba(10,9,8,0.32);
+  border: 1px solid rgba(244,239,230,0.16);
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  border-radius: 999px;
+  text-decoration: none;
+  transition: transform 0.3s ease, background 0.3s ease, border-color 0.3s ease;
+  box-shadow: 0 12px 28px -10px rgba(0,0,0,0.55);
+}
+.glass-section .glass-pill:hover {
+  transform: translateY(-2px);
+  background: rgba(10,9,8,0.42);
+  border-color: rgba(255,77,46,0.45);
+}
+
+/* Body text on photo (no card) — strong shadow, larger max-width */
+.glass-section .lede.gs-prose {
+  color: var(--ink);
+  text-shadow: 0 2px 14px rgba(0,0,0,0.6);
+  max-width: 56rem;
+  position: relative;
+  z-index: 2;
+}
