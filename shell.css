@@ -1368,8 +1368,8 @@ body.has-page-bg .ambient { display: none; }
    ─────────────────────────────────────────────────────── */
 .replay-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, 220px);
-  gap: 2rem;
+  grid-template-columns: repeat(auto-fill, 290px);
+  gap: 1.6rem;
   margin-top: 1rem;
   justify-content: start;
 }
