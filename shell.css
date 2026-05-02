@@ -827,7 +827,7 @@ body.has-page-bg .ambient { display: none; }
   border-radius: 3px;
   font-family: "Geist Mono", monospace; font-size: 0.62rem;
   text-transform: uppercase; letter-spacing: 0.22em;
-  color: var(--ink);
+  color: var(--bg);
   background: linear-gradient(180deg, rgba(244,239,230,0.96) 0%, rgba(214,205,189,0.94) 100%);
   border: 1px solid rgba(244,239,230,0.7);
   box-shadow:
