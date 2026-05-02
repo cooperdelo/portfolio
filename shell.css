@@ -1730,6 +1730,13 @@ body.has-page-bg .ambient { display: none; }
   .project-row { grid-template-columns: 1fr !important; gap: 0.5rem !important; padding: 1.6rem 0 !important; }
   .project-row .meta { font-size: 0.62rem; padding-top: 0; }
   .project-row:hover h3 { transform: none !important; }
+  /* Glass-card variant (home page Builder section) — keep horizontal padding so
+     text doesn't touch the card edges, and shrink margin/radius for mobile. */
+  .block.world-builder.has-bg .project-row {
+    padding: 1.4rem 1.2rem !important;
+    margin-bottom: 0.8rem !important;
+    border-radius: 14px !important;
+  }
 
   /* ── Lineup cards (Rubber Band) ── */
   .lineup-stage { grid-template-columns: repeat(2, 1fr); margin-top: 1.5rem; }
