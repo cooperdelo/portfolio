@@ -2828,20 +2828,73 @@ section.world-builder.has-bg {
   /* Tame the new clips' brighter exposure so they match the older ones */
   filter: brightness(0.78) saturate(0.95) contrast(1.04) !important;
 }
-/* Constrain the golf-video and iron-placeholder photo-frames so the
-   portrait media doesn't grow taller than the col-7 text block on the
-   left. Cap width and use a less extreme aspect ratio so it scales
-   nicely on every viewport. */
-.col-5 .photo-frame:has(.golf-video-frame),
-.col-5 .photo-frame:has(.iron-placeholder) {
+/* Constrain the golf-video photo-frame so the portrait video doesn't grow
+   taller than the col-7 text block on the left. Cap width and use a less
+   extreme aspect ratio so it scales nicely on every viewport. */
+.col-5 .photo-frame:has(.golf-video-frame) {
   max-width: 440px;
   margin-left: auto;
 }
-.photo.golf-video-frame,
-.photo.iron-placeholder { aspect-ratio: 4 / 5 !important; }
+.photo.golf-video-frame { aspect-ratio: 4 / 5 !important; }
 @media (max-width: 900px) {
-  .col-5 .photo-frame:has(.golf-video-frame),
-  .col-5 .photo-frame:has(.iron-placeholder) { max-width: 100%; margin: 0 auto; }
+  .col-5 .photo-frame:has(.golf-video-frame) { max-width: 100%; margin: 0 auto; }
+}
+
+/* Iron section — two overlapping photo cards (polaroid stack, like /cover) */
+.iron-stack {
+  position: relative;
+  max-width: 440px;
+  margin-left: auto;
+  aspect-ratio: 4 / 5;
+}
+.iron-card {
+  position: absolute;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow:
+    0 30px 80px rgba(0,0,0,0.65),
+    0 0 0 1px rgba(244,239,230,0.08);
+}
+.iron-card img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.iron-card::after {
+  content: "";
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,0.04) 0%, rgba(0,0,0,0.32) 100%);
+  pointer-events: none;
+}
+.iron-card-back {
+  top: 0; left: 0;
+  width: 78%; height: 78%;
+  transform: rotate(-3deg);
+  z-index: 1;
+}
+.iron-card-front {
+  bottom: 0; right: 0;
+  width: 60%; height: 65%;
+  transform: rotate(5deg);
+  z-index: 2;
+}
+.iron-stack-caption {
+  position: absolute;
+  bottom: 0; left: 0;
+  z-index: 3;
+  font-family: "Geist Mono", monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  font-size: 0.6rem;
+  color: rgba(244,239,230,0.92);
+  background: rgba(10,9,8,0.55);
+  padding: 0.4rem 0.7rem;
+  border-radius: 4px;
+  backdrop-filter: blur(6px);
+  transform: rotate(-3deg) translateY(0.4rem);
+}
+@media (max-width: 900px) {
+  .iron-stack { max-width: 100%; margin: 0 auto; }
 }
 
 /* Golf gallery — small triptych below the section */
