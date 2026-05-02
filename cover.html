@@ -114,7 +114,7 @@
     font-weight: 300;
     font-variation-settings: "opsz" 144, "WONK" 1, "SOFT" 100;
     color: var(--rust);
-    text-transform: lowercase;
+    text-transform: none;
     letter-spacing: -0.01em;
     font-size: 0.88em;
     margin-left: 0.04em;
@@ -164,23 +164,21 @@
     backdrop-filter: blur(6px);
   }
 
-  /* Card 1 — top right, music */
+  /* All three cards: vertical 4:5 portrait crops, fanned diagonally */
   .shard-1 {
-    top: 80px; right: 80px;
-    width: 280px; height: 360px;
-    transform: rotate(4deg);
+    top: 60px; right: 70px;
+    width: 260px; height: 360px;
+    transform: rotate(5deg);
   }
-  /* Card 2 — middle right, builder */
   .shard-2 {
-    top: 380px; right: 240px;
-    width: 320px; height: 200px;
+    top: 280px; right: 330px;
+    width: 260px; height: 360px;
     transform: rotate(-3deg);
   }
-  /* Card 3 — lower right, lens */
   .shard-3 {
-    bottom: 80px; right: 110px;
-    width: 240px; height: 300px;
-    transform: rotate(5deg);
+    bottom: 60px; right: 120px;
+    width: 260px; height: 360px;
+    transform: rotate(4deg);
   }
 
   /* Capture helper — a fixed-size guide visible only outside the canvas */
@@ -205,17 +203,17 @@
     <img src="photos/cooper_with_guitar_outdoor.jpg" alt="" />
   </div>
 
-  <!-- Floating photo cards: range of work -->
+  <!-- Floating photo cards: three vertical crops -->
   <div class="shard shard-1">
-    <img src="photos/solo_cooper_bass.jpeg" alt="" />
+    <img src="photos/gig_rubber_tent_purple.jpg" alt="" />
     <span class="cap">Music</span>
   </div>
   <div class="shard shard-2">
-    <img src="photos/plugverse_profile.jpg" alt="" />
+    <img src="photos/front-page-hero.jpg" alt="" />
     <span class="cap">Builder</span>
   </div>
   <div class="shard shard-3">
-    <img src="photos/thailand_trip_wat_arun.jpg" alt="" />
+    <img src="photos/thailand_trip_bangkok_skyline.jpg" alt="" />
     <span class="cap">Lens</span>
   </div>
 
@@ -228,7 +226,7 @@
   <!-- Headline -->
   <div class="headline-wrap">
     <span class="eyebrow">Builder · Musician · Athlete · Lens</span>
-    <h1 class="name">Cooper<br/><span class="accent">delo.</span></h1>
+    <h1 class="name">Cooper<br/><span class="accent">Delo.</span></h1>
   </div>
 
   <!-- Grain on top of everything -->
