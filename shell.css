@@ -2826,6 +2826,18 @@ section.world-builder.has-bg {
   object-fit: cover;
   display: block;
 }
+/* Constrain the golf-video photo-frame so the portrait video doesn't grow
+   taller than the col-7 text block on the left. Cap width and use a less
+   extreme aspect ratio so it scales nicely on every viewport. */
+.col-5 > div > .photo-frame:has(.golf-video-frame),
+.col-5 .photo-frame:has(.golf-video-frame) {
+  max-width: 440px;
+  margin-left: auto;
+}
+.photo.golf-video-frame { aspect-ratio: 4 / 5 !important; }
+@media (max-width: 900px) {
+  .col-5 .photo-frame:has(.golf-video-frame) { max-width: 100%; margin: 0 auto; }
+}
 
 /* Golf gallery — small triptych below the section */
 .golf-gallery {
