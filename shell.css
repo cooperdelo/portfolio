@@ -2825,6 +2825,8 @@ section.world-builder.has-bg {
   height: 100%;
   object-fit: cover;
   display: block;
+  /* Tame the new clips' brighter exposure so they match the older ones */
+  filter: brightness(0.78) saturate(0.95) contrast(1.04) !important;
 }
 /* Constrain the golf-video photo-frame so the portrait video doesn't grow
    taller than the col-7 text block on the left. Cap width and use a less
