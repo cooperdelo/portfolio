@@ -2621,18 +2621,21 @@ section.world-builder.has-bg {
   color: var(--ink) !important;
 }
 .block.world-builder.has-bg .project-row {
-  background: rgba(10,9,8,0.28);
-  backdrop-filter: blur(8px) saturate(125%);
-  -webkit-backdrop-filter: blur(8px) saturate(125%);
-  border: 1px solid rgba(244,239,230,0.14);
+  background: rgba(10,9,8,0.42);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border: 1px solid rgba(244,239,230,0.18);
   border-radius: 18px;
   margin-bottom: 1rem;
   padding: 1.6rem 2rem;
+  box-shadow:
+    0 18px 40px -16px rgba(0,0,0,0.55),
+    0 1px 0 rgba(244,239,230,0.16) inset;
   transition: transform 0.4s cubic-bezier(0.22,1,0.36,1), background 0.4s ease, border-color 0.4s ease;
 }
 .block.world-builder.has-bg .project-row:hover {
-  background: rgba(10,9,8,0.4);
-  border-color: rgba(244,239,230,0.24);
+  background: rgba(10,9,8,0.55);
+  border-color: rgba(244,239,230,0.28);
   transform: translateY(-2px);
 }
 .block.world-builder.has-bg .project-row .meta { color: rgba(244,239,230,0.6) !important; }
@@ -3203,4 +3206,17 @@ section.world-builder.has-bg {
   background:
     radial-gradient(ellipse at center, rgba(10,9,8,0.35) 0%, rgba(10,9,8,0.75) 100%),
     linear-gradient(180deg, rgba(10,9,8,0.55) 0%, rgba(10,9,8,0.35) 35%, rgba(10,9,8,0.75) 100%);
+}
+
+/* ============================================================
+   v6.4 — Cooper Delo section vintage tinted backdrop
+   ============================================================ */
+.cooper-section .section-bg img,
+.cooper-section .section-bg video {
+  filter: brightness(0.5) saturate(0.78) contrast(1.06) sepia(0.28) hue-rotate(-8deg);
+}
+.cooper-section .section-bg::after {
+  background:
+    radial-gradient(ellipse at 30% 50%, rgba(10,9,8,0.35) 0%, rgba(10,9,8,0.7) 100%),
+    linear-gradient(180deg, rgba(10,9,8,0.5) 0%, rgba(10,9,8,0.25) 35%, rgba(10,9,8,0.7) 100%);
 }
