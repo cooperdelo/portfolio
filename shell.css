@@ -2402,3 +2402,119 @@ footer.site {
 .now-workspace-bg img {
   filter: brightness(0.35) saturate(0.85) contrast(1.05);
 }
+
+/* ============================================================
+   Concert show-card v2 — genre tag + hover blurb reveal
+   The card sits at rest with image + date/artist/venue.
+   On hover (or focus), a short blurb fades up from the bottom
+   over the dark gradient. Text is always readable, never floats
+   in mid-air without a backdrop.
+   ============================================================ */
+
+.travel-card.show-card .show-tag {
+  position: absolute;
+  top: 0.9rem;
+  left: 0.9rem;
+  z-index: 3;
+  padding: 0.32rem 0.7rem;
+  font-family: 'Geist Mono', monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 0.6rem;
+  color: rgba(244,239,230,0.92);
+  background: rgba(10,9,8,0.55);
+  border: 1px solid rgba(244,239,230,0.16);
+  border-radius: 999px;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.travel-card.show-card .show-blurb {
+  margin-top: 0.7rem;
+  font-family: 'Fraunces', 'Times New Roman', serif;
+  font-size: 0.84rem;
+  line-height: 1.45;
+  color: rgba(244,239,230,0.85);
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: max-height 0.55s cubic-bezier(0.22,1,0.36,1),
+              opacity 0.4s ease,
+              transform 0.55s cubic-bezier(0.22,1,0.36,1);
+}
+
+@media (hover: hover) {
+  .travel-card.show-card:hover .show-blurb,
+  .travel-card.show-card:focus-within .show-blurb {
+    max-height: 12rem;
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .travel-card.show-card:hover::before {
+    opacity: 1;
+    background: linear-gradient(180deg, rgba(10,9,8,0) 10%, rgba(10,9,8,0.55) 50%, rgba(10,9,8,0.92) 100%);
+  }
+}
+
+/* On touch devices — always show the blurb (no hover state) */
+@media (hover: none) {
+  .travel-card.show-card .show-blurb {
+    max-height: 12rem;
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Reduced-motion: instant reveal, no slide */
+@media (prefers-reduced-motion: reduce) {
+  .travel-card.show-card .show-blurb {
+    transition: opacity 0.2s ease;
+    transform: none;
+  }
+}
+
+/* ============================================================
+   Hero video-cover utility — used on rubber-band, lens, builder,
+   athletic, plugverse. Full-viewport ambient looping background.
+   The .video-cover element fills the page-head; .inner sits on
+   top with a vignette gradient between for legibility.
+   ============================================================ */
+.page-head.video-cover-wrap {
+  position: relative;
+  min-height: 100vh;
+  padding: 8rem 2.4rem 4rem;
+  overflow: hidden;
+}
+.page-head .video-cover {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+  filter: brightness(0.45) saturate(0.95) contrast(1.05);
+}
+.page-head.video-cover-wrap::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at center, transparent 30%, rgba(10,9,8,0.55) 100%),
+    linear-gradient(180deg, rgba(10,9,8,0.55) 0%, rgba(10,9,8,0.05) 35%, rgba(10,9,8,0.85) 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+.page-head.video-cover-wrap .inner {
+  position: relative;
+  z-index: 2;
+}
+
+@media (max-width: 720px) {
+  .page-head.video-cover-wrap { padding: 6rem 1.4rem 3rem; min-height: 80vh; }
+}
+
+/* Reduced motion — pause the loop, show the poster */
+@media (prefers-reduced-motion: reduce) {
+  .page-head .video-cover { animation: none; }
+}
