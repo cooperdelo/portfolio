@@ -3491,3 +3491,82 @@ footer.site > div {
   text-shadow: 0 2px 12px rgba(0,0,0,0.6);
   max-width: 38rem;
 }
+
+/* ============================================================
+   v8 — comprehensive laptop scale-down
+   Default sizing assumed 1600px+ ultrawide. On 13-15" laptops
+   (1280-1500px) the section posters were rendering at 200+ px,
+   sections were taking 80-100vh of vertical space, and the page
+   felt physically oversized. This scales the whole vertical
+   rhythm down for medium screens.
+   ============================================================ */
+@media (max-width: 1500px) {
+  /* Section poster — was clamp(4, 14vw, 18rem) which hits ~200px on a
+     14" laptop. Clamp to roughly half that. */
+  h2.section-poster, .section-poster {
+    font-size: clamp(3rem, 8vw, 6.5rem) !important;
+    line-height: 0.9 !important;
+  }
+  h1.poster {
+    font-size: clamp(3.6rem, 9vw, 7.5rem) !important;
+    line-height: 0.92 !important;
+  }
+  h3.row-poster {
+    font-size: clamp(1.4rem, 3vw, 2.4rem) !important;
+    line-height: 1 !important;
+  }
+
+  /* Section block padding — already dropped from 8 to 6 in v7,
+     drop another notch to 4. */
+  section.block { padding: 4.5rem 2rem; }
+
+  /* Full-viewport sections: stop forcing 100vh / 80vh on medium
+     screens. Let content drive height. */
+  .page-head.video-cover-wrap { min-height: 70vh; padding: 5rem 1.8rem 3rem; }
+  .glass-section { min-height: 0; padding: 4.5rem 1.8rem 3.5rem; }
+  .manifesto-section { min-height: 0; padding: 4.5rem 1.8rem 3.5rem; }
+  .lineup-banner { height: auto; min-height: 0; padding: 5rem 0 3rem; }
+  .now-section, section.now-section { padding: 4.5rem 2rem; }
+
+  /* Lede + body prose on laptop — slight scale down */
+  .lede { font-size: clamp(1rem, 1.5vw, 1.2rem) !important; line-height: 1.4; }
+  .body-prose { font-size: 0.92rem; line-height: 1.55; }
+
+  /* Stat cards in hero callouts */
+  .hero .stats, header .stats { gap: 0.6rem; }
+
+  /* Setlist poster — was clamp(4, 12vw, 11rem) which is too much */
+  .setlist-poster { font-size: clamp(3rem, 8vw, 6.5rem) !important; }
+
+  /* Marquee strip a touch smaller */
+  .marquee-band { font-size: 0.7rem; }
+  .marquee-track span { padding: 0 1.6rem; }
+}
+
+@media (max-width: 1280px) {
+  h2.section-poster, .section-poster {
+    font-size: clamp(2.4rem, 7.5vw, 4.8rem) !important;
+  }
+  h1.poster {
+    font-size: clamp(3rem, 8vw, 5.6rem) !important;
+  }
+  section.block { padding: 3.5rem 1.4rem; }
+  .page-head.video-cover-wrap { min-height: 60vh; padding: 4rem 1.4rem 2.4rem; }
+  .glass-section { padding: 3.5rem 1.4rem 2.8rem; }
+  .manifesto-section { padding: 3.5rem 1.4rem 2.8rem; }
+  .lineup-banner { padding: 4rem 0 2.5rem; }
+  .now-section, section.now-section { padding: 3.5rem 1.4rem; }
+  .lede { font-size: clamp(0.95rem, 1.4vw, 1.1rem) !important; }
+  .setlist-poster { font-size: clamp(2.4rem, 7.5vw, 5rem) !important; }
+
+  /* Reduce hero in lineup banner heading too */
+  .lineup-overlay { padding: 5rem 0 3rem !important; }
+}
+
+/* Re-tighten margins between section header and grid below */
+@media (max-width: 1500px) {
+  section.block .grid + .grid { margin-top: 2rem !important; }
+}
+@media (max-width: 1280px) {
+  section.block .grid + .grid { margin-top: 1.5rem !important; }
+}
