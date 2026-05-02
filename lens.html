@@ -21,6 +21,15 @@
 <link rel="preload" as="image" href="photos/cooper_tux_with_canon.jpg" fetchpriority="high" />
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,300..900,30..100,0..1;1,9..144,300..900,30..100,0..1&family=Geist+Mono:wght@400;500&family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="shell.css" />
+<style>
+  /* Lighter tint on the "Through the frame" hero video so the landscape reads */
+  .page-head.video-cover-wrap .video-cover {
+    filter: brightness(0.82) contrast(1.04) !important;
+  }
+  .page-head.video-cover-wrap::after {
+    background: linear-gradient(180deg, rgba(10,9,8,0.18) 0%, rgba(10,9,8,0.42) 100%) !important;
+  }
+</style>
 </head>
 <body class="grain">
 
