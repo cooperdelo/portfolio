@@ -143,16 +143,23 @@
     </svg>
   </div>
   <div class="grid">
-    <div class="col-12 reveal">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-        <span class="plate glass"><span class="num">03</span><span class="eyebrow" style="margin:0;">The hobby</span></span>
-        <span class="eyebrow">For fun</span>
+    <div class="col-7">
+      <div class="reveal">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+          <span class="plate glass"><span class="num">03</span><span class="eyebrow" style="margin:0;">The hobby</span></span>
+          <span class="eyebrow">For fun</span>
+        </div>
+        <h2 class="section-poster">Golf<span class="accent">.</span></h2>
+        <p class="lede" style="margin-top: 2rem;">Golf is the hobby. Three or four rounds a month when school and Plugverse let me. I am not chasing scratch, I am chasing four hours of being completely off the clock with my phone in the cart. It clears my head better than anything else.</p>
+        <div class="stats" style="margin-top: 2.5rem;">
+          <div class="stat-card glass"><span class="label">Rounds / month</span><span class="value">3 to 4</span></div>
+          <div class="stat-card glass"><span class="label">Why</span><span class="value">Head reset</span></div>
+          <div class="stat-card glass"><span class="label">Stakes</span><span class="value">None</span></div>
+          <div class="stat-card glass"><span class="label">Bag</span><span class="value">Titleist</span></div>
+        </div>
       </div>
-      <h2 class="section-poster">Golf<span class="accent">.</span></h2>
     </div>
-  </div>
-  <div class="grid" style="margin-top: 3rem;">
-    <div class="col-4">
+    <div class="col-5">
       <div class="reveal"><div class="photo-frame">
         <div class="photo has-media portrait-tall golf-video-frame" data-world="athletic">
           <video id="golf-chained" autoplay muted playsinline preload="metadata" poster="photos/golf_portrait.jpg">
@@ -162,17 +169,6 @@
         </div>
         <div class="caption-shard">Course / 2026</div>
       </div></div>
-    </div>
-    <div class="col-8">
-      <div class="reveal">
-        <p class="lede">Golf is the hobby. Three or four rounds a month when school and Plugverse let me. I am not chasing scratch, I am chasing four hours of being completely off the clock with my phone in the cart. It clears my head better than anything else.</p>
-      </div>
-      <div class="stats" style="margin-top: 2.5rem;">
-        <div class="stat-card glass"><span class="label">Rounds / month</span><span class="value">3 to 4</span></div>
-        <div class="stat-card glass"><span class="label">Why</span><span class="value">Head reset</span></div>
-        <div class="stat-card glass"><span class="label">Stakes</span><span class="value">None</span></div>
-        <div class="stat-card glass"><span class="label">Bag</span><span class="value">Titleist</span></div>
-      </div>
     </div>
   </div>
 
@@ -341,11 +337,16 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" defer></script>
 <script src="shell.js" defer></script>
 <script>
-  // Chain the two golf swing videos: alternate iron → driver → iron → driver
+  // Chain the four golf swing videos: iron → driver → iron2 → driver2 → loop
   (function chainGolfVideos() {
     const v = document.getElementById('golf-chained');
     if (!v) return;
-    const clips = ['videos/golf_swing_iron.mov', 'videos/golf_swing_driver.mov'];
+    const clips = [
+      'videos/golf_swing_iron.mov',
+      'videos/golf_swing_driver.mov',
+      'videos/iron_swing_2.mov',
+      'videos/driver_swing_golf_2.mov'
+    ];
     let i = 0;
     v.addEventListener('ended', function () {
       i = (i + 1) % clips.length;
