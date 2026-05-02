@@ -3389,7 +3389,7 @@ footer.site::before {
   background-image: url("photos/vegas_trip_1.jpg");
   background-size: cover;
   background-position: center 60%;
-  filter: brightness(0.4) saturate(0.78) contrast(1.05) sepia(0.22) hue-rotate(-6deg);
+  filter: brightness(0.28) saturate(0.78) contrast(1.05) sepia(0.24) hue-rotate(-6deg);
 }
 footer.site::after {
   content: "";
@@ -3397,9 +3397,29 @@ footer.site::after {
   inset: 0;
   z-index: -1;
   background:
-    radial-gradient(ellipse at 30% 50%, rgba(10,9,8,0) 0%, rgba(10,9,8,0.45) 100%),
-    linear-gradient(180deg, rgba(10,9,8,0.35) 0%, rgba(10,9,8,0.65) 100%);
+    radial-gradient(ellipse at 30% 50%, rgba(10,9,8,0.2) 0%, rgba(10,9,8,0.7) 100%),
+    linear-gradient(180deg, rgba(10,9,8,0.55) 0%, rgba(10,9,8,0.85) 100%);
   pointer-events: none;
+}
+
+/* Footer continue-reading row — merged with the get-in-touch block */
+.footer-continue {
+  text-align: center;
+  padding-bottom: 2.5rem;
+  border-bottom: 1px solid rgba(244,239,230,0.14);
+  margin-bottom: 2.5rem;
+}
+.footer-continue .eyebrow {
+  display: block;
+  margin-bottom: 1.2rem;
+  color: rgba(244,239,230,0.85);
+  text-shadow: 0 1px 8px rgba(0,0,0,0.5);
+}
+.footer-continue .pills {
+  display: flex;
+  justify-content: center;
+  gap: 0.8rem;
+  flex-wrap: wrap;
 }
 footer.site > div {
   position: relative;
