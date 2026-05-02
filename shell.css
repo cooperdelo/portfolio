@@ -1059,8 +1059,8 @@ body.has-page-bg .ambient { display: none; }
    ─────────────────────────────────────────────────────── */
 .gear-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.2rem;
   perspective: 1800px;
   margin-top: 1.5rem;
 }
@@ -1188,9 +1188,14 @@ body.has-page-bg .ambient { display: none; }
    ─────────────────────────────────────────────────────── */
 .travel-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 1rem;
   margin-top: 2rem;
+}
+/* Concerts grid (rubber-band shows) — denser, fits 5-6 per row on laptop */
+.travel-grid:has(.show-card) {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.8rem;
 }
 .travel-card {
   position: relative;
@@ -3238,4 +3243,48 @@ section.world-builder.has-bg {
 .cooper-section .stat-card.glass:hover {
   background: rgba(10,9,8,0.55);
   border-color: rgba(244,239,230,0.28);
+}
+
+/* ============================================================
+   v7 — laptop / medium-screen responsive scaling
+   Default sizing was tuned for 1600px+ ultrawide. On 1280-1500px
+   laptop screens everything was reading too big. Tighter padding,
+   smaller gear-card padding/text, smaller section paddings, smaller
+   stat-cards. Concert grid switches to denser min-widths.
+   ============================================================ */
+@media (max-width: 1500px) {
+  section.block { padding: 6rem 2rem; }
+  .gear-grid { gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); }
+  .gear-card { padding: 1rem; border-radius: 14px; }
+  .gear-card h4 { font-size: 1.05rem; }
+  .gear-card .gear-desc { font-size: 0.78rem; }
+  .gear-card .gear-specs li { padding: 0.4rem 0; font-size: 0.7rem; }
+  .gear-card .gear-badge { font-size: 0.55rem; padding: 0.28rem 0.55rem; }
+  .travel-grid { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.9rem; }
+  .travel-grid:has(.show-card) { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 0.7rem; }
+  .travel-card.show-card .show-headline { font-size: clamp(1rem, 1.7vw, 1.5rem); }
+  .travel-card.show-card .show-tag { font-size: 0.55rem; padding: 0.26rem 0.55rem; }
+  .stat-card.glass { padding: 0.9rem 1rem; }
+  .stat-card.glass .label { font-size: 0.6rem; }
+  .stat-card.glass .value { font-size: 0.95rem; }
+  .strip-grid { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.8rem; }
+  .replay-grid { grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 0.8rem; }
+}
+
+@media (max-width: 1280px) {
+  section.block { padding: 5rem 1.6rem; }
+  .gear-grid { grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); }
+  .gear-card { padding: 0.85rem; }
+  .gear-card .gear-img { border-radius: 10px; }
+  .travel-grid { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+  .travel-grid:has(.show-card) { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+  .replay-grid { grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); }
+  .now-list li { font-size: 0.95rem; }
+  .lede { font-size: clamp(1rem, 1.6vw, 1.25rem); }
+  .body-prose { font-size: 0.92rem; }
+}
+
+/* Make the home Plugverse mockup not dominate on laptops */
+@media (max-width: 1500px) {
+  .col-6 .photo-frame .photo { aspect-ratio: 4 / 3; }
 }
