@@ -3138,3 +3138,55 @@ section.world-builder.has-bg {
 .glass-section .gs-bg::after {
   background: linear-gradient(180deg, rgba(10,9,8,0.4) 0%, rgba(10,9,8,0.15) 35%, rgba(10,9,8,0.55) 100%);
 }
+
+/* ============================================================
+   v6.2 — softer glass everywhere over backdrop photos
+   The user wants to actually see the backgrounds. Drop the blur
+   radii on glass elements that float over photos.
+   ============================================================ */
+.glass-section .stat-card.glass {
+  backdrop-filter: blur(10px) saturate(130%);
+  -webkit-backdrop-filter: blur(10px) saturate(130%);
+  background: rgba(10,9,8,0.28);
+}
+.glass-section .glass-pill {
+  backdrop-filter: blur(10px) saturate(130%);
+  -webkit-backdrop-filter: blur(10px) saturate(130%);
+  background: rgba(10,9,8,0.28);
+}
+.glass-section .plate.glass {
+  backdrop-filter: blur(8px) saturate(130%);
+  -webkit-backdrop-filter: blur(8px) saturate(130%);
+  background: rgba(10,9,8,0.32);
+}
+
+/* Manifesto glass on the lens page — soften from 28 → 12 */
+.manifesto-glass {
+  backdrop-filter: blur(12px) saturate(140%) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(140%) !important;
+  background: rgba(10,9,8,0.28) !important;
+  border-color: rgba(244,239,230,0.16) !important;
+}
+
+/* Glass-card (any remaining usage) — keep but soften */
+.glass-card {
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  background: rgba(10,9,8,0.26);
+}
+
+/* Glass-card-tight (still around in some pages) — softer too */
+.glass-card-tight {
+  backdrop-filter: blur(10px) saturate(130%);
+  -webkit-backdrop-filter: blur(10px) saturate(130%);
+  background: rgba(10,9,8,0.22);
+}
+
+/* Section-bg images get a gentler darken — same vintage feel */
+.section-bg img,
+.section-bg video {
+  filter: brightness(0.7) saturate(0.85) contrast(1.04) sepia(0.12);
+}
+.section-bg::after {
+  background: linear-gradient(180deg, rgba(10,9,8,0.45) 0%, rgba(10,9,8,0.15) 30%, rgba(10,9,8,0.6) 100%);
+}
