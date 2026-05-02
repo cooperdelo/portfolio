@@ -22,8 +22,11 @@
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,300..900,30..100,0..1;1,9..144,300..900,30..100,0..1&family=Geist+Mono:wght@400;500&family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="shell.css" />
 <style>
-  /* Full-viewport rubber band header — drop the existing .MOV, video element fills the entire page-head */
-  .page-head.video-cover-wrap { min-height: 100vh; padding: 8rem 2.4rem 4rem; }
+  /* Full-viewport rubber band header on desktop. Mobile keeps the shorter
+     50-56vh from shell.css so the hero isn't a whole phone screen. */
+  @media (min-width: 901px) {
+    .page-head.video-cover-wrap { min-height: 100vh; padding: 8rem 2.4rem 4rem; }
+  }
 </style>
 </head>
 <body class="grain">
