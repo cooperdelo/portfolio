@@ -46,19 +46,25 @@
     <source src="videos/hero_plugverse_product.mov" type="video/quicktime" />
   </video>
   <div class="inner">
-    <span class="eyebrow">Project / 2024 to now</span>
+    <span class="eyebrow">Project / Dec 2025 to now</span>
     <h1 class="poster reveal in" style="margin-top: 1.5rem;">Plug<span class="accent">verse.</span></h1>
-    <p class="lede reveal" style="margin-top: 2.4rem; max-width: 50rem;">Where local music gets booked.</p>
+    <p class="lede reveal" style="margin-top: 2.4rem; max-width: 60rem;">The marketplace for local artists, venues, and organizers.</p>
+    <div class="reveal" style="margin-top: 2.2rem; display: flex; gap: 1rem; flex-wrap: wrap;">
+      <span class="stat-card glass" style="padding: 0.85rem 1.1rem;"><span class="label">Built in</span><span class="value" id="pv-since-days">—</span></span>
+      <span class="stat-card glass" style="padding: 0.85rem 1.1rem;"><span class="label">Raised</span><span class="value">$21,850</span></span>
+      <span class="stat-card glass" style="padding: 0.85rem 1.1rem;"><span class="label">Equity given</span><span class="value">0%</span></span>
+    </div>
   </div>
 </header>
 
 <div class="marquee-band">
   <div class="marquee-track">
-    <span>Booking infrastructure</span><span>Built solo</span><span>1789 Fund 2025</span><span>Launching April 30</span><span>plugverse.app</span>
-    <span>Booking infrastructure</span><span>Built solo</span><span>1789 Fund 2025</span><span>Launching April 30</span><span>plugverse.app</span>
+    <span>Marketplace for local music</span><span>Artists · Venues · Organizers</span><span>Built solo with Claude Code</span><span>$20K Luby Pitch</span><span>plugverse.app</span>
+    <span>Marketplace for local music</span><span>Artists · Venues · Organizers</span><span>Built solo with Claude Code</span><span>$20K Luby Pitch</span><span>plugverse.app</span>
   </div>
 </div>
 
+<!-- The problem — tight -->
 <section class="block has-bg">
   <div class="section-bg">
     <img src="photos/gig_rubber_outdoor_deck.jpg" alt="" loading="lazy" />
@@ -66,38 +72,84 @@
   <div class="grid">
     <div class="col-4"><span class="eyebrow">The problem</span></div>
     <div class="col-8">
-      <div class="reveal">
-        <p class="lede">A local band gets a text. You guys available April 12th? They spend twenty minutes writing a bio they have written forty times. Attach a setlist from the camera roll. Copy a contract from a Google Doc they found in 2023. Send their Venmo. Two weeks later, same thing. Different venue. Same twenty minutes.</p>
-      </div>
-      <div class="reveal" style="margin-top: 2rem;">
-        <p class="body-prose">The problem is not payment. Artists get paid. The problem is that there is no professional identity layer for independent artists. No persistent profile. No searchable availability. No standard contract. Every booking is cold and manual and starts at zero.</p>
+      <p class="lede reveal">Every gig starts from scratch. Bio rewritten. Setlist re-attached. Rate re-explained. Contract copy-pasted from a Google Doc. There's no LinkedIn for local music. No Airbnb listing for "here's who I am, what I charge, when I'm free."</p>
+    </div>
+  </div>
+</section>
+
+<!-- The analogy — Airbnb for local music -->
+<section class="block">
+  <div class="grid">
+    <div class="col-12" style="text-align: center;">
+      <div class="reveal" style="max-width: 920px; margin: 0 auto;">
+        <span class="eyebrow">The analogy</span>
+        <h3 class="section-poster" style="margin-top: 0.6rem; font-size: clamp(1.8rem, 4vw, 3rem); line-height: 1.05;">Airbnb gave infrastructure<br/>to an industry that needed it.<br/><span class="accent">Live local music is next.</span></h3>
+        <p class="body-prose" style="margin-top: 1.6rem; max-width: 56rem; margin-left: auto; margin-right: auto;">Rooms existed before Airbnb. Bookings existed before Airbnb. What didn't exist was the layer that made it standard — listings, identity, payments, reviews. Local music has the same gap. Plugverse is the layer.</p>
       </div>
     </div>
   </div>
 </section>
 
+<!-- What it is — three-sided marketplace -->
 <section class="block world-plugverse has-bg">
   <div class="section-bg">
     <img src="photos/gig_rubber_big_stage_3.jpg" alt="" loading="lazy" />
   </div>
   <div class="grid">
-    <div class="col-7">
-      <div class="reveal">
-        <span class="eyebrow">What I built</span>
-        <p class="lede" style="margin-top: 1rem;">One profile that does the work for them. Get discovered. Get booked. Contract auto-generated. Payment held in escrow until the gig is done. Free for organizers. Marketplace fee on artist payout. Built with Stripe Connect, Supabase, Next.js, and a lot of late nights.</p>
+    <div class="col-12 reveal">
+      <span class="eyebrow">What it is</span>
+      <h2 class="section-poster" style="margin-top: 0.6rem;">A three-sided<br/><span class="accent">marketplace.</span></h2>
+      <p class="lede" style="margin-top: 1.6rem; max-width: 60rem;">Artists list their availability and rate. Venues post their stages and dates. Organizers find the right act and book it in one flow. Contract auto-generated. Payment in escrow until the show is done.</p>
+    </div>
+  </div>
+  <div class="grid" style="margin-top: 2.4rem;">
+    <div class="col-12 reveal">
+      <div class="role-grid">
+        <div class="role-card">
+          <div class="role-tag">Artists</div>
+          <h4>One profile, every gig</h4>
+          <p>Bio, setlist, rate, samples, dates available. Send the link instead of the twenty-minute pitch.</p>
+        </div>
+        <div class="role-card">
+          <div class="role-tag">Venues</div>
+          <h4>Fill the calendar</h4>
+          <p>Post the room, the date, the budget. Discoverable to every artist on the platform.</p>
+        </div>
+        <div class="role-card">
+          <div class="role-tag">Organizers</div>
+          <h4>Book the show end-to-end</h4>
+          <p>Search, offer, sign, pay — one flow. Free to use. Contract and escrow handled for you.</p>
+        </div>
       </div>
-      <div class="stats" style="margin-top: 2.4rem;">
-        <div class="stat-card glass"><span class="label">Founded</span><span class="value">Nov 2024</span></div>
+    </div>
+  </div>
+  <div class="grid" style="margin-top: 2.4rem;">
+    <div class="col-12 reveal">
+      <div class="stats">
+        <div class="stat-card glass"><span class="label">Founded</span><span class="value">Dec 2025</span></div>
         <div class="stat-card glass"><span class="label">Form</span><span class="value">NC LLC</span></div>
-        <div class="stat-card glass"><span class="label">Built by</span><span class="value">Cooper</span></div>
-        <div class="stat-card glass"><span class="label">Stack</span><span class="value">Next, Supa, Stripe</span></div>
-        <div class="stat-card glass"><span class="label">Funding</span><span class="value">$1,850</span></div>
+        <div class="stat-card glass"><span class="label">Built by</span><span class="value">Cooper, solo</span></div>
+        <div class="stat-card glass"><span class="label">Stack</span><span class="value">Next · Supabase · Stripe</span></div>
+        <div class="stat-card glass"><span class="label">Funding</span><span class="value">$21,850</span></div>
         <div class="stat-card glass"><span class="label">Equity given</span><span class="value">0%</span></div>
-        <div class="stat-card glass"><span class="label">Status</span><span class="value">Apr 30 launch</span></div>
+        <div class="stat-card glass"><span class="label">Status</span><span class="value">Live</span></div>
         <div class="stat-card glass"><span class="label">Live at</span><span class="value">plugverse.app</span></div>
       </div>
     </div>
+  </div>
+</section>
+
+<!-- The artist profile — what an artist's page looks like -->
+<section class="block">
+  <div class="grid">
     <div class="col-5">
+      <div class="reveal">
+        <span class="eyebrow">The artist profile</span>
+        <h3 class="section-poster" style="margin-top: 0.5rem; font-size: clamp(1.8rem, 4vw, 3rem);">Send a link.<br/><span class="accent">Get booked.</span></h3>
+        <p class="body-prose" style="margin-top: 1.2rem;">Every artist gets a public profile — plugverse.app/their-name. Bio, samples, setlists, rates, calendar, instant book. Copy the URL into a venue's DM and the conversation is already half done.</p>
+      </div>
+    </div>
+    <div class="col-7">
       <div class="reveal">
         <div class="mockup-card">
           <div class="mockup-bar">
@@ -114,58 +166,67 @@
   </div>
 </section>
 
-<section class="block">
+<!-- How a booking happens — the UI demo video -->
+<section class="block world-plugverse">
   <div class="grid">
-    <div class="col-7"><div class="reveal"><div class="photo-frame">
-      <div class="photo has-media landscape" data-world="plugverse">
-        <img src="photos/hero.jpg" alt="Cooper pitching Plugverse at UNC Innovate Carolina Junction" loading="lazy" />
+    <div class="col-5">
+      <div class="reveal">
+        <span class="eyebrow">How a booking happens</span>
+        <h3 class="section-poster" style="margin-top: 0.5rem; font-size: clamp(1.8rem, 4vw, 3rem);">Organizer side<span class="accent">.</span></h3>
+        <p class="body-prose" style="margin-top: 1.2rem;">Recording from the live UI. An organizer drafts a direct offer to an artist — performance time, arrival time, lineup role, budget — and the contract auto-fills from the artist's profile. Sign, hold the payment in escrow, done.</p>
+        <ul class="body-prose" style="margin-top: 1.4rem; padding-left: 1rem; line-height: 1.9;">
+          <li>One offer flow for any gig type</li>
+          <li>Auto-generated contract from artist + venue defaults</li>
+          <li>Payment held in escrow until the show is performed</li>
+        </ul>
       </div>
-      <div class="caption-shard glass-light">Pitching at Innovate Carolina / 2026</div>
-    </div></div></div>
-    <div class="col-5"><div class="reveal" style="margin-top: 4rem;">
-      <!-- App mockup card with browser chrome — already wired to the existing UI demo video -->
-      <div class="mockup-card">
-        <div class="mockup-bar">
-          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
-          <span class="url">plugverse.app/dashboard</span>
+    </div>
+    <div class="col-7">
+      <div class="reveal">
+        <div class="mockup-card">
+          <div class="mockup-bar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="url">plugverse.app/dashboard</span>
+          </div>
+          <div class="mockup-body">
+            <video autoplay muted loop playsinline preload="metadata" poster="photos/Plugverse_picture.jpeg">
+              <source src="videos/plugverse_ui.mp4" type="video/mp4" />
+            </video>
+          </div>
         </div>
-        <div class="mockup-body">
-          <video autoplay muted loop playsinline preload="metadata" poster="photos/Plugverse_picture.jpeg">
-            <source src="videos/plugverse_ui.mp4" type="video/mp4" />
-          </video>
-        </div>
+        <div class="caption-shard glass-light" style="position: relative; left: 0; bottom: 0; margin-top: 1rem; transform: rotate(1.4deg);">Live UI / 2026</div>
       </div>
-      <div class="caption-shard glass-light" style="position: relative; left: 0; bottom: 0; margin-top: 1rem; transform: rotate(1.4deg);">Plugverse / live UI / 2026</div>
-    </div></div>
+    </div>
   </div>
 </section>
 
-<!-- Wins / Recognition -->
+<!-- The biggest moment — Luby Pitch -->
 <section class="block world-plugverse">
   <div class="grid">
     <div class="col-12 reveal">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-        <span class="plate glass"><span class="num">04</span><span class="eyebrow" style="margin:0;">Recognition</span></span>
-        <span class="eyebrow">$21,850 raised, zero equity given</span>
+        <span class="plate glass"><span class="num">04</span><span class="eyebrow" style="margin:0;">The biggest win</span></span>
+        <span class="eyebrow">April 2026</span>
       </div>
-      <h2 class="section-poster">Wins<span class="accent">.</span></h2>
+      <h2 class="section-poster">Twenty<br/><span class="accent">grand.</span></h2>
     </div>
   </div>
   <div class="grid" style="margin-top: 3rem;">
     <div class="col-7">
       <div class="reveal"><div class="photo-frame">
         <div class="photo has-media landscape" data-world="plugverse">
-          <img src="photos/luby_pic_with_check.jpg" alt="Cooper Delo accepting the Luby Pitch Competition $20,000 check for Plugverse" loading="lazy" />
+          <img src="photos/luby_pic_with_check.jpg" alt="Cooper accepting the Luby Pitch $20,000 check for Plugverse at Innovate Carolina Junction" loading="lazy" />
         </div>
-        <div class="caption-shard glass-light">Luby Pitch Competition / Apr 2026</div>
+        <div class="caption-shard glass-light">Luby Pitch Competition / Innovate Carolina Junction / Apr 2026</div>
       </div></div>
     </div>
     <div class="col-5">
       <div class="reveal">
-        <ul class="wins-list">
+        <p class="lede">Won the Luby Pitch Competition — $20,000, zero equity given. Hosted by Innovate Carolina at the Junction. Plugverse's biggest achievement so far, four months after founding.</p>
+        <ul class="wins-list" style="margin-top: 1.6rem;">
           <li>
             <span class="amount">$20K</span>
-            <span class="title">Luby Pitch Competition</span>
+            <span class="title">Luby Pitch · Innovate Carolina</span>
             <span class="when">Apr 2026</span>
           </li>
           <li>
@@ -175,7 +236,7 @@
           </li>
           <li>
             <span class="amount">LLC</span>
-            <span class="title">Plugverse LLC formed in NC</span>
+            <span class="title">Plugverse LLC · NC</span>
             <span class="when">Mar 2026</span>
           </li>
         </ul>
@@ -249,5 +310,22 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" defer></script>
 <script src="shell.js" defer></script>
+<script>
+  // Founding day counter — shows months/days since Dec 1, 2025
+  (function plugverseSinceCounter() {
+    const el = document.getElementById('pv-since-days');
+    if (!el) return;
+    const founded = new Date(2025, 11, 1); // Dec 1, 2025 (months are 0-indexed)
+    const now = new Date();
+    const diffDays = Math.max(0, Math.floor((now - founded) / 86400000));
+    const months = Math.floor(diffDays / 30.44);
+    const remDays = Math.round(diffDays - months * 30.44);
+    if (months >= 1) {
+      el.textContent = months + ' mo · ' + remDays + ' d';
+    } else {
+      el.textContent = diffDays + ' days';
+    }
+  })();
+</script>
 </body>
 </html>
