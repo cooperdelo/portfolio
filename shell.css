@@ -1568,6 +1568,8 @@ body.has-page-bg .ambient { display: none; }
   .gear-card .gear-specs li { padding: 0.4rem 0; }
 
   .travel-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 0.6rem; }
+  /* Concert show-cards must override their default 340px min on mobile */
+  .travel-grid:has(.show-card) { grid-template-columns: repeat(2, 1fr) !important; gap: 0.6rem; }
   .travel-card .travel-place { font-size: 1.05rem !important; }
   .travel-card .travel-meta { padding: 0.8rem 0.9rem; }
 
@@ -1578,6 +1580,7 @@ body.has-page-bg .ambient { display: none; }
 }
 @media (max-width: 480px) {
   .travel-grid { grid-template-columns: 1fr !important; }
+  .travel-grid:has(.show-card) { grid-template-columns: 1fr !important; }
   .reel-grid { grid-template-columns: repeat(2, 1fr) !important; }
 }
 
@@ -1699,7 +1702,7 @@ body.has-page-bg .ambient { display: none; }
   .video-cover-wrap { min-height: 56vh; }
 
   /* ── Poster typography ── */
-  .poster, h1.poster { font-size: clamp(2.6rem, 13vw, 6rem) !important; line-height: 0.92 !important; }
+  .poster, h1.poster { font-size: clamp(3.4rem, 17vw, 7.5rem) !important; line-height: 0.92 !important; }
   .section-poster, h2.section-poster { font-size: clamp(2.2rem, 11vw, 4.5rem) !important; line-height: 0.92 !important; }
   .row-poster, h3.row-poster { font-size: clamp(1.6rem, 7vw, 2.6rem) !important; line-height: 0.98 !important; }
 
@@ -1752,8 +1755,12 @@ body.has-page-bg .ambient { display: none; }
 
   /* ── Setlist (Spotify embed) — kill 3D tilt on touch ── */
   .setlist-wrap { perspective: none; margin-top: 1.5rem; }
-  .setlist-tilt { transform: none !important; border-radius: 8px; }
-  .setlist-tilt iframe { height: 380px !important; }
+  .setlist-tilt { transform: none !important; border-radius: 8px; display: block; }
+  .setlist-tilt iframe { height: 580px !important; min-height: 580px; width: 100% !important; display: block; }
+  /* Setlist section grid must collapse to single col so the iframe stops
+     leaving the col-5 photos in a sidebar void on phones. */
+  .setlist-section .grid { grid-template-columns: 1fr !important; }
+  .setlist-section .col-5, .setlist-section .col-7 { grid-column: 1 / -1 !important; }
 
   /* ── Drag gallery ── */
   .drag-section { padding: 3.5rem 0 !important; }
@@ -1875,8 +1882,8 @@ body.has-page-bg .ambient { display: none; }
   .drag-gallery, #drag-gallery { height: 240px !important; }
   .drag-card { width: 150px !important; height: 210px !important; }
 
-  /* Setlist iframe */
-  .setlist-tilt iframe { height: 340px !important; }
+  /* Setlist iframe — keep tall so Spotify's mobile playlist isn't truncated */
+  .setlist-tilt iframe { height: 540px !important; min-height: 540px; }
 
   /* Modal h3 */
   .modal h3 { font-size: 1.5rem !important; }
