@@ -3657,3 +3657,21 @@ footer.site > div {
 @media (max-width: 1280px) {
   section.block .grid + .grid { margin-top: 1.5rem !important; }
 }
+
+/* ============================================================
+   FINAL mobile hero override — must come last so it beats the
+   v8 laptop scale-down rules above (max-width: 1500/1280) which
+   also match mobile viewports and previously won by source order.
+   ============================================================ */
+@media (max-width: 900px) {
+  .poster, h1.poster {
+    font-size: clamp(3.4rem, 17vw, 7.5rem) !important;
+    line-height: 0.92 !important;
+  }
+}
+@media (max-width: 480px) {
+  .poster, h1.poster {
+    font-size: clamp(3.2rem, 18vw, 6.5rem) !important;
+    line-height: 0.92 !important;
+  }
+}
