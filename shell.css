@@ -3668,6 +3668,18 @@ footer.site > div {
     font-size: clamp(3.4rem, 17vw, 7.5rem) !important;
     line-height: 0.92 !important;
   }
+
+  /* Section eyebrow rows like
+     [01 The discipline]    5 days a week, no skipping
+     are inline display:flex space-between divs. On phones the two ends
+     crash into each other. Force wrap with a gap so they stack cleanly.
+     The :has() narrows the override to rows that actually contain a
+     .plate or .eyebrow so unrelated flex layouts aren't disturbed. */
+  div[style*="space-between"][style*="display: flex"]:has(.plate, .eyebrow) {
+    flex-wrap: wrap !important;
+    gap: 0.6rem 1rem !important;
+    align-items: flex-start !important;
+  }
 }
 @media (max-width: 480px) {
   .poster, h1.poster {
