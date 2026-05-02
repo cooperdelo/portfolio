@@ -3104,3 +3104,37 @@ section.world-builder.has-bg {
   position: relative;
   z-index: 2;
 }
+
+/* ============================================================
+   v6.1 — text on photo, no blur container
+   For .glass-section content, prefer text-shadow on the prose
+   over wrapping it in a blurred glass card. Background image
+   reads through cleanly.
+   ============================================================ */
+.glass-section .lede {
+  color: var(--ink);
+  text-shadow:
+    0 2px 14px rgba(0,0,0,0.7),
+    0 1px 4px rgba(0,0,0,0.6);
+  position: relative;
+  z-index: 2;
+}
+.glass-section .body-prose {
+  color: rgba(244,239,230,0.92);
+  text-shadow:
+    0 2px 12px rgba(0,0,0,0.7),
+    0 1px 3px rgba(0,0,0,0.55);
+  position: relative;
+  z-index: 2;
+}
+
+/* Lighter dim on the gs-bg img so the photo actually shows. The
+   bottom gradient on ::after handles legibility, not brightness
+   reduction on the image itself. */
+.glass-section .gs-bg img,
+.glass-section .gs-bg video {
+  filter: brightness(0.72) saturate(0.85) contrast(1.04) sepia(0.1);
+}
+.glass-section .gs-bg::after {
+  background: linear-gradient(180deg, rgba(10,9,8,0.4) 0%, rgba(10,9,8,0.15) 35%, rgba(10,9,8,0.55) 100%);
+}
