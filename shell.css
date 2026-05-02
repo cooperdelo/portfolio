@@ -2828,17 +2828,20 @@ section.world-builder.has-bg {
   /* Tame the new clips' brighter exposure so they match the older ones */
   filter: brightness(0.78) saturate(0.95) contrast(1.04) !important;
 }
-/* Constrain the golf-video photo-frame so the portrait video doesn't grow
-   taller than the col-7 text block on the left. Cap width and use a less
-   extreme aspect ratio so it scales nicely on every viewport. */
-.col-5 > div > .photo-frame:has(.golf-video-frame),
-.col-5 .photo-frame:has(.golf-video-frame) {
+/* Constrain the golf-video and iron-placeholder photo-frames so the
+   portrait media doesn't grow taller than the col-7 text block on the
+   left. Cap width and use a less extreme aspect ratio so it scales
+   nicely on every viewport. */
+.col-5 .photo-frame:has(.golf-video-frame),
+.col-5 .photo-frame:has(.iron-placeholder) {
   max-width: 440px;
   margin-left: auto;
 }
-.photo.golf-video-frame { aspect-ratio: 4 / 5 !important; }
+.photo.golf-video-frame,
+.photo.iron-placeholder { aspect-ratio: 4 / 5 !important; }
 @media (max-width: 900px) {
-  .col-5 .photo-frame:has(.golf-video-frame) { max-width: 100%; margin: 0 auto; }
+  .col-5 .photo-frame:has(.golf-video-frame),
+  .col-5 .photo-frame:has(.iron-placeholder) { max-width: 100%; margin: 0 auto; }
 }
 
 /* Golf gallery — small triptych below the section */
