@@ -2885,3 +2885,95 @@ section.world-builder.has-bg {
 .gear-card,
 .travel-card,
 .drag-card { contain: layout paint; }
+
+/* ============================================================
+   v5 — fix the manifesto-glass plate contrast and provide a
+   reusable .glass-section pattern (background image + dark
+   glass card overlay) that can drop into any sparse block.
+   ============================================================ */
+.manifesto-glass .plate.glass {
+  background: rgba(244,239,230,0.10);
+  border-color: rgba(244,239,230,0.28);
+  color: var(--ink);
+}
+.manifesto-glass .plate.glass .num { color: var(--rust); }
+.manifesto-glass .plate.glass .eyebrow { color: rgba(244,239,230,0.85); }
+
+/* Reusable glass-section: section gets a backdrop photo, content goes
+   inside .glass-card which becomes the readable glass overlay. */
+.glass-section {
+  position: relative;
+  min-height: 70vh;
+  padding: 7rem 2.4rem 6rem;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+}
+.glass-section .gs-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+.glass-section .gs-bg img,
+.glass-section .gs-bg video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.55) saturate(0.82) contrast(1.05) sepia(0.16);
+}
+.glass-section .gs-bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(10,9,8,0.5) 0%, rgba(10,9,8,0.18) 40%, rgba(10,9,8,0.7) 100%);
+}
+.glass-section > .grid {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+.glass-card {
+  padding: 2.4rem 2.8rem;
+  border-radius: 26px;
+  background: rgba(244,239,230,0.04);
+  backdrop-filter: blur(28px) saturate(160%);
+  -webkit-backdrop-filter: blur(28px) saturate(160%);
+  border: 1px solid rgba(244,239,230,0.14);
+  box-shadow:
+    0 32px 80px -28px rgba(0,0,0,0.7),
+    0 1px 0 rgba(244,239,230,0.18) inset;
+  position: relative;
+  overflow: hidden;
+}
+.glass-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0) 60%);
+  pointer-events: none;
+}
+.glass-card .plate.glass {
+  background: rgba(244,239,230,0.10);
+  border-color: rgba(244,239,230,0.28);
+  color: var(--ink);
+}
+.glass-card .plate.glass .num { color: var(--rust); }
+.glass-card .plate.glass .eyebrow { color: rgba(244,239,230,0.85); }
+.glass-card .lede { color: var(--ink); }
+.glass-card .body-prose { color: rgba(244,239,230,0.78); }
+.glass-card .eyebrow { color: rgba(244,239,230,0.85); }
+.glass-card h2.section-poster,
+.glass-card h3.row-poster { color: var(--ink); }
+.glass-card h2.section-poster .accent,
+.glass-card h3.row-poster .accent { color: var(--rust); }
+.glass-card .stat-card.glass {
+  background: rgba(244,239,230,0.06);
+  border-color: rgba(244,239,230,0.18);
+  color: var(--ink);
+}
+@media (max-width: 720px) {
+  .glass-section { min-height: 60vh; padding: 4rem 1.2rem 3rem; }
+  .glass-card { padding: 1.6rem 1.4rem; }
+}
