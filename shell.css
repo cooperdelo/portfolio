@@ -2610,7 +2610,8 @@ footer.site {
 }
 .block.has-bg { position: relative; overflow: hidden; }
 .block.has-bg > .grid,
-.block.has-bg > div { position: relative; z-index: 1; }
+.block.has-bg > div:not(.section-bg) { position: relative; z-index: 1; }
+.block.has-bg > .section-bg { z-index: 0; }
 
 /* When the .block.world-builder gets a backdrop, ensure the cream
    project rows have a backing so they read against the photo */
@@ -2779,4 +2780,35 @@ footer.site {
 .golf-gallery .photo { aspect-ratio: 4 / 3; }
 @media (max-width: 720px) {
   .golf-gallery { grid-template-columns: 1fr; }
+}
+
+/* ============================================================
+   Strip-grid — full-width 3-up photo strip used below text rows
+   to absorb supporting photos without creating horizontal
+   whitespace next to the col-7/col-5 layout.
+   ============================================================ */
+.strip-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+.strip-grid .photo-frame { margin: 0; }
+.strip-grid .photo {
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-radius: 12px;
+}
+.strip-grid .photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+@media (max-width: 720px) {
+  .strip-grid { grid-template-columns: 1fr; }
+}
+
+/* Variant: 4-up for tighter packing if needed */
+.strip-grid.cols-4 { grid-template-columns: repeat(4, 1fr); }
+@media (max-width: 720px) {
+  .strip-grid.cols-4 { grid-template-columns: 1fr 1fr; }
 }
