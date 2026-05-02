@@ -2154,8 +2154,15 @@ footer.site {
 }
 .mockup-body { background: rgba(12,10,9,0.95); min-height: 220px; }
 .mockup-body img, .mockup-body video {
-  display: block; width: 100%; height: auto; max-height: 420px;
-  object-fit: cover; object-position: top;
+  display: block; width: 100%; height: auto;
+}
+/* Laptop: cap mockup-card width so the screenshot section doesn't
+   dominate one viewport. Image stays natural-aspect (no crop). */
+@media (max-width: 1500px) {
+  .mockup-card { max-width: 440px; margin: 0 auto; }
+}
+@media (max-width: 1280px) {
+  .mockup-card { max-width: 380px; }
 }
 .mockup-placeholder {
   min-height: 220px; display: flex; align-items: center; justify-content: center;
