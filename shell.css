@@ -1194,10 +1194,10 @@ body.has-page-bg .ambient { display: none; }
   gap: 1rem;
   margin-top: 2rem;
 }
-/* Concerts grid (rubber-band shows) — denser, fits 5-6 per row on laptop */
+/* Concerts grid (rubber-band shows) — sized for ~5 per row */
 .travel-grid:has(.show-card) {
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 0.8rem;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 1rem;
 }
 .travel-card {
   position: relative;
@@ -3177,11 +3177,11 @@ section.world-builder.has-bg {
   background: rgba(10,9,8,0.32);
 }
 
-/* Manifesto glass on the lens page — soften from 28 → 12 */
+/* Manifesto glass on the lens page — blur removed; rely on solid bg for legibility */
 .manifesto-glass {
-  backdrop-filter: blur(12px) saturate(140%) !important;
-  -webkit-backdrop-filter: blur(12px) saturate(140%) !important;
-  background: rgba(10,9,8,0.28) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: rgba(10,9,8,0.62) !important;
   border-color: rgba(244,239,230,0.16) !important;
 }
 
@@ -3270,7 +3270,7 @@ section.world-builder.has-bg {
   .gear-card .gear-specs li { padding: 0.4rem 0; font-size: 0.7rem; }
   .gear-card .gear-badge { font-size: 0.55rem; padding: 0.28rem 0.55rem; }
   .travel-grid { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.9rem; }
-  .travel-grid:has(.show-card) { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 0.7rem; }
+  .travel-grid:has(.show-card) { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 0.9rem; }
   .travel-card.show-card .show-headline { font-size: clamp(1rem, 1.7vw, 1.5rem); }
   .travel-card.show-card .show-tag { font-size: 0.55rem; padding: 0.26rem 0.55rem; }
   .stat-card.glass { padding: 0.9rem 1rem; }
@@ -3286,7 +3286,7 @@ section.world-builder.has-bg {
   .gear-card { padding: 0.85rem; }
   .gear-card .gear-img { border-radius: 10px; }
   .travel-grid { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
-  .travel-grid:has(.show-card) { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+  .travel-grid:has(.show-card) { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
   .replay-grid { grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); }
   .now-list li { font-size: 0.95rem; }
   .lede { font-size: clamp(1rem, 1.6vw, 1.25rem); }

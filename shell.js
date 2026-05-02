@@ -209,7 +209,6 @@ const dlog = (...args) => { if (DEBUG) console.log("[shell]", ...args); };
     { href: "index.html",       label: "Home",        tr: "HOME"      },
     { href: "plugverse.html",   label: "Plugverse",   tr: "PLUGVERSE" },
     { href: "rubber-band.html", label: "Music",       tr: "MUSIC"     },
-    { href: "builder.html",     label: "Builder",     tr: "BUILDER"   },
     { href: "athletic.html",    label: "Athletic",    tr: "ATHLETIC"  },
     { href: "lens.html",        label: "Lens",        tr: "LENS"      },
     { href: "now.html",         label: "Now",         tr: "NOW"       },
