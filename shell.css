@@ -875,10 +875,12 @@ body.has-page-bg .ambient { display: none; }
 /* Drag gallery (CSS-based) */
 .drag-section {
   position: relative;
-  padding: 8rem 0;
+  padding: 5rem 0 5rem;
   overflow: hidden;
   isolation: isolate;
 }
+.drag-section .grid + .drag-gallery,
+.drag-section [class*="drag-gallery"] { margin-top: 1.6rem; }
 .drag-bg {
   position: absolute; inset: 0; z-index: 0;
   pointer-events: none; overflow: hidden;
