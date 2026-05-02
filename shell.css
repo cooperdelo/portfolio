@@ -1368,9 +1368,10 @@ body.has-page-bg .ambient { display: none; }
    ─────────────────────────────────────────────────────── */
 .replay-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, 220px);
+  gap: 2rem;
   margin-top: 1rem;
+  justify-content: start;
 }
 .replay-card {
   position: relative;
