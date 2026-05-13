@@ -72,7 +72,7 @@
 </style>
 </head>
 <body>
-  <div class="login-card">
+  <div class="login-card" id="login-card" hidden>
     <a href="/" class="home-link">← Back to site</a>
     <div class="eyebrow">Admin · Restricted</div>
     <h1>SIGN <span class="accent">in</span></h1>
@@ -89,32 +89,77 @@
     </div>
   </div>
 
+  <div class="login-card" id="not-found" hidden style="text-align:center;">
+    <div class="eyebrow">404</div>
+    <h1>NOT <span class="accent">found</span></h1>
+    <p class="lede">The page you're looking for doesn't exist.</p>
+    <a href="/" class="btn primary" style="display:inline-block;text-decoration:none;">← Back to home</a>
+  </div>
+
   <script type="module">
     import { sendMagicLink, isAdmin, ADMIN_EMAIL } from '/admin/_shell/supabase.js';
 
-    document.getElementById('ts').textContent = new Date().toISOString().slice(0,10);
+    // ---- Access gate: hidden URL param ----
+    // Bookmark this with ?k=<ACCESS_KEY>. Without it, the page looks like a 404.
+    const ACCESS_KEY = 'a9c4f2e8';
+    const RATE_LIMIT_MS = 60_000;
+    const RATE_KEY = 'cd-admin-last-send';
 
-    // If already signed in, bounce to admin home (or ?next= target)
+    const params = new URLSearchParams(location.search);
+    const hasKey = params.get('k') === ACCESS_KEY;
+
+    // If already signed in, skip the gate entirely and bounce to admin home
     if (await isAdmin()) {
-      const params = new URLSearchParams(location.search);
       location.replace(params.get('next') || '/admin/');
+    } else if (!hasKey) {
+      document.getElementById('not-found').hidden = false;
+      document.title = '404 · Not Found';
+    } else {
+      document.getElementById('login-card').hidden = false;
+      document.getElementById('ts').textContent = new Date().toISOString().slice(0,10);
+
+      const form = document.getElementById('login-form');
+      const btn  = document.getElementById('submit-btn');
+      const ok   = document.getElementById('ok-msg');
+
+      const remainingCooldown = () => {
+        const last = Number(localStorage.getItem(RATE_KEY) || 0);
+        return Math.max(0, RATE_LIMIT_MS - (Date.now() - last));
+      };
+
+      const startCooldown = () => {
+        const tick = () => {
+          const ms = remainingCooldown();
+          if (ms <= 0) {
+            btn.disabled = false;
+            btn.textContent = 'Send me a magic link';
+            return;
+          }
+          btn.disabled = true;
+          btn.textContent = `Wait ${Math.ceil(ms / 1000)}s`;
+          setTimeout(tick, 500);
+        };
+        tick();
+      };
+
+      // If a recent send is still cooling down, show that on load
+      if (remainingCooldown() > 0) {
+        ok.classList.add('show');
+        startCooldown();
+      }
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (remainingCooldown() > 0) return;
+        btn.disabled = true; btn.textContent = 'Sending…';
+        const next = params.get('next') || '/admin/';
+        const redirectTo = `${location.origin}${next}`;
+        await sendMagicLink(ADMIN_EMAIL, redirectTo);
+        localStorage.setItem(RATE_KEY, String(Date.now()));
+        ok.classList.add('show');
+        startCooldown();
+      });
     }
-
-    const form = document.getElementById('login-form');
-    const btn  = document.getElementById('submit-btn');
-    const ok   = document.getElementById('ok-msg');
-
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      btn.disabled = true; btn.textContent = 'Sending…';
-      const params = new URLSearchParams(location.search);
-      const next = params.get('next') || '/admin/';
-      const redirectTo = `${location.origin}${next}`;
-      await sendMagicLink(ADMIN_EMAIL, redirectTo);
-      ok.classList.add('show');
-      btn.textContent = 'Sent';
-      setTimeout(() => { btn.disabled = false; btn.textContent = 'Send me a magic link'; }, 20000);
-    });
   </script>
 </body>
 </html>
