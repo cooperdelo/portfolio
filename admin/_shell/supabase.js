@@ -6,8 +6,8 @@
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';
 
-const SUPABASE_URL = 'https://yhemvsksnoojplnxirlv.supabase.co';
-const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_365EVdOW0BPWK8dsK15AaA_n3XxloRV';
+const SUPABASE_URL = 'https://eibtnkaoqsgwiqttiwjo.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVpYnRua2FvcXNnd2lxdHRpd2pvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTIwMTI4MTYsImV4cCI6MjA2NzU4ODgxNn0.8gBRu_k_4YPVOq8rf8dfuyXKbCSgqZ4UQeoIXUIlgxo';
 export const ADMIN_EMAIL = 'delocooper6@gmail.com';
 
 export const sb = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
