@@ -25,6 +25,9 @@ const NAV = [
     { href: '/admin/plugverse/',                label: 'Plugverse KPIs' },
     { href: '/admin/social/',                   label: 'Social Analytics' },
   ]},
+  { section: 'Brand', items: [
+    { href: '/admin/playbook/',                 label: 'Playbook' },
+  ]},
   { section: 'Reports', items: [
     { href: '/admin/finance/plugverse.html',  label: 'Plugverse P&L' },
     { href: '/admin/finance/funding.html',    label: 'Funding Sources' },

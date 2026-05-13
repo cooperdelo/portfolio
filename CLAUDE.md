@@ -28,6 +28,9 @@ Static HTML portfolio site (Vercel-hosted at cooperdelo.com) plus a private admi
     index.html                   ← Plugverse KPIs dashboard (MRR, users, payouts, top events)
   social/
     index.html                   ← IG + TikTok unified dashboard (posts, engagement, account stats)
+  playbook/
+    index.html                   ← Brand/strategy/voice vault — filters, search, CRUD, realtime
+    _js/playbook.js
 /api/                            ← Vercel serverless functions
   plugverse-kpi.mjs              ← Aggregates Plugverse Supabase + Stripe + PostHog, writes daily snapshots
   instagram-oauth.mjs            ← Meta IG OAuth callback → upserts instagram_credentials
@@ -35,6 +38,7 @@ Static HTML portfolio site (Vercel-hosted at cooperdelo.com) plus a private admi
   instagram-sync.mjs             ← Pulls IG media + account stats → social_posts / social_post_metrics / social_account_snapshots
   tiktok-oauth.mjs               ← TikTok OAuth callback → upserts tiktok_credentials
   tiktok-sync.mjs                ← Pulls TikTok user info + videos with auto-refresh → social_* tables
+  investments-sync.mjs           ← Pulls quotes from Yahoo Finance (stocks) + Coinbase spot (crypto, keyless) → updates investment_positions
 ```
 
 ---
@@ -50,9 +54,9 @@ Static HTML portfolio site (Vercel-hosted at cooperdelo.com) plus a private admi
 | Table | Purpose | Key columns |
 |---|---|---|
 | `admin_allowlist` | Email allowlist for the admin gate | `email` (PK), `added_at` |
-| `finance_accounts` | Bank/card/investment account dictionary | `slug` (PK), `display_name`, `account_type`, `institution`, `is_active` |
+| `finance_accounts` | Bank/card/investment account dictionary | `slug` (PK), `display_name`, `account_type`, `institution`, `is_active`, `cash_balance` (uninvested cash sitting in investment accounts — Schwab settlement, Coinbase USD — edited manually, not auto-synced) |
 | `financial_transactions` | Master ledger — personal, Plugverse LLC, 1789 Fund | `id`, `date`, `description`, `amount`, `type` (income/expense), `entity` (personal/plugverse/1789_fund), `funding_source` (FK → funding_sources.slug), `account`, `category`, `is_tax_deductible`, `tax_category`, `deductible_pct`, `is_food_log`, `merchant`, `external_source` (mercury/stripe/manual/NULL), `external_id` (provider-side id), `deleted_at` (soft-delete) |
-| `investment_positions` | Roth IRA + brokerage holdings | `id`, `account_slug` → finance_accounts, `symbol`, `shares`, `cost_basis`, `current_price` |
+| `investment_positions` | Roth IRA + brokerage + crypto holdings. `current_price` is auto-synced by `/api/investments-sync` (Yahoo for stocks, Coinbase spot for crypto). Crypto sync uses `symbol` directly as the Coinbase ticker. | `id`, `account_slug` → finance_accounts, `symbol`, `shares`, `cost_basis`, `current_price`, `asset_type` (stock/crypto, CHECK), `coingecko_id` (legacy — kept for possible future fallback), `price_updated_at` |
 | `budget_targets` | Monthly budget targets per entity/category | `id`, `entity`, `category`, `monthly_target`, `effective_date` |
 | `merch_items` | Merch SKUs (Plugverse tees etc.) | `id`, `name`, `variant`, `price`, `initial_stock`, `sort_order`, `archived` |
 | `merch_transactions` | Sales, restocks, gifts, adjustments | `id`, `item_id` → merch_items, `type` (sale/restock/adjust/gift/lost), `quantity`, `person_name`, `amount_owed`, `amount_paid`, `paid_at` |
@@ -63,6 +67,7 @@ Static HTML portfolio site (Vercel-hosted at cooperdelo.com) plus a private admi
 | `social_posts` | Unified posts table across platforms | `id` (PK uuid), `platform` (instagram/tiktok/youtube/spotify), `external_id`, `account_handle`, `caption`, `posted_at`, `media_type`, `media_url`, `thumbnail_url`, `permalink`, `hashtags` (text[]), `raw` (jsonb), `first_seen_at`, `updated_at`. Unique (platform, external_id). |
 | `social_post_metrics` | Time-series metrics per post (one row per sync) | `id`, `post_id` → social_posts, `captured_at`, `views`, `likes`, `comments`, `shares`, `saves`, `reach`, `impressions`, `engagement_pct`, `raw` |
 | `social_account_snapshots` | Daily account-level stats per platform | `date` + `platform` (composite PK), `followers`, `following`, `posts_total`, `total_views`, `total_likes`, `handle`, `raw`, `captured_at` |
+| `playbook_items` | Brand/strategy/voice vault — read by `/admin/playbook`. Auto-populated by chat sessions (post-response protocol writes atomic rows). `scope` is `personal-brand` / `plugverse` / `both`. `item_type` is `caption-idea` / `video-idea` / `philosophy-line` / `hook` / `decision` / `identity` / `pillar` / `strategy` / `rule` / `voice-rule` / `framework` / `prompt` (open-ended; new types are fine). | `id`, `scope`, `item_type`, `title`, `summary`, `body_markdown`, `category`, `subcategory`, `tags` (text[]), `priority` (lower=higher), `is_pinned`, `source_vault_path`, `source_anchor`, `status` (default `active`), `expires_at`, `last_synced_at`, `deleted_at` (soft-delete) |
 
 ### Views (read-only summaries)
 
@@ -72,6 +77,7 @@ Static HTML portfolio site (Vercel-hosted at cooperdelo.com) plus a private admi
 - `v_food_log` — food log rows (`is_food_log = true`)
 - `v_plugverse_pl` — monthly P&L for `entity = 'plugverse'`
 - `v_tax_deductible` — `tax_year, tax_category, tx_count, deductible_amount, gross_amount`
+- `v_playbook_active` — `playbook_items` filtered to `deleted_at IS NULL AND status='active' AND (expires_at IS NULL OR expires_at >= CURRENT_DATE)`. The admin page reads this view, not the raw table.
 
 ### Function
 
@@ -157,7 +163,7 @@ ORDER BY balance DESC;
 1. **Read first.** Before mutating, run a `SELECT` to confirm what's there.
 2. **Soft-delete, don't drop.** `financial_transactions` has `deleted_at` — set it instead of DELETE.
 3. **Use `apply_migration` for DDL**, `execute_sql` for DML. Both go through the same MCP server.
-4. **Realtime is wired.** The admin pages subscribe to `financial_transactions`, `merch_items`, `merch_transactions`. Any insert/update from `execute_sql` will show up on Cooper's open admin tab within ~350ms (debounced).
+4. **Realtime is wired.** The admin pages subscribe to `financial_transactions`, `merch_items`, `merch_transactions`, `playbook_items`. Any insert/update from `execute_sql` (or a chat session writing playbook rows) will show up on Cooper's open admin tab within ~350ms (debounced).
 5. **RLS bypasses.** The Supabase MCP uses the service role, so all RLS is bypassed — you can read/write anything. Don't accidentally write to PlugVerse tables (project `yhemvsksnoojplnxirlv`) — that's a separate app.
 
 ### Adding a new transaction
