@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="robots" content="noindex, nofollow, noarchive" />
+<title>Funding sources · CD Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Geist+Mono:wght@300..700&family=Geist:wght@300..700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/admin/_shell/admin-shell.css" />
+<style>
+  .fs-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+  .fs-card { padding: 1.5rem 1.6rem; display: flex; flex-direction: column; gap: 0.6rem; }
+  .fs-card .name { font-family: "Geist", sans-serif; font-weight: 600; font-size: 1.15rem; color: var(--ink); letter-spacing: -0.005em; }
+  .fs-card .slug-row { display: flex; justify-content: space-between; align-items: baseline; gap: 0.6rem; flex-wrap: wrap; }
+  .fs-card .slug { font-family: "Geist Mono", monospace; font-size: 0.6rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--muted); }
+  .fs-card .award { font-family: "Geist Mono", monospace; font-size: 0.6rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-2); }
+  .fs-card .award.unbounded { color: var(--sage); }
+  .fs-card .remaining { font-family: "Anton", Impact, sans-serif; font-size: clamp(2rem, 4vw, 2.6rem); line-height: 1; color: var(--ink); letter-spacing: -0.01em; margin-top: 0.3rem; }
+  .fs-card .remaining.exhausted { color: var(--rust); }
+  .fs-card .remaining.negative { color: var(--rust); }
+  .fs-card .sub { font-family: "Geist Mono", monospace; font-size: 0.62rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); }
+  .fs-bar { height: 12px; border-radius: 999px; background: rgba(244,239,230,0.06); overflow: hidden; border: 1px solid rgba(244,239,230,0.1); margin-top: 0.5rem; position: relative; }
+  .fs-bar > .fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--rust), var(--crimson)); box-shadow: 0 0 18px -4px rgba(255,77,46,0.55); transition: width 0.7s cubic-bezier(0.22,1,0.36,1); }
+  .fs-bar.unbounded > .fill { background: linear-gradient(90deg, var(--sage), #b5c0a3); box-shadow: 0 0 18px -4px rgba(122,138,110,0.55); }
+  .fs-bar.exhausted > .fill { background: linear-gradient(90deg, var(--crimson), #ff6b6b); }
+  .fs-card .pct-row { display: flex; justify-content: space-between; margin-top: 0.4rem; font-family: "Geist Mono", monospace; font-size: 0.6rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); }
+  .fs-card .actions { margin-top: auto; padding-top: 0.8rem; display: flex; gap: 0.5rem; flex-wrap: wrap; }
+  .fs-card .actions a { font-family: "Geist Mono", monospace; font-size: 0.6rem; letter-spacing: 0.22em; text-transform: uppercase; padding: 0.55rem 0.85rem; border-radius: 999px; background: rgba(244,239,230,0.04); border: 1px solid var(--card-border); color: var(--ink-2); transition: all 0.2s; }
+  .fs-card .actions a:hover { color: var(--rust); border-color: rgba(255,77,46,0.5); }
+  .fs-card .started { font-family: "Geist Mono", monospace; font-size: 0.58rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); opacity: 0.7; }
+  .fs-inactive { opacity: 0.55; }
+</style>
+</head>
+<body>
+  <main>
+    <div class="page-head">
+      <div>
+        <div class="eyebrow">Every dollar, by source</div>
+        <h1>Funding <span class="accent">sources</span></h1>
+      </div>
+      <div class="actions">
+        <span class="live-dot" id="live-indicator">Live · syncing</span>
+        <a class="btn" href="/admin/finance/">← Dashboard</a>
+      </div>
+    </div>
+
+    <div class="kpi-grid">
+      <div class="card"><div class="label">Total received</div><div class="value" data-k="t_received">—</div><div class="delta flat" data-k="t_received_sub">All time · across all sources</div></div>
+      <div class="card"><div class="label">Total spent</div><div class="value" data-k="t_spent">—</div><div class="delta flat" data-k="t_spent_sub">All time · funded expenses only</div></div>
+      <div class="card"><div class="label">Available</div><div class="value" data-k="t_remaining">—</div><div class="delta flat" data-k="t_remaining_sub">Across active sources</div></div>
+      <div class="card"><div class="label">Active sources</div><div class="value" data-k="t_sources">—</div><div class="delta flat" data-k="t_sources_sub">In rotation</div></div>
+    </div>
+
+    <h2 class="section-h">Active</h2>
+    <div class="fs-grid" id="fs-active"></div>
+
+    <h2 class="section-h" id="inactive-header" style="display:none;">Retired</h2>
+    <div class="fs-grid" id="fs-inactive"></div>
+  </main>
+
+  <script type="module">
+    import { sb, fmtUSD, fmtUSDCompact, subscribeTable } from '/admin/_shell/supabase.js';
+    import { mountShell, toast } from '/admin/_shell/admin-shell.js';
+
+    await mountShell({ title: 'Funding sources · Finance' });
+    const indicator = document.getElementById('live-indicator');
+
+    function setK(k, v){ const e = document.querySelector(`[data-k="${k}"]`); if (e) e.textContent = v; }
+    function escapeHtml(s){ return String(s || '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c])); }
+
+    function sourceCard(s){
+      const received = Number(s.total_received) || 0;
+      const spent    = Number(s.total_spent)    || 0;
+      const award    = s.award_amount != null ? Number(s.award_amount) : null;
+      const remaining = Number(s.remaining) || 0;
+      const unbounded = award == null;
+
+      // Burn percentage:
+      //   bounded   → spent / award (cap at 100)
+      //   unbounded → spent / max(received, 1) so the bar reflects cash flowing out
+      let pct = 0;
+      if (unbounded) {
+        pct = received > 0 ? Math.min(100, (spent / received) * 100) : 0;
+      } else {
+        pct = award > 0 ? Math.min(100, (spent / award) * 100) : 0;
+      }
+
+      const exhausted = !unbounded && remaining <= 0.005;
+      const negative  = unbounded && remaining < -0.005;
+      const remCls    = exhausted ? 'exhausted' : (negative ? 'negative' : '');
+      const barCls    = exhausted ? 'exhausted' : (unbounded ? 'unbounded' : '');
+
+      const awardLine = unbounded
+        ? `<span class="award unbounded">Unbounded</span>`
+        : `<span class="award">${fmtUSD(award)} award</span>`;
+
+      const startedLine = s.started_at
+        ? `<div class="started">Started ${new Date(s.started_at).toLocaleDateString('en-US', { month:'short', day:'2-digit', year:'numeric' })}</div>`
+        : '';
+
+      const subLine = unbounded
+        ? `${fmtUSD(received)} in · ${fmtUSD(spent)} out · ${remaining >= 0 ? '+' : '−'}${fmtUSD(Math.abs(remaining))} net`
+        : `${fmtUSD(spent)} spent of ${fmtUSD(award)}`;
+
+      const pctLine = unbounded
+        ? `<span>${pct.toFixed(0)}% spent of received</span><span>${remaining >= 0 ? '+' : '−'}${fmtUSDCompact(Math.abs(remaining))} net</span>`
+        : `<span>${pct.toFixed(1)}% used</span><span>${(100 - pct).toFixed(1)}% left</span>`;
+
+      return `<div class="card fs-card ${s.is_active ? '' : 'fs-inactive'}">
+        <div class="slug-row">
+          <div class="name">${escapeHtml(s.display_name)}</div>
+          ${awardLine}
+        </div>
+        <div class="slug">${escapeHtml(s.slug)}</div>
+        <div class="remaining ${remCls}">${fmtUSDCompact(remaining)}${unbounded ? '' : ' left'}</div>
+        <div class="sub">${subLine}</div>
+        <div class="fs-bar ${barCls}"><div class="fill" style="width:${pct}%"></div></div>
+        <div class="pct-row">${pctLine}</div>
+        ${startedLine}
+        <div class="actions">
+          <a href="/admin/finance/transactions.html?funding_source=${encodeURIComponent(s.slug)}">View transactions</a>
+          ${s.slug === '1789_fund' ? `<a href="/admin/finance/fund.html">1789 deep dive</a>` : ''}
+        </div>
+      </div>`;
+    }
+
+    async function load(){
+      const { data, error } = await sb.from('v_funding_balance').select('*');
+      if (error){ toast('Failed to load', 'err'); return; }
+      const rows = data || [];
+
+      // Roll-up totals across ACTIVE sources only (retired sources shouldn't count toward "available")
+      const active   = rows.filter(r => r.is_active);
+      const inactive = rows.filter(r => !r.is_active);
+
+      const totalReceived = active.reduce((a, r) => a + (Number(r.total_received) || 0), 0);
+      const totalSpent    = active.reduce((a, r) => a + (Number(r.total_spent)    || 0), 0);
+      const totalRemain   = active.reduce((a, r) => a + (Number(r.remaining)      || 0), 0);
+
+      setK('t_received',  fmtUSD(totalReceived));
+      setK('t_spent',     fmtUSD(totalSpent));
+      setK('t_remaining', fmtUSD(totalRemain));
+      setK('t_sources',   active.length);
+      setK('t_sources_sub', `${inactive.length} retired`);
+
+      document.getElementById('fs-active').innerHTML   = active.length   ? active.map(sourceCard).join('')   : `<div class="empty" style="grid-column:1/-1;">No active funding sources.</div>`;
+      document.getElementById('fs-inactive').innerHTML = inactive.length ? inactive.map(sourceCard).join('') : '';
+      document.getElementById('inactive-header').style.display = inactive.length ? 'block' : 'none';
+    }
+
+    // Realtime: refresh on any change to transactions OR the lookup table
+    subscribeTable('financial_transactions', () => {
+      indicator.textContent = 'Live · updated';
+      load().then(() => setTimeout(() => indicator.textContent = 'Live · syncing', 1600));
+    });
+    subscribeTable('funding_sources', () => load());
+
+    await load();
+    indicator.textContent = 'Live · syncing';
+  </script>
+</body>
+</html>

@@ -23,6 +23,7 @@ const NAV = [
   ]},
   { section: 'Reports', items: [
     { href: '/admin/finance/plugverse.html',  label: 'Plugverse P&L' },
+    { href: '/admin/finance/funding.html',    label: 'Funding Sources' },
     { href: '/admin/finance/fund.html',       label: '1789 Fund' },
     { href: '/admin/finance/food-log.html',   label: 'Food Log' },
     { href: '/admin/finance/tax.html',        label: 'Tax Prep' },

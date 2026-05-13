@@ -19,8 +19,21 @@ const filters = {
   type:    document.getElementById('f-type'),
   range:   document.getElementById('f-range'),
   special: document.getElementById('f-special'),
+  funding: document.getElementById('f-funding'),
 };
 Object.values(filters).forEach(el => el.addEventListener('input', () => render()));
+
+// Populate funding dropdown from the lookup table, then honour ?funding_source= from URL
+{
+  const { data } = await sb.from('funding_sources').select('slug, display_name').order('sort_order');
+  for (const fs of (data || [])) {
+    const opt = document.createElement('option');
+    opt.value = fs.slug; opt.textContent = fs.display_name;
+    filters.funding.appendChild(opt);
+  }
+  const urlFunding = new URLSearchParams(location.search).get('funding_source');
+  if (urlFunding) filters.funding.value = urlFunding;
+}
 
 async function load() {
   const { data, error } = await sb
@@ -53,6 +66,7 @@ function filterRows() {
   if (s === 'food')   rows = rows.filter(r => r.is_food_log);
   if (s === 'deduct') rows = rows.filter(r => r.is_tax_deductible);
   if (s === 'cpa')    rows = rows.filter(r => r.cpa_review_needed);
+  if (filters.funding.value) rows = rows.filter(r => r.funding_source === filters.funding.value);
   return rows;
 }
 
