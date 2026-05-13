@@ -40,7 +40,7 @@ Static HTML portfolio site (Vercel-hosted at cooperdelo.com) plus a private admi
 |---|---|---|
 | `admin_allowlist` | Email allowlist for the admin gate | `email` (PK), `added_at` |
 | `finance_accounts` | Bank/card/investment account dictionary | `slug` (PK), `display_name`, `account_type`, `institution`, `is_active` |
-| `financial_transactions` | Master ledger — personal, Plugverse LLC, 1789 Fund | `id`, `date`, `description`, `amount`, `type` (income/expense), `entity` (personal/plugverse/1789_fund), `funding_source` (NULL/1789_fund/founder_contribution/revenue/personal_savings/parents), `account`, `category`, `is_tax_deductible`, `tax_category`, `deductible_pct`, `is_food_log`, `merchant`, `deleted_at` (soft-delete) |
+| `financial_transactions` | Master ledger — personal, Plugverse LLC, 1789 Fund | `id`, `date`, `description`, `amount`, `type` (income/expense), `entity` (personal/plugverse/1789_fund), `funding_source` (FK → funding_sources.slug), `account`, `category`, `is_tax_deductible`, `tax_category`, `deductible_pct`, `is_food_log`, `merchant`, `external_source` (mercury/stripe/manual/NULL), `external_id` (provider-side id), `deleted_at` (soft-delete) |
 | `investment_positions` | Roth IRA + brokerage holdings | `id`, `account_slug` → finance_accounts, `symbol`, `shares`, `cost_basis`, `current_price` |
 | `budget_targets` | Monthly budget targets per entity/category | `id`, `entity`, `category`, `monthly_target`, `effective_date` |
 | `merch_items` | Merch SKUs (Plugverse tees etc.) | `id`, `name`, `variant`, `price`, `initial_stock`, `sort_order`, `archived` |
@@ -84,6 +84,20 @@ VALUES ('luby_pitch', 'Luby Pitch Competition', 'Won 2026-XX-XX. No equity.', 20
 After insert, refresh `/admin/finance/entry.html` and "Luby Pitch Competition ($20,000)" will appear in the dropdown. To check its balance: `SELECT * FROM v_funding_balance WHERE slug = 'luby_pitch';`
 
 To retire a source (e.g. after it's fully spent), set `is_active = false` — it stays in historic rows and views but stops appearing in the form.
+
+**Pre-registered pending sources.** A source can be added with `is_active = false` *before* it's won, so transactions can be retroactively tagged the moment funds arrive. Currently pre-registered: `luby_pitch` ($20,000 estimated, awaiting result). When won:
+
+```sql
+UPDATE funding_sources
+SET is_active = true,
+    started_at = 'YYYY-MM-DD',
+    description = 'Won YYYY-MM-DD. No equity. $20,000 prize.'
+WHERE slug = 'luby_pitch';
+```
+
+### External transaction sync (Mercury / Stripe)
+
+`financial_transactions.external_source` + `external_id` are reserved for the scheduled Mercury/Stripe importer. The unique partial index `uq_external_txn (external_source, external_id) WHERE external_id IS NOT NULL AND deleted_at IS NULL` makes the importer idempotent — re-running pulls the same row, not duplicates. CHECK constraint restricts `external_source` to `mercury`, `stripe`, or `manual`. Manual entries leave both NULL.
 
 ### Auth model
 
