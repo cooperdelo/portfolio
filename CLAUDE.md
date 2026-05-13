@@ -20,10 +20,14 @@ Static HTML portfolio site (Vercel-hosted at cooperdelo.com) plus a private admi
     supabase.js                  ← Shared sb client, isAdmin(), debounced realtime helpers
   finance/                       ← Finance dashboard suite
     index.html, transactions.html, entry.html, investments.html,
-    plugverse.html, fund.html, food-log.html, tax.html, export.html
+    plugverse.html, fund.html, funding.html, food-log.html, tax.html, export.html
     _js/                         ← Per-page logic
   merch/
     index.html                   ← Merch inventory + debt tracker (admin-styled)
+  plugverse/
+    index.html                   ← Plugverse KPIs dashboard (MRR, users, payouts, top events)
+/api/                            ← Vercel serverless functions
+  plugverse-kpi.mjs              ← Aggregates Plugverse Supabase + Stripe + PostHog, writes daily snapshots
 ```
 
 ---
@@ -46,6 +50,7 @@ Static HTML portfolio site (Vercel-hosted at cooperdelo.com) plus a private admi
 | `merch_items` | Merch SKUs (Plugverse tees etc.) | `id`, `name`, `variant`, `price`, `initial_stock`, `sort_order`, `archived` |
 | `merch_transactions` | Sales, restocks, gifts, adjustments | `id`, `item_id` → merch_items, `type` (sale/restock/adjust/gift/lost), `quantity`, `person_name`, `amount_owed`, `amount_paid`, `paid_at` |
 | `funding_sources` | Lookup table of valid `funding_source` slugs | `slug` (PK, referenced by `financial_transactions.funding_source` via FK), `display_name`, `description`, `award_amount` (NULL = unbounded), `is_active`, `sort_order`, `started_at`, `exhausted_at` |
+| `plugverse_kpi_snapshots` | Daily KPI snapshot for the Plugverse dashboard. UPSERTed by `/api/plugverse-kpi` on each admin visit. Read for sparklines. | `date` (PK), `captured_at`, `mrr_cents`, `arr_cents`, `active_subscriptions`, `users_total`, `signups_24h`, `signups_7d`, `churn_7d`, `payouts_pending_cents`, `payouts_completed_mtd_cents`, `top_events_7d` (jsonb), `raw` (jsonb full payload) |
 
 ### Views (read-only summaries)
 
@@ -156,6 +161,36 @@ VALUES ('2026-05-13', 'Coffee at Caribou', 6.50, 'expense', 'personal', 'food');
 The dashboard reads `financial_transactions WHERE deleted_at IS NULL`. To "delete" a row, set `deleted_at = now()`. To restore it, set `deleted_at = NULL`.
 
 ---
+
+## Vercel serverless functions
+
+Static-site repo with a small `/api/` directory for serverless functions. Auto-detected by Vercel — no Next.js, no build step, no `package.json` (functions use Node 20's built-in `fetch`).
+
+### `/api/plugverse-kpi.mjs`
+
+Aggregates Plugverse KPIs from three sources and persists daily snapshots:
+
+- **PlugVerse Supabase** (`yhemvsksnoojplnxirlv`, read via `PLUGVERSE_SUPABASE_SERVICE_ROLE` env var): users count, signups 24h/7d/30d, artist/fan counts, active subscriptions, churn 7d, MRR/ARR computed by joining `user_subscriptions` × `subscription_tiers`, total GMV cents, gigs completed.
+- **Stripe** (`STRIPE_SECRET_KEY`): payouts pending + payouts paid month-to-date.
+- **PostHog** (`POSTHOG_API_KEY`, project `331986`, host defaults to `https://us.posthog.com`): top 5 events in the last 7 days via HogQL.
+
+Each source is wrapped in `safe()` so a single outage doesn't blank the page — failed sources show up in the response's `errors` array and the corresponding KPI cards render `—`.
+
+**Auth model:** the page sends `Authorization: Bearer <admin-supabase-jwt>` (from `sb.auth.getSession()`). The function hits `${ADMIN_URL}/auth/v1/user` to verify the JWT and checks the email is the admin allowlist email. No service-role key required for the auth check.
+
+**Snapshot UPSERT:** every successful call writes one row to `plugverse_kpi_snapshots` keyed by today's date (`Prefer: resolution=merge-duplicates`). The function uses the user's JWT for the write, so RLS still applies. The dashboard reads the last 30 days for sparkline rendering.
+
+### Required Vercel env vars (Production + Preview)
+
+| Var | Source | Notes |
+|---|---|---|
+| `STRIPE_SECRET_KEY` | PlugVerse Stripe account → Developers → API keys | `sk_live_…` |
+| `POSTHOG_API_KEY` | posthog.com → Settings → Personal API keys | Scope: "Performing analytics queries", project 331986 |
+| `PLUGVERSE_SUPABASE_SERVICE_ROLE` | Supabase project `yhemvsksnoojplnxirlv` → Settings → API → service_role | NEVER ship this to client code — function only |
+| `POSTHOG_HOST` (optional) | Override if EU or self-hosted | Defaults to `https://us.posthog.com` |
+| `POSTHOG_PROJECT` (optional) | Override if PostHog project ID changes | Defaults to `331986` |
+
+If any required var is missing, the affected source returns an error message in the response payload — the page renders the other KPIs and shows the error banner.
 
 ## Public site notes
 

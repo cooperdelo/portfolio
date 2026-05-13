@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="robots" content="noindex, nofollow, noarchive" />
+<title>Plugverse · CD Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Geist+Mono:wght@300..700&family=Geist:wght@300..700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/admin/_shell/admin-shell.css" />
+<style>
+  .pv-spark { width: 100%; height: 36px; margin-top: 0.5rem; display: block; }
+  .pv-spark path.line { fill: none; stroke: var(--rust); stroke-width: 1.6; opacity: 0.85; }
+  .pv-spark path.area { fill: var(--rust); opacity: 0.12; }
+  .pv-spark.flat path.line { stroke: var(--muted); }
+  .pv-spark.flat path.area { fill: var(--muted); opacity: 0.08; }
+
+  .pv-events { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; }
+  .pv-events li { display: flex; justify-content: space-between; align-items: baseline; padding: 0.55rem 0; border-bottom: 1px solid rgba(244,239,230,0.06); }
+  .pv-events li:last-child { border-bottom: 0; }
+  .pv-events .ev { font-family: "Geist Mono", monospace; font-size: 0.78rem; color: var(--ink); letter-spacing: 0.01em; }
+  .pv-events .n { font-family: "Anton", Impact, sans-serif; font-size: 1.1rem; color: var(--rust); line-height: 1; }
+
+  .pv-errors { font-family: "Geist Mono", monospace; font-size: 0.7rem; letter-spacing: 0.08em; color: var(--rust); padding: 0.7rem 1rem; border: 1px solid rgba(255,77,46,0.4); border-radius: 10px; background: rgba(255,77,46,0.05); margin-bottom: 1.4rem; }
+  .pv-errors strong { color: var(--rust); }
+</style>
+</head>
+<body>
+  <main>
+    <div class="page-head">
+      <div>
+        <div class="eyebrow">Live · multi-source aggregation</div>
+        <h1>Plug<span class="accent">verse</span> · KPIs</h1>
+      </div>
+      <div class="actions">
+        <span class="live-dot" id="live-indicator">Loading</span>
+        <button class="btn" id="refresh-btn">Refresh now</button>
+      </div>
+    </div>
+
+    <div id="errors-box"></div>
+
+    <div class="kpi-grid">
+      <div class="card"><div class="label">MRR</div><div class="value" data-k="mrr">—</div><div class="delta flat" data-k="mrr_sub">From active subscriptions</div><svg class="pv-spark" data-spark="mrr_cents"></svg></div>
+      <div class="card"><div class="label">ARR</div><div class="value" data-k="arr">—</div><div class="delta flat">MRR × 12</div></div>
+      <div class="card"><div class="label">Active subs</div><div class="value" data-k="active_subs">—</div><div class="delta flat" data-k="active_subs_sub">Currently paying</div><svg class="pv-spark" data-spark="active_subscriptions"></svg></div>
+      <div class="card"><div class="label">Total users</div><div class="value" data-k="users_total">—</div><div class="delta flat" data-k="users_sub">All accounts</div><svg class="pv-spark" data-spark="users_total"></svg></div>
+      <div class="card"><div class="label">Signups · 24h</div><div class="value" data-k="signups_24h">—</div><div class="delta flat" data-k="signups_24h_sub">New accounts today</div></div>
+      <div class="card"><div class="label">Signups · 7d</div><div class="value" data-k="signups_7d">—</div><div class="delta flat" data-k="signups_7d_sub">Last week</div><svg class="pv-spark" data-spark="signups_7d"></svg></div>
+      <div class="card"><div class="label">Churn · 7d</div><div class="value" data-k="churn_7d">—</div><div class="delta flat">Cancellations last week</div></div>
+      <div class="card"><div class="label">Artists onboarded</div><div class="value" data-k="artists_onboarded">—</div><div class="delta flat" data-k="artists_sub">Of total artist profiles</div></div>
+      <div class="card"><div class="label">Total GMV</div><div class="value" data-k="gmv">—</div><div class="delta flat" data-k="gmv_sub">Through Plugverse</div></div>
+      <div class="card"><div class="label">Gigs completed</div><div class="value" data-k="gigs">—</div><div class="delta flat">Lifetime</div></div>
+      <div class="card"><div class="label">Stripe pending</div><div class="value" data-k="payouts_pending">—</div><div class="delta flat">Payouts queued</div></div>
+      <div class="card"><div class="label">Stripe paid · MTD</div><div class="value" data-k="payouts_paid">—</div><div class="delta flat">Settled this month</div></div>
+    </div>
+
+    <h2 class="section-h">Top events · 7d <span class="accent" id="top-events-source">PostHog</span></h2>
+    <div class="card">
+      <ul class="pv-events" id="top-events">
+        <li class="empty">Loading…</li>
+      </ul>
+    </div>
+  </main>
+
+  <script type="module">
+    import { sb } from '/admin/_shell/supabase.js';
+    import { mountShell, toast } from '/admin/_shell/admin-shell.js';
+
+    await mountShell({ title: 'Plugverse · KPIs' });
+
+    const indicator = document.getElementById('live-indicator');
+    const errBox    = document.getElementById('errors-box');
+    const refreshBtn = document.getElementById('refresh-btn');
+
+    function setK(k, v){ const e = document.querySelector(`[data-k="${k}"]`); if (e) e.textContent = v; }
+    function fmtUSD(cents){ if (cents == null) return '—'; return '$' + (Number(cents)/100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+    function fmtUSDk(cents){ if (cents == null) return '—'; const v = Number(cents)/100; if (Math.abs(v) >= 1000) return '$' + (v/1000).toFixed(1) + 'k'; return '$' + v.toFixed(0); }
+    function fmtN(n){ if (n == null) return '—'; return Number(n).toLocaleString('en-US'); }
+    function pct(n){ if (n == null) return '—'; return n.toFixed(1) + '%'; }
+
+    function sparkline(svg, series){
+      svg.innerHTML = '';
+      if (!series || series.length < 2){ svg.classList.add('flat'); return; }
+      const w = svg.clientWidth || 240;
+      const h = 36;
+      const xs = series.map((_, i) => i * (w / (series.length - 1)));
+      const min = Math.min(...series);
+      const max = Math.max(...series);
+      const range = max - min || 1;
+      const ys = series.map(v => h - ((v - min) / range) * (h - 4) - 2);
+      const linePath  = xs.map((x, i) => `${i ? 'L' : 'M'}${x.toFixed(1)},${ys[i].toFixed(1)}`).join(' ');
+      const areaPath  = `${linePath} L${xs[xs.length-1].toFixed(1)},${h} L${xs[0].toFixed(1)},${h} Z`;
+      svg.classList.toggle('flat', range < 0.5);
+      svg.innerHTML =
+        `<path class="area" d="${areaPath}"/>` +
+        `<path class="line" d="${linePath}"/>`;
+    }
+
+    function renderErrors(errors){
+      if (!errors || !errors.length){ errBox.innerHTML = ''; return; }
+      errBox.innerHTML = `<div class="pv-errors"><strong>Some sources are down:</strong> ` +
+        errors.map(e => `${e.source} — ${e.error.replace(/</g, '&lt;')}`).join(' · ') +
+        `</div>`;
+    }
+
+    function renderTopEvents(events){
+      const ul = document.getElementById('top-events');
+      if (!events || !events.length){
+        ul.innerHTML = `<li class="empty">No events captured this week (or PostHog is offline).</li>`;
+        return;
+      }
+      ul.innerHTML = events.map(e => `<li><span class="ev">${e.event}</span><span class="n">${fmtN(e.count)}</span></li>`).join('');
+    }
+
+    function renderAll({ data, history, errors }){
+      renderErrors(errors);
+
+      setK('mrr',  fmtUSD(data.mrr_cents));
+      setK('arr',  fmtUSD(data.arr_cents));
+      setK('active_subs', fmtN(data.active_subscriptions));
+      setK('users_total', fmtN(data.users_total));
+      setK('signups_24h', fmtN(data.signups_24h));
+      setK('signups_7d',  fmtN(data.signups_7d));
+      setK('churn_7d',    fmtN(data.churn_7d));
+      setK('artists_onboarded', fmtN(data.artists_onboarded));
+      setK('gmv',  fmtUSDk(data.total_gmv_cents));
+      setK('gigs', fmtN(data.total_gigs_completed));
+      setK('payouts_pending', fmtUSD(data.payouts_pending_cents));
+      setK('payouts_paid',    fmtUSD(data.payouts_completed_mtd_cents));
+
+      setK('artists_sub', `of ${fmtN(data.artists_total)} artist profiles`);
+      setK('users_sub',   `${fmtN(data.fans_total)} fans · ${fmtN(data.artists_total)} artists`);
+      setK('gmv_sub',     `${fmtN(data.total_gigs_completed)} gigs total`);
+
+      // Sparklines from history (oldest → newest, so reverse the desc-ordered fetch)
+      const hist = (history || []).slice().reverse();
+      for (const svg of document.querySelectorAll('[data-spark]')){
+        const col = svg.dataset.spark;
+        const series = hist.map(r => Number(r[col])).filter(v => Number.isFinite(v));
+        sparkline(svg, series);
+      }
+
+      renderTopEvents(data.top_events_7d);
+    }
+
+    async function load(){
+      indicator.textContent = 'Live · fetching';
+      refreshBtn.disabled = true;
+      const { data: sessionData } = await sb.auth.getSession();
+      const jwt = sessionData?.session?.access_token;
+      if (!jwt){ toast('Session expired — sign in again', 'err'); indicator.textContent = 'Offline'; return; }
+
+      try {
+        const r = await fetch('/api/plugverse-kpi', {
+          headers: { Authorization: `Bearer ${jwt}` },
+          cache: 'no-store',
+        });
+        if (!r.ok){
+          const body = await r.text();
+          toast(`Fetch failed (${r.status})`, 'err', 4000);
+          indicator.textContent = 'Offline';
+          errBox.innerHTML = `<div class="pv-errors"><strong>${r.status}:</strong> ${body.replace(/</g, '&lt;')}</div>`;
+          return;
+        }
+        const payload = await r.json();
+        renderAll(payload);
+        indicator.textContent = 'Live · synced';
+      } catch (e){
+        toast('Network error', 'err');
+        indicator.textContent = 'Offline';
+        errBox.innerHTML = `<div class="pv-errors"><strong>Network:</strong> ${(e?.message || e)}</div>`;
+      } finally {
+        refreshBtn.disabled = false;
+      }
+    }
+
+    refreshBtn.addEventListener('click', load);
+    await load();
+  </script>
+</body>
+</html>

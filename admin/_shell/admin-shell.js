@@ -21,6 +21,9 @@ const NAV = [
   { section: 'Inventory', items: [
     { href: '/admin/merch/',                    label: 'Merch Tracker' },
   ]},
+  { section: 'Projects', items: [
+    { href: '/admin/plugverse/',                label: 'Plugverse KPIs' },
+  ]},
   { section: 'Reports', items: [
     { href: '/admin/finance/plugverse.html',  label: 'Plugverse P&L' },
     { href: '/admin/finance/funding.html',    label: 'Funding Sources' },
