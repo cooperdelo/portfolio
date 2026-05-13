@@ -344,11 +344,17 @@ table.data .meta { color: var(--muted); font-size: 0.7rem; }
   color: var(--ink); padding: 0.7rem 0.9rem;
   border-radius: 10px;
   outline: none; transition: border-color 0.2s, background 0.2s;
+  color-scheme: dark;
 }
 .field input:focus, .field select:focus, .field textarea:focus {
   border-color: var(--rust, #FF4D2E);
   background: rgba(20,17,15,0.9);
 }
+.field select option, .filters select option {
+  background: #14110F;
+  color: var(--ink, #F4EFE6);
+}
+.filters select, .filters input { color-scheme: dark; }
 .field textarea { min-height: 80px; resize: vertical; }
 .field .row { display: flex; gap: 0.6rem; align-items: center; }
 .checkrow { display: flex; align-items: center; gap: 0.6rem; }
