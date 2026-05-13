@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="robots" content="noindex, nofollow, noarchive" />
+<title>Plugverse P&amp;L · CD Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Geist+Mono:wght@300..700&family=Geist:wght@300..700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/admin/_shell/admin-shell.css" />
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <main>
+    <div class="page-head">
+      <div>
+        <div class="eyebrow">Plugverse · all entities</div>
+        <h1>P&amp;L &amp; <span class="accent">runway</span></h1>
+      </div>
+    </div>
+
+    <div class="kpi-grid">
+      <div class="card"><div class="label">Total income</div><div class="value" data-k="income">—</div><div class="delta flat">All time</div></div>
+      <div class="card"><div class="label">Total expense</div><div class="value" data-k="expense">—</div><div class="delta flat">All time</div></div>
+      <div class="card"><div class="label">Net</div><div class="value" data-k="net">—</div><div class="delta flat" data-k="net_pct">Margin</div></div>
+      <div class="card"><div class="label">Burn · last 30d</div><div class="value" data-k="burn">—</div><div class="delta flat">Trailing</div></div>
+    </div>
+
+    <div class="chart-row">
+      <div class="card chart-card">
+        <h3>Monthly <span class="accent">P&amp;L</span></h3>
+        <div class="sub">Income vs expense · last 12 months</div>
+        <div class="chart-canvas-wrap tall"><canvas id="chart-pnl"></canvas></div>
+      </div>
+      <div class="card chart-card">
+        <h3>Expense <span class="accent">categories</span></h3>
+        <div class="sub">Last 90 days</div>
+        <div class="chart-canvas-wrap tall"><canvas id="chart-cats"></canvas></div>
+      </div>
+    </div>
+
+    <h2 class="section-h">Ledger</h2>
+    <div class="card" style="padding:0; overflow:hidden;">
+      <div class="tbl-wrap">
+        <table class="data">
+          <thead>
+            <tr><th>Date</th><th>Description</th><th>Category</th><th>Vendor</th><th>Type</th><th class="right">Amount</th></tr>
+          </thead>
+          <tbody id="ledger-tbody"><tr><td colspan="6" class="empty">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script type="module" src="/admin/finance/_js/plugverse.js"></script>
+</body>
+</html>

@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="robots" content="noindex, nofollow, noarchive" />
+<title>Admin · Cooper Delo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Geist+Mono:wght@300..700&family=Geist:wght@300..700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/admin/_shell/admin-shell.css" />
+</head>
+<body>
+  <main>
+    <div class="page-head">
+      <div>
+        <div class="eyebrow">Admin Console</div>
+        <h1>WELCOME <span class="accent">back</span></h1>
+      </div>
+      <div class="actions">
+        <span class="live-dot">Realtime · ON</span>
+      </div>
+    </div>
+
+    <div class="kpi-grid" id="entry-grid">
+      <a class="card" href="/admin/finance/">
+        <div class="label">Finance</div>
+        <div class="value">DASH</div>
+        <div class="delta flat">KPIs · charts · runway</div>
+      </a>
+      <a class="card" href="/admin/finance/transactions.html">
+        <div class="label">Transactions</div>
+        <div class="value">LIST</div>
+        <div class="delta flat">Filter · edit · audit</div>
+      </a>
+      <a class="card" href="/admin/finance/entry.html">
+        <div class="label">Quick add</div>
+        <div class="value">+ NEW</div>
+        <div class="delta flat">Log income or expense</div>
+      </a>
+      <a class="card" href="/admin/finance/investments.html">
+        <div class="label">Investments</div>
+        <div class="value">PORT</div>
+        <div class="delta flat">Roth · brokerage · trend</div>
+      </a>
+      <a class="card" href="/admin/finance/export.html">
+        <div class="label">Export</div>
+        <div class="value">XLSX</div>
+        <div class="delta flat">For parents · for taxes</div>
+      </a>
+      <a class="card" href="/admin/finance/tax.html">
+        <div class="label">Tax prep</div>
+        <div class="value">DEDUC</div>
+        <div class="delta flat">By year · by category</div>
+      </a>
+    </div>
+  </main>
+
+  <script type="module">
+    import { mountShell } from '/admin/_shell/admin-shell.js';
+    mountShell({ title: 'Admin' });
+  </script>
+</body>
+</html>

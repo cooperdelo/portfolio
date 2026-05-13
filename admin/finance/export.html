@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="robots" content="noindex, nofollow, noarchive" />
+<title>Export · CD Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Geist+Mono:wght@300..700&family=Geist:wght@300..700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/admin/_shell/admin-shell.css" />
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+</head>
+<body>
+  <main>
+    <div class="page-head">
+      <div>
+        <div class="eyebrow">XLSX export · fresh every time</div>
+        <h1>EXPORT <span class="accent">data</span></h1>
+      </div>
+    </div>
+
+    <div class="card" style="max-width: 760px;">
+      <p class="lede" style="font-family: 'Fraunces', Georgia, serif; font-size: 1.2rem; line-height: 1.5; color: var(--ink-2); margin-bottom: 1.4rem;">
+        Generate a fresh <strong>Cooper_Delo_Finances.xlsx</strong> matching your old format. Tabs: All Transactions, Plugverse Ledger, 1789 Fund, Monthly Food Log, Personal Spending, Tax Prep, Business Travel &amp; Meals.
+      </p>
+      <div style="display:flex; gap:0.6rem; flex-wrap:wrap;">
+        <button class="btn primary" id="dl-all">Download full XLSX</button>
+        <button class="btn" id="dl-food">Food log only (CSV)</button>
+        <button class="btn" id="dl-tax">Tax deductibles only (CSV)</button>
+      </div>
+      <div id="status" style="margin-top: 1.4rem; font-family: 'Geist Mono', monospace; font-size: 0.7rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted);">Ready</div>
+    </div>
+
+    <div class="card" style="max-width: 760px; margin-top: 1.6rem;">
+      <h2 class="section-h" style="margin-top: 0;">What's <span class="accent">included</span></h2>
+      <ul style="list-style:none; padding:0; margin:0; font-family: 'Geist Mono', monospace; font-size: 0.72rem; letter-spacing: 0.12em; line-height: 1.9; color: var(--ink-2);">
+        <li>· All Transactions — every non-deleted row</li>
+        <li>· Plugverse Ledger — entity = plugverse</li>
+        <li>· 1789 Fund — entity = 1789_fund (with running balance)</li>
+        <li>· Monthly Food Log — is_food_log = true</li>
+        <li>· Personal Spending — entity = personal</li>
+        <li>· Tax Prep — is_tax_deductible = true, by year</li>
+        <li>· Business Travel &amp; Meals — tax_category contains "travel" or "meal"</li>
+      </ul>
+    </div>
+  </main>
+
+  <script type="module" src="/admin/finance/_js/export.js"></script>
+</body>
+</html>

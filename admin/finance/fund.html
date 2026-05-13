@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="robots" content="noindex, nofollow, noarchive" />
+<title>1789 Fund · CD Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Geist+Mono:wght@300..700&family=Geist:wght@300..700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/admin/_shell/admin-shell.css" />
+</head>
+<body>
+  <main>
+    <div class="page-head">
+      <div>
+        <div class="eyebrow">$1,850 award · no equity · accountability tracking</div>
+        <h1>1789 <span class="accent">fund</span></h1>
+      </div>
+    </div>
+
+    <div class="kpi-grid">
+      <div class="card"><div class="label">Total award</div><div class="value">$1,850</div><div class="delta flat">Received 2026-03-26</div></div>
+      <div class="card"><div class="label">Total spent</div><div class="value" data-k="spent">—</div><div class="delta flat" data-k="spent_pct">% of award</div></div>
+      <div class="card"><div class="label">Remaining</div><div class="value" data-k="remaining">—</div><div class="delta flat" data-k="rem_pct">Available</div></div>
+      <div class="card"><div class="label">Entries</div><div class="value" data-k="entries">—</div><div class="delta flat">Logged</div></div>
+    </div>
+
+    <!-- Burn-down bar -->
+    <div class="card" style="margin-bottom: 1.6rem;">
+      <div style="font-family: 'Geist Mono', monospace; font-size: 0.65rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--muted, #6F6A60); margin-bottom: 0.7rem;">Burn down · against $1,850</div>
+      <div style="height: 18px; border-radius: 999px; background: rgba(244,239,230,0.06); overflow: hidden; position: relative; border: 1px solid rgba(244,239,230,0.1);">
+        <div id="burn-bar" style="height: 100%; width: 0%; background: linear-gradient(90deg, var(--rust, #FF4D2E), var(--crimson, #C8102E)); box-shadow: 0 0 24px -4px rgba(255,77,46,0.6); transition: width 0.7s cubic-bezier(0.22, 1, 0.36, 1);"></div>
+      </div>
+      <div style="display:flex; justify-content:space-between; margin-top: 0.6rem; font-family: 'Geist Mono', monospace; font-size: 0.65rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted, #6F6A60);">
+        <span id="burn-spent">$0 spent</span>
+        <span id="burn-remaining">$1,850 remaining</span>
+      </div>
+    </div>
+
+    <h2 class="section-h">Expenses</h2>
+    <div class="card" style="padding:0; overflow:hidden;">
+      <div class="tbl-wrap">
+        <table class="data">
+          <thead>
+            <tr><th>Date</th><th>Description</th><th>Category</th><th>Vendor</th><th class="right">Amount</th></tr>
+          </thead>
+          <tbody id="fund-tbody"><tr><td colspan="5" class="empty">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script type="module" src="/admin/finance/_js/fund.js"></script>
+</body>
+</html>

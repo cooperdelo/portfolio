@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="robots" content="noindex, nofollow, noarchive" />
+<title>Food Log · CD Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Geist+Mono:wght@300..700&family=Geist:wght@300..700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/admin/_shell/admin-shell.css" />
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <main>
+    <div class="page-head">
+      <div>
+        <div class="eyebrow">For monthly send to parents</div>
+        <h1>FOOD <span class="accent">log</span></h1>
+      </div>
+      <div class="actions">
+        <select id="month-pick" class="filters" style="padding: 0.55rem 0.85rem; background: rgba(20,17,15,0.7); border: 1px solid var(--card-border); color: var(--ink); border-radius: 999px; font-family: 'Geist Mono', monospace; font-size: 0.7rem; letter-spacing: 0.18em; text-transform: uppercase;"></select>
+        <button class="btn" id="copy-summary">Copy summary</button>
+      </div>
+    </div>
+
+    <div class="kpi-grid">
+      <div class="card"><div class="label">This month total</div><div class="value" data-k="month_total">—</div><div class="delta flat" data-k="month_count">entries</div></div>
+      <div class="card"><div class="label">Avg per entry</div><div class="value" data-k="month_avg">—</div><div class="delta flat">This month</div></div>
+      <div class="card"><div class="label">Last month</div><div class="value" data-k="last_month">—</div><div class="delta flat" data-k="mom">vs prior</div></div>
+      <div class="card"><div class="label">YTD total</div><div class="value" data-k="ytd">—</div><div class="delta flat">All food log</div></div>
+    </div>
+
+    <div class="chart-row">
+      <div class="card chart-card" style="grid-column: 1 / -1;">
+        <h3>Monthly <span class="accent">food spend</span></h3>
+        <div class="sub">Last 12 months</div>
+        <div class="chart-canvas-wrap tall"><canvas id="chart-food"></canvas></div>
+      </div>
+    </div>
+
+    <h2 class="section-h">Entries</h2>
+    <div class="card" style="padding:0; overflow:hidden;">
+      <div class="tbl-wrap">
+        <table class="data">
+          <thead>
+            <tr><th>Date</th><th>Description</th><th>Merchant</th><th>Account</th><th class="right">Amount</th></tr>
+          </thead>
+          <tbody id="food-tbody"><tr><td colspan="5" class="empty">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script type="module" src="/admin/finance/_js/food-log.js"></script>
+</body>
+</html>

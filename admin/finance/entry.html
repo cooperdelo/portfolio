@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="robots" content="noindex, nofollow, noarchive" />
+<title>Add transaction · CD Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Geist+Mono:wght@300..700&family=Geist:wght@300..700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/admin/_shell/admin-shell.css" />
+</head>
+<body>
+  <main>
+    <div class="page-head">
+      <div>
+        <div class="eyebrow" id="mode-eyebrow">New entry</div>
+        <h1 id="mode-h1">QUICK <span class="accent">add</span></h1>
+      </div>
+      <div class="actions">
+        <a class="btn ghost" href="/admin/finance/transactions.html">Cancel</a>
+      </div>
+    </div>
+
+    <div class="card" style="max-width: 880px;">
+      <form id="tx-form">
+        <div class="form-grid">
+          <div class="field">
+            <label>Type</label>
+            <select name="type" required>
+              <option value="expense" selected>Expense</option>
+              <option value="income">Income</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Date</label>
+            <input type="date" name="date" required />
+          </div>
+          <div class="field">
+            <label>Amount (USD)</label>
+            <input type="number" name="amount" step="0.01" min="0" required placeholder="0.00" />
+          </div>
+          <div class="field">
+            <label>Entity</label>
+            <select name="entity" required>
+              <option value="personal" selected>Personal</option>
+              <option value="plugverse">Plugverse</option>
+              <option value="1789_fund">1789 Fund</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Category</label>
+            <input type="text" name="category" list="cat-list" required placeholder="food, software, marketing…" />
+            <datalist id="cat-list"></datalist>
+          </div>
+          <div class="field">
+            <label>Account</label>
+            <select name="account">
+              <option value="">—</option>
+            </select>
+          </div>
+          <div class="field" style="grid-column: 1 / -1;">
+            <label>Description</label>
+            <input type="text" name="description" required placeholder="What was this for?" />
+          </div>
+          <div class="field">
+            <label>Merchant</label>
+            <input type="text" name="merchant" placeholder="Vendor name" />
+          </div>
+          <div class="field">
+            <label>Funded by</label>
+            <input type="text" name="funded_by" placeholder="e.g. founder_capital, grant, gig" />
+          </div>
+          <div class="field" style="grid-column: 1 / -1;">
+            <label>Notes</label>
+            <textarea name="notes" placeholder="Optional context"></textarea>
+          </div>
+        </div>
+
+        <h2 class="section-h" style="font-size: 1.1rem; margin: 1.8rem 0 0.6rem;">Flags</h2>
+        <div class="form-grid">
+          <label class="checkrow">
+            <input type="checkbox" name="is_food_log" />
+            <span>Food log (parents)</span>
+          </label>
+          <label class="checkrow">
+            <input type="checkbox" name="is_tax_deductible" />
+            <span>Tax deductible</span>
+          </label>
+          <label class="checkrow">
+            <input type="checkbox" name="cpa_review_needed" />
+            <span>CPA review needed</span>
+          </label>
+          <div class="field">
+            <label>Tax category</label>
+            <input type="text" name="tax_category" placeholder="e.g. business_meals, office_expense" />
+          </div>
+          <div class="field">
+            <label>Deductible %</label>
+            <input type="number" name="deductible_pct" min="0" max="100" step="1" placeholder="100" />
+          </div>
+          <div class="field" style="grid-column: 1 / -1;">
+            <label>Write-off notes</label>
+            <textarea name="writeoff_notes" placeholder="IRS justification"></textarea>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:0.6rem; margin-top: 1.8rem; flex-wrap:wrap;">
+          <button class="btn primary" type="submit" id="save-btn">Save</button>
+          <button class="btn" type="button" id="save-add-btn">Save &amp; add another</button>
+          <button class="btn danger" type="button" id="delete-btn" style="display:none; margin-left:auto;">Delete</button>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <script type="module" src="/admin/finance/_js/entry.js"></script>
+</body>
+</html>

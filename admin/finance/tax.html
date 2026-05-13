@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="robots" content="noindex, nofollow, noarchive" />
+<title>Tax Prep · CD Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Geist+Mono:wght@300..700&family=Geist:wght@300..700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/admin/_shell/admin-shell.css" />
+</head>
+<body>
+  <main>
+    <div class="page-head">
+      <div>
+        <div class="eyebrow">Deductibles · by year · by category</div>
+        <h1>TAX <span class="accent">prep</span></h1>
+      </div>
+      <div class="actions">
+        <select id="year-pick" style="padding: 0.55rem 0.85rem; background: rgba(20,17,15,0.7); border: 1px solid var(--card-border); color: var(--ink); border-radius: 999px; font-family: 'Geist Mono', monospace; font-size: 0.7rem; letter-spacing: 0.18em; text-transform: uppercase;"></select>
+      </div>
+    </div>
+
+    <div class="kpi-grid">
+      <div class="card"><div class="label">Deductible · YTD</div><div class="value" data-k="ded_total">—</div><div class="delta flat">After percentage</div></div>
+      <div class="card"><div class="label">Gross flagged</div><div class="value" data-k="gross_total">—</div><div class="delta flat">Before percentage</div></div>
+      <div class="card"><div class="label">Entries flagged</div><div class="value" data-k="entries">—</div><div class="delta flat">Tax deductible</div></div>
+      <div class="card"><div class="label">Needs CPA</div><div class="value" data-k="cpa_count">—</div><div class="delta flat" data-k="cpa_amt">unresolved</div></div>
+    </div>
+
+    <h2 class="section-h">By <span class="accent">category</span></h2>
+    <div class="card" style="padding:0; overflow:hidden; margin-bottom: 2rem;">
+      <div class="tbl-wrap">
+        <table class="data">
+          <thead>
+            <tr><th>Tax category</th><th class="right">Entries</th><th class="right">Gross</th><th class="right">Deductible</th></tr>
+          </thead>
+          <tbody id="cat-tbody"><tr><td colspan="4" class="empty">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <h2 class="section-h">All <span class="accent">flagged</span></h2>
+    <div class="card" style="padding:0; overflow:hidden;">
+      <div class="tbl-wrap">
+        <table class="data">
+          <thead>
+            <tr><th>Date</th><th>Description</th><th>Tax category</th><th>Pct</th><th class="right">Gross</th><th class="right">Deductible</th><th>Flags</th></tr>
+          </thead>
+          <tbody id="ded-tbody"><tr><td colspan="7" class="empty">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script type="module" src="/admin/finance/_js/tax.js"></script>
+</body>
+</html>

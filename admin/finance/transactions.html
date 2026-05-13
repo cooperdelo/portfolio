@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="robots" content="noindex, nofollow, noarchive" />
+<title>Transactions · CD Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Geist+Mono:wght@300..700&family=Geist:wght@300..700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/admin/_shell/admin-shell.css" />
+</head>
+<body>
+  <main>
+    <div class="page-head">
+      <div>
+        <div class="eyebrow">Every entry · every dollar</div>
+        <h1>TRANSAC<span class="accent">tions</span></h1>
+      </div>
+      <div class="actions">
+        <span class="live-dot" id="live-indicator">Live</span>
+        <a class="btn primary" href="/admin/finance/entry.html">+ Add</a>
+      </div>
+    </div>
+
+    <div class="filters">
+      <input type="search" id="f-search" placeholder="Search description, merchant, notes…" style="min-width:260px; flex:1;" />
+      <select id="f-entity">
+        <option value="">All entities</option>
+        <option value="personal">Personal</option>
+        <option value="plugverse">Plugverse</option>
+        <option value="1789_fund">1789 Fund</option>
+      </select>
+      <select id="f-type">
+        <option value="">All types</option>
+        <option value="expense">Expenses</option>
+        <option value="income">Income</option>
+      </select>
+      <select id="f-range">
+        <option value="30">Last 30 days</option>
+        <option value="90">Last 90 days</option>
+        <option value="365">Last year</option>
+        <option value="all" selected>All time</option>
+      </select>
+      <select id="f-special">
+        <option value="">All</option>
+        <option value="food">Food log only</option>
+        <option value="deduct">Tax deductible only</option>
+        <option value="cpa">Needs CPA review</option>
+      </select>
+    </div>
+
+    <div class="card" style="padding:0; overflow:hidden;">
+      <div class="tbl-wrap">
+        <table class="data">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Description</th>
+              <th>Entity</th>
+              <th>Category</th>
+              <th>Account</th>
+              <th>Type</th>
+              <th class="right">Amount</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="tx-tbody">
+            <tr><td colspan="8" class="empty">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="padding: 0.9rem 1.2rem; display:flex; justify-content:space-between; align-items:center; border-top:1px solid rgba(244,239,230,0.08); font-family: 'Geist Mono', monospace; font-size: 0.7rem; letter-spacing: 0.18em; text-transform:uppercase; color: var(--muted, #6F6A60);">
+        <span id="tx-count">0 rows</span>
+        <span id="tx-total">Total · $0</span>
+      </div>
+    </div>
+  </main>
+
+  <script type="module" src="/admin/finance/_js/transactions.js"></script>
+</body>
+</html>
