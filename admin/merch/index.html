@@ -371,7 +371,7 @@
         if (!confirm('Archive this item? Past sales stay in history.')) return;
         const { error } = await sb.from('merch_items').update({ archived: true }).eq('id', id);
         if (error) return toast(error.message, 'err');
-        toast('Archived', 'ok'); closeSheet();
+        toast('Archived', 'ok'); closeSheet(); await loadAll();
       }
     });
 
@@ -427,7 +427,7 @@
         const { error } = await sb.from('merch_transactions').insert(payload);
         if (error) return toast(error.message, 'err');
         toast(`Sale logged · ${fmt$(owed)}${paid < owed ? ' · ' + fmt$(owed - paid) + ' owed' : ''}`, 'ok');
-        closeSheet();
+        closeSheet(); await loadAll();
       }
       if (f.id === 'restock-form'){
         const fd = new FormData(f);
@@ -435,7 +435,7 @@
         const { error } = await sb.from('merch_transactions').insert(payload);
         if (error) return toast(error.message, 'err');
         toast(`Restocked +${payload.quantity}`, 'ok');
-        closeSheet();
+        closeSheet(); await loadAll();
       }
       if (f.id === 'item-form'){
         const fd = new FormData(f);
@@ -456,7 +456,7 @@
           if (error) return toast(error.message, 'err');
           toast('Item created', 'ok');
         }
-        closeSheet();
+        closeSheet(); await loadAll();
       }
     });
 
@@ -464,6 +464,7 @@
       const { error } = await sb.from('merch_transactions').insert({ item_id: itemId, type: 'restock', quantity: 1, notes: 'Quick +1' });
       if (error) return toast(error.message, 'err');
       toast('Restocked +1', 'ok');
+      await loadAll();
     }
 
     async function markPaid(name){
@@ -476,6 +477,7 @@
       const results = await Promise.all(updates);
       if (results.some(r => r.error)) return toast('Some updates failed', 'err');
       toast(`${name} cleared`, 'ok');
+      await loadAll();
     }
 
     // ============ Realtime (debounced) ============
