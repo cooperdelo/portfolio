@@ -40,7 +40,7 @@ Static HTML portfolio site (Vercel-hosted at cooperdelo.com) plus a private admi
 |---|---|---|
 | `admin_allowlist` | Email allowlist for the admin gate | `email` (PK), `added_at` |
 | `finance_accounts` | Bank/card/investment account dictionary | `slug` (PK), `display_name`, `account_type`, `institution`, `is_active` |
-| `financial_transactions` | Master ledger — personal, Plugverse LLC, 1789 Fund | `id`, `date`, `description`, `amount`, `type` (income/expense), `entity` (personal/plugverse/1789_fund), `account`, `category`, `is_tax_deductible`, `tax_category`, `deductible_pct`, `is_food_log`, `merchant`, `deleted_at` (soft-delete) |
+| `financial_transactions` | Master ledger — personal, Plugverse LLC, 1789 Fund | `id`, `date`, `description`, `amount`, `type` (income/expense), `entity` (personal/plugverse/1789_fund), `funding_source` (NULL/1789_fund/founder_contribution/revenue/personal_savings/parents), `account`, `category`, `is_tax_deductible`, `tax_category`, `deductible_pct`, `is_food_log`, `merchant`, `deleted_at` (soft-delete) |
 | `investment_positions` | Roth IRA + brokerage holdings | `id`, `account_slug` → finance_accounts, `symbol`, `shares`, `cost_basis`, `current_price` |
 | `budget_targets` | Monthly budget targets per entity/category | `id`, `entity`, `category`, `monthly_target`, `effective_date` |
 | `merch_items` | Merch SKUs (Plugverse tees etc.) | `id`, `name`, `variant`, `price`, `initial_stock`, `sort_order`, `archived` |
@@ -57,6 +57,17 @@ Static HTML portfolio site (Vercel-hosted at cooperdelo.com) plus a private admi
 ### Function
 
 - `is_admin()` — returns `true` iff `auth.jwt() ->> 'email'` is in `admin_allowlist`. Every RLS policy uses this.
+
+### Dual-tag pattern: `entity` vs `funding_source`
+
+A transaction has two independent dimensions:
+
+- **`entity`** = whose books own this — `personal`, `plugverse`, or `1789_fund`. This is what shows up in entity-scoped P&Ls (e.g. `v_plugverse_pl` filters `entity = 'plugverse'`).
+- **`funding_source`** = where the cash came from — `NULL` (no specific source / personal default), `1789_fund`, `founder_contribution`, `revenue`, `personal_savings`, `parents`.
+
+Example: a Plugverse software expense paid from the 1789 award is `entity = 'plugverse'` (counts in Plugverse P&L) **and** `funding_source = '1789_fund'` (counts toward fund burn). Don't drop one for the other.
+
+The 1789 fund accounting (`v_fund_1789`, `/admin/finance/fund`) filters on `funding_source = '1789_fund'`. Plugverse P&L (`v_plugverse_pl`, `/admin/finance/plugverse`) filters on `entity = 'plugverse'`. Both views are correct; they measure different things.
 
 ### Auth model
 
