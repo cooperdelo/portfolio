@@ -88,8 +88,9 @@ async function exchangeShortForLong(shortToken) {
   return r.json(); // { access_token, token_type, expires_in (seconds) }
 }
 
-async function fetchIgProfile(igUserId, accessToken) {
-  const url = new URL(`https://graph.instagram.com/v21.0/${igUserId}`);
+async function fetchIgProfile(accessToken) {
+  // Use /me — works regardless of which Instagram Login ID flavor was returned by /oauth/access_token.
+  const url = new URL(`https://graph.instagram.com/v21.0/me`);
   url.searchParams.set('fields', 'id,username,account_type');
   url.searchParams.set('access_token', accessToken);
   const r = await fetch(url.toString());
@@ -148,12 +149,15 @@ export default async function handler(req, res) {
     const shortTok = await exchangeCodeForShortToken(String(code));
     const longTok  = await exchangeShortForLong(shortTok.access_token);
 
-    const igUserId = String(shortTok.user_id);
-    let username   = null;
+    // Prefer the canonical id returned by /me over the user_id from /oauth/access_token —
+    // they can be different in the Instagram Login flow and only the /me id works with Graph API.
+    let igUserId = String(shortTok.user_id);
+    let username = null;
     try {
-      const profile = await fetchIgProfile(igUserId, longTok.access_token);
+      const profile = await fetchIgProfile(longTok.access_token);
+      if (profile.id) igUserId = String(profile.id);
       username = profile.username || null;
-    } catch (_) { /* non-fatal */ }
+    } catch (_) { /* non-fatal, keep oauth-provided id */ }
 
     const expiresAt = new Date(Date.now() + Number(longTok.expires_in || 5184000) * 1000).toISOString();
 

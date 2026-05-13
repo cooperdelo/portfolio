@@ -83,16 +83,16 @@ export default async function handler(req, res) {
   try {
     const cred = await getLatestCreds();
     const token = cred.access_token;
-    const igUserId = cred.ig_user_id;
 
-    // 1) Account profile
-    const profile = await igGet(`v21.0/${igUserId}`, {
+    // Use /me to sidestep ID-format ambiguity. The token identifies the account.
+    // Graph API rejects the OAuth-returned user_id in some Instagram Login flows
+    // because the ID format differs from the canonical Instagram Business Account ID.
+    const profile = await igGet(`v21.0/me`, {
       fields: 'id,username,account_type,followers_count,follows_count,media_count',
       access_token: token,
     });
 
-    // 2) Media list (last 25 posts)
-    const media = await igGet(`v21.0/${igUserId}/media`, {
+    const media = await igGet(`v21.0/me/media`, {
       fields: 'id,caption,media_type,media_url,thumbnail_url,permalink,timestamp,like_count,comments_count',
       limit: '25',
       access_token: token,
