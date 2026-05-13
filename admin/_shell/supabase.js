@@ -79,12 +79,35 @@ export const fmtMonth = (d) => new Date(d).toLocaleDateString('en-US', {
 
 // ---------- Realtime subscription helper ----------
 
-export function subscribeTransactions(handler) {
+export function subscribeTransactions(handler, debounceMs = 350) {
+  let timer = null;
+  let lastPayload = null;
+  const debounced = (payload) => {
+    lastPayload = payload;
+    clearTimeout(timer);
+    timer = setTimeout(() => handler(lastPayload), debounceMs);
+  };
   const channel = sb
     .channel('finance-tx')
     .on('postgres_changes',
       { event: '*', schema: 'public', table: 'financial_transactions' },
-      handler)
+      debounced)
     .subscribe();
-  return () => sb.removeChannel(channel);
+  return () => { clearTimeout(timer); sb.removeChannel(channel); };
+}
+
+// Generic debounced subscription helper for any table
+export function subscribeTable(table, handler, debounceMs = 350) {
+  let timer = null;
+  let lastPayload = null;
+  const debounced = (payload) => {
+    lastPayload = payload;
+    clearTimeout(timer);
+    timer = setTimeout(() => handler(lastPayload), debounceMs);
+  };
+  const channel = sb
+    .channel(`tbl-${table}`)
+    .on('postgres_changes', { event: '*', schema: 'public', table }, debounced)
+    .subscribe();
+  return () => { clearTimeout(timer); sb.removeChannel(channel); };
 }

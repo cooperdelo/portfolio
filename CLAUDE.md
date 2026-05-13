@@ -1,0 +1,145 @@
+# Cooper Delo Portfolio — Claude Code context
+
+Static HTML portfolio site (Vercel-hosted at cooperdelo.com) plus a private admin console at `/admin/*` backed by Supabase. This file gives Claude Code sessions everything needed to read/write the admin DB and ship changes confidently.
+
+---
+
+## Repo shape
+
+```
+/                                ← Public marketing site (vanilla HTML/CSS/JS)
+  index.html, plugverse.html, rubber-band.html, athletic.html, lens.html, now.html
+  shell.css, shell.js            ← Shared public-site styles + interactivity
+  vercel.json                    ← Vercel routing + admin headers
+/admin/                          ← Private admin console
+  login.html                     ← Password-gated magic-link sign-in
+  index.html                     ← Admin home (tool launcher)
+  _shell/
+    admin-shell.css              ← Layout, tokens, components (left rail, cards, tables)
+    admin-shell.js               ← mountShell() — auth gate + sidebar + toast
+    supabase.js                  ← Shared sb client, isAdmin(), debounced realtime helpers
+  finance/                       ← Finance dashboard suite
+    index.html, transactions.html, entry.html, investments.html,
+    plugverse.html, fund.html, food-log.html, tax.html, export.html
+    _js/                         ← Per-page logic
+  merch/
+    index.html                   ← Merch inventory + debt tracker (admin-styled)
+```
+
+---
+
+## Supabase
+
+**Project:** `eibtnkaoqsgwiqttiwjo` ("cooperdelo's Project")
+**URL:** `https://eibtnkaoqsgwiqttiwjo.supabase.co`
+**Use the Supabase MCP tools** for any DB work — `list_tables`, `execute_sql`, `apply_migration`, `get_logs`, `get_advisors`. The MCP is configured against this project.
+
+### Tables (all in `public` schema, all RLS-gated by `is_admin()`)
+
+| Table | Purpose | Key columns |
+|---|---|---|
+| `admin_allowlist` | Email allowlist for the admin gate | `email` (PK), `added_at` |
+| `finance_accounts` | Bank/card/investment account dictionary | `slug` (PK), `display_name`, `account_type`, `institution`, `is_active` |
+| `financial_transactions` | Master ledger — personal, Plugverse LLC, 1789 Fund | `id`, `date`, `description`, `amount`, `type` (income/expense), `entity` (personal/plugverse/1789_fund), `account`, `category`, `is_tax_deductible`, `tax_category`, `deductible_pct`, `is_food_log`, `merchant`, `deleted_at` (soft-delete) |
+| `investment_positions` | Roth IRA + brokerage holdings | `id`, `account_slug` → finance_accounts, `symbol`, `shares`, `cost_basis`, `current_price` |
+| `budget_targets` | Monthly budget targets per entity/category | `id`, `entity`, `category`, `monthly_target`, `effective_date` |
+| `merch_items` | Merch SKUs (Plugverse tees etc.) | `id`, `name`, `variant`, `price`, `initial_stock`, `sort_order`, `archived` |
+| `merch_transactions` | Sales, restocks, gifts, adjustments | `id`, `item_id` → merch_items, `type` (sale/restock/adjust/gift/lost), `quantity`, `person_name`, `amount_owed`, `amount_paid`, `paid_at` |
+
+### Views (read-only summaries)
+
+- `v_fund_1789` — total_received / total_spent / remaining for `entity = '1789_fund'`
+- `v_monthly_summary` — `month, entity, type, category, tx_count, total`
+- `v_food_log` — food log rows (`is_food_log = true`)
+- `v_plugverse_pl` — monthly P&L for `entity = 'plugverse'`
+- `v_tax_deductible` — `tax_year, tax_category, tx_count, deductible_amount, gross_amount`
+
+### Function
+
+- `is_admin()` — returns `true` iff `auth.jwt() ->> 'email'` is in `admin_allowlist`. Every RLS policy uses this.
+
+### Auth model
+
+- Magic-link only. Password field in `login.html` is a client-side gate that gates whether to call `sendMagicLink()`.
+- Admin email (only one allowed): `delocooper6@gmail.com`
+- Admin password (rotate by editing the constant in `admin/login.html`): currently `plugverse2026`
+- Auth URL allowlist + Site URL configured in Supabase dashboard → Authentication → URL Configuration. Must include `https://cooperdelo.com/admin/**`.
+
+### Common queries
+
+```sql
+-- recent activity
+SELECT date, description, entity, category, type, amount
+FROM financial_transactions
+WHERE deleted_at IS NULL
+ORDER BY date DESC LIMIT 50;
+
+-- this month's personal spend
+SELECT sum(amount) FROM financial_transactions
+WHERE entity = 'personal' AND type = 'expense'
+  AND date >= date_trunc('month', current_date)
+  AND deleted_at IS NULL;
+
+-- 1789 fund burn
+SELECT * FROM v_fund_1789;
+
+-- open debts (people who owe me for merch)
+SELECT person_name, sum(amount_owed - amount_paid) AS balance
+FROM merch_transactions
+WHERE type = 'sale' AND person_name <> ''
+GROUP BY person_name
+HAVING sum(amount_owed - amount_paid) > 0
+ORDER BY balance DESC;
+```
+
+---
+
+## Doing admin work from Claude Code
+
+1. **Read first.** Before mutating, run a `SELECT` to confirm what's there.
+2. **Soft-delete, don't drop.** `financial_transactions` has `deleted_at` — set it instead of DELETE.
+3. **Use `apply_migration` for DDL**, `execute_sql` for DML. Both go through the same MCP server.
+4. **Realtime is wired.** The admin pages subscribe to `financial_transactions`, `merch_items`, `merch_transactions`. Any insert/update from `execute_sql` will show up on Cooper's open admin tab within ~350ms (debounced).
+5. **RLS bypasses.** The Supabase MCP uses the service role, so all RLS is bypassed — you can read/write anything. Don't accidentally write to PlugVerse tables (project `yhemvsksnoojplnxirlv`) — that's a separate app.
+
+### Adding a new transaction
+
+```sql
+INSERT INTO financial_transactions (date, description, amount, type, entity, category)
+VALUES ('2026-05-13', 'Coffee at Caribou', 6.50, 'expense', 'personal', 'food');
+-- The /admin/finance dashboard will refresh live.
+```
+
+### Editing without breaking the dashboard
+
+The dashboard reads `financial_transactions WHERE deleted_at IS NULL`. To "delete" a row, set `deleted_at = now()`. To restore it, set `deleted_at = NULL`.
+
+---
+
+## Public site notes
+
+- Each top-level page is its own HTML file with inline `<style>` blocks scoped by section.
+- Shared layout primitives live in `shell.css` (glass cards, .plate, .eyebrow, nav, footer, modal).
+- `shell.js` handles custom cursor, reveal-on-scroll, page transitions, mobile menu, nav indicator, contact modal. Loading it on a new page makes those features just work.
+- The portfolio's brand tokens are in `shell.css :root` (`--ink`, `--bg`, `--rust`, `--sage`, `--crimson`, etc.) — admin shell duplicates them in `admin-shell.css :root` so admin pages don't need to import `shell.css`.
+
+---
+
+## Deploy
+
+Pushing to `main` auto-deploys via Vercel. `vercel.json` injects `X-Robots-Tag: noindex` + `no-store` on `/admin/*`, plus `Cache-Control: no-cache` on all root HTML so site updates are immediate.
+
+```bash
+git add . && git commit -m "..." && git push
+# Vercel: 30-60s build, then live at cooperdelo.com
+```
+
+---
+
+## Don't
+
+- Don't add the resume-gpt or PlugVerse tables back into this project — they live elsewhere.
+- Don't disable RLS on the seven admin tables. The advisor will scream and the anon key would gain read access.
+- Don't switch the admin Supabase project back to PlugVerse (`yhemvsksnoojplnxirlv`) — that mixing was the bug we fixed.
+- Don't create `.md` docs unless explicitly requested.
+- Don't add cute emoji icons. Typography only. Stay aligned with the existing minimalist brand.

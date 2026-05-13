@@ -15,6 +15,18 @@
   --warn: #FF4D2E;
   --neutral: #DDD4C5;
   --line: rgba(244,239,230,0.10);
+  /* brand tokens (shared with public shell.css) */
+  --ink:    #F4EFE6;
+  --ink-2:  #DDD4C5;
+  --bg:     #0A0908;
+  --rust:   #FF4D2E;
+  --crimson:#C8102E;
+  --muted:  #6F6A60;
+  --sage:   #7A8A6E;
+  --cream:  #F2EDE4;
+  --pastel-lavender: #C9BEE6;
+  --pastel-cyan:     #B2E3E1;
+  --pastel-pink:     #F2C1D1;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -151,15 +163,17 @@ body::before {
   margin-bottom: 0.5rem;
 }
 .page-head h1 {
-  font-family: "Anton", Impact, sans-serif;
-  font-size: clamp(2.4rem, 5vw, 4.4rem);
-  line-height: 0.92; letter-spacing: -0.015em;
-  text-transform: uppercase;
+  font-family: "Geist", -apple-system, sans-serif;
+  font-weight: 600;
+  font-size: clamp(1.5rem, 2.4vw, 2.1rem);
+  line-height: 1.1; letter-spacing: -0.015em;
+  text-transform: none;
+  color: var(--ink, #F4EFE6);
 }
 .page-head h1 .accent {
-  font-family: "Fraunces", Georgia, serif;
-  font-style: italic; font-weight: 300; text-transform: none;
-  font-variation-settings: "opsz" 144, "WONK" 1, "SOFT" 100;
+  font-family: inherit;
+  font-style: normal; font-weight: 600;
+  font-variation-settings: normal;
   color: var(--rust, #FF4D2E);
 }
 
@@ -239,12 +253,13 @@ body::before {
 
 .chart-card { padding: 1.4rem 1.5rem 1rem; }
 .chart-card h3 {
-  font-family: "Fraunces", Georgia, serif; font-weight: 400;
-  font-size: 1.4rem; line-height: 1.2; margin-bottom: 0.2rem;
+  font-family: "Geist", -apple-system, sans-serif; font-weight: 600;
+  font-size: 1.05rem; line-height: 1.25; margin-bottom: 0.2rem;
+  letter-spacing: -0.005em;
 }
 .chart-card h3 .accent {
-  font-style: italic; color: var(--rust, #FF4D2E);
-  font-variation-settings: "opsz" 144, "WONK" 1, "SOFT" 100;
+  font-style: normal; color: var(--rust, #FF4D2E);
+  font-variation-settings: normal;
 }
 .chart-card .sub {
   font-family: "Geist Mono", monospace; font-size: 0.65rem;
@@ -389,13 +404,16 @@ table.data .meta { color: var(--muted); font-size: 0.7rem; }
 
 /* Section heading */
 h2.section-h {
-  font-family: "Anton", Impact, sans-serif;
-  font-size: 1.6rem; text-transform: uppercase; letter-spacing: -0.005em;
+  font-family: "Geist", -apple-system, sans-serif;
+  font-weight: 600;
+  font-size: 1.05rem;
+  text-transform: uppercase; letter-spacing: 0.18em;
   margin: 2rem 0 1rem;
+  color: var(--ink-2, #DDD4C5);
 }
 h2.section-h .accent {
-  font-family: "Fraunces", Georgia, serif;
-  font-style: italic; color: var(--rust, #FF4D2E);
-  font-variation-settings: "opsz" 144, "WONK" 1, "SOFT" 100;
-  font-weight: 300;
+  font-family: inherit;
+  font-style: normal; color: var(--rust, #FF4D2E);
+  font-variation-settings: normal;
+  font-weight: 600;
 }

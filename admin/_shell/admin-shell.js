@@ -18,6 +18,9 @@ const NAV = [
     { href: '/admin/finance/entry.html',        label: 'Quick Add' },
     { href: '/admin/finance/investments.html',  label: 'Investments' },
   ]},
+  { section: 'Inventory', items: [
+    { href: '/admin/merch/',                    label: 'Merch Tracker' },
+  ]},
   { section: 'Reports', items: [
     { href: '/admin/finance/plugverse.html',  label: 'Plugverse P&L' },
     { href: '/admin/finance/fund.html',       label: '1789 Fund' },
