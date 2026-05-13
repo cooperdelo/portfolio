@@ -24,14 +24,23 @@ export default async function handler(req, res) {
     const token     = req.query['hub.verify_token'] || req.query.hub_verify_token;
     const challenge = req.query['hub.challenge']    || req.query.hub_challenge;
 
-    const expected = process.env.IG_WEBHOOK_VERIFY_TOKEN;
+    // Trim whitespace defensively — pasted Vercel env values sometimes
+    // include trailing newlines / spaces that silently break exact compare.
+    const expected = (process.env.IG_WEBHOOK_VERIFY_TOKEN || '').trim();
+    const got      = (token || '').trim();
     if (!expected) {
       return res.status(500).json({ error: 'IG_WEBHOOK_VERIFY_TOKEN not set' });
     }
-    if (mode === 'subscribe' && token === expected) {
+    if (mode === 'subscribe' && got === expected) {
       return res.status(200).send(challenge);
     }
-    return res.status(403).json({ error: 'verify token mismatch' });
+    // Mismatch — return lengths only (not values) for diagnostic. Safe to expose.
+    return res.status(403).json({
+      error: 'verify token mismatch',
+      got_len: got.length,
+      expected_len: expected.length,
+      mode,
+    });
   }
 
   if (req.method === 'POST') {
