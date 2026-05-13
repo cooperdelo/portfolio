@@ -182,13 +182,21 @@ Each source is wrapped in `safe()` so a single outage doesn't blank the page —
 
 ### Required Vercel env vars (Production + Preview)
 
-| Var | Source | Notes |
+Every serverless function uses these — kept in one canonical table here so naming stays consistent across files.
+
+| Var | Used by | Source |
 |---|---|---|
-| `STRIPE_SECRET_KEY` | PlugVerse Stripe account → Developers → API keys | `sk_live_…` |
-| `POSTHOG_API_KEY` | posthog.com → Settings → Personal API keys | Scope: "Performing analytics queries", project 331986 |
-| `PLUGVERSE_SUPABASE_SERVICE_ROLE` | Supabase project `yhemvsksnoojplnxirlv` → Settings → API → service_role | NEVER ship this to client code — function only |
-| `POSTHOG_HOST` (optional) | Override if EU or self-hosted | Defaults to `https://us.posthog.com` |
-| `POSTHOG_PROJECT` (optional) | Override if PostHog project ID changes | Defaults to `331986` |
+| `STRIPE_SECRET_KEY` | plugverse-kpi | PlugVerse Stripe account → Developers → API keys (`sk_live_…`) |
+| `POSTHOG_PERSONAL_API_KEY` | plugverse-kpi | posthog.com → Settings → Personal API keys, scope "Performing analytics queries", project 331986 |
+| `SUPABASE_SERVICE_ROLE_KEY` | plugverse-kpi | Supabase project `yhemvsksnoojplnxirlv` (PlugVerse) → Settings → API → service_role |
+| `SUPABASE_ADMIN_SERVICE_ROLE_KEY` | instagram-oauth (and any future admin-DB writer) | Supabase project `eibtnkaoqsgwiqttiwjo` (admin) → Settings → API → service_role |
+| `INSTAGRAM_APP_ID` | instagram-oauth | developers.facebook.com → App → Settings → Basic → App ID |
+| `INSTAGRAM_APP_SECRET` | instagram-oauth | same place → App Secret (sensitive — function only) |
+| `IG_WEBHOOK_VERIFY_TOKEN` | instagram-webhook | Arbitrary string. Must match what's pasted into the Meta App webhook UI's "Verify token" field |
+| `POSTHOG_HOST` (optional) | plugverse-kpi | Override if EU/self-hosted. Defaults `https://us.posthog.com` |
+| `POSTHOG_PROJECT` (optional) | plugverse-kpi | Override if project ID changes. Defaults `331986` |
+
+NOTE on the two Supabase service-role keys: there are TWO separate Supabase projects in this repo's orbit. `SUPABASE_SERVICE_ROLE_KEY` (no prefix) = the **PlugVerse** project. `SUPABASE_ADMIN_SERVICE_ROLE_KEY` (explicit) = the **admin** project. Don't mix them — they're different secrets that grant access to different databases.
 
 If any required var is missing, the affected source returns an error message in the response payload — the page renders the other KPIs and shows the error banner.
 

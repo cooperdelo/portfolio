@@ -15,10 +15,10 @@
 //      page is up at the time — for now we render a simple success page).
 //
 // Env vars:
-//   INSTAGRAM_APP_ID            — App ID from developers.facebook.com → App → Settings → Basic
-//   INSTAGRAM_APP_SECRET        — App Secret from same place (NEVER ship to client)
-//   ADMIN_SUPABASE_SERVICE_ROLE — service_role key for project eibtnkaoqsgwiqttiwjo
-//   IG_OAUTH_REDIRECT (optional) — override redirect URI if needed; defaults to this endpoint
+//   INSTAGRAM_APP_ID                — App ID from developers.facebook.com → App → Settings → Basic
+//   INSTAGRAM_APP_SECRET            — App Secret from same place (NEVER ship to client)
+//   SUPABASE_ADMIN_SERVICE_ROLE_KEY — service_role key for admin project eibtnkaoqsgwiqttiwjo
+//   IG_OAUTH_REDIRECT (optional)    — override redirect URI if needed; defaults to this endpoint
 // =====================================================================
 
 const ADMIN_URL    = 'https://eibtnkaoqsgwiqttiwjo.supabase.co';
@@ -100,8 +100,8 @@ async function fetchIgProfile(igUserId, accessToken) {
 // ---- Persist to admin DB ----
 
 async function upsertCredentials(row) {
-  const svc = process.env.ADMIN_SUPABASE_SERVICE_ROLE;
-  if (!svc) throw new Error('ADMIN_SUPABASE_SERVICE_ROLE env var not set');
+  const svc = process.env.SUPABASE_ADMIN_SERVICE_ROLE_KEY;
+  if (!svc) throw new Error('SUPABASE_ADMIN_SERVICE_ROLE_KEY env var not set');
   const r = await fetch(`${ADMIN_URL}/rest/v1/instagram_credentials`, {
     method: 'POST',
     headers: {

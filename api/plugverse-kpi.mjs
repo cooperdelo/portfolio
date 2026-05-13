@@ -67,8 +67,10 @@ async function pvSelect(path, headers) {
 }
 
 async function fetchPlugverseKpis() {
-  const key = process.env.PLUGVERSE_SUPABASE_SERVICE_ROLE;
-  if (!key) throw new Error('PLUGVERSE_SUPABASE_SERVICE_ROLE env var not set');
+  // SUPABASE_SERVICE_ROLE_KEY is Plugverse's service role (project yhemvsksnoojplnxirlv).
+  // The admin DB uses SUPABASE_ADMIN_SERVICE_ROLE_KEY — different project.
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!key) throw new Error('SUPABASE_SERVICE_ROLE_KEY env var not set (PlugVerse service role)');
   const h = { apikey: key, Authorization: `Bearer ${key}` };
 
   const since24 = iso(daysAgo(1));
@@ -165,8 +167,8 @@ async function fetchStripeKpis() {
 // ---------- PostHog fetchers ----------
 
 async function posthogQuery(hogql) {
-  const key = process.env.POSTHOG_API_KEY;
-  if (!key) throw new Error('POSTHOG_API_KEY env var not set');
+  const key = process.env.POSTHOG_PERSONAL_API_KEY;
+  if (!key) throw new Error('POSTHOG_PERSONAL_API_KEY env var not set');
   const r = await fetch(`${POSTHOG_HOST}/api/projects/${POSTHOG_PROJECT}/query/`, {
     method: 'POST',
     headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
