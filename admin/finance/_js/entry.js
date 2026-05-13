@@ -26,6 +26,23 @@ const modeEyebrow = document.getElementById('mode-eyebrow');
   }
 }
 
+// Populate funding_source dropdown from the lookup table
+{
+  const { data } = await sb.from('funding_sources')
+    .select('slug, display_name, award_amount')
+    .eq('is_active', true)
+    .order('sort_order');
+  const sel = form.elements['funding_source'];
+  for (const fs of (data || [])) {
+    const opt = document.createElement('option');
+    opt.value = fs.slug;
+    opt.textContent = fs.award_amount != null
+      ? `${fs.display_name} ($${Number(fs.award_amount).toLocaleString()})`
+      : fs.display_name;
+    sel.appendChild(opt);
+  }
+}
+
 // Populate category datalist from existing distinct categories
 {
   const { data } = await sb.from('financial_transactions').select('category').is('deleted_at', null).limit(2000);
@@ -39,6 +56,8 @@ const modeEyebrow = document.getElementById('mode-eyebrow');
 // Default date = today
 form.elements['date'].value = new Date().toISOString().slice(0,10);
 form.elements['deductible_pct'].value = '100';
+// Default funding source for new entries = 1789 fund (overridden on edit by the row's actual value)
+if (!editId && form.elements['funding_source']) form.elements['funding_source'].value = '1789_fund';
 
 if (editId) {
   modeH1.innerHTML = 'EDIT <span class="accent">entry</span>';
@@ -99,6 +118,7 @@ async function save({ thenAddAnother = false } = {}) {
     form.elements['deductible_pct'].value = '100';
     form.elements['type'].value = 'expense';
     form.elements['entity'].value = 'personal';
+    if (form.elements['funding_source']) form.elements['funding_source'].value = '1789_fund';
     form.elements['description'].focus();
   } else {
     setTimeout(() => location.href = '/admin/finance/transactions.html', 600);

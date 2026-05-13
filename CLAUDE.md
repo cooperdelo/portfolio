@@ -45,10 +45,12 @@ Static HTML portfolio site (Vercel-hosted at cooperdelo.com) plus a private admi
 | `budget_targets` | Monthly budget targets per entity/category | `id`, `entity`, `category`, `monthly_target`, `effective_date` |
 | `merch_items` | Merch SKUs (Plugverse tees etc.) | `id`, `name`, `variant`, `price`, `initial_stock`, `sort_order`, `archived` |
 | `merch_transactions` | Sales, restocks, gifts, adjustments | `id`, `item_id` → merch_items, `type` (sale/restock/adjust/gift/lost), `quantity`, `person_name`, `amount_owed`, `amount_paid`, `paid_at` |
+| `funding_sources` | Lookup table of valid `funding_source` slugs | `slug` (PK, referenced by `financial_transactions.funding_source` via FK), `display_name`, `description`, `award_amount` (NULL = unbounded), `is_active`, `sort_order`, `started_at`, `exhausted_at` |
 
 ### Views (read-only summaries)
 
-- `v_fund_1789` — total_received / total_spent / remaining for `entity = '1789_fund'`
+- `v_fund_1789` — total_received / total_spent / remaining for `funding_source = '1789_fund'`
+- `v_funding_balance` — generic version of v_fund_1789, one row per funding source: `slug, display_name, is_active, award_amount, total_received, total_spent, remaining, started_at, exhausted_at`
 - `v_monthly_summary` — `month, entity, type, category, tx_count, total`
 - `v_food_log` — food log rows (`is_food_log = true`)
 - `v_plugverse_pl` — monthly P&L for `entity = 'plugverse'`
@@ -68,6 +70,20 @@ A transaction has two independent dimensions:
 Example: a Plugverse software expense paid from the 1789 award is `entity = 'plugverse'` (counts in Plugverse P&L) **and** `funding_source = '1789_fund'` (counts toward fund burn). Don't drop one for the other.
 
 The 1789 fund accounting (`v_fund_1789`, `/admin/finance/fund`) filters on `funding_source = '1789_fund'`. Plugverse P&L (`v_plugverse_pl`, `/admin/finance/plugverse`) filters on `entity = 'plugverse'`. Both views are correct; they measure different things.
+
+### Adding a new funding source
+
+The `funding_sources` lookup table drives the "Funded by" dropdown on the Quick Add form. Adding a new source is a single insert — no code change needed:
+
+```sql
+-- Example: $20k Luby Pitch Competition prize
+INSERT INTO funding_sources (slug, display_name, description, award_amount, is_active, sort_order, started_at)
+VALUES ('luby_pitch', 'Luby Pitch Competition', 'Won 2026-XX-XX. No equity.', 20000.00, true, 15, '2026-XX-XX');
+```
+
+After insert, refresh `/admin/finance/entry.html` and "Luby Pitch Competition ($20,000)" will appear in the dropdown. To check its balance: `SELECT * FROM v_funding_balance WHERE slug = 'luby_pitch';`
+
+To retire a source (e.g. after it's fully spent), set `is_active = false` — it stays in historic rows and views but stops appearing in the form.
 
 ### Auth model
 
