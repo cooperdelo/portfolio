@@ -1,7 +1,9 @@
 // =====================================================================
-// /admin/finance/_js/investments.js — manual position tracking
+// /admin/finance/_js/investments.js
+// Positions table with auto price sync via /api/investments-sync.
+// Stale-while-revalidate: prices older than 5 minutes trigger a sync on load.
 // =====================================================================
-import { sb, fmtUSD, fmtUSDCompact } from '/admin/_shell/supabase.js';
+import { sb, fmtUSD, fmtUSDCompact, getSession } from '/admin/_shell/supabase.js';
 import { mountShell, toast } from '/admin/_shell/admin-shell.js';
 
 await mountShell({ title: 'Investments · Finance' });
@@ -18,32 +20,94 @@ Chart.defaults.font.size = 11;
 const charts = {};
 const palette = [C.rust, C.crimson, C.stage, C.lavender, C.cyan, C.pink, C.sage, C.cream];
 
-async function load() {
-  const { data, error } = await sb.from('investment_positions').select('*').order('symbol');
-  if (error) { toast('Failed to load positions', 'err'); return; }
-  render(data || []);
+const SYNC_TTL_MS = 5 * 60 * 1000; // 5 min — don't re-sync if any price is fresher than this
+
+// Sub-dollar crypto needs more precision than fmtUSD gives.
+function fmtPrice(n) {
+  const v = Number(n || 0);
+  if (v === 0) return '—';
+  if (Math.abs(v) < 1) {
+    return '$' + v.toLocaleString('en-US', { maximumFractionDigits: 6, minimumFractionDigits: 2 });
+  }
+  return fmtUSD(v);
 }
 
-function render(rows) {
+async function fetchPositions() {
+  const { data, error } = await sb.from('investment_positions').select('*').order('asset_type').order('symbol');
+  if (error) { toast('Failed to load positions', 'err'); return []; }
+  return data || [];
+}
+
+async function fetchCashAccounts() {
+  const { data, error } = await sb.from('finance_accounts')
+    .select('slug,display_name,cash_balance')
+    .eq('account_type', 'investment');
+  if (error) return [];
+  return data || [];
+}
+
+async function syncPrices() {
+  const session = await getSession();
+  if (!session) { toast('Not signed in', 'err'); return null; }
+  const r = await fetch('/api/investments-sync', {
+    headers: { Authorization: `Bearer ${session.access_token}` },
+  });
+  if (!r.ok) {
+    const body = await r.text().catch(() => '');
+    toast(`Sync failed: ${r.status}`, 'err');
+    console.error('sync error', body);
+    return null;
+  }
+  return r.json();
+}
+
+function isStale(rows) {
+  if (!rows.length) return false;
+  const newest = rows
+    .map(r => r.price_updated_at ? new Date(r.price_updated_at).getTime() : 0)
+    .reduce((a, b) => Math.max(a, b), 0);
+  if (!newest) return true;
+  return (Date.now() - newest) > SYNC_TTL_MS;
+}
+
+async function load({ forceSync = false } = {}) {
+  let rows = await fetchPositions();
+  const cashAccounts = await fetchCashAccounts();
+
+  if (forceSync || isStale(rows)) {
+    const result = await syncPrices();
+    if (result?.updated_count) {
+      rows = await fetchPositions();
+      if (result.errors?.length) {
+        console.warn('Sync had partial errors:', result.errors);
+      }
+    }
+  }
+
+  render(rows, cashAccounts);
+}
+
+function render(rows, cashAccounts) {
   // KPIs
   let totalValue = 0, totalCost = 0, lastUpdate = null;
   for (const r of rows) {
-    const value = Number(r.shares || 0) * Number(r.current_price || 0);
-    const cost  = Number(r.shares || 0) * Number(r.cost_basis || 0);
-    totalValue += value;
-    totalCost  += cost;
+    totalValue += Number(r.shares || 0) * Number(r.current_price || 0);
+    totalCost  += Number(r.shares || 0) * Number(r.cost_basis  || 0);
     if (r.price_updated_at && (!lastUpdate || new Date(r.price_updated_at) > lastUpdate)) {
       lastUpdate = new Date(r.price_updated_at);
     }
   }
+  const cashTotal = cashAccounts.reduce((a, x) => a + Number(x.cash_balance || 0), 0);
   const gain = totalValue - totalCost;
+
   setK('total_value', fmtUSDCompact(totalValue));
   setK('total_gain',  `${gain >= 0 ? '+' : ''}${fmtUSDCompact(gain)} ${totalCost ? `(${((gain/totalCost)*100).toFixed(1)}%)` : ''}`);
   const gainEl = document.querySelector('[data-k="total_gain"]');
-  gainEl.className = 'delta ' + (gain >= 0 ? 'pos' : 'neg');
+  if (gainEl) gainEl.className = 'delta ' + (gain >= 0 ? 'pos' : 'neg');
   setK('total_cost',  fmtUSDCompact(totalCost));
-  setK('pos_count',   rows.length);
-  setK('last_update', lastUpdate ? lastUpdate.toLocaleDateString() : '—');
+  setK('cash_total',  fmtUSD(cashTotal));
+  setK('pos_count',   `Positions: ${rows.length}`);
+  setK('last_update', lastUpdate ? lastUpdate.toLocaleString([], { month:'short', day:'numeric', hour:'numeric', minute:'2-digit' }) : '—');
 
   // Table
   const tbody = document.getElementById('pos-tbody');
@@ -55,13 +119,16 @@ function render(rows) {
       const cost  = Number(r.shares || 0) * Number(r.cost_basis || 0);
       const g     = value - cost;
       const gClr  = g >= 0 ? 'var(--good)' : 'var(--rust, #FF4D2E)';
+      const sharesStr = r.asset_type === 'crypto'
+        ? Number(r.shares).toLocaleString('en-US', { maximumFractionDigits: 8 })
+        : Number(r.shares).toLocaleString('en-US', { maximumFractionDigits: 4 });
       return `
         <tr>
-          <td class="mono"><strong>${escapeHtml(r.symbol)}</strong></td>
+          <td class="mono"><strong>${escapeHtml(r.symbol)}</strong>${r.asset_type === 'crypto' ? ' <span class="meta">₿</span>' : ''}</td>
           <td>${escapeHtml(r.name || '—')}</td>
           <td class="mono meta">${escapeHtml(r.account_slug || '—')}</td>
-          <td class="right mono">${Number(r.shares).toFixed(4)}</td>
-          <td class="right mono">${r.current_price ? fmtUSD(r.current_price) : '—'}</td>
+          <td class="right mono">${sharesStr}</td>
+          <td class="right mono">${r.current_price ? fmtPrice(r.current_price) : '—'}</td>
           <td class="right mono"><strong>${fmtUSD(value)}</strong></td>
           <td class="right mono meta">${fmtUSD(cost)}</td>
           <td class="right mono" style="color:${gClr};">${g >= 0 ? '+' : '−'}${fmtUSD(Math.abs(g))}</td>
@@ -97,6 +164,11 @@ function render(rows) {
     if (!v) continue;
     accMap[r.account_slug || 'other'] = (accMap[r.account_slug || 'other'] || 0) + v;
   }
+  for (const a of cashAccounts) {
+    if (Number(a.cash_balance) > 0) {
+      accMap[`${a.slug} (cash)`] = (accMap[`${a.slug} (cash)`] || 0) + Number(a.cash_balance);
+    }
+  }
   const accEntries = Object.entries(accMap);
   drawDonut('chart-acct', accEntries.map(([k]) => k), accEntries.map(([,v]) => v));
 }
@@ -129,9 +201,23 @@ const modal   = document.getElementById('add-modal');
 const posForm = document.getElementById('pos-form');
 let editId = null;
 
-document.getElementById('add-pos').addEventListener('click', () => { editId = null; posForm.reset(); modal.style.display = 'block'; });
+document.getElementById('add-pos').addEventListener('click', () => {
+  editId = null; posForm.reset();
+  modal.style.display = 'block';
+});
 document.getElementById('add-cancel').addEventListener('click', () => modal.style.display = 'none');
 modal.addEventListener('click', (e) => { if (e.target === modal) modal.style.display = 'none'; });
+
+document.getElementById('sync-prices').addEventListener('click', async (e) => {
+  const btn = e.currentTarget;
+  btn.disabled = true;
+  const originalText = btn.textContent;
+  btn.textContent = 'Syncing…';
+  await load({ forceSync: true });
+  btn.disabled = false;
+  btn.textContent = originalText;
+  toast('Prices refreshed');
+});
 
 function openEdit(row) {
   if (!row) return;

@@ -20,6 +20,7 @@
         <h1>INVEST<span class="accent">ments</span></h1>
       </div>
       <div class="actions">
+        <button class="btn" id="sync-prices">Sync prices</button>
         <button class="btn primary" id="add-pos">+ Add position</button>
       </div>
     </div>
@@ -27,8 +28,8 @@
     <div class="kpi-grid" id="inv-kpis">
       <div class="card"><div class="label">Total value</div><div class="value" data-k="total_value">—</div><div class="delta flat" data-k="total_gain">Gain/loss</div></div>
       <div class="card"><div class="label">Cost basis</div><div class="value" data-k="total_cost">—</div><div class="delta flat">Sum of basis</div></div>
-      <div class="card"><div class="label">Positions</div><div class="value" data-k="pos_count">—</div><div class="delta flat">Across accounts</div></div>
-      <div class="card"><div class="label">Last price update</div><div class="value" data-k="last_update">—</div><div class="delta flat">Manual entry for now</div></div>
+      <div class="card"><div class="label">Uninvested cash</div><div class="value" data-k="cash_total">—</div><div class="delta flat">Settlement + crypto USD</div></div>
+      <div class="card"><div class="label">Last price update</div><div class="value" data-k="last_update">—</div><div class="delta flat" data-k="pos_count">Positions: —</div></div>
     </div>
 
     <div class="chart-row">
@@ -74,18 +75,25 @@
         <div class="card">
           <h2 class="section-h" style="margin-top:0;">New <span class="accent">position</span></h2>
           <form id="pos-form" class="form-grid">
-            <div class="field"><label>Symbol</label><input name="symbol" required placeholder="VTI, AAPL, BTC" /></div>
+            <div class="field"><label>Symbol</label><input name="symbol" required placeholder="VTI, BTC, ETH" /></div>
             <div class="field"><label>Name</label><input name="name" placeholder="Vanguard Total Market" /></div>
+            <div class="field"><label>Asset type</label>
+              <select name="asset_type" required>
+                <option value="stock">Stock / ETF</option>
+                <option value="crypto">Crypto</option>
+              </select>
+            </div>
             <div class="field"><label>Account</label>
               <select name="account_slug" required>
-                <option value="roth_ira">Roth IRA</option>
+                <option value="roth_ira">Roth IRA (Schwab)</option>
                 <option value="brokerage">Brokerage</option>
+                <option value="coinbase">Coinbase</option>
                 <option value="other">Other</option>
               </select>
             </div>
-            <div class="field"><label>Shares</label><input name="shares" type="number" step="0.0001" min="0" required /></div>
-            <div class="field"><label>Cost basis (per share avg)</label><input name="cost_basis" type="number" step="0.01" min="0" /></div>
-            <div class="field"><label>Current price</label><input name="current_price" type="number" step="0.01" min="0" /></div>
+            <div class="field"><label>Shares / coins</label><input name="shares" type="number" step="0.00000001" min="0" required /></div>
+            <div class="field"><label>Cost basis (per unit avg)</label><input name="cost_basis" type="number" step="0.0001" min="0" /></div>
+            <div class="field"><label>Current price <span class="meta">(auto-filled by sync)</span></label><input name="current_price" type="number" step="0.0001" min="0" /></div>
             <div class="field" style="grid-column: 1 / -1;"><label>Notes</label><textarea name="notes"></textarea></div>
             <div style="grid-column: 1 / -1; display:flex; gap:0.6rem;">
               <button class="btn primary" type="submit">Save</button>
