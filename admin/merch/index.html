@@ -38,7 +38,8 @@
 .btn-paid{font-family:"Geist Mono",monospace;font-size:.6rem;letter-spacing:.22em;text-transform:uppercase;padding:.6rem .85rem;border-radius:8px;background:rgba(244,239,230,.05);border:1px solid rgba(244,239,230,.12);color:var(--ink-2);cursor:pointer;transition:all .2s}
 .btn-paid:hover{background:var(--sage);border-color:var(--sage);color:var(--bg)}
 
-.t-row{display:grid;grid-template-columns:6rem 1fr auto;gap:1.2rem;align-items:center;padding:.8rem 1.5rem;border-bottom:1px solid rgba(244,239,230,.05)}
+.t-row{display:grid;grid-template-columns:6rem 1fr auto;gap:1.2rem;align-items:center;padding:.8rem 1.5rem;border-bottom:1px solid rgba(244,239,230,.05);cursor:pointer;transition:background .15s}
+.t-row:hover{background:rgba(244,239,230,.03)}
 .t-row:last-child{border-bottom:0}
 .t-row .when{font-family:"Geist Mono",monospace;font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
 .t-row .what{font-family:"Geist",sans-serif;font-size:.88rem;color:var(--ink-2);line-height:1.4}
@@ -285,11 +286,42 @@
       }
       const amt    = t.type === 'sale' ? (paid >= owed ? fmt$(paid) : `${fmt$(paid)} / ${fmt$(owed)}`) : '';
       const amtCls = (t.type === 'sale' && paid < owed) ? 'owed' : '';
-      return `<div class="t-row">
+      return `<div class="t-row" data-action="edit-tx" data-id="${t.id}" title="Click to edit">
         <div class="when">${fromNow(t.created_at)}</div>
         <div class="what">${line}</div>
         <div class="amt ${amtCls}">${amt}</div>
       </div>`;
+    }
+
+    function editTxForm(t){
+      const itemOpts = state.items.map(i =>
+        `<option value="${i.id}" ${i.id === t.item_id ? 'selected' : ''}>${esc(i.name)}${i.variant ? ' · ' + esc(i.variant) : ''}</option>`
+      ).join('');
+      const typeOpts = ['sale','restock','adjust','gift','lost'].map(v =>
+        `<option value="${v}" ${v === t.type ? 'selected' : ''}>${cap(v)}</option>`
+      ).join('');
+      const isSale = t.type === 'sale';
+      return `<h2>Edit transaction</h2>
+        <form id="tx-edit-form" data-id="${t.id}">
+          <div class="grid-2">
+            <div class="field"><label>Type</label><select name="type" required>${typeOpts}</select></div>
+            <div class="field"><label>Quantity</label><input name="quantity" type="number" min="1" value="${Math.abs(t.quantity)}" required></div>
+          </div>
+          <div class="field"><label>Item</label><select name="item_id" required>${itemOpts}</select></div>
+          <div class="sale-fields" style="display:${isSale ? 'block' : 'none'}">
+            <div class="field"><label>Buyer (optional)</label><input name="person_name" value="${esc(t.person_name || '')}" placeholder="Name or leave blank for cash"></div>
+            <div class="grid-2">
+              <div class="field"><label>Amount owed ($)</label><input name="amount_owed" type="number" step="0.01" min="0" value="${Number(t.amount_owed) || 0}"></div>
+              <div class="field"><label>Amount paid ($)</label><input name="amount_paid" type="number" step="0.01" min="0" value="${Number(t.amount_paid) || 0}"></div>
+            </div>
+            <div class="field"><label>Payment method</label><input name="payment_method" value="${esc(t.payment_method || '')}" placeholder="Cash, Venmo, Zelle…"></div>
+          </div>
+          <div class="field"><label>Notes</label><input name="notes" value="${esc(t.notes || '')}"></div>
+          <div class="hint">Logged ${fromNow(t.created_at)}</div>
+          <button class="btn-rust" type="submit">Save changes</button>
+          <button class="btn-danger" type="button" data-action="delete-tx">Delete transaction</button>
+          <button class="btn-ghost" type="button" data-action="close">Cancel</button>
+        </form>`;
     }
 
     // ============ Forms ============
@@ -367,6 +399,19 @@
       if (a === 'restock-one')   return quickRestock(t.dataset.id);
       if (a === 'edit-item'){ const it = state.items.find(i => i.id === t.dataset.id); return openSheet(itemForm(it)); }
       if (a === 'mark-paid')     return markPaid(t.dataset.name);
+      if (a === 'edit-tx'){
+        const tx = state.txs.find(x => x.id === t.dataset.id);
+        if (tx) return openSheet(editTxForm(tx));
+      }
+      if (a === 'delete-tx'){
+        const id = $('#tx-edit-form')?.dataset.id;
+        if (!id) return;
+        if (!confirm('Delete this transaction? This cannot be undone.')) return;
+        const { error } = await sb.from('merch_transactions').delete().eq('id', id);
+        if (error) return toast(error.message, 'err');
+        toast('Deleted', 'ok'); closeSheet(); await loadAll();
+        return;
+      }
       if (a === 'archive'){
         const id = $('#item-form').dataset.id;
         if (!confirm('Archive this item? Past sales stay in history.')) return;
@@ -404,6 +449,10 @@
         if (opt && pf && !pf.dataset.touched) pf.value = opt.dataset.price;
       }
       if (e.target.matches('#sell-form [name="price"]')) e.target.dataset.touched = '1';
+      if (e.target.matches('#tx-edit-form [name="type"]')){
+        const saleFields = e.target.closest('form').querySelector('.sale-fields');
+        if (saleFields) saleFields.style.display = e.target.value === 'sale' ? 'block' : 'none';
+      }
     });
 
     document.addEventListener('submit', async e => {
@@ -437,6 +486,36 @@
         if (error) return toast(error.message, 'err');
         toast(`Restocked +${payload.quantity}`, 'ok');
         closeSheet(); await loadAll();
+      }
+      if (f.id === 'tx-edit-form'){
+        const fd = new FormData(f);
+        const type = fd.get('type');
+        const qty = parseInt(fd.get('quantity'), 10);
+        const payload = {
+          type,
+          item_id: fd.get('item_id'),
+          quantity: qty,
+          notes: (fd.get('notes') || '').trim(),
+        };
+        if (type === 'sale'){
+          const owed = parseFloat(fd.get('amount_owed') || '0');
+          const paid = parseFloat(fd.get('amount_paid') || '0');
+          payload.person_name    = (fd.get('person_name') || '').trim();
+          payload.amount_owed    = isNaN(owed) ? 0 : owed;
+          payload.amount_paid    = isNaN(paid) ? 0 : paid;
+          payload.payment_method = (fd.get('payment_method') || '').trim();
+          payload.paid_at        = payload.amount_paid >= payload.amount_owed ? new Date().toISOString() : null;
+        } else {
+          payload.person_name    = '';
+          payload.amount_owed    = 0;
+          payload.amount_paid    = 0;
+          payload.payment_method = '';
+          payload.paid_at        = null;
+        }
+        const { error } = await sb.from('merch_transactions').update(payload).eq('id', f.dataset.id);
+        if (error) return toast(error.message, 'err');
+        toast('Saved', 'ok'); closeSheet(); await loadAll();
+        return;
       }
       if (f.id === 'item-form'){
         const fd = new FormData(f);
