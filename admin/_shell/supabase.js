@@ -8,7 +8,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';
 
 const SUPABASE_URL = 'https://yhemvsksnoojplnxirlv.supabase.co';
 const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_365EVdOW0BPWK8dsK15AaA_n3XxloRV';
-const ADMIN_EMAIL = 'delocooper6@gmail.com';
+export const ADMIN_EMAIL = 'delocooper6@gmail.com';
 
 export const sb = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
   auth: {
