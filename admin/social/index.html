@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="robots" content="noindex, nofollow, noarchive" />
+<title>Social · CD Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Geist+Mono:wght@300..700&family=Geist:wght@300..700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/admin/_shell/admin-shell.css" />
+<style>
+  .tabs { display: flex; gap: 0.4rem; margin-bottom: 1.6rem; flex-wrap: wrap; }
+  .tab { font-family: "Geist Mono", monospace; font-size: 0.7rem; letter-spacing: 0.22em; text-transform: uppercase; padding: 0.7rem 1.1rem; border-radius: 999px; background: rgba(244,239,230,0.04); border: 1px solid var(--card-border); color: var(--ink-2); cursor: pointer; transition: all 0.2s; }
+  .tab:hover { color: var(--ink); border-color: rgba(244,239,230,0.3); }
+  .tab.active { background: rgba(255,77,46,0.1); border-color: rgba(255,77,46,0.5); color: var(--ink); }
+
+  .post-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 0.9rem; margin-bottom: 2rem; }
+  .post { padding: 0; border-radius: 14px; overflow: hidden; background: var(--card-bg); border: 1px solid var(--card-border); transition: border-color 0.25s; }
+  .post:hover { border-color: var(--card-border-hover); }
+  .post .thumb { aspect-ratio: 1 / 1; background: #14110F center/cover no-repeat; position: relative; }
+  .post .thumb .badge { position: absolute; top: 0.6rem; left: 0.6rem; font-family: "Geist Mono", monospace; font-size: 0.55rem; letter-spacing: 0.18em; text-transform: uppercase; padding: 0.25rem 0.5rem; border-radius: 4px; background: rgba(0,0,0,0.6); color: var(--ink); }
+  .post .body { padding: 0.85rem 1rem 1rem; }
+  .post .cap { font-family: "Geist", sans-serif; font-size: 0.82rem; line-height: 1.4; color: var(--ink-2); margin-bottom: 0.6rem; max-height: 3.4rem; overflow: hidden; }
+  .post .stats { display: flex; gap: 0.9rem; font-family: "Geist Mono", monospace; font-size: 0.66rem; letter-spacing: 0.1em; color: var(--muted); }
+  .post .stats .n { font-family: "Anton", Impact, sans-serif; font-size: 1rem; color: var(--ink); margin-right: 0.25rem; letter-spacing: 0; }
+  .post .date { font-family: "Geist Mono", monospace; font-size: 0.58rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--muted); margin-top: 0.6rem; }
+
+  .err-banner { font-family: "Geist Mono", monospace; font-size: 0.7rem; letter-spacing: 0.08em; color: var(--rust); padding: 0.7rem 1rem; border: 1px solid rgba(255,77,46,0.4); border-radius: 10px; background: rgba(255,77,46,0.05); margin-bottom: 1.4rem; }
+  .err-banner strong { color: var(--rust); }
+  .err-banner a { color: var(--rust); text-decoration: underline; text-underline-offset: 3px; }
+
+  .connect-cta { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+  .connect-cta .text { font-family: "Geist Mono", monospace; font-size: 0.78rem; letter-spacing: 0.08em; color: var(--ink-2); }
+</style>
+</head>
+<body>
+  <main>
+    <div class="page-head">
+      <div>
+        <div class="eyebrow">My content, on every platform</div>
+        <h1>Social <span class="accent">analytics</span></h1>
+      </div>
+      <div class="actions">
+        <span class="live-dot" id="live-indicator">Loading</span>
+        <button class="btn" id="refresh-btn">Refresh now</button>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" data-tab="instagram">Instagram</button>
+      <button class="tab" data-tab="tiktok">TikTok</button>
+    </div>
+
+    <div id="error-slot"></div>
+
+    <div class="kpi-grid" id="kpi-slot">
+      <div class="card"><div class="label">Followers</div><div class="value" data-k="followers">—</div><div class="delta flat" data-k="followers_sub">Account size</div></div>
+      <div class="card"><div class="label">Posts total</div><div class="value" data-k="posts_total">—</div><div class="delta flat">Lifetime</div></div>
+      <div class="card"><div class="label">Most-recent post</div><div class="value" data-k="last_post">—</div><div class="delta flat" data-k="last_post_sub">Days since last post</div></div>
+      <div class="card"><div class="label">Total likes</div><div class="value" data-k="total_likes">—</div><div class="delta flat">Across recent fetched</div></div>
+    </div>
+
+    <h2 class="section-h">Recent posts</h2>
+    <div class="post-grid" id="post-grid">
+      <div class="empty" style="grid-column:1/-1;">Loading…</div>
+    </div>
+  </main>
+
+  <script type="module">
+    import { sb } from '/admin/_shell/supabase.js';
+    import { mountShell, toast } from '/admin/_shell/admin-shell.js';
+
+    await mountShell({ title: 'Social · Analytics' });
+
+    const indicator = document.getElementById('live-indicator');
+    const errSlot   = document.getElementById('error-slot');
+    const refreshBtn = document.getElementById('refresh-btn');
+    let activeTab = 'instagram';
+
+    function setK(k, v){ const e = document.querySelector(`[data-k="${k}"]`); if (e) e.textContent = v; }
+    function fmtN(n){ if (n == null) return '—'; return Number(n).toLocaleString('en-US'); }
+    function fmtCompact(n){ if (n == null) return '—'; const v = Number(n); if (Math.abs(v) >= 1e6) return (v/1e6).toFixed(1) + 'M'; if (Math.abs(v) >= 1e3) return (v/1e3).toFixed(1) + 'k'; return String(v); }
+    function escapeHtml(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c])); }
+    function daysSince(iso){ if (!iso) return '—'; return Math.floor((Date.now() - new Date(iso).getTime()) / 86400000) + 'd ago'; }
+
+    function renderError(platform, msg) {
+      errSlot.innerHTML = `<div class="err-banner"><strong>${platform}:</strong> ${escapeHtml(msg)}</div>`;
+    }
+    function clearError() { errSlot.innerHTML = ''; }
+
+    function renderConnectCTA(platform) {
+      const oauthUrl = platform === 'instagram'
+        ? 'https://www.instagram.com/oauth/authorize?force_reauth=true&client_id=946685798340166&redirect_uri=https://www.cooperdelo.com/api/instagram-oauth&response_type=code&scope=instagram_business_basic%2Cinstagram_business_manage_messages%2Cinstagram_business_manage_comments%2Cinstagram_business_content_publish%2Cinstagram_business_manage_insights'
+        : '#'; // TikTok URL filled after user pastes client_key — see below
+      document.getElementById('post-grid').innerHTML = `
+        <div class="card connect-cta" style="grid-column:1/-1;padding:1.6rem 1.7rem;">
+          <div class="text">No ${platform} account connected yet.</div>
+          <a class="btn primary" href="${oauthUrl}">Connect ${platform}</a>
+        </div>`;
+    }
+
+    function renderPosts(platform, posts) {
+      const grid = document.getElementById('post-grid');
+      if (!posts || !posts.length) {
+        grid.innerHTML = `<div class="empty" style="grid-column:1/-1;">No posts synced yet.</div>`;
+        return;
+      }
+      grid.innerHTML = posts.map(p => {
+        const cap = (p.caption || '').slice(0, 120).replace(/\n/g, ' ');
+        const thumb = p.thumbnail_url || p.media_url || '';
+        const m = p.latest || {};
+        const stats = platform === 'tiktok'
+          ? `<span><span class="n">${fmtCompact(m.views)}</span>views</span><span><span class="n">${fmtCompact(m.likes)}</span>likes</span><span><span class="n">${fmtN(m.comments)}</span>comments</span>`
+          : `<span><span class="n">${fmtN(m.likes)}</span>likes</span><span><span class="n">${fmtN(m.comments)}</span>comments</span>`;
+        return `<a class="post" href="${escapeHtml(p.permalink || '#')}" target="_blank" rel="noreferrer">
+          <div class="thumb" style="${thumb ? `background-image:url('${escapeHtml(thumb)}');` : ''}">
+            <span class="badge">${escapeHtml(p.media_type || platform.toUpperCase())}</span>
+          </div>
+          <div class="body">
+            <div class="cap">${escapeHtml(cap || '(no caption)')}</div>
+            <div class="stats">${stats}</div>
+            <div class="date">${escapeHtml(p.posted_at ? new Date(p.posted_at).toLocaleDateString('en-US',{month:'short',day:'2-digit',year:'numeric'}) : '—')}</div>
+          </div>
+        </a>`;
+      }).join('');
+    }
+
+    function renderHeader(platform, data) {
+      const followers = data.followers;
+      setK('followers',        fmtN(followers));
+      setK('followers_sub',    data.handle ? `@${data.handle}` : 'Account size');
+      setK('posts_total',      fmtN(data.posts_total));
+      setK('total_likes',      fmtN(data.total_likes ?? (data.posts || []).reduce((a,p)=>a + (Number(p.latest?.likes)||0), 0)));
+      const latest = (data.posts || [])[0];
+      setK('last_post',        latest ? daysSince(latest.posted_at) : '—');
+      setK('last_post_sub',    latest ? `${escapeHtml(latest.media_type || '')}` : 'No posts yet');
+    }
+
+    async function syncPlatform(platform) {
+      indicator.textContent = `Syncing ${platform}`;
+      refreshBtn.disabled = true;
+      clearError();
+      const { data: sessionData } = await sb.auth.getSession();
+      const jwt = sessionData?.session?.access_token;
+      if (!jwt){ toast('Session expired — sign in again', 'err'); indicator.textContent = 'Offline'; refreshBtn.disabled = false; return; }
+
+      try {
+        const r = await fetch(`/api/${platform}-sync`, { headers: { Authorization: `Bearer ${jwt}` }, cache: 'no-store' });
+        const j = await r.json();
+        if (!r.ok) {
+          if (String(j.error || '').match(/No (Instagram|TikTok) account connected/i)) {
+            renderConnectCTA(platform);
+            setK('followers','—'); setK('posts_total','—'); setK('last_post','—'); setK('total_likes','—');
+            indicator.textContent = `Not connected`;
+            return;
+          }
+          renderError(platform, j.error || `HTTP ${r.status}`);
+          indicator.textContent = 'Error';
+          return;
+        }
+        renderHeader(platform, j);
+        renderPosts(platform, j.posts);
+        indicator.textContent = `Synced · ${platform}`;
+      } catch (e) {
+        renderError(platform, e?.message || String(e));
+        indicator.textContent = 'Offline';
+      } finally {
+        refreshBtn.disabled = false;
+      }
+    }
+
+    document.querySelectorAll('.tab').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(b => b.classList.toggle('active', b === btn));
+        activeTab = btn.dataset.tab;
+        syncPlatform(activeTab);
+      });
+    });
+    refreshBtn.addEventListener('click', () => syncPlatform(activeTab));
+
+    await syncPlatform(activeTab);
+  </script>
+</body>
+</html>

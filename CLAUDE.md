@@ -26,8 +26,15 @@ Static HTML portfolio site (Vercel-hosted at cooperdelo.com) plus a private admi
     index.html                   ← Merch inventory + debt tracker (admin-styled)
   plugverse/
     index.html                   ← Plugverse KPIs dashboard (MRR, users, payouts, top events)
+  social/
+    index.html                   ← IG + TikTok unified dashboard (posts, engagement, account stats)
 /api/                            ← Vercel serverless functions
   plugverse-kpi.mjs              ← Aggregates Plugverse Supabase + Stripe + PostHog, writes daily snapshots
+  instagram-oauth.mjs            ← Meta IG OAuth callback → upserts instagram_credentials
+  instagram-webhook.mjs          ← Meta webhook verify (GET) + event ack (POST)
+  instagram-sync.mjs             ← Pulls IG media + account stats → social_posts / social_post_metrics / social_account_snapshots
+  tiktok-oauth.mjs               ← TikTok OAuth callback → upserts tiktok_credentials
+  tiktok-sync.mjs                ← Pulls TikTok user info + videos with auto-refresh → social_* tables
 ```
 
 ---
@@ -51,6 +58,11 @@ Static HTML portfolio site (Vercel-hosted at cooperdelo.com) plus a private admi
 | `merch_transactions` | Sales, restocks, gifts, adjustments | `id`, `item_id` → merch_items, `type` (sale/restock/adjust/gift/lost), `quantity`, `person_name`, `amount_owed`, `amount_paid`, `paid_at` |
 | `funding_sources` | Lookup table of valid `funding_source` slugs | `slug` (PK, referenced by `financial_transactions.funding_source` via FK), `display_name`, `description`, `award_amount` (NULL = unbounded), `is_active`, `sort_order`, `started_at`, `exhausted_at` |
 | `plugverse_kpi_snapshots` | Daily KPI snapshot for the Plugverse dashboard. UPSERTed by `/api/plugverse-kpi` on each admin visit. Read for sparklines. | `date` (PK), `captured_at`, `mrr_cents`, `arr_cents`, `active_subscriptions`, `users_total`, `signups_24h`, `signups_7d`, `churn_7d`, `payouts_pending_cents`, `payouts_completed_mtd_cents`, `top_events_7d` (jsonb), `raw` (jsonb full payload) |
+| `instagram_credentials` | Long-lived IG access tokens (one row per connected IG business/creator account) | `ig_user_id` (PK), `username`, `access_token`, `expires_at`, `connected_at`, `refreshed_at` |
+| `tiktok_credentials` | TikTok access + refresh tokens with their separate expiry windows | `tiktok_user_id` / open_id (PK), `union_id`, `username`, `display_name`, `avatar_url`, `access_token`, `refresh_token`, `expires_at`, `refresh_expires_at`, `connected_at`, `refreshed_at` |
+| `social_posts` | Unified posts table across platforms | `id` (PK uuid), `platform` (instagram/tiktok/youtube/spotify), `external_id`, `account_handle`, `caption`, `posted_at`, `media_type`, `media_url`, `thumbnail_url`, `permalink`, `hashtags` (text[]), `raw` (jsonb), `first_seen_at`, `updated_at`. Unique (platform, external_id). |
+| `social_post_metrics` | Time-series metrics per post (one row per sync) | `id`, `post_id` → social_posts, `captured_at`, `views`, `likes`, `comments`, `shares`, `saves`, `reach`, `impressions`, `engagement_pct`, `raw` |
+| `social_account_snapshots` | Daily account-level stats per platform | `date` + `platform` (composite PK), `followers`, `following`, `posts_total`, `total_views`, `total_likes`, `handle`, `raw`, `captured_at` |
 
 ### Views (read-only summaries)
 
@@ -193,6 +205,8 @@ Every serverless function uses these — kept in one canonical table here so nam
 | `INSTAGRAM_APP_ID` | instagram-oauth | developers.facebook.com → App → Settings → Basic → App ID |
 | `INSTAGRAM_APP_SECRET` | instagram-oauth | same place → App Secret (sensitive — function only) |
 | `IG_WEBHOOK_VERIFY_TOKEN` | instagram-webhook | Arbitrary string. Must match what's pasted into the Meta App webhook UI's "Verify token" field |
+| `TIKTOK_CLIENT_KEY` | tiktok-oauth, tiktok-sync | developers.tiktok.com → App → Credentials → Client key |
+| `TIKTOK_CLIENT_SECRET` | tiktok-oauth, tiktok-sync | same place → Client secret. Rotate via "Reset secret" if leaked |
 | `POSTHOG_HOST` (optional) | plugverse-kpi | Override if EU/self-hosted. Defaults `https://us.posthog.com` |
 | `POSTHOG_PROJECT` (optional) | plugverse-kpi | Override if project ID changes. Defaults `331986` |
 

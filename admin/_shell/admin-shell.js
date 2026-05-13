@@ -23,6 +23,7 @@ const NAV = [
   ]},
   { section: 'Projects', items: [
     { href: '/admin/plugverse/',                label: 'Plugverse KPIs' },
+    { href: '/admin/social/',                   label: 'Social Analytics' },
   ]},
   { section: 'Reports', items: [
     { href: '/admin/finance/plugverse.html',  label: 'Plugverse P&L' },
