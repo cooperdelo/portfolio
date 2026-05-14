@@ -1,59 +1,72 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" shape-rendering="geometricPrecision">
   <defs>
-    <!-- Vinyl surface: warm-black radial -->
-    <radialGradient id="g-vinyl" cx="44%" cy="30%" r="80%">
-      <stop offset="0%"  stop-color="#2A241E"/>
-      <stop offset="55%" stop-color="#14110F"/>
+    <!-- Vinyl surface: warm-black radial, light from top-left -->
+    <radialGradient id="g-vinyl" cx="36%" cy="32%" r="80%">
+      <stop offset="0%"  stop-color="#322A23"/>
+      <stop offset="50%" stop-color="#14110F"/>
       <stop offset="100%" stop-color="#06050A"/>
     </radialGradient>
-    <!-- Extruded side: rust → crimson -->
+    <!-- Outer rust ring: brighter at top (light hitting it), darker at bottom -->
     <linearGradient id="g-edge" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%"  stop-color="#FF4D2E"/>
-      <stop offset="100%" stop-color="#5F0712"/>
-    </linearGradient>
-    <!-- Center label: brighter rust radial -->
-    <radialGradient id="g-label" cx="38%" cy="30%" r="80%">
       <stop offset="0%"  stop-color="#FF7656"/>
-      <stop offset="100%" stop-color="#D63A1F"/>
+      <stop offset="50%" stop-color="#D63A1F"/>
+      <stop offset="100%" stop-color="#6B0E18"/>
+    </linearGradient>
+    <!-- Label: rust radial with highlight top-left -->
+    <radialGradient id="g-label" cx="35%" cy="28%" r="80%">
+      <stop offset="0%"  stop-color="#FF8062"/>
+      <stop offset="100%" stop-color="#C42915"/>
     </radialGradient>
     <!-- Frame inner gradient -->
     <linearGradient id="g-frame" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0%"  stop-color="#1B1814"/>
       <stop offset="100%" stop-color="#0A0908"/>
     </linearGradient>
+    <!-- Soft highlight catching the disc top-left -->
+    <radialGradient id="g-shine" cx="34%" cy="32%" r="55%">
+      <stop offset="0%"  stop-color="#F4EFE6" stop-opacity="0.14"/>
+      <stop offset="100%" stop-color="#F4EFE6" stop-opacity="0"/>
+    </radialGradient>
+    <!-- Mask: rust label with CD letters punched out so the vinyl shows through -->
+    <mask id="cd-knockout">
+      <circle cx="50" cy="50" r="24" fill="white"/>
+      <text x="50" y="50.5" font-family="Anton, Impact, 'Arial Black', sans-serif" font-weight="900"
+            font-size="30" fill="black" text-anchor="middle" dominant-baseline="central"
+            letter-spacing="-1.5">CD</text>
+    </mask>
   </defs>
 
-  <!-- Rounded charcoal frame -->
+  <!-- Frame -->
   <rect x="0" y="0" width="100" height="100" rx="22" fill="url(#g-frame)"/>
 
-  <!-- Disc side edge — fills almost the whole width -->
-  <path d="M 2 55 A 48 22 0 0 0 98 55 L 98 65 A 48 22 0 0 1 2 65 Z" fill="url(#g-edge)"/>
-  <!-- Edge inner shadow stripe for cylindrical depth -->
-  <path d="M 2 55 A 48 22 0 0 0 98 55 L 98 58 A 48 22 0 0 1 2 58 Z" fill="#3D0810" opacity="0.55"/>
+  <!-- Drop shadow under disc — suggests held in space -->
+  <ellipse cx="50" cy="95" rx="36" ry="2.2" fill="#000" opacity="0.38"/>
 
-  <!-- Disc top surface -->
-  <ellipse cx="50" cy="55" rx="48" ry="22" fill="url(#g-vinyl)"/>
+  <!-- Outer rust ring (the side thickness of the record visible because it's tilted slightly toward you) -->
+  <circle cx="50" cy="50" r="44" fill="url(#g-edge)"/>
+  <!-- Inner shadow on the rim so it reads as a true rim, not a flat ring -->
+  <circle cx="50" cy="50" r="43.2" fill="none" stroke="#3D0810" stroke-width="0.8" opacity="0.6"/>
 
-  <!-- Concentric grooves stop short of the label so they don't muddy it -->
-  <g fill="none" stroke="#251F1A" stroke-width="0.32" opacity="0.85">
-    <ellipse cx="50" cy="55" rx="45"   ry="20.5"/>
-    <ellipse cx="50" cy="55" rx="42"   ry="19.0"/>
-    <ellipse cx="50" cy="55" rx="39"   ry="17.6"/>
-    <ellipse cx="50" cy="55" rx="36"   ry="16.2"/>
-    <ellipse cx="50" cy="55" rx="33"   ry="14.8"/>
-    <ellipse cx="50" cy="55" rx="30"   ry="13.4"/>
-    <ellipse cx="50" cy="55" rx="27"   ry="12.0"/>
+  <!-- Vinyl front face -->
+  <circle cx="50" cy="50" r="42" fill="url(#g-vinyl)"/>
+
+  <!-- Concentric grooves -->
+  <g fill="none" stroke="#251F1A" stroke-width="0.4" opacity="0.85">
+    <circle cx="50" cy="50" r="40"/>
+    <circle cx="50" cy="50" r="37"/>
+    <circle cx="50" cy="50" r="34"/>
+    <circle cx="50" cy="50" r="31"/>
+    <circle cx="50" cy="50" r="28"/>
   </g>
 
-  <!-- Center label — much bigger, the hero element -->
-  <ellipse cx="50" cy="55" rx="24" ry="11" fill="url(#g-label)"/>
-  <ellipse cx="50" cy="55" rx="24" ry="11" fill="none" stroke="#9B2814" stroke-width="0.35" opacity="0.6"/>
+  <!-- Soft top-left highlight on the disc — light catching the surface -->
+  <circle cx="50" cy="50" r="42" fill="url(#g-shine)"/>
 
-  <!-- HUGE CD — fills the label, dominant feature -->
-  <text x="50" y="55" font-family="Anton, Impact, 'Arial Black', sans-serif" font-weight="900"
-        font-size="18" fill="#1A0606" text-anchor="middle" dominant-baseline="central"
-        letter-spacing="-0.5">CD</text>
+  <!-- Rust label with CD cut THROUGH it — dark vinyl shows through the letters, so they read as part of the same material -->
+  <circle cx="50" cy="50" r="24" fill="url(#g-label)" mask="url(#cd-knockout)"/>
+  <!-- Subtle hairline outline around the label for crisp edge definition -->
+  <circle cx="50" cy="50" r="24" fill="none" stroke="#9B2814" stroke-width="0.4" opacity="0.6"/>
 
-  <!-- Frame outline (so it has definition on light browser tabs) -->
-  <rect x="0.5" y="0.5" width="99" height="99" rx="21.5" fill="none" stroke="#FF4D2E" stroke-width="0.3" opacity="0.18"/>
+  <!-- Frame outline (subtle rust for definition on light tabs) -->
+  <rect x="0.5" y="0.5" width="99" height="99" rx="21.5" fill="none" stroke="#FF4D2E" stroke-width="0.3" opacity="0.2"/>
 </svg>
