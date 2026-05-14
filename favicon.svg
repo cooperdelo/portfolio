@@ -1,80 +1,59 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" shape-rendering="geometricPrecision">
   <defs>
-    <!-- Vinyl surface: subtle warm-black radial so it doesn't read as flat black -->
+    <!-- Vinyl surface: warm-black radial -->
     <radialGradient id="g-vinyl" cx="44%" cy="30%" r="80%">
-      <stop offset="0%"  stop-color="#28221C"/>
+      <stop offset="0%"  stop-color="#2A241E"/>
       <stop offset="55%" stop-color="#14110F"/>
       <stop offset="100%" stop-color="#06050A"/>
     </radialGradient>
-    <!-- Side edge: rust → crimson for the extruded depth -->
+    <!-- Extruded side: rust → crimson -->
     <linearGradient id="g-edge" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%"  stop-color="#C8102E"/>
+      <stop offset="0%"  stop-color="#FF4D2E"/>
       <stop offset="100%" stop-color="#5F0712"/>
     </linearGradient>
-    <!-- Top sheen across the disc -->
-    <linearGradient id="g-shine" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%"  stop-color="#F4EFE6" stop-opacity="0.22"/>
-      <stop offset="60%" stop-color="#F4EFE6" stop-opacity="0"/>
-    </linearGradient>
-    <!-- Center label: rust radial -->
-    <radialGradient id="g-label" cx="40%" cy="32%" r="80%">
-      <stop offset="0%"  stop-color="#FF6B4D"/>
+    <!-- Center label: brighter rust radial -->
+    <radialGradient id="g-label" cx="38%" cy="30%" r="80%">
+      <stop offset="0%"  stop-color="#FF7656"/>
       <stop offset="100%" stop-color="#D63A1F"/>
     </radialGradient>
-    <!-- Frame inner glow -->
+    <!-- Frame inner gradient -->
     <linearGradient id="g-frame" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%"  stop-color="#1B1814" stop-opacity="1"/>
-      <stop offset="100%" stop-color="#0A0908" stop-opacity="1"/>
+      <stop offset="0%"  stop-color="#1B1814"/>
+      <stop offset="100%" stop-color="#0A0908"/>
     </linearGradient>
   </defs>
 
-  <!-- Rounded charcoal frame (the "card" the disc sits on) -->
+  <!-- Rounded charcoal frame -->
   <rect x="0" y="0" width="100" height="100" rx="22" fill="url(#g-frame)"/>
-  <!-- Subtle top-down sheen on the frame -->
-  <rect x="0" y="0" width="100" height="100" rx="22" fill="url(#g-shine)" opacity="0.5"/>
 
-  <!-- Iso disc — SIDE EDGE (the 3D extrusion thickness) -->
-  <path d="M 8 54 A 42 19 0 0 0 92 54 L 92 61 A 42 19 0 0 1 8 61 Z" fill="url(#g-edge)"/>
-  <!-- Edge inner shadow stripe so the rim reads as cylindrical -->
-  <path d="M 8 54 A 42 19 0 0 0 92 54 L 92 56 A 42 19 0 0 1 8 56 Z" fill="#3D0810" opacity="0.55"/>
+  <!-- Disc side edge — fills almost the whole width -->
+  <path d="M 2 55 A 48 22 0 0 0 98 55 L 98 65 A 48 22 0 0 1 2 65 Z" fill="url(#g-edge)"/>
+  <!-- Edge inner shadow stripe for cylindrical depth -->
+  <path d="M 2 55 A 48 22 0 0 0 98 55 L 98 58 A 48 22 0 0 1 2 58 Z" fill="#3D0810" opacity="0.55"/>
 
-  <!-- Iso disc — TOP SURFACE -->
-  <ellipse cx="50" cy="54" rx="42" ry="19" fill="url(#g-vinyl)"/>
+  <!-- Disc top surface -->
+  <ellipse cx="50" cy="55" rx="48" ry="22" fill="url(#g-vinyl)"/>
 
-  <!-- Concentric grooves (subtle, deepen at center) -->
-  <g fill="none" stroke="#251F1A" stroke-width="0.28" opacity="0.85">
-    <ellipse cx="50" cy="54" rx="39"   ry="17.6"/>
-    <ellipse cx="50" cy="54" rx="36.2" ry="16.2"/>
-    <ellipse cx="50" cy="54" rx="33.4" ry="14.9"/>
-    <ellipse cx="50" cy="54" rx="30.6" ry="13.6"/>
-    <ellipse cx="50" cy="54" rx="27.8" ry="12.3"/>
-    <ellipse cx="50" cy="54" rx="25"   ry="11.0"/>
-    <ellipse cx="50" cy="54" rx="22.2" ry="9.7"/>
-    <ellipse cx="50" cy="54" rx="19.4" ry="8.4"/>
+  <!-- Concentric grooves stop short of the label so they don't muddy it -->
+  <g fill="none" stroke="#251F1A" stroke-width="0.32" opacity="0.85">
+    <ellipse cx="50" cy="55" rx="45"   ry="20.5"/>
+    <ellipse cx="50" cy="55" rx="42"   ry="19.0"/>
+    <ellipse cx="50" cy="55" rx="39"   ry="17.6"/>
+    <ellipse cx="50" cy="55" rx="36"   ry="16.2"/>
+    <ellipse cx="50" cy="55" rx="33"   ry="14.8"/>
+    <ellipse cx="50" cy="55" rx="30"   ry="13.4"/>
+    <ellipse cx="50" cy="55" rx="27"   ry="12.0"/>
   </g>
 
-  <!-- Top sheen arc across the disc -->
-  <path d="M 14 47 Q 50 38 86 47" fill="none" stroke="#F4EFE6" stroke-width="0.6" opacity="0.18"/>
+  <!-- Center label — much bigger, the hero element -->
+  <ellipse cx="50" cy="55" rx="24" ry="11" fill="url(#g-label)"/>
+  <ellipse cx="50" cy="55" rx="24" ry="11" fill="none" stroke="#9B2814" stroke-width="0.35" opacity="0.6"/>
 
-  <!-- Center label (rust) -->
-  <ellipse cx="50" cy="54" rx="14" ry="6.4" fill="url(#g-label)"/>
-  <!-- Inner label ring for a clean edge -->
-  <ellipse cx="50" cy="54" rx="14" ry="6.4" fill="none" stroke="#9B2814" stroke-width="0.25" opacity="0.6"/>
+  <!-- HUGE CD — fills the label, dominant feature -->
+  <text x="50" y="55" font-family="Anton, Impact, 'Arial Black', sans-serif" font-weight="900"
+        font-size="18" fill="#1A0606" text-anchor="middle" dominant-baseline="central"
+        letter-spacing="-0.5">CD</text>
 
-  <!-- Engraved "CD" — the deboss illusion is built from 3 stacked text layers:
-       (1) bright cream sliver below, (2) dark shadow above, (3) face on top -->
-  <g font-family="Anton, Impact, 'Arial Black', sans-serif" font-weight="900" text-anchor="middle">
-    <!-- Bottom highlight (light reflecting off the lower carved edge) -->
-    <text x="50" y="56.9" font-size="7.2" fill="#FFB89E" opacity="0.7" letter-spacing="-0.3">CD</text>
-    <!-- Top shadow (dark side of the carve) -->
-    <text x="50" y="55.8" font-size="7.2" fill="#3D0810" opacity="0.95" letter-spacing="-0.3">CD</text>
-    <!-- Face — the "engraved" letter color (dark amber, sits inside the carve) -->
-    <text x="50" y="56.35" font-size="7.2" fill="#8A2616" letter-spacing="-0.3">CD</text>
-  </g>
-
-  <!-- Spindle hole (tiny black dot through the center) -->
-  <ellipse cx="50" cy="54" rx="0.85" ry="0.4" fill="#06050A"/>
-
-  <!-- Frame border (just inside the rounded square) for definition on light browser tabs -->
+  <!-- Frame outline (so it has definition on light browser tabs) -->
   <rect x="0.5" y="0.5" width="99" height="99" rx="21.5" fill="none" stroke="#FF4D2E" stroke-width="0.3" opacity="0.18"/>
 </svg>
