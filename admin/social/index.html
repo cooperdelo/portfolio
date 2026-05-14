@@ -22,9 +22,13 @@
   .post .thumb .badge { position: absolute; top: 0.6rem; left: 0.6rem; font-family: "Geist Mono", monospace; font-size: 0.55rem; letter-spacing: 0.18em; text-transform: uppercase; padding: 0.25rem 0.5rem; border-radius: 4px; background: rgba(0,0,0,0.6); color: var(--ink); }
   .post .body { padding: 0.85rem 1rem 1rem; }
   .post .cap { font-family: "Geist", sans-serif; font-size: 0.82rem; line-height: 1.4; color: var(--ink-2); margin-bottom: 0.6rem; max-height: 3.4rem; overflow: hidden; }
-  .post .stats { display: flex; gap: 0.9rem; font-family: "Geist Mono", monospace; font-size: 0.66rem; letter-spacing: 0.1em; color: var(--muted); }
-  .post .stats .n { font-family: "Anton", Impact, sans-serif; font-size: 1rem; color: var(--ink); margin-right: 0.25rem; letter-spacing: 0; }
-  .post .date { font-family: "Geist Mono", monospace; font-size: 0.58rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--muted); margin-top: 0.6rem; }
+  .post .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem 0.7rem; font-family: "Geist Mono", monospace; font-size: 0.6rem; letter-spacing: 0.1em; color: var(--muted); }
+  .post .stats .stat { display: flex; flex-direction: column; gap: 0.05rem; min-width: 0; }
+  .post .stats .stat .n { font-family: "Anton", Impact, sans-serif; font-size: 1.05rem; color: var(--ink); letter-spacing: 0; line-height: 1; }
+  .post .stats .stat .n.muted { color: var(--muted); }
+  .post .stats .stat .lbl { font-size: 0.55rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--muted); }
+  .post .stats .stat .lbl .pct { color: var(--sage); margin-left: 0.25rem; }
+  .post .date { font-family: "Geist Mono", monospace; font-size: 0.58rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--muted); margin-top: 0.7rem; padding-top: 0.55rem; border-top: 1px solid rgba(244,239,230,0.06); }
 
   .err-banner { font-family: "Geist Mono", monospace; font-size: 0.7rem; letter-spacing: 0.08em; color: var(--rust); padding: 0.7rem 1rem; border: 1px solid rgba(255,77,46,0.4); border-radius: 10px; background: rgba(255,77,46,0.05); margin-bottom: 1.4rem; }
   .err-banner strong { color: var(--rust); }
@@ -100,6 +104,14 @@
         </div>`;
     }
 
+    function stat(label, value, opts = {}) {
+      const empty = value == null || value === undefined;
+      const display = empty ? '—' : fmtCompact(value);
+      const cls = empty ? 'n muted' : 'n';
+      const suffix = opts.suffix ? ` <span class="pct">${opts.suffix}</span>` : '';
+      return `<div class="stat"><span class="${cls}">${display}</span><span class="lbl">${escapeHtml(label)}${suffix}</span></div>`;
+    }
+
     function renderPosts(platform, posts) {
       const grid = document.getElementById('post-grid');
       if (!posts || !posts.length) {
@@ -110,17 +122,44 @@
         const cap = (p.caption || '').slice(0, 120).replace(/\n/g, ' ');
         const thumb = p.thumbnail_url || p.media_url || '';
         const m = p.latest || {};
-        const stats = platform === 'tiktok'
-          ? `<span><span class="n">${fmtCompact(m.views)}</span>views</span><span><span class="n">${fmtCompact(m.likes)}</span>likes</span><span><span class="n">${fmtN(m.comments)}</span>comments</span>`
-          : `<span><span class="n">${fmtN(m.likes)}</span>likes</span><span><span class="n">${fmtN(m.comments)}</span>comments</span>`;
+        const engagement = m.engagement_pct != null ? `${Number(m.engagement_pct).toFixed(1)}%` : null;
+
+        // 6 stats per card: views, likes, comments, shares, saves/reach, engagement.
+        // Layout adapts because not every platform supplies every field.
+        let cells;
+        if (platform === 'tiktok') {
+          // TikTok Display API gives views/likes/comments/shares per video. No reach exposed.
+          const engCell = engagement
+            ? `<div class="stat"><span class="n">${engagement}</span><span class="lbl">engagement</span></div>`
+            : stat('engag.', null);
+          cells = [
+            stat('views',    m.views),
+            stat('likes',    m.likes),
+            stat('comments', m.comments),
+            stat('shares',   m.shares),
+            engCell,
+          ];
+        } else {
+          // Instagram — views may be null on older posts.
+          cells = [
+            stat('views',    m.views),
+            stat('likes',    m.likes),
+            stat('comments', m.comments),
+            stat('saves',    m.saves),
+            stat('shares',   m.shares),
+            stat('reach',    m.reach),
+          ];
+        }
+        const statsHtml = cells.join('');
+
         return `<a class="post" href="${escapeHtml(p.permalink || '#')}" target="_blank" rel="noreferrer">
           <div class="thumb" style="${thumb ? `background-image:url('${escapeHtml(thumb)}');` : ''}">
             <span class="badge">${escapeHtml(p.media_type || platform.toUpperCase())}</span>
           </div>
           <div class="body">
             <div class="cap">${escapeHtml(cap || '(no caption)')}</div>
-            <div class="stats">${stats}</div>
-            <div class="date">${escapeHtml(p.posted_at ? new Date(p.posted_at).toLocaleDateString('en-US',{month:'short',day:'2-digit',year:'numeric'}) : '—')}</div>
+            <div class="stats">${statsHtml}</div>
+            <div class="date">${escapeHtml(p.posted_at ? new Date(p.posted_at).toLocaleDateString('en-US',{month:'short',day:'2-digit',year:'numeric'}) : '—')}${m.avg_watch_seconds ? ` · avg watch ${m.avg_watch_seconds}s` : ''}${platform === 'instagram' && engagement ? ` · engag ${engagement}` : ''}</div>
           </div>
         </a>`;
       }).join('');

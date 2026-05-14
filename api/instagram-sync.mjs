@@ -44,6 +44,26 @@ async function igGet(path, params) {
   return j;
 }
 
+// Insights are per-post and gated by instagram_business_manage_insights scope.
+// Different media types support different metrics; this returns whatever the
+// API actually answers and quietly drops the rest. NON-fatal on errors so an
+// older/legacy post doesn't break the entire sync.
+async function fetchPostInsights(mediaId, mediaType, token) {
+  const base = 'views,reach,saved,shares,total_interactions';
+  const isVideo = mediaType === 'VIDEO' || mediaType === 'REELS';
+  const metric = isVideo ? `${base},ig_reels_avg_watch_time,ig_reels_video_view_total_time` : base;
+  try {
+    const r = await igGet(`v21.0/${mediaId}/insights`, { metric, access_token: token });
+    const out = {};
+    for (const item of (r.data || [])) {
+      out[item.name] = item.values?.[0]?.value;
+    }
+    return out;
+  } catch (_) {
+    return {}; // older posts / image types missing insights — non-fatal
+  }
+}
+
 async function upsertPost(post) {
   const r = await fetch(`${ADMIN_URL}/rest/v1/social_posts?on_conflict=platform,external_id`, {
     method: 'POST',
@@ -126,16 +146,37 @@ export default async function handler(req, res) {
         raw: m,
         updated_at: new Date().toISOString(),
       });
+
+      const insights = await fetchPostInsights(m.id, m.media_type, token);
       const likes    = Number(m.like_count     ?? 0);
       const comments = Number(m.comments_count ?? 0);
+      const views    = insights.views != null ? Number(insights.views) : null;
+      const reach    = insights.reach != null ? Number(insights.reach) : null;
+      const saves    = insights.saved != null ? Number(insights.saved) : null;
+      const shares   = insights.shares != null ? Number(insights.shares) : null;
+      const avgWatchSec = insights.ig_reels_avg_watch_time != null
+        ? Math.round(Number(insights.ig_reels_avg_watch_time) / 1000)
+        : null;
+
+      // Engagement rate: prefer reach-based denominator (industry standard);
+      // fall back to followers if reach not exposed for this post.
+      const interactions = likes + comments + (saves || 0) + (shares || 0);
+      const denom = reach || profile.followers_count || 0;
+      const engagement_pct = denom > 0 ? (interactions / denom) * 100 : null;
+
       await insertMetrics({
         post_id: post.id,
-        likes,
-        comments,
-        engagement_pct: profile.followers_count ? ((likes + comments) / profile.followers_count) * 100 : null,
-        raw: { source: 'media_list', like_count: likes, comments_count: comments },
+        views, reach,
+        likes, comments,
+        shares, saves,
+        engagement_pct,
+        raw: { source: 'media_list+insights', media: m, insights, avg_watch_seconds: avgWatchSec },
       });
-      postsOut.push({ ...post, latest: { likes, comments } });
+
+      postsOut.push({
+        ...post,
+        latest: { views, reach, likes, comments, shares, saves, avg_watch_seconds: avgWatchSec, engagement_pct },
+      });
     }
 
     return res.status(200).json({
