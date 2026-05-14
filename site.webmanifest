@@ -1,0 +1,16 @@
+{
+  "name": "Cooper Delo",
+  "short_name": "CD",
+  "description": "Cooper Delo — Builder, musician, athlete, lens.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0A0908",
+  "theme_color": "#FF4D2E",
+  "icons": [
+    { "src": "/favicon.svg",          "type": "image/svg+xml", "sizes": "any",     "purpose": "any maskable" },
+    { "src": "/favicon-32.png",       "type": "image/png",     "sizes": "32x32"   },
+    { "src": "/favicon-192.png",      "type": "image/png",     "sizes": "192x192" },
+    { "src": "/favicon-512.png",      "type": "image/png",     "sizes": "512x512" },
+    { "src": "/apple-touch-icon.png", "type": "image/png",     "sizes": "180x180" }
+  ]
+}
