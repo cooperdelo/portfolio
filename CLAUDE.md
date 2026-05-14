@@ -213,6 +213,7 @@ Every serverless function uses these — kept in one canonical table here so nam
 | `IG_WEBHOOK_VERIFY_TOKEN` | instagram-webhook | Arbitrary string. Must match what's pasted into the Meta App webhook UI's "Verify token" field |
 | `TIKTOK_CLIENT_KEY` | tiktok-oauth, tiktok-sync | developers.tiktok.com → App → Credentials → Client key |
 | `TIKTOK_CLIENT_SECRET` | tiktok-oauth, tiktok-sync | same place → Client secret. Rotate via "Reset secret" if leaked |
+| `CRON_SECRET` | cron-social-sync (auth), instagram-sync + tiktok-sync (bypass) | Arbitrary high-entropy string. Vercel auto-sends `Authorization: Bearer <CRON_SECRET>` on scheduled cron invocations. Set once in Vercel env so the daily sync can run without an admin JWT. |
 | `POSTHOG_HOST` (optional) | plugverse-kpi | Override if EU/self-hosted. Defaults `https://us.posthog.com` |
 | `POSTHOG_PROJECT` (optional) | plugverse-kpi | Override if project ID changes. Defaults `331986` |
 

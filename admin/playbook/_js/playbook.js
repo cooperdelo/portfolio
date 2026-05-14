@@ -150,12 +150,66 @@ function itemCard(it) {
     it.priority != null ? `<span>Priority ${esc(it.priority)}</span>` : '',
     it.updated_at  ? `<span>Updated ${fromNow(it.updated_at)}</span>` : '',
   ].filter(Boolean).join('');
-  return `<div class="pb-card ${it.is_pinned ? 'pinned' : ''}" data-action="edit" data-id="${it.id}">
+  // Card body → view sheet. Edit pencil → edit sheet (does not also fire view).
+  return `<div class="pb-card ${it.is_pinned ? 'pinned' : ''}" data-action="view" data-id="${it.id}">
+    <button class="card-edit" data-action="edit" data-id="${it.id}" title="Edit">Edit</button>
     <div class="meta-row">${scopeBadge}${typeBadge}${pinBadge}${expBadge}</div>
     <h3>${esc(it.title)}</h3>
     ${summary ? `<div class="summary">${esc(summary)}</div>` : ''}
     ${tags ? `<div class="tags">${tags}</div>` : ''}
     ${foot ? `<div class="footline">${foot}</div>` : ''}
+  </div>`;
+}
+
+// Minimal markdown renderer — enough for the body field's typical content.
+function renderMd(text) {
+  if (!text) return '';
+  let h = String(text).replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
+  // Inline (bold > italic order matters because ** also matches *)
+  h = h.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+       .replace(/(^|[^*])\*(?!\s)([^*\n]+?)\*(?!\*)/g, '$1<em>$2</em>')
+       .replace(/`([^`\n]+?)`/g, '<code>$1</code>');
+  // Headers
+  h = h.replace(/^### +(.+)$/gm, '<h4>$1</h4>')
+       .replace(/^## +(.+)$/gm,  '<h3>$1</h3>');
+  // Bullet lists (contiguous "- " or "* " lines)
+  h = h.replace(/(?:^|\n)((?:[-*] .+(?:\n|$))+)/g, (_m, group) => {
+    const items = group.trim().split('\n').map(l => l.replace(/^[-*] /, '')).map(l => `<li>${l}</li>`).join('');
+    return `\n<ul>${items}</ul>`;
+  });
+  // Paragraphs from blank-line splits
+  return h.split(/\n\s*\n/).map(p => {
+    const trimmed = p.trim();
+    if (!trimmed) return '';
+    if (/^<(h\d|ul|ol|pre)/.test(trimmed)) return trimmed;
+    return `<p>${trimmed.replace(/\n/g, '<br>')}</p>`;
+  }).join('');
+}
+
+function itemView(it) {
+  const scopeBadge = `<span class="badge scope-${esc(it.scope)}">${esc(it.scope.replace('-', ' '))}</span>`;
+  const typeBadge  = `<span class="badge type">${esc(labelType(it.item_type))}</span>`;
+  const pinBadge   = it.is_pinned ? `<span class="badge pin">Pinned</span>` : '';
+  const expBadge   = it.expires_at ? `<span class="badge expires">Expires ${esc(it.expires_at)}</span>` : '';
+  const tags = (it.tags || []).map(t => `<span class="tag">${esc(t)}</span>`).join('');
+  const foot = [
+    it.category    ? `<span>${esc(it.category)}</span>` : '',
+    it.subcategory ? `<span>${esc(it.subcategory)}</span>` : '',
+    it.priority != null ? `<span>Priority ${esc(it.priority)}</span>` : '',
+    it.updated_at  ? `<span>Updated ${fromNow(it.updated_at)}</span>` : '',
+  ].filter(Boolean).join(' · ');
+  return `<div class="pb-view">
+    <div class="meta-row">${scopeBadge}${typeBadge}${pinBadge}${expBadge}</div>
+    <h2 style="font-size:1.5rem;line-height:1.2;margin:0 0 1rem">${esc(it.title)}</h2>
+    ${it.summary ? `<p class="pb-summary">${esc(it.summary)}</p>` : ''}
+    ${it.body_markdown ? `<div class="pb-body">${renderMd(it.body_markdown)}</div>` : ''}
+    ${tags ? `<div class="tags" style="margin-top:1rem">${tags}</div>` : ''}
+    ${foot ? `<div class="footline" style="margin-top:1rem">${foot}</div>` : ''}
+    ${it.source_vault_path ? `<div class="hint" style="margin-top:1rem">Source: ${esc(it.source_vault_path)}${it.source_anchor ? ' · ' + esc(it.source_anchor) : ''}</div>` : ''}
+    <div style="display:flex;gap:.5rem;margin-top:1.4rem">
+      <button class="btn-rust" data-action="edit" data-id="${it.id}" style="flex:1">Edit</button>
+      <button class="btn-ghost" data-action="close" style="flex:1">Close</button>
+    </div>
   </div>`;
 }
 
@@ -220,11 +274,20 @@ function itemForm(it) {
 
 // ---------- Click dispatch ----------
 document.addEventListener('click', async e => {
+  // Stop card-click "view" from firing when the user clicked the inner Edit pencil.
+  const editBtn = e.target.closest('.card-edit');
+  if (editBtn) e.stopPropagation();
+
   const t = e.target.closest('[data-action]');
   if (!t) return;
   const a = t.dataset.action;
   if (a === 'close')    return closeSheet();
   if (a === 'new-item') return openSheet(itemForm(null));
+  if (a === 'view') {
+    const it = state.items.find(x => x.id === t.dataset.id);
+    if (it) openSheet(itemView(it));
+    return;
+  }
   if (a === 'edit') {
     const it = state.items.find(x => x.id === t.dataset.id);
     if (it) openSheet(itemForm(it));

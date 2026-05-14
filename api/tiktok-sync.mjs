@@ -17,6 +17,13 @@ async function verifyAdminJwt(jwt) {
   return { ok: true };
 }
 
+function isAuthorizedCron(req) {
+  const secret = process.env.CRON_SECRET;
+  if (!secret) return false;
+  const header = req.headers['x-cron-secret'] || req.headers['authorization'] || '';
+  return header === secret || header === `Bearer ${secret}`;
+}
+
 const svcHeaders = () => {
   const svc = process.env.SUPABASE_ADMIN_SERVICE_ROLE_KEY;
   if (!svc) throw new Error('SUPABASE_ADMIN_SERVICE_ROLE_KEY env var not set');
@@ -134,9 +141,11 @@ async function upsertAccountSnapshot(row) {
 export default async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store');
 
-  const jwt = (req.headers.authorization || '').replace(/^Bearer\s+/i, '');
-  const auth = await verifyAdminJwt(jwt);
-  if (!auth.ok) return res.status(auth.status).json({ error: 'unauthorized' });
+  if (!isAuthorizedCron(req)) {
+    const jwt = (req.headers.authorization || '').replace(/^Bearer\s+/i, '');
+    const auth = await verifyAdminJwt(jwt);
+    if (!auth.ok) return res.status(auth.status).json({ error: 'unauthorized' });
+  }
 
   try {
     const cred = await getLatestCreds();

@@ -9,6 +9,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Geist+Mono:wght@300..700&family=Geist:wght@300..700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/admin/_shell/admin-shell.css" />
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
 <style>
   .tabs { display: flex; gap: 0.4rem; margin-bottom: 1.6rem; flex-wrap: wrap; }
   .tab { font-family: "Geist Mono", monospace; font-size: 0.7rem; letter-spacing: 0.22em; text-transform: uppercase; padding: 0.7rem 1.1rem; border-radius: 999px; background: rgba(244,239,230,0.04); border: 1px solid var(--card-border); color: var(--ink-2); cursor: pointer; transition: all 0.2s; }
@@ -36,6 +38,62 @@
 
   .connect-cta { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
   .connect-cta .text { font-family: "Geist Mono", monospace; font-size: 0.78rem; letter-spacing: 0.08em; color: var(--ink-2); }
+
+  /* Top posts horizontal scroller */
+  .top-row { display: grid; grid-template-columns: repeat(5, minmax(200px, 1fr)); gap: 0.7rem; margin-bottom: 1.8rem; }
+  @media (max-width: 1100px) { .top-row { grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 760px)  { .top-row { grid-template-columns: repeat(2, 1fr); } }
+  .top-card { padding: 0; overflow: hidden; cursor: pointer; }
+  .top-card .rank { position: absolute; top: 0.55rem; left: 0.55rem; font-family: "Anton", Impact, sans-serif; font-size: 1.6rem; color: var(--ink); text-shadow: 0 0 8px rgba(0,0,0,0.7); line-height: 1; }
+  .top-card .thumb { aspect-ratio: 1 / 1; background: #14110F center/cover no-repeat; position: relative; }
+  .top-card .body { padding: 0.7rem 0.85rem; }
+  .top-card .views { font-family: "Anton", Impact, sans-serif; font-size: 1.3rem; color: var(--rust); line-height: 1; margin-bottom: 0.2rem; }
+  .top-card .lbl  { font-family: "Geist Mono", monospace; font-size: 0.52rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--muted); }
+  .top-card .cap  { font-family: "Geist", sans-serif; font-size: 0.74rem; color: var(--ink-2); margin-top: 0.4rem; line-height: 1.35; max-height: 2rem; overflow: hidden; }
+
+  /* Hashtag table */
+  .ht-tbl { width: 100%; }
+  .ht-tag { font-family: "Geist Mono", monospace; font-size: 0.78rem; color: var(--rust); letter-spacing: 0.01em; }
+  .ht-tbl .n { font-family: "Anton", Impact, sans-serif; font-size: 1.05rem; color: var(--ink); letter-spacing: 0; line-height: 1; }
+
+  /* Watch-time leaderboard rows */
+  .wt-row { display: grid; grid-template-columns: 2.4rem 4rem 1fr 5rem 5rem; gap: 0.9rem; padding: 0.85rem 1.2rem; align-items: center; border-bottom: 1px solid rgba(244,239,230,0.06); transition: background 0.15s; cursor: pointer; }
+  .wt-row:hover { background: rgba(244,239,230,0.025); }
+  .wt-row:last-child { border-bottom: 0; }
+  .wt-row .rank { font-family: "Anton", Impact, sans-serif; font-size: 1.3rem; color: var(--ink); }
+  .wt-row .thumb { width: 4rem; height: 4rem; border-radius: 6px; background: #14110F center/cover no-repeat; }
+  .wt-row .cap { font-family: "Geist", sans-serif; font-size: 0.85rem; color: var(--ink-2); line-height: 1.4; max-height: 2.8rem; overflow: hidden; }
+  .wt-row .meta { font-family: "Geist Mono", monospace; font-size: 0.6rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); margin-top: 0.25rem; }
+  .wt-row .stat { text-align: right; }
+  .wt-row .stat .n { font-family: "Anton", Impact, sans-serif; font-size: 1.15rem; color: var(--ink); line-height: 1; }
+  .wt-row .stat .lbl { font-family: "Geist Mono", monospace; font-size: 0.55rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--muted); margin-top: 0.2rem; }
+  @media (max-width: 720px) {
+    .wt-row { grid-template-columns: 2rem 3.2rem 1fr 4rem; }
+    .wt-row .stat:nth-child(5) { display: none; }
+  }
+
+  /* Post detail sheet */
+  .scrim { position: fixed; inset: 0; background: rgba(0,0,0,0.78); z-index: 90; opacity: 0; pointer-events: none; transition: opacity 0.35s; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+  .scrim.on { opacity: 1; pointer-events: auto; }
+  .sheet { position: fixed; left: 50%; top: 50%; transform: translate(-50%, calc(-50% + 4rem)); width: min(880px, 94vw); max-height: 90vh; overflow-y: auto; background: rgba(20,17,15,0.94); backdrop-filter: blur(40px) saturate(180%); border: 1px solid rgba(244,239,230,0.14); border-radius: 22px; padding: 1.8rem 2rem 2rem; z-index: 95; opacity: 0; pointer-events: none; transition: all 0.4s cubic-bezier(0.22,1,0.36,1); }
+  .sheet.on { opacity: 1; pointer-events: auto; transform: translate(-50%, -50%); }
+  .sheet .close { position: absolute; top: 1rem; right: 1.1rem; font-family: "Geist Mono", monospace; font-size: 0.65rem; letter-spacing: 0.22em; text-transform: uppercase; padding: 0.5rem 0.8rem; border-radius: 999px; background: rgba(244,239,230,0.05); border: 1px solid rgba(244,239,230,0.1); color: var(--ink-2); cursor: pointer; transition: all 0.15s; }
+  .sheet .close:hover { color: var(--rust); border-color: var(--rust); }
+  .sheet h2 { font-family: "Geist", sans-serif; font-weight: 600; font-size: 1.25rem; line-height: 1.2; letter-spacing: -0.01em; margin: 0 0 1rem; padding-right: 4rem; }
+  .sheet .detail-layout { display: grid; grid-template-columns: 220px 1fr; gap: 1.4rem; margin-bottom: 1.4rem; }
+  @media (max-width: 680px) { .sheet .detail-layout { grid-template-columns: 1fr; } }
+  .sheet .d-thumb { aspect-ratio: 1 / 1; background: #14110F center/cover no-repeat; border-radius: 10px; }
+  .sheet .d-caption { font-family: "Geist", sans-serif; font-size: 0.92rem; line-height: 1.55; color: var(--ink-2); white-space: pre-wrap; max-height: 220px; overflow-y: auto; }
+  .sheet .d-meta { font-family: "Geist Mono", monospace; font-size: 0.6rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); margin-top: 0.6rem; }
+  .sheet .d-meta a { color: var(--rust); }
+  .sheet .d-stats { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.5rem; margin-bottom: 1.4rem; }
+  @media (max-width: 680px) { .sheet .d-stats { grid-template-columns: repeat(3, 1fr); } }
+  .sheet .d-stat { padding: 0.7rem 0.8rem; background: rgba(244,239,230,0.03); border: 1px solid rgba(244,239,230,0.07); border-radius: 8px; }
+  .sheet .d-stat .n { font-family: "Anton", Impact, sans-serif; font-size: 1.2rem; color: var(--ink); line-height: 1; }
+  .sheet .d-stat .n.muted { color: var(--muted); }
+  .sheet .d-stat .lbl { font-family: "Geist Mono", monospace; font-size: 0.55rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--muted); margin-top: 0.3rem; }
+  .sheet .chart-h { font-family: "Geist", sans-serif; font-weight: 600; font-size: 0.95rem; letter-spacing: -0.005em; color: var(--ink); margin: 0 0 0.6rem; }
+  .sheet .chart-wrap { position: relative; height: 240px; }
 </style>
 </head>
 <body>
@@ -65,11 +123,33 @@
       <div class="card"><div class="label">Total likes</div><div class="value" data-k="total_likes">—</div><div class="delta flat">Across recent fetched</div></div>
     </div>
 
+    <h2 class="section-h">Top 5 · <span class="accent">last 30 days</span></h2>
+    <div class="top-row" id="top-row"></div>
+
+    <h2 class="section-h" id="watch-time-h" style="display:none">Reels · <span class="accent">avg watch time</span></h2>
+    <div class="card" id="watch-time-card" style="padding:0;overflow:hidden;margin-bottom:2rem;display:none"></div>
+
+    <h2 class="section-h">Hashtag <span class="accent">performance</span></h2>
+    <div class="card" id="hashtag-card" style="padding:0;overflow:hidden;margin-bottom:2rem">
+      <div class="tbl-wrap">
+        <table class="data ht-tbl">
+          <thead><tr><th>Hashtag</th><th class="right">Posts</th><th class="right">Total views</th><th class="right">Avg views</th><th class="right">Total likes</th></tr></thead>
+          <tbody id="hashtag-tbody"><tr><td colspan="5" class="empty">—</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
     <h2 class="section-h">Recent posts</h2>
     <div class="post-grid" id="post-grid">
       <div class="empty" style="grid-column:1/-1;">Loading…</div>
     </div>
   </main>
+
+  <div class="scrim" id="scrim"></div>
+  <div class="sheet" id="sheet">
+    <button class="close" data-action="close">Close</button>
+    <div id="sheet-body"></div>
+  </div>
 
   <script type="module">
     import { sb } from '/admin/_shell/supabase.js';
@@ -92,6 +172,187 @@
       errSlot.innerHTML = `<div class="err-banner"><strong>${platform}:</strong> ${escapeHtml(msg)}</div>`;
     }
     function clearError() { errSlot.innerHTML = ''; }
+
+    // Cache current posts so the detail sheet can look up by id without re-fetching.
+    let currentPosts = [];
+
+    // ---- Top 5 (rolling 30d) ----
+    function renderTop5(platform, posts) {
+      const cutoff = Date.now() - 30 * 86400000;
+      const candidates = (posts || [])
+        .filter(p => p.posted_at && new Date(p.posted_at).getTime() >= cutoff)
+        .filter(p => p.latest?.views != null);
+      candidates.sort((a, b) => (Number(b.latest?.views) || 0) - (Number(a.latest?.views) || 0));
+      const top = candidates.slice(0, 5);
+      const row = document.getElementById('top-row');
+      if (!top.length) {
+        row.innerHTML = `<div class="empty" style="grid-column:1/-1;padding:1.8rem 1rem;">No view data on posts from the last 30 days yet.</div>`;
+        return;
+      }
+      row.innerHTML = top.map((p, i) => {
+        const thumb = p.thumbnail_url || p.media_url || '';
+        const cap = (p.caption || '').slice(0, 60).replace(/\n/g, ' ');
+        return `<div class="card top-card" data-post-id="${escapeHtml(p.id)}">
+          <div class="thumb" style="${thumb ? `background-image:url('${escapeHtml(thumb)}');` : ''}">
+            <span class="rank">${i + 1}</span>
+          </div>
+          <div class="body">
+            <div class="views">${fmtCompact(p.latest.views)}</div>
+            <div class="lbl">Views</div>
+            <div class="cap">${escapeHtml(cap || '(no caption)')}</div>
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    // ---- Hashtag performance ----
+    function renderHashtags(posts) {
+      const map = new Map();
+      for (const p of (posts || [])) {
+        const m = p.latest || {};
+        const views = Number(m.views || 0);
+        const likes = Number(m.likes || 0);
+        for (const raw of (p.hashtags || [])) {
+          const tag = raw.toLowerCase();
+          const e = map.get(tag) || { tag, posts: 0, views: 0, likes: 0 };
+          e.posts++; e.views += views; e.likes += likes;
+          map.set(tag, e);
+        }
+      }
+      const rows = [...map.values()].sort((a, b) => b.views - a.views).slice(0, 15);
+      const tbody = document.getElementById('hashtag-tbody');
+      if (!rows.length) {
+        tbody.innerHTML = `<tr><td colspan="5" class="empty">No hashtags found across recent posts.</td></tr>`;
+        return;
+      }
+      tbody.innerHTML = rows.map(h => `<tr>
+        <td><span class="ht-tag">${escapeHtml(h.tag)}</span></td>
+        <td class="right mono"><span class="n">${fmtN(h.posts)}</span></td>
+        <td class="right mono"><span class="n">${fmtCompact(h.views)}</span></td>
+        <td class="right mono"><span class="n">${fmtCompact(Math.round(h.views / h.posts))}</span></td>
+        <td class="right mono"><span class="n">${fmtCompact(h.likes)}</span></td>
+      </tr>`).join('');
+    }
+
+    // ---- Reels watch-time leaderboard (IG only) ----
+    function renderWatchTime(platform, posts) {
+      const wrap = document.getElementById('watch-time-card');
+      const hdr  = document.getElementById('watch-time-h');
+      if (platform !== 'instagram') { wrap.style.display = 'none'; hdr.style.display = 'none'; return; }
+      const reels = (posts || [])
+        .filter(p => (p.media_type === 'VIDEO' || p.media_type === 'REELS'))
+        .filter(p => p.latest?.avg_watch_seconds != null && Number(p.latest.avg_watch_seconds) > 0)
+        .sort((a, b) => Number(b.latest.avg_watch_seconds) - Number(a.latest.avg_watch_seconds))
+        .slice(0, 10);
+      if (!reels.length) { wrap.style.display = 'none'; hdr.style.display = 'none'; return; }
+      wrap.style.display = ''; hdr.style.display = '';
+      wrap.innerHTML = reels.map((p, i) => {
+        const thumb = p.thumbnail_url || p.media_url || '';
+        const cap = (p.caption || '').slice(0, 90).replace(/\n/g, ' ');
+        const watch = Number(p.latest.avg_watch_seconds || 0);
+        const views = Number(p.latest.views || 0);
+        return `<div class="wt-row" data-post-id="${escapeHtml(p.id)}">
+          <div class="rank">${i + 1}</div>
+          <div class="thumb" style="${thumb ? `background-image:url('${escapeHtml(thumb)}');` : ''}"></div>
+          <div>
+            <div class="cap">${escapeHtml(cap || '(no caption)')}</div>
+            <div class="meta">${escapeHtml(p.posted_at ? new Date(p.posted_at).toLocaleDateString('en-US',{month:'short',day:'2-digit',year:'numeric'}) : '—')}</div>
+          </div>
+          <div class="stat"><div class="n">${watch}s</div><div class="lbl">avg watch</div></div>
+          <div class="stat"><div class="n">${fmtCompact(views)}</div><div class="lbl">views</div></div>
+        </div>`;
+      }).join('');
+    }
+
+    // ---- Post detail sheet with time-series chart ----
+    const scrimEl = document.getElementById('scrim');
+    const sheetEl = document.getElementById('sheet');
+    const sheetBody = document.getElementById('sheet-body');
+    let chartInstance = null;
+    function openSheet(html) {
+      sheetBody.innerHTML = html;
+      scrimEl.classList.add('on'); sheetEl.classList.add('on');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeSheet() {
+      scrimEl.classList.remove('on'); sheetEl.classList.remove('on');
+      document.body.style.overflow = '';
+      if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
+    }
+    scrimEl.addEventListener('click', closeSheet);
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSheet(); });
+
+    function detailStat(label, value) {
+      const empty = value == null;
+      return `<div class="d-stat"><div class="n ${empty ? 'muted' : ''}">${empty ? '—' : fmtCompact(value)}</div><div class="lbl">${escapeHtml(label)}</div></div>`;
+    }
+
+    async function showPostDetail(postId) {
+      const p = currentPosts.find(x => x.id === postId);
+      if (!p) return;
+      const thumb = p.thumbnail_url || p.media_url || '';
+      const m = p.latest || {};
+      const eng = m.engagement_pct != null ? `${Number(m.engagement_pct).toFixed(1)}%` : null;
+      openSheet(`
+        <h2>${escapeHtml((p.caption || '(no caption)').slice(0, 110).replace(/\n/g, ' '))}</h2>
+        <div class="detail-layout">
+          <div class="d-thumb" style="${thumb ? `background-image:url('${escapeHtml(thumb)}');` : ''}"></div>
+          <div>
+            <div class="d-caption">${escapeHtml(p.caption || '')}</div>
+            <div class="d-meta">
+              <div>${escapeHtml(p.posted_at ? new Date(p.posted_at).toLocaleString('en-US') : '—')}</div>
+              <div>${escapeHtml(p.media_type || '')} · ${escapeHtml(p.platform || '')}</div>
+              ${p.permalink ? `<div><a href="${escapeHtml(p.permalink)}" target="_blank" rel="noreferrer">Open on platform ↗</a></div>` : ''}
+              ${eng ? `<div style="color:var(--sage);margin-top:.35rem">Engagement ${eng}</div>` : ''}
+              ${m.avg_watch_seconds ? `<div>Avg watch · ${m.avg_watch_seconds}s</div>` : ''}
+            </div>
+          </div>
+        </div>
+        <div class="d-stats">
+          ${detailStat('views',    m.views)}
+          ${detailStat('likes',    m.likes)}
+          ${detailStat('comments', m.comments)}
+          ${detailStat('shares',   m.shares)}
+          ${detailStat('saves',    m.saves)}
+          ${detailStat('reach',    m.reach)}
+        </div>
+        <h3 class="chart-h">Metric history</h3>
+        <div class="chart-wrap"><canvas id="post-chart"></canvas></div>
+      `);
+      // Pull time series and render
+      const { data: history, error } = await sb
+        .from('social_post_metrics')
+        .select('captured_at, views, likes, comments, shares, saves, reach')
+        .eq('post_id', postId)
+        .order('captured_at', { ascending: true });
+      if (error || !history?.length) {
+        document.querySelector('.chart-wrap').innerHTML = `<div class="empty" style="padding:2rem 1rem">${error ? escapeHtml(error.message) : 'Only one snapshot so far — come back tomorrow.'}</div>`;
+        return;
+      }
+      const ctx = document.getElementById('post-chart').getContext('2d');
+      const palette = { views:'#FF4D2E', likes:'#F2C1D1', comments:'#B2E3E1', shares:'#C9BEE6', saves:'#7A8A6E', reach:'#DDD4C5' };
+      const datasets = ['views','likes','comments','shares','saves','reach']
+        .filter(k => history.some(h => h[k] != null))
+        .map(k => ({
+          label: k,
+          data: history.map(h => ({ x: h.captured_at, y: h[k] != null ? Number(h[k]) : null })),
+          borderColor: palette[k], backgroundColor: palette[k] + '22',
+          tension: 0.32, borderWidth: 2, pointRadius: 0, pointHoverRadius: 4, spanGaps: true,
+        }));
+      chartInstance = new Chart(ctx, {
+        type: 'line',
+        data: { datasets },
+        options: {
+          maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
+          plugins: { legend: { labels: { color: '#DDD4C5', font: { family: '"Geist Mono", monospace', size: 10 } } },
+                     tooltip: { backgroundColor: 'rgba(20,17,15,0.95)', titleColor: '#F4EFE6', bodyColor: '#DDD4C5', borderColor: 'rgba(244,239,230,0.18)', borderWidth: 1 } },
+          scales: {
+            x: { type: 'time', time: { unit: 'day' }, ticks: { color: '#6F6A60', font: { family: '"Geist Mono", monospace', size: 9 } }, grid: { color: 'rgba(244,239,230,0.05)' } },
+            y: { ticks: { color: '#6F6A60', font: { family: '"Geist Mono", monospace', size: 9 } }, grid: { color: 'rgba(244,239,230,0.05)' } },
+          },
+        },
+      });
+    }
 
     function renderConnectCTA(platform) {
       const oauthUrl = platform === 'instagram'
@@ -152,7 +413,7 @@
         }
         const statsHtml = cells.join('');
 
-        return `<a class="post" href="${escapeHtml(p.permalink || '#')}" target="_blank" rel="noreferrer">
+        return `<div class="post" data-post-id="${escapeHtml(p.id)}" style="cursor:pointer">
           <div class="thumb" style="${thumb ? `background-image:url('${escapeHtml(thumb)}');` : ''}">
             <span class="badge">${escapeHtml(p.media_type || platform.toUpperCase())}</span>
           </div>
@@ -161,9 +422,22 @@
             <div class="stats">${statsHtml}</div>
             <div class="date">${escapeHtml(p.posted_at ? new Date(p.posted_at).toLocaleDateString('en-US',{month:'short',day:'2-digit',year:'numeric'}) : '—')}${m.avg_watch_seconds ? ` · avg watch ${m.avg_watch_seconds}s` : ''}${platform === 'instagram' && engagement ? ` · engag ${engagement}` : ''}</div>
           </div>
-        </a>`;
+        </div>`;
       }).join('');
     }
+
+    // Delegate clicks on any element with data-post-id (post cards, top cards, watch-time rows)
+    document.addEventListener('click', e => {
+      const el = e.target.closest('[data-post-id]');
+      if (!el) return;
+      if (e.target.closest('a')) return; // let normal anchor clicks through
+      e.preventDefault();
+      showPostDetail(el.dataset.postId);
+    });
+    document.addEventListener('click', e => {
+      const cl = e.target.closest('[data-action="close"]');
+      if (cl) closeSheet();
+    });
 
     function renderHeader(platform, data) {
       const followers = data.followers;
@@ -198,8 +472,12 @@
           indicator.textContent = 'Error';
           return;
         }
+        currentPosts = j.posts || [];
         renderHeader(platform, j);
-        renderPosts(platform, j.posts);
+        renderTop5(platform, currentPosts);
+        renderWatchTime(platform, currentPosts);
+        renderHashtags(currentPosts);
+        renderPosts(platform, currentPosts);
         indicator.textContent = `Synced · ${platform}`;
       } catch (e) {
         renderError(platform, e?.message || String(e));
