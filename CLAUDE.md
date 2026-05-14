@@ -31,6 +31,9 @@ Static HTML portfolio site (Vercel-hosted at cooperdelo.com) plus a private admi
   playbook/
     index.html                   ← Brand/strategy/voice vault — filters, search, CRUD, realtime
     _js/playbook.js
+  contacts/
+    index.html                   ← Pipeline + network vault — Due/Cold alert strips, 4 filters, drawer w/ inline pipeline + copy chips + "Mark contacted today"
+    _js/contacts.js
 /api/                            ← Vercel serverless functions
   plugverse-kpi.mjs              ← Aggregates Plugverse Supabase + Stripe + PostHog, writes daily snapshots
   instagram-oauth.mjs            ← Meta IG OAuth callback → upserts instagram_credentials
@@ -68,6 +71,7 @@ Static HTML portfolio site (Vercel-hosted at cooperdelo.com) plus a private admi
 | `social_post_metrics` | Time-series metrics per post (one row per sync) | `id`, `post_id` → social_posts, `captured_at`, `views`, `likes`, `comments`, `shares`, `saves`, `reach`, `impressions`, `engagement_pct`, `raw` |
 | `social_account_snapshots` | Daily account-level stats per platform | `date` + `platform` (composite PK), `followers`, `following`, `posts_total`, `total_views`, `total_likes`, `handle`, `raw`, `captured_at` |
 | `playbook_items` | Brand/strategy/voice vault — read by `/admin/playbook`. Auto-populated by chat sessions (post-response protocol writes atomic rows). `scope` is `personal-brand` / `plugverse` / `both`. `item_type` is `caption-idea` / `video-idea` / `philosophy-line` / `hook` / `decision` / `identity` / `pillar` / `strategy` / `rule` / `voice-rule` / `framework` / `prompt` (open-ended; new types are fine). | `id`, `scope`, `item_type`, `title`, `summary`, `body_markdown`, `category`, `subcategory`, `tags` (text[]), `priority` (lower=higher), `is_pinned`, `source_vault_path`, `source_anchor`, `status` (default `active`), `expires_at`, `last_synced_at`, `deleted_at` (soft-delete) |
+| `plugverse_contacts` | Pipeline + network vault — read by `/admin/contacts`. Auto-populated by chat sessions when contacts are added or updated. `pipeline_stage` flows `identified` → `engaged` → `contacted` → `demo` → `committed` (plus `team`, `dead`). `pipeline_type` is `artist`/`organizer`/`venue`/`partnership`/`team`. | `id`, `full_name`, `preferred_name`, `role`, `title`, `organization`, `college`, `org_type`, `email`, `phone`, `instagram`, `twitter`, `linkedin`, `other_links` (jsonb), `pipeline_stage`, `pipeline_type`, `warm_path`, `last_contacted` (date), `next_step`, `next_step_due` (date), `notes`, `tags` (text[]), `referral_credit_to` → plugverse_contacts.id, `bookings_attributed`, `payout_owed`, `source_vault_path`, `is_pinned`, `priority`, `status` (default `active`), `deleted_at` (soft-delete) |
 
 ### Views (read-only summaries)
 
@@ -78,6 +82,9 @@ Static HTML portfolio site (Vercel-hosted at cooperdelo.com) plus a private admi
 - `v_plugverse_pl` — monthly P&L for `entity = 'plugverse'`
 - `v_tax_deductible` — `tax_year, tax_category, tx_count, deductible_amount, gross_amount`
 - `v_playbook_active` — `playbook_items` filtered to `deleted_at IS NULL AND status='active' AND (expires_at IS NULL OR expires_at >= CURRENT_DATE)`. The admin page reads this view, not the raw table.
+- `v_contacts_active` — `plugverse_contacts` filtered to `deleted_at IS NULL AND status='active'`. Joins `referral_credit_to` → `referred_by_name`. Main list source for `/admin/contacts`.
+- `v_contacts_due_today` — `plugverse_contacts` with `next_step_due` ≤ today + 3 days. Drives the "Due this week" alert strip. Includes `days_until_due` (negative = overdue).
+- `v_contacts_stale` — active pipeline contacts (`engaged`/`contacted`/`demo`/`committed`) with `last_contacted` NULL or >14 days ago. Drives the "Going cold" alert strip. Includes `days_since_contact`.
 
 ### Function
 
@@ -163,7 +170,7 @@ ORDER BY balance DESC;
 1. **Read first.** Before mutating, run a `SELECT` to confirm what's there.
 2. **Soft-delete, don't drop.** `financial_transactions` has `deleted_at` — set it instead of DELETE.
 3. **Use `apply_migration` for DDL**, `execute_sql` for DML. Both go through the same MCP server.
-4. **Realtime is wired.** The admin pages subscribe to `financial_transactions`, `merch_items`, `merch_transactions`, `playbook_items`. Any insert/update from `execute_sql` (or a chat session writing playbook rows) will show up on Cooper's open admin tab within ~350ms (debounced).
+4. **Realtime is wired.** The admin pages subscribe to `financial_transactions`, `merch_items`, `merch_transactions`, `playbook_items`, `plugverse_contacts`. Any insert/update from `execute_sql` (or a chat session writing playbook/contact rows) will show up on Cooper's open admin tab within ~350ms (debounced).
 5. **RLS bypasses.** The Supabase MCP uses the service role, so all RLS is bypassed — you can read/write anything. Don't accidentally write to PlugVerse tables (project `yhemvsksnoojplnxirlv`) — that's a separate app.
 
 ### Adding a new transaction

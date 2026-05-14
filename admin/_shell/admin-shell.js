@@ -27,6 +27,7 @@ const NAV = [
   ]},
   { section: 'Brand', items: [
     { href: '/admin/playbook/',                 label: 'Playbook' },
+    { href: '/admin/contacts/',                 label: 'Contacts' },
   ]},
   { section: 'Reports', items: [
     { href: '/admin/finance/plugverse.html',  label: 'Plugverse P&L' },
