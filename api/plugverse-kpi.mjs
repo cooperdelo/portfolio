@@ -104,9 +104,14 @@ async function fetchPlugverseKpis() {
     pvCount(`artist_profiles?select=id`, h),
     pvCount(`artist_profiles?select=id&stripe_connect_onboarded=eq.true`, h),
     pvCount(`fan_profiles?select=id`, h),
-    pvCount(`user_subscriptions?select=id&status=eq.active`, h),
-    pvCount(`user_subscriptions?select=id&cancelled_at=gte.${since7}`, h),
-    pvSelect(`user_subscriptions?select=tier_id,billing_interval,status&status=eq.active`, h),
+    // Billable-only filters: stripe_subscription_id IS NOT NULL excludes
+    // comp / admin-grant rows that have status='active' but no Stripe billing
+    // attached. Without this, our own admin grants inflate MRR. The plugverse
+    // data model uses user_subscriptions for both paid subs and feature-access
+    // grants, so we have to discriminate at query time.
+    pvCount(`user_subscriptions?select=id&status=eq.active&stripe_subscription_id=not.is.null`, h),
+    pvCount(`user_subscriptions?select=id&cancelled_at=gte.${since7}&stripe_subscription_id=not.is.null`, h),
+    pvSelect(`user_subscriptions?select=tier_id,billing_interval,status&status=eq.active&stripe_subscription_id=not.is.null`, h),
     pvSelect(`subscription_tiers?select=id,name,price_monthly,price_annually`, h),
     pvSelect(`users?select=total_gmv_cents,total_gigs_completed&deleted_at=is.null`, h),
   ]);
