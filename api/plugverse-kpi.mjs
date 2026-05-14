@@ -17,7 +17,6 @@
 
 const ADMIN_URL  = 'https://eibtnkaoqsgwiqttiwjo.supabase.co';
 const ADMIN_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVpYnRua2FvcXNnd2lxdHRpd2pvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTIwMTI4MTYsImV4cCI6MjA2NzU4ODgxNn0.8gBRu_k_4YPVOq8rf8dfuyXKbCSgqZ4UQeoIXUIlgxo';
-const ADMIN_EMAIL = 'delocooper6@gmail.com';
 
 const PV_URL = 'https://yhemvsksnoojplnxirlv.supabase.co';
 
@@ -33,8 +32,15 @@ async function verifyAdminJwt(jwt) {
   });
   if (!r.ok) return { ok: false, status: 401, error: 'invalid token' };
   const u = await r.json();
-  if (u.email !== ADMIN_EMAIL) return { ok: false, status: 403, error: 'forbidden' };
-  return { ok: true, user: u };
+  // Plugverse KPIs are accessible to anyone in the admin_allowlist (both
+  // full and plugverse-scoped admins). The allowlist policy is self-read,
+  // so this query returns a row only if the caller is allowlisted.
+  const a = await fetch(`${ADMIN_URL}/rest/v1/admin_allowlist?select=admin_role&email=eq.${encodeURIComponent(u.email || '')}`,
+    { headers: { Authorization: `Bearer ${jwt}`, apikey: ADMIN_ANON } });
+  if (!a.ok) return { ok: false, status: 403, error: 'forbidden' };
+  const rows = await a.json();
+  if (!rows.length) return { ok: false, status: 403, error: 'forbidden' };
+  return { ok: true, user: u, role: rows[0].admin_role };
 }
 
 // ---------- helpers ----------

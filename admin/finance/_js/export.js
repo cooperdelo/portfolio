@@ -2,9 +2,10 @@
 // /admin/finance/_js/export.js — generate XLSX/CSV downloads from Supabase
 // SheetJS is loaded as a global from the page (xlsx.full.min.js).
 // =====================================================================
-import { sb } from '/admin/_shell/supabase.js';
+import { sb, requireFullAdminOrRedirect } from '/admin/_shell/supabase.js';
 import { mountShell, toast } from '/admin/_shell/admin-shell.js';
 
+if (!(await requireFullAdminOrRedirect())) throw new Error('access denied');
 await mountShell({ title: 'Export · Finance' });
 
 const status = document.getElementById('status');

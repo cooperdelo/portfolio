@@ -56,7 +56,7 @@ Static HTML portfolio site (Vercel-hosted at cooperdelo.com) plus a private admi
 
 | Table | Purpose | Key columns |
 |---|---|---|
-| `admin_allowlist` | Email allowlist for the admin gate | `email` (PK), `added_at` |
+| `admin_allowlist` | Email allowlist for the admin gate, with role | `email` (PK), `admin_role` (text, CHECK in `'full' / 'plugverse'`, default `'full'`), `added_at` |
 | `finance_accounts` | Bank/card/investment account dictionary | `slug` (PK), `display_name`, `account_type`, `institution`, `is_active`, `cash_balance` (uninvested cash sitting in investment accounts — Schwab settlement, Coinbase USD — edited manually, not auto-synced) |
 | `financial_transactions` | Master ledger — personal, Plugverse LLC, 1789 Fund | `id`, `date`, `description`, `amount`, `type` (income/expense), `entity` (personal/plugverse/1789_fund), `funding_source` (FK → funding_sources.slug), `account`, `category`, `is_tax_deductible`, `tax_category`, `deductible_pct`, `is_food_log`, `merchant`, `external_source` (mercury/stripe/manual/NULL), `external_id` (provider-side id), `deleted_at` (soft-delete) |
 | `investment_positions` | Roth IRA + brokerage + crypto holdings. `current_price` is auto-synced by `/api/investments-sync` (Yahoo for stocks, Coinbase spot for crypto). Crypto sync uses `symbol` directly as the Coinbase ticker. | `id`, `account_slug` → finance_accounts, `symbol`, `shares`, `cost_basis`, `current_price`, `asset_type` (stock/crypto, CHECK), `coingecko_id` (legacy — kept for possible future fallback), `price_updated_at` |
@@ -86,9 +86,13 @@ Static HTML portfolio site (Vercel-hosted at cooperdelo.com) plus a private admi
 - `v_contacts_due_today` — `plugverse_contacts` with `next_step_due` ≤ today + 3 days. Drives the "Due this week" alert strip. Includes `days_until_due` (negative = overdue).
 - `v_contacts_stale` — active pipeline contacts (`engaged`/`contacted`/`demo`/`committed`) with `last_contacted` NULL or >14 days ago. Drives the "Going cold" alert strip. Includes `days_since_contact`.
 
-### Function
+### Functions
 
-- `is_admin()` — returns `true` iff `auth.jwt() ->> 'email'` is in `admin_allowlist`. Every RLS policy uses this.
+- `is_admin()` — true iff `auth.jwt() ->> 'email'` is in `admin_allowlist` (any role).
+- `is_full_admin()` — true iff the caller's `admin_role = 'full'`.
+- `is_plugverse_scope()` — true iff the caller's `admin_role IN ('full','plugverse')`.
+- `current_admin_role()` — returns the caller's `admin_role` (`'full' | 'plugverse' | NULL`).
+- All four are `SECURITY DEFINER` (bypass RLS on `admin_allowlist`) and called from every RLS policy. The detailed access matrix is in the "Auth model" section below.
 
 ### Dual-tag pattern: `entity` vs `funding_source`
 
@@ -131,10 +135,54 @@ WHERE slug = 'luby_pitch';
 
 ### Auth model
 
-- Magic-link only. Password field in `login.html` is a client-side gate that gates whether to call `sendMagicLink()`.
-- Admin email (only one allowed): `delocooper6@gmail.com`
-- Admin password (rotate by editing the constant in `admin/login.html`): currently `plugverse2026`
+- Magic-link only. The `admin/login.html` page asks for **email + shared password**. Password is a client-side soft gate; the real authn is the email-bound magic link.
+- Shared password (rotate by editing the constant in `admin/login.html`): currently `plugverse2026`.
 - Auth URL allowlist + Site URL configured in Supabase dashboard → Authentication → URL Configuration. Must include `https://cooperdelo.com/admin/**`.
+- **Two roles**, stored in `admin_allowlist.admin_role` (text, CHECK in `('full','plugverse')`):
+  - `full` — Cooper (`delocooper6@gmail.com`). Sees and writes everything.
+  - `plugverse` — Adler (`adlerrice@gmail.com`) and any future Plugverse cofounder. Sees and writes ONLY rows tied to Plugverse / the 1789 fund. Cannot touch personal finance, investments, merch, social analytics, IG/TikTok credentials, or the personal-brand playbook.
+- **RLS is the source of truth.** Client-side nav filtering + `requireFullAdminOrRedirect()` are UX only — direct-URL navigation, raw API calls, and even the Supabase JS client are all blocked at the DB layer.
+- SQL helpers (all `SECURITY DEFINER` so they ignore RLS on `admin_allowlist`):
+  - `is_admin()` — true if the caller is in the allowlist with any role.
+  - `is_full_admin()` — true only for `admin_role = 'full'`.
+  - `is_plugverse_scope()` — true for `full` OR `plugverse`. Used in policies that both roles share.
+  - `current_admin_role()` — returns `'full' | 'plugverse' | NULL`.
+
+### Access matrix
+
+| Table / view | full | plugverse | Notes |
+|---|---|---|---|
+| `admin_allowlist` | ALL | SELECT own row | Plugverse role can self-discover their role |
+| `financial_transactions` | ALL | ALL filtered by `entity IN ('plugverse','1789_fund') OR funding_source='1789_fund'` | Dual-tag boundary |
+| `budget_targets` | ALL | ALL filtered by `entity IN ('plugverse','1789_fund')` | |
+| `finance_accounts` | ALL | SELECT only | Lookup needed to render labels |
+| `funding_sources` | ALL | SELECT only | Lookup table |
+| `investment_positions` | ALL | none | Personal Roth + Coinbase |
+| `merch_items`, `merch_transactions` | ALL | none | Personal side hustle |
+| `social_posts`, `social_post_metrics`, `social_account_snapshots` | ALL | none | Personal IG/TikTok |
+| `instagram_credentials`, `tiktok_credentials` | ALL | none | Personal API tokens |
+| `plugverse_kpi_snapshots` | ALL | ALL | Plugverse data |
+| `plugverse_contacts` | ALL | ALL | Plugverse pipeline |
+| `playbook_items` | ALL | ALL filtered by `scope IN ('plugverse','both')` | Personal-brand items hidden |
+
+Views inherit RLS from their underlying tables, so `v_plugverse_pl`, `v_fund_1789`, `v_funding_balance`, `v_playbook_active`, `v_contacts_active`, `v_contacts_due_today`, `v_contacts_stale`, etc. all return the correct subset automatically.
+
+### Adding a new admin
+
+```sql
+-- Full admin (sees everything):
+INSERT INTO admin_allowlist (email, admin_role) VALUES ('person@example.com', 'full');
+
+-- Plugverse-scoped admin (sees only Plugverse finance + plugverse-tagged data):
+INSERT INTO admin_allowlist (email, admin_role) VALUES ('person@example.com', 'plugverse');
+```
+
+They sign in via `/admin/login.html` with their email + the shared password. Their role is fetched once per session (cached in `getAdminRole()` in `supabase.js`) and drives nav rail + tile visibility.
+
+### API auth (`/api/*`)
+
+- `/api/plugverse-kpi.mjs` — accepts any allowlisted email (both roles).
+- `/api/investments-sync.mjs` — requires `admin_role = 'full'`. Verifies via PostgREST `admin_allowlist?email=eq...` using the caller's JWT (works because of the self-read policy).
 
 ### Common queries
 

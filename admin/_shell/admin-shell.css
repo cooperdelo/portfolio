@@ -91,6 +91,11 @@ body::before {
   font-size: 0.6rem; color: var(--muted, #6F6A60);
   margin-left: auto;
 }
+.rail .brand small.role-badge {
+  background: rgba(255,77,46,0.16); color: var(--rust, #FF4D2E);
+  padding: 0.25rem 0.5rem; border-radius: 4px; margin-left: 0.4rem;
+  letter-spacing: 0.2em;
+}
 
 .rail-section { margin-top: 0.6rem; }
 .rail-section .eyebrow {

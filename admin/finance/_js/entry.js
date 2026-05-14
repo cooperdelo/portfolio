@@ -1,10 +1,21 @@
 // =====================================================================
 // /admin/finance/_js/entry.js — add or edit a transaction
 // =====================================================================
-import { sb } from '/admin/_shell/supabase.js';
+import { sb, getAdminRole } from '/admin/_shell/supabase.js';
 import { mountShell, toast } from '/admin/_shell/admin-shell.js';
 
 await mountShell({ title: 'Add transaction · Finance' });
+
+// Plugverse-scoped admins can only create rows tied to Plugverse / 1789 fund.
+// Remove the 'personal' entity option for them so the UI matches the RLS.
+const _role = await getAdminRole();
+if (_role === 'plugverse') {
+  const entitySel = document.querySelector('select[name="entity"]');
+  if (entitySel) {
+    entitySel.querySelectorAll('option[value="personal"]').forEach(o => o.remove());
+    if (entitySel.value === 'personal') entitySel.value = 'plugverse';
+  }
+}
 
 const params  = new URLSearchParams(location.search);
 const editId  = params.get('id');
@@ -117,7 +128,7 @@ async function save({ thenAddAnother = false } = {}) {
     form.elements['date'].value = new Date().toISOString().slice(0,10);
     form.elements['deductible_pct'].value = '100';
     form.elements['type'].value = 'expense';
-    form.elements['entity'].value = 'personal';
+    form.elements['entity'].value = (_role === 'plugverse') ? 'plugverse' : 'personal';
     if (form.elements['funding_source']) form.elements['funding_source'].value = '1789_fund';
     form.elements['description'].focus();
   } else {

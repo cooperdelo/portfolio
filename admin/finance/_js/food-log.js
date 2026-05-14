@@ -1,6 +1,7 @@
-import { sb, fmtUSD, fmtUSDCompact, fmtMonth, subscribeTransactions } from '/admin/_shell/supabase.js';
+import { sb, fmtUSD, fmtUSDCompact, fmtMonth, subscribeTransactions, requireFullAdminOrRedirect } from '/admin/_shell/supabase.js';
 import { mountShell, toast, monthsBack, monthKey } from '/admin/_shell/admin-shell.js';
 
+if (!(await requireFullAdminOrRedirect())) throw new Error('access denied');
 await mountShell({ title: 'Food Log · Finance' });
 
 const C = { rust: '#FF4D2E', sage: '#7A8A6E', ink2: '#DDD4C5' };

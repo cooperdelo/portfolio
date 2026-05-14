@@ -13,8 +13,6 @@
 
 const ADMIN_URL  = 'https://eibtnkaoqsgwiqttiwjo.supabase.co';
 const ADMIN_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVpYnRua2FvcXNnd2lxdHRpd2pvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTIwMTI4MTYsImV4cCI6MjA2NzU4ODgxNn0.8gBRu_k_4YPVOq8rf8dfuyXKbCSgqZ4UQeoIXUIlgxo';
-const ADMIN_EMAIL = 'delocooper6@gmail.com';
-
 // Yahoo blocks bare/curl UAs — a normal browser UA passes.
 const BROWSER_UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
 
@@ -25,7 +23,12 @@ async function verifyAdminJwt(jwt) {
   });
   if (!r.ok) return { ok: false, status: 401, error: 'invalid token' };
   const u = await r.json();
-  if (u.email !== ADMIN_EMAIL) return { ok: false, status: 403, error: 'forbidden' };
+  // Investments are personal — require admin_role = 'full' (not 'plugverse').
+  const a = await fetch(`${ADMIN_URL}/rest/v1/admin_allowlist?select=admin_role&email=eq.${encodeURIComponent(u.email || '')}`,
+    { headers: { Authorization: `Bearer ${jwt}`, apikey: ADMIN_ANON } });
+  if (!a.ok) return { ok: false, status: 403, error: 'forbidden' };
+  const rows = await a.json();
+  if (!rows.length || rows[0].admin_role !== 'full') return { ok: false, status: 403, error: 'forbidden' };
   return { ok: true };
 }
 

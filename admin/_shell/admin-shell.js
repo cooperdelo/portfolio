@@ -3,61 +3,74 @@
 // - Enforces auth before rendering admin pages
 // - Injects the left rail (sidebar) into every page
 // - Highlights active nav item
+// - Filters nav rail + tile grid by admin_role (full vs plugverse)
 // - Exposes toast(), signOut, and a small DOM helper
 // =====================================================================
 
-import { requireAdminOrRedirect, signOut, getSession } from './supabase.js';
+import { requireAdminOrRedirect, signOut, getSession, getAdminRole } from './supabase.js';
 
+// `roles` declares which admin_role values can see each nav item.
+// Default is both. Items not listed in `roles` are visible to everyone signed in.
 const NAV = [
   { section: 'Overview', items: [
-    { href: '/admin/',                   label: 'Home' },
-    { href: '/admin/finance/',           label: 'Finance Dashboard' },
+    { href: '/admin/',                          label: 'Home' },
+    { href: '/admin/finance/',                  label: 'Finance Dashboard' },
   ]},
   { section: 'Finance', items: [
     { href: '/admin/finance/transactions.html', label: 'Transactions' },
     { href: '/admin/finance/entry.html',        label: 'Quick Add' },
-    { href: '/admin/finance/investments.html',  label: 'Investments' },
+    { href: '/admin/finance/investments.html',  label: 'Investments', roles: ['full'] },
   ]},
   { section: 'Inventory', items: [
-    { href: '/admin/merch/',                    label: 'Merch Tracker' },
+    { href: '/admin/merch/',                    label: 'Merch Tracker', roles: ['full'] },
   ]},
   { section: 'Projects', items: [
     { href: '/admin/plugverse/',                label: 'Plugverse KPIs' },
-    { href: '/admin/social/',                   label: 'Social Analytics' },
+    { href: '/admin/social/',                   label: 'Social Analytics', roles: ['full'] },
   ]},
   { section: 'Brand', items: [
     { href: '/admin/playbook/',                 label: 'Playbook' },
     { href: '/admin/contacts/',                 label: 'Contacts' },
   ]},
   { section: 'Reports', items: [
-    { href: '/admin/finance/plugverse.html',  label: 'Plugverse P&L' },
-    { href: '/admin/finance/funding.html',    label: 'Funding Sources' },
-    { href: '/admin/finance/fund.html',       label: '1789 Fund' },
-    { href: '/admin/finance/food-log.html',   label: 'Food Log' },
-    { href: '/admin/finance/tax.html',        label: 'Tax Prep' },
+    { href: '/admin/finance/plugverse.html',    label: 'Plugverse P&L' },
+    { href: '/admin/finance/funding.html',      label: 'Funding Sources' },
+    { href: '/admin/finance/fund.html',         label: '1789 Fund' },
+    { href: '/admin/finance/food-log.html',     label: 'Food Log', roles: ['full'] },
+    { href: '/admin/finance/tax.html',          label: 'Tax Prep', roles: ['full'] },
   ]},
   { section: 'Data', items: [
-    { href: '/admin/finance/export.html', label: 'Export XLSX' },
+    { href: '/admin/finance/export.html',       label: 'Export XLSX', roles: ['full'] },
   ]},
 ];
 
-function railHTML(activePath, email) {
+function visibleForRole(item, role) {
+  if (!item.roles) return true;
+  return item.roles.includes(role);
+}
+
+function railHTML(activePath, email, role) {
   const sections = NAV.map(sec => {
-    const items = sec.items.map(it => {
-      const isActive = normalizePath(it.href) === normalizePath(activePath);
-      return `<a class="nav-item ${isActive ? 'active' : ''}" href="${it.href}">
-                <span class="pulse"></span><span>${it.label}</span>
-              </a>`;
-    }).join('');
+    const items = sec.items
+      .filter(it => visibleForRole(it, role))
+      .map(it => {
+        const isActive = normalizePath(it.href) === normalizePath(activePath);
+        return `<a class="nav-item ${isActive ? 'active' : ''}" href="${it.href}">
+                  <span class="pulse"></span><span>${it.label}</span>
+                </a>`;
+      }).join('');
+    if (!items) return ''; // hide whole section if every item is gated out
     return `<div class="rail-section">
               <div class="eyebrow">${sec.section}</div>
               ${items}
             </div>`;
   }).join('');
 
+  const roleBadge = role === 'plugverse' ? '<small class="role-badge">Plugverse</small>' : '';
+
   return `
     <aside class="rail">
-      <div class="brand"><span class="dot"></span>CD <small>Admin</small></div>
+      <div class="brand"><span class="dot"></span>CD <small>Admin</small>${roleBadge}</div>
       ${sections}
       <div class="rail-foot">
         <span>Signed in as</span>
@@ -74,14 +87,28 @@ function normalizePath(p) {
   return n.toLowerCase();
 }
 
+/**
+ * Hide tiles on the home page (or any page using the same role-data attrs)
+ * that aren't allowed for the current role. Tiles with `data-role="full"`
+ * are hidden for plugverse-scoped admins.
+ */
+function filterTilesByRole(role) {
+  document.querySelectorAll('[data-role]').forEach(el => {
+    const allowed = String(el.dataset.role || '').split(',').map(s => s.trim()).filter(Boolean);
+    if (!allowed.length) return;
+    if (!allowed.includes(role)) el.style.display = 'none';
+  });
+}
+
 export async function mountShell({ title } = {}) {
-  // 1) Gate the page on auth
+  // 1) Gate the page on auth (membership in admin_allowlist, any role)
   const ok = await requireAdminOrRedirect();
   if (!ok) return null;
 
-  // 2) Get user email for the footer
+  // 2) Resolve role + email
   const session = await getSession();
   const email = session?.user?.email || '';
+  const role  = (await getAdminRole()) || 'full';
 
   // 3) Wrap existing main content
   const main = document.querySelector('main');
@@ -90,18 +117,20 @@ export async function mountShell({ title } = {}) {
 
   const wrap = document.createElement('div');
   wrap.className = 'admin-app';
-  wrap.innerHTML = railHTML(location.pathname, email) + '<div class="main"></div>';
+  wrap.innerHTML = railHTML(location.pathname, email, role) + '<div class="main"></div>';
   document.body.prepend(wrap);
 
   const mainSlot = wrap.querySelector('.main');
   mainSlot.appendChild(main);
-  // Hide the original <main> wrapper styles if any; keep its children
   main.style.display = 'contents';
 
   // 4) Hook sign-out
   wrap.querySelector('[data-signout]')?.addEventListener('click', signOut);
 
-  return { session, email };
+  // 5) Tile-level role gating (anything in the DOM with data-role)
+  filterTilesByRole(role);
+
+  return { session, email, role };
 }
 
 // ---------- Toast ----------

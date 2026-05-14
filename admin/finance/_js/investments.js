@@ -3,9 +3,10 @@
 // Positions table with auto price sync via /api/investments-sync.
 // Stale-while-revalidate: prices older than 5 minutes trigger a sync on load.
 // =====================================================================
-import { sb, fmtUSD, fmtUSDCompact, getSession } from '/admin/_shell/supabase.js';
+import { sb, fmtUSD, fmtUSDCompact, getSession, requireFullAdminOrRedirect } from '/admin/_shell/supabase.js';
 import { mountShell, toast } from '/admin/_shell/admin-shell.js';
 
+if (!(await requireFullAdminOrRedirect())) throw new Error('access denied');
 await mountShell({ title: 'Investments · Finance' });
 
 const C = {
