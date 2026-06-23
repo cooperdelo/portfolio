@@ -7,7 +7,7 @@
 <title>Carousels · CD Admin</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo+Black&family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Playfair+Display:ital,wght@0,400..800;1,400..700&family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Geist+Mono:wght@300..700&family=Geist:wght@300..700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo+Black&family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Playfair+Display:ital,wght@0,400..800;1,400..700&family=Plus+Jakarta+Sans:wght@400..800&family=Space+Mono:wght@400;700&family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Geist+Mono:wght@300..700&family=Geist:wght@300..700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/admin/_shell/admin-shell.css" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
@@ -85,7 +85,16 @@
   .rblock.f-serif em { font-style:italic; }
   .rblock.f-capcut { font-family:"Helvetica Neue",Arial,sans-serif; font-weight:800; color:#fff; font-size:58px; line-height:1.08; text-shadow:0 2px 10px rgba(0,0,0,0.6), 0 1px 2px rgba(0,0,0,0.7); }
   .rblock.f-stat   { font-family:"Archivo Black","Archivo",sans-serif; color:#fff; font-size:150px; line-height:0.95; letter-spacing:-0.02em; text-shadow:0 2px 18px rgba(0,0,0,0.5); }
+  /* Plugverse theme overrides (orange / glass / Archivo Black) */
+  .rslide[data-theme="plugverse"] .rblock.f-serif  { font-family:"Plus Jakarta Sans",sans-serif; font-weight:700; color:#fafafa; letter-spacing:-0.015em; text-shadow:0 2px 20px rgba(0,0,0,0.5); }
+  .rslide[data-theme="plugverse"] .rblock.f-serif em { font-style:normal; color:#FF6B35; }
+  .rslide[data-theme="plugverse"] .rblock.f-capcut { font-family:"Archivo Black","Impact",sans-serif; font-weight:400; color:#fafafa; letter-spacing:-0.01em; text-shadow:0 2px 14px rgba(0,0,0,0.55); }
+  .rslide[data-theme="plugverse"] .rblock.f-stat   { font-family:"Space Mono",monospace; font-weight:700; color:#fafafa; letter-spacing:-0.01em; }
+  .rslide[data-theme="plugverse"] .rblock.accent   { color:#FF6B35; }
+  .rslide[data-theme="mono"] .rblock.accent em,
+  .rslide[data-theme="mono"] .rblock.accent        { font-style:italic; }
   .rhandle { position:absolute; left:90px; bottom:54px; font-family:"Geist Mono",monospace; font-size:24px; letter-spacing:0.18em; color:rgba(244,239,230,0.78); }
+  .rslide[data-theme="plugverse"] .rhandle { font-family:"Space Mono",monospace; color:rgba(255,107,53,0.85); }
   .rscrim-b { position:absolute; left:0; right:0; bottom:0; height:55%; background:linear-gradient(to top, rgba(0,0,0,0.6), rgba(0,0,0,0)); }
   .rscrim-t { position:absolute; left:0; right:0; top:0; height:45%; background:linear-gradient(to bottom, rgba(0,0,0,0.45), rgba(0,0,0,0)); }
 </style>
@@ -198,6 +207,7 @@
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
   title text not null default 'Untitled',
+  theme text not null default 'mono',
   pillar text, format text, caption text default '',
   hashtags text[] default '{}',
   slides jsonb not null default '[]'::jsonb,
@@ -230,7 +240,10 @@ end $$;`;
       if (!list.length) { grid.innerHTML = `<div class="empty" style="grid-column:1/-1;">No carousels ${filter==='all'?'yet':'in '+filter}. Hit “New carousel” or “Import JSON”.</div>`; return; }
       grid.innerHTML = list.map(p => {
         const first = (p.slides || [])[0];
-        const bg = first?.bg ? `background-image:url('${esc(first.bg)}')` : '';
+        const themeBg = p.theme === 'plugverse'
+          ? 'radial-gradient(120% 80% at 80% 0%, rgba(255,107,53,0.18), transparent 60%), linear-gradient(160deg,#161616,#0a0a0a)'
+          : 'linear-gradient(160deg,#1a1714,#0a0908)';
+        const bg = first?.bg ? `background-image:url('${esc(first.bg)}')` : `background-image:${themeBg}`;
         const n = (p.slides || []).length;
         return `<div class="card ccard" data-id="${esc(p.id)}">
           <div class="preview" style="${bg}">
@@ -264,26 +277,33 @@ end $$;`;
 
     // ---------- render a slide to a DOM node (exact 1080x1350) ----------
     function italicize(text){ return esc(text).replace(/\*(.+?)\*/g, '<em>$1</em>').replace(/\n/g,'<br>'); }
-    function buildSlideNode(slide) {
+    const THEME_BG = {
+      mono: 'linear-gradient(160deg,#1a1714,#0a0908)',
+      plugverse: 'radial-gradient(120% 80% at 80% 0%, rgba(255,107,53,0.14), transparent 60%), linear-gradient(160deg,#161616,#0a0a0a)',
+    };
+    function buildSlideNode(slide, theme = 'mono') {
       const node = document.createElement('div');
       node.className = 'rslide';
+      node.dataset.theme = theme;
       const bg = slide.bg
         ? `<div class="rbg" style="background-image:url('${slide.bg}')"></div>`
-        : `<div class="rbg" style="background-image:linear-gradient(160deg,#1a1714,#0a0908)"></div>`;
+        : `<div class="rbg" style="background-image:${THEME_BG[theme]||THEME_BG.mono}"></div>`;
       const hasTop = (slide.blocks||[]).some(b => b.place==='top');
       const hasLow = (slide.blocks||[]).some(b => b.place==='lower' || b.place==='bottom');
       const scrim = (slide.bg ? (`${hasTop?'<div class="rscrim-t"></div>':''}${hasLow?'<div class="rscrim-b"></div>':''}`) : '');
+      const handleLabel = theme === 'plugverse' ? 'plugverse.app' : 'cooperdelo';
       const blocks = (slide.blocks||[]).map(b => {
         const sz = b.size ? `font-size:${b.size}px;` : '';
-        return `<div class="rblock place-${esc(b.place||'lower')} f-${esc(b.font||'serif')}" style="${sz}">${italicize(b.text||'')}</div>`;
+        const acc = b.accent ? ' accent' : '';
+        return `<div class="rblock place-${esc(b.place||'lower')} f-${esc(b.font||'serif')}${acc}" style="${sz}">${italicize(b.text||'')}</div>`;
       }).join('');
-      const handle = slide.handle ? `<div class="rhandle">cooperdelo</div>` : '';
+      const handle = slide.handle ? `<div class="rhandle">${handleLabel}</div>` : '';
       node.innerHTML = bg + (slide.overlay ? `<div style="position:absolute;inset:0;background:rgba(0,0,0,${Number(slide.overlay)})"></div>` : '') + scrim + `<div class="rgrain"></div>` + blocks + handle;
       return node;
     }
 
-    async function renderSlideToCanvas(slide) {
-      const node = buildSlideNode(slide);
+    async function renderSlideToCanvas(slide, theme = 'mono') {
+      const node = buildSlideNode(slide, theme);
       renderStage.appendChild(node);
       // wait a tick for fonts/images to settle
       if (document.fonts && document.fonts.ready) { try { await document.fonts.ready; } catch(e){} }
@@ -306,7 +326,7 @@ end $$;`;
       if (!slides.length) { toast('No slides', 'err'); return; }
       toast('Rendering…');
       for (let i=0;i<slides.length;i++){
-        const canvas = await renderSlideToCanvas(slides[i]);
+        const canvas = await renderSlideToCanvas(slides[i], post.theme || 'mono');
         const blob = await canvasToBlob(canvas);
         downloadBlob(blob, `${slugify(post.title)}-${String(i+1).padStart(2,'0')}.png`);
         // space the downloads so the browser (esp. mobile) saves each one
@@ -315,7 +335,7 @@ end $$;`;
       toast(`Downloaded ${slides.length} slides`);
     }
     async function downloadOne(post, i){
-      const canvas = await renderSlideToCanvas(post.slides[i]);
+      const canvas = await renderSlideToCanvas(post.slides[i], post.theme || 'mono');
       const blob = await canvasToBlob(canvas);
       downloadBlob(blob, `${slugify(post.title)}-${String(i+1).padStart(2,'0')}.png`);
     }
@@ -335,7 +355,7 @@ end $$;`;
     let previewIdx = 0;
 
     function blankSlide(){ return { bg:null, overlay:0, handle:false, blocks:[{ text:'', font:'serif', place:'lower' }] }; }
-    function blankPost(){ return { title:'Untitled', pillar:'juggling', format:'statement', caption:'', hashtags:[], slides:[blankSlide()], status:'queued', source:'manual' }; }
+    function blankPost(){ return { title:'Untitled', theme:'mono', pillar:'juggling', format:'statement', caption:'', hashtags:[], slides:[blankSlide()], status:'queued', source:'manual' }; }
 
     function opt(list, val){ return list.map(x => `<option value="${x}" ${x===val?'selected':''}>${x}</option>`).join(''); }
 
@@ -345,6 +365,7 @@ end $$;`;
         <div>
           <div class="form-grid" style="margin-bottom:1rem">
             <div class="field"><label>Title</label><input id="f-title" value="${esc(p.title)}"></div>
+            <div class="field"><label>Theme / brand</label><select id="f-theme">${opt(['mono','plugverse'], p.theme||'mono')}</select></div>
             <div class="field"><label>Status</label><select id="f-status">${opt(['queued','approved','posted'], p.status)}</select></div>
             <div class="field"><label>Pillar</label><select id="f-pillar">${opt(PILLARS, p.pillar)}</select></div>
             <div class="field"><label>Format</label><select id="f-format">${opt(FORMATS, p.format)}</select></div>
@@ -383,8 +404,11 @@ end $$;`;
             <div class="field"><label>Place</label><select data-k="place">${opt(PLACES, b.place)}</select></div>
             <button class="iconbtn" data-rmblock="${bi}" style="align-self:end">✕</button>
           </div>
-          <div class="field"><textarea data-k="text" style="min-height:54px" placeholder="text · wrap a word in *stars* for italic">${esc(b.text)}</textarea></div>
-          <div class="field"><label>Size override (px, optional)</label><input data-k="size" type="number" value="${b.size||''}"></div>
+          <div class="field"><textarea data-k="text" style="min-height:54px" placeholder="text · wrap a word in *stars* for italic/accent">${esc(b.text)}</textarea></div>
+          <div class="row2" style="grid-template-columns:1fr auto">
+            <div class="field"><label>Size override (px, optional)</label><input data-k="size" type="number" value="${b.size||''}"></div>
+            <label class="mini" style="display:flex;align-items:center;gap:0.3rem;align-self:end;padding-bottom:0.7rem"><input type="checkbox" data-k="accent" ${b.accent?'checked':''}>accent</label>
+          </div>
         </div>`).join('');
       return `<div class="slide-ed" data-si="${i}">
         <div class="sh">
@@ -415,7 +439,7 @@ end $$;`;
       const nav = document.getElementById('slide-nav');
       if (previewIdx >= draft.slides.length) previewIdx = 0;
       nav.innerHTML = draft.slides.map((_,i)=>`<span class="dot ${i===previewIdx?'active':''}" data-go="${i}"></span>`).join('');
-      const canvas = await renderSlideToCanvas(draft.slides[previewIdx]);
+      const canvas = await renderSlideToCanvas(draft.slides[previewIdx], draft.theme || 'mono');
       frame.innerHTML = '';
       canvas.style.width = '100%'; canvas.style.height = '100%'; canvas.style.objectFit = 'cover';
       frame.appendChild(canvas);
@@ -423,6 +447,7 @@ end $$;`;
 
     function readFormIntoDraft(){
       draft.title = document.getElementById('f-title').value.trim() || 'Untitled';
+      draft.theme = document.getElementById('f-theme').value;
       draft.status = document.getElementById('f-status').value;
       draft.pillar = document.getElementById('f-pillar').value;
       draft.format = document.getElementById('f-format').value;
@@ -445,6 +470,7 @@ end $$;`;
       col.addEventListener('change', onSlideInput);
       col.addEventListener('click', onSlideClick);
 
+      document.getElementById('f-theme').addEventListener('change', e => { draft.theme = e.target.value; paintPreview(); });
       document.getElementById('add-slide').addEventListener('click', () => { draft.slides.push(blankSlide()); paintSlidesCol(); paintPreview(); });
       document.getElementById('dl-one').addEventListener('click', async () => { readFormIntoDraft(); await downloadOne(draft, previewIdx); });
       document.getElementById('dl-all').addEventListener('click', async () => { readFormIntoDraft(); await downloadAll(draft); });
@@ -468,7 +494,13 @@ end $$;`;
       if (blockEl){
         const bi = Number(blockEl.dataset.bi);
         const k = t.dataset.k;
-        if (k){ draft.slides[si].blocks[bi][k] = (k==='size') ? (t.value?Number(t.value):undefined) : t.value; paintPreview(); }
+        if (k){
+          let v;
+          if (k==='size') v = t.value ? Number(t.value) : undefined;
+          else if (k==='accent') v = t.checked;
+          else v = t.value;
+          draft.slides[si].blocks[bi][k] = v; paintPreview();
+        }
       }
     }
     async function onSlideClick(e){
@@ -496,7 +528,7 @@ end $$;`;
 
     async function savePost(){
       readFormIntoDraft();
-      const row = { title:draft.title, pillar:draft.pillar, format:draft.format, caption:draft.caption,
+      const row = { title:draft.title, theme:draft.theme||'mono', pillar:draft.pillar, format:draft.format, caption:draft.caption,
                     hashtags:draft.hashtags, slides:draft.slides, status:draft.status, source:draft.source||'manual' };
       let res;
       if (draft.id){ res = await sb.from('carousel_posts').update(row).eq('id', draft.id); }
@@ -550,7 +582,7 @@ end $$;`;
       catch(e){ toast('Invalid JSON','err'); return; }
       if (!Array.isArray(arr)) arr = [arr];
       const rows = arr.map(p => ({
-        title:p.title||'Untitled', pillar:p.pillar||null, format:p.format||null,
+        title:p.title||'Untitled', theme:p.theme||'mono', pillar:p.pillar||null, format:p.format||null,
         caption:p.caption||'', hashtags:(p.hashtags||[]).map(t=>String(t).replace(/^#/,'')),
         slides:p.slides||[], status:p.status||'queued', source:p.source||'agent'
       }));

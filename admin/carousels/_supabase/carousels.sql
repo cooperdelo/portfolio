@@ -11,6 +11,7 @@ create table if not exists public.carousel_posts (
   created_at  timestamptz not null default now(),
   updated_at  timestamptz not null default now(),
   title       text not null default 'Untitled',
+  theme       text not null default 'mono',-- mono (personal editorial) / plugverse (orange-glass brand)
   pillar      text,                       -- juggling / discipline / behind / perceived / figuring-it-out
   format      text,                       -- statement / one-liner / two-part / stat / value-step / reflective / framework / save-carousel
   caption     text default '',            -- the IG/TikTok caption
