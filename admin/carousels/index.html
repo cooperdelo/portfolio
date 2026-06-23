@@ -10,7 +10,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo+Black&family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Playfair+Display:ital,wght@0,400..800;1,400..700&family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Geist+Mono:wght@300..700&family=Geist:wght@300..700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/admin/_shell/admin-shell.css" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
   /* ---- toolbar ---- */
   .toolbar { display:flex; flex-wrap:wrap; gap:0.5rem; align-items:center; margin-bottom:1.4rem; }
@@ -306,14 +305,13 @@ end $$;`;
       const slides = post.slides || [];
       if (!slides.length) { toast('No slides', 'err'); return; }
       toast('Rendering…');
-      const zip = new JSZip();
       for (let i=0;i<slides.length;i++){
         const canvas = await renderSlideToCanvas(slides[i]);
         const blob = await canvasToBlob(canvas);
-        zip.file(`${slugify(post.title)}-${String(i+1).padStart(2,'0')}.png`, blob);
+        downloadBlob(blob, `${slugify(post.title)}-${String(i+1).padStart(2,'0')}.png`);
+        // space the downloads so the browser (esp. mobile) saves each one
+        await new Promise(r => setTimeout(r, 700));
       }
-      const out = await zip.generateAsync({ type:'blob' });
-      downloadBlob(out, `${slugify(post.title)}.zip`);
       toast(`Downloaded ${slides.length} slides`);
     }
     async function downloadOne(post, i){
@@ -365,7 +363,7 @@ end $$;`;
             <div class="slide-nav" id="slide-nav"></div>
             <div class="dl-row">
               <button class="btn small" id="dl-one">Download slide</button>
-              <button class="btn small primary" id="dl-all">Download all (zip)</button>
+              <button class="btn small primary" id="dl-all">Download all slides</button>
             </div>
             <div class="dl-row">
               <button class="btn small" id="copy-cap">Copy caption</button>
