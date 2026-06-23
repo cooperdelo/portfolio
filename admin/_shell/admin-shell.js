@@ -29,6 +29,7 @@ const NAV = [
     { href: '/admin/social/',                   label: 'Social Analytics', roles: ['full'] },
   ]},
   { section: 'Brand', items: [
+    { href: '/admin/carousels/',                label: 'Carousel Studio', roles: ['full'] },
     { href: '/admin/playbook/',                 label: 'Playbook' },
     { href: '/admin/contacts/',                 label: 'Contacts' },
   ]},

@@ -1,0 +1,569 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="robots" content="noindex, nofollow, noarchive" />
+<title>Carousels · CD Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo+Black&family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Playfair+Display:ital,wght@0,400..800;1,400..700&family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Geist+Mono:wght@300..700&family=Geist:wght@300..700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/admin/_shell/admin-shell.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<style>
+  /* ---- toolbar ---- */
+  .toolbar { display:flex; flex-wrap:wrap; gap:0.5rem; align-items:center; margin-bottom:1.4rem; }
+  .toolbar .spacer { flex:1; }
+  .seg { display:flex; gap:0.3rem; flex-wrap:wrap; }
+  .seg button { font-family:"Geist Mono",monospace; font-size:0.62rem; letter-spacing:0.2em; text-transform:uppercase; padding:0.5rem 0.85rem; border-radius:999px; background:rgba(244,239,230,0.04); border:1px solid var(--card-border); color:var(--ink-2); cursor:pointer; transition:all 0.2s; }
+  .seg button:hover { color:var(--ink); border-color:rgba(244,239,230,0.3); }
+  .seg button.active { background:rgba(255,77,46,0.1); border-color:rgba(255,77,46,0.5); color:var(--ink); }
+
+  /* ---- card grid ---- */
+  .cg { display:grid; grid-template-columns:repeat(auto-fill, minmax(280px,1fr)); gap:1rem; }
+  .ccard { padding:0; overflow:hidden; cursor:pointer; display:flex; flex-direction:column; }
+  .ccard .preview { aspect-ratio:4/5; background:#14110F center/cover no-repeat; position:relative; display:flex; align-items:flex-end; }
+  .ccard .preview .ph { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:var(--muted); font-family:"Geist Mono",monospace; font-size:0.6rem; letter-spacing:0.2em; text-transform:uppercase; }
+  .ccard .badges { position:absolute; top:0.6rem; left:0.6rem; display:flex; gap:0.35rem; flex-wrap:wrap; }
+  .ccard .body { padding:0.9rem 1rem 1.05rem; }
+  .ccard .t { font-family:"Geist",sans-serif; font-weight:600; font-size:0.95rem; line-height:1.25; color:var(--ink); margin-bottom:0.35rem; }
+  .ccard .meta { font-family:"Geist Mono",monospace; font-size:0.58rem; letter-spacing:0.18em; text-transform:uppercase; color:var(--muted); }
+  .st-queued  { color:var(--neutral); border-color:var(--neutral)!important; }
+  .st-approved{ color:var(--good);    border-color:var(--good)!important; }
+  .st-posted  { color:var(--rust);    border-color:var(--rust)!important; }
+
+  /* ---- setup banner ---- */
+  .setup { border:1px solid rgba(255,77,46,0.4); background:rgba(255,77,46,0.05); border-radius:14px; padding:1.2rem 1.4rem; margin-bottom:1.6rem; }
+  .setup h3 { font-family:"Geist",sans-serif; font-weight:600; font-size:1rem; color:var(--ink); margin-bottom:0.5rem; }
+  .setup p { font-family:"Geist Mono",monospace; font-size:0.72rem; line-height:1.6; color:var(--ink-2); letter-spacing:0.03em; }
+  .setup pre { margin-top:0.8rem; max-height:240px; overflow:auto; background:rgba(0,0,0,0.4); border:1px solid var(--card-border); border-radius:10px; padding:0.9rem 1rem; font-family:"Geist Mono",monospace; font-size:0.62rem; line-height:1.5; color:var(--ink-2); white-space:pre; }
+
+  /* ---- modal ---- */
+  .scrim { position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:90; opacity:0; pointer-events:none; transition:opacity 0.3s; backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); }
+  .scrim.on { opacity:1; pointer-events:auto; }
+  .sheet { position:fixed; left:50%; top:50%; transform:translate(-50%,calc(-50% + 3rem)); width:min(1080px,96vw); max-height:92vh; overflow-y:auto; background:rgba(20,17,15,0.96); backdrop-filter:blur(40px) saturate(180%); border:1px solid rgba(244,239,230,0.14); border-radius:20px; padding:1.6rem 1.7rem 2rem; z-index:95; opacity:0; pointer-events:none; transition:all 0.4s cubic-bezier(0.22,1,0.36,1); }
+  .sheet.on { opacity:1; pointer-events:auto; transform:translate(-50%,-50%); }
+  .sheet .close { position:absolute; top:0.9rem; right:1rem; font-family:"Geist Mono",monospace; font-size:0.62rem; letter-spacing:0.22em; text-transform:uppercase; padding:0.5rem 0.8rem; border-radius:999px; background:rgba(244,239,230,0.05); border:1px solid rgba(244,239,230,0.1); color:var(--ink-2); cursor:pointer; }
+  .sheet .close:hover { color:var(--rust); border-color:var(--rust); }
+  .sheet h2 { font-family:"Geist",sans-serif; font-weight:600; font-size:1.2rem; margin:0 0 1.1rem; padding-right:4rem; }
+
+  .ed-layout { display:grid; grid-template-columns:1fr 1fr; gap:1.4rem; }
+  @media (max-width:820px) { .ed-layout { grid-template-columns:1fr; } }
+
+  .slides-col { display:flex; flex-direction:column; gap:0.9rem; }
+  .slide-ed { border:1px solid var(--card-border); border-radius:12px; padding:0.9rem 1rem; background:rgba(244,239,230,0.02); }
+  .slide-ed .sh { display:flex; align-items:center; justify-content:space-between; margin-bottom:0.6rem; }
+  .slide-ed .sh .n { font-family:"Anton",Impact,sans-serif; font-size:0.95rem; letter-spacing:0.04em; color:var(--ink-2); text-transform:uppercase; }
+  .block-ed { border:1px dashed rgba(244,239,230,0.14); border-radius:8px; padding:0.6rem 0.7rem; margin-top:0.55rem; }
+  .block-ed .row2 { display:grid; grid-template-columns:1fr 1fr auto; gap:0.4rem; margin-bottom:0.4rem; }
+  .mini { font-family:"Geist Mono",monospace; font-size:0.58rem; letter-spacing:0.16em; text-transform:uppercase; color:var(--muted); }
+  .iconbtn { font-family:"Geist Mono",monospace; font-size:0.58rem; letter-spacing:0.16em; text-transform:uppercase; padding:0.3rem 0.55rem; border-radius:6px; border:1px solid var(--card-border); color:var(--ink-2); background:rgba(244,239,230,0.03); cursor:pointer; }
+  .iconbtn:hover { border-color:var(--rust); color:var(--rust); }
+  .photo-row { display:flex; align-items:center; gap:0.5rem; margin-top:0.5rem; flex-wrap:wrap; }
+  .photo-row .thumb { width:40px; height:50px; border-radius:5px; background:#14110F center/cover no-repeat; border:1px solid var(--card-border); }
+
+  /* live preview stage (visible, scaled) */
+  .preview-col { position:sticky; top:0; align-self:start; }
+  .stage-wrap { width:100%; max-width:360px; margin:0 auto; }
+  .stage-frame { width:100%; aspect-ratio:4/5; border-radius:14px; overflow:hidden; border:1px solid var(--card-border); position:relative; background:#0a0908; }
+  .slide-nav { display:flex; align-items:center; justify-content:center; gap:0.6rem; margin-top:0.7rem; }
+  .slide-nav .dot { width:7px; height:7px; border-radius:50%; background:rgba(244,239,230,0.2); cursor:pointer; }
+  .slide-nav .dot.active { background:var(--rust); }
+  .dl-row { display:flex; gap:0.5rem; flex-wrap:wrap; justify-content:center; margin-top:0.9rem; }
+
+  /* offscreen exact-size render target */
+  #render-stage { position:fixed; left:-99999px; top:0; width:1080px; height:1350px; }
+  .rslide { width:1080px; height:1350px; position:relative; overflow:hidden; background:#0a0908; }
+  .rbg { position:absolute; inset:0; background-size:cover; background-position:center; }
+  .rgrain { position:absolute; inset:0; opacity:0.06; mix-blend-mode:overlay; background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' seed='7'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>"); }
+  .rblock { position:absolute; left:90px; right:90px; }
+  .rblock.place-top    { top:96px; }
+  .rblock.place-center { top:50%; transform:translateY(-50%); text-align:center; }
+  .rblock.place-lower  { bottom:150px; }
+  .rblock.place-bottom { bottom:80px; }
+  .rblock.f-serif  { font-family:"Bodoni Moda","Playfair Display",serif; font-weight:500; color:#f4f1ea; font-size:66px; line-height:1.12; letter-spacing:-0.01em; text-shadow:0 2px 26px rgba(0,0,0,0.5); }
+  .rblock.f-serif em { font-style:italic; }
+  .rblock.f-capcut { font-family:"Helvetica Neue",Arial,sans-serif; font-weight:800; color:#fff; font-size:58px; line-height:1.08; text-shadow:0 2px 10px rgba(0,0,0,0.6), 0 1px 2px rgba(0,0,0,0.7); }
+  .rblock.f-stat   { font-family:"Archivo Black","Archivo",sans-serif; color:#fff; font-size:150px; line-height:0.95; letter-spacing:-0.02em; text-shadow:0 2px 18px rgba(0,0,0,0.5); }
+  .rhandle { position:absolute; left:90px; bottom:54px; font-family:"Geist Mono",monospace; font-size:24px; letter-spacing:0.18em; color:rgba(244,239,230,0.78); }
+  .rscrim-b { position:absolute; left:0; right:0; bottom:0; height:55%; background:linear-gradient(to top, rgba(0,0,0,0.6), rgba(0,0,0,0)); }
+  .rscrim-t { position:absolute; left:0; right:0; top:0; height:45%; background:linear-gradient(to bottom, rgba(0,0,0,0.45), rgba(0,0,0,0)); }
+</style>
+</head>
+<body>
+  <main>
+    <div class="page-head">
+      <div>
+        <div class="eyebrow">Generate. Store. Mass-download. Any device.</div>
+        <h1>Carousel <span class="accent">studio</span></h1>
+      </div>
+      <div class="actions">
+        <span class="live-dot" id="live">Loading</span>
+        <button class="btn" id="import-btn">Import JSON</button>
+        <button class="btn primary" id="new-btn">New carousel</button>
+      </div>
+    </div>
+
+    <div id="setup-slot"></div>
+
+    <div class="toolbar">
+      <div class="seg" id="status-filter">
+        <button class="active" data-f="all">All</button>
+        <button data-f="queued">Queued</button>
+        <button data-f="approved">Approved</button>
+        <button data-f="posted">Posted</button>
+      </div>
+      <div class="spacer"></div>
+      <span class="mini" id="count">—</span>
+    </div>
+
+    <div class="cg" id="grid"><div class="empty" style="grid-column:1/-1;">Loading…</div></div>
+  </main>
+
+  <div class="scrim" id="scrim"></div>
+
+  <!-- Editor / preview sheet -->
+  <div class="sheet" id="sheet">
+    <button class="close" data-action="close">Close</button>
+    <div id="sheet-body"></div>
+  </div>
+
+  <!-- Import sheet -->
+  <div class="sheet" id="import-sheet">
+    <button class="close" data-action="close-import">Close</button>
+    <h2>Import carousels from JSON</h2>
+    <p class="mini" style="line-height:1.7;margin-bottom:0.8rem">Paste an array of carousel objects. Shape: <code>{ title, pillar, format, caption, hashtags:[], slides:[{ overlay, handle, blocks:[{ text, font:'serif'|'capcut'|'stat', place:'top'|'center'|'lower'|'bottom', size }] }] }</code>. Photos get added per-slide here after import.</p>
+    <div class="field"><textarea id="import-text" style="min-height:240px;font-family:'Geist Mono',monospace;font-size:0.72rem" placeholder="[ { &quot;title&quot;: &quot;...&quot;, &quot;slides&quot;: [ ... ] } ]"></textarea></div>
+    <div style="display:flex;gap:0.5rem;margin-top:0.9rem">
+      <button class="btn primary" id="import-go">Import</button>
+      <button class="btn" id="import-sample">Load sample</button>
+    </div>
+  </div>
+
+  <div id="render-stage"></div>
+
+  <script type="module">
+    import { sb, requireFullAdminOrRedirect, fmtDate, subscribeTable } from '/admin/_shell/supabase.js';
+    import { mountShell, toast } from '/admin/_shell/admin-shell.js';
+
+    if (!(await requireFullAdminOrRedirect())) throw new Error('access denied');
+    await mountShell({ title: 'Carousel Studio' });
+
+    const live = document.getElementById('live');
+    const grid = document.getElementById('grid');
+    const setupSlot = document.getElementById('setup-slot');
+    const renderStage = document.getElementById('render-stage');
+    let posts = [];
+    let filter = 'all';
+    let tableReady = true;
+
+    const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    const PILLARS = ['juggling','discipline','behind','perceived','figuring-it-out'];
+    const FORMATS = ['statement','one-liner','two-part','stat','value-step','reflective','framework','save-carousel'];
+    const FONTS   = ['serif','capcut','stat'];
+    const PLACES  = ['top','center','lower','bottom'];
+
+    // ---------- data ----------
+    async function load() {
+      live.textContent = 'Syncing';
+      const { data, error } = await sb.from('carousel_posts').select('*').order('updated_at', { ascending:false });
+      if (error) {
+        if (/relation .* does not exist|could not find the table/i.test(error.message)) {
+          tableReady = false; showSetup(); grid.innerHTML = '';
+          live.textContent = 'Setup needed';
+          return;
+        }
+        toast(error.message, 'err'); live.textContent = 'Error'; return;
+      }
+      tableReady = true; setupSlot.innerHTML = '';
+      posts = data || [];
+      render();
+      live.textContent = `Synced · ${posts.length}`;
+    }
+
+    function showSetup() {
+      setupSlot.innerHTML = `<div class="setup">
+        <h3>One-time setup</h3>
+        <p>The <code>carousel_posts</code> table doesn't exist yet. Open the Supabase SQL editor for the <strong>portfolio admin</strong> project (eibtnkaoqsgwiqttiwjo), paste the SQL below, run it once, then reload this page. The file also lives at <code>/admin/carousels/_supabase/carousels.sql</code>.</p>
+        <button class="btn small" id="copy-sql" style="margin-top:0.8rem">Copy SQL</button>
+        <pre id="sql-pre">${esc(SETUP_SQL)}</pre>
+      </div>`;
+      document.getElementById('copy-sql').addEventListener('click', () => {
+        navigator.clipboard.writeText(SETUP_SQL).then(()=>toast('SQL copied'));
+      });
+    }
+
+    const SETUP_SQL = `create table if not exists public.carousel_posts (
+  id uuid primary key default gen_random_uuid(),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  title text not null default 'Untitled',
+  pillar text, format text, caption text default '',
+  hashtags text[] default '{}',
+  slides jsonb not null default '[]'::jsonb,
+  status text not null default 'queued',
+  source text not null default 'manual',
+  notes text default ''
+);
+create or replace function public.touch_carousel_updated_at()
+returns trigger language plpgsql as $$ begin new.updated_at = now(); return new; end $$;
+drop trigger if exists trg_carousel_touch on public.carousel_posts;
+create trigger trg_carousel_touch before update on public.carousel_posts
+  for each row execute function public.touch_carousel_updated_at();
+alter table public.carousel_posts enable row level security;
+drop policy if exists carousel_posts_admin_all on public.carousel_posts;
+create policy carousel_posts_admin_all on public.carousel_posts
+  for all using (public.is_admin()) with check (public.is_admin());
+do $$ begin
+  if not exists (select 1 from pg_publication_tables
+    where pubname='supabase_realtime' and tablename='carousel_posts') then
+    alter publication supabase_realtime add table public.carousel_posts;
+  end if;
+end $$;`;
+
+    // ---------- grid render ----------
+    function statusPill(s){ return `<span class="pill st-${esc(s)}">${esc(s)}</span>`; }
+
+    function render() {
+      const list = posts.filter(p => filter === 'all' || p.status === filter);
+      document.getElementById('count').textContent = `${list.length} carousel${list.length===1?'':'s'}`;
+      if (!list.length) { grid.innerHTML = `<div class="empty" style="grid-column:1/-1;">No carousels ${filter==='all'?'yet':'in '+filter}. Hit “New carousel” or “Import JSON”.</div>`; return; }
+      grid.innerHTML = list.map(p => {
+        const first = (p.slides || [])[0];
+        const bg = first?.bg ? `background-image:url('${esc(first.bg)}')` : '';
+        const n = (p.slides || []).length;
+        return `<div class="card ccard" data-id="${esc(p.id)}">
+          <div class="preview" style="${bg}">
+            ${first?.bg ? '' : '<div class="ph">no photo yet</div>'}
+            <div class="badges">${statusPill(p.status)}${p.source==='agent'?'<span class="pill" style="color:var(--pastel-cyan)">agent</span>':''}</div>
+          </div>
+          <div class="body">
+            <div class="t">${esc(p.title)}</div>
+            <div class="meta">${esc(p.format||'—')} · ${n} slide${n===1?'':'s'} · ${esc(p.pillar||'')}</div>
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    // ---------- helpers: photo downscale ----------
+    function fileToScaledDataURL(file, maxW = 1080) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        const url = URL.createObjectURL(file);
+        img.onload = () => {
+          const scale = Math.min(1, maxW / img.width);
+          const w = Math.round(img.width * scale), h = Math.round(img.height * scale);
+          const c = document.createElement('canvas'); c.width = w; c.height = h;
+          c.getContext('2d').drawImage(img, 0, 0, w, h);
+          URL.revokeObjectURL(url);
+          resolve(c.toDataURL('image/jpeg', 0.82));
+        };
+        img.onerror = reject; img.src = url;
+      });
+    }
+
+    // ---------- render a slide to a DOM node (exact 1080x1350) ----------
+    function italicize(text){ return esc(text).replace(/\*(.+?)\*/g, '<em>$1</em>').replace(/\n/g,'<br>'); }
+    function buildSlideNode(slide) {
+      const node = document.createElement('div');
+      node.className = 'rslide';
+      const bg = slide.bg
+        ? `<div class="rbg" style="background-image:url('${slide.bg}')"></div>`
+        : `<div class="rbg" style="background-image:linear-gradient(160deg,#1a1714,#0a0908)"></div>`;
+      const hasTop = (slide.blocks||[]).some(b => b.place==='top');
+      const hasLow = (slide.blocks||[]).some(b => b.place==='lower' || b.place==='bottom');
+      const scrim = (slide.bg ? (`${hasTop?'<div class="rscrim-t"></div>':''}${hasLow?'<div class="rscrim-b"></div>':''}`) : '');
+      const blocks = (slide.blocks||[]).map(b => {
+        const sz = b.size ? `font-size:${b.size}px;` : '';
+        return `<div class="rblock place-${esc(b.place||'lower')} f-${esc(b.font||'serif')}" style="${sz}">${italicize(b.text||'')}</div>`;
+      }).join('');
+      const handle = slide.handle ? `<div class="rhandle">cooperdelo</div>` : '';
+      node.innerHTML = bg + (slide.overlay ? `<div style="position:absolute;inset:0;background:rgba(0,0,0,${Number(slide.overlay)})"></div>` : '') + scrim + `<div class="rgrain"></div>` + blocks + handle;
+      return node;
+    }
+
+    async function renderSlideToCanvas(slide) {
+      const node = buildSlideNode(slide);
+      renderStage.appendChild(node);
+      // wait a tick for fonts/images to settle
+      if (document.fonts && document.fonts.ready) { try { await document.fonts.ready; } catch(e){} }
+      await new Promise(r => setTimeout(r, 60));
+      const canvas = await html2canvas(node, { width:1080, height:1350, scale:1, useCORS:true, backgroundColor:'#0a0908', logging:false });
+      renderStage.removeChild(node);
+      return canvas;
+    }
+
+    function canvasToBlob(canvas){ return new Promise(res => canvas.toBlob(res, 'image/png')); }
+    function downloadBlob(blob, name){
+      const a = document.createElement('a'); const url = URL.createObjectURL(blob);
+      a.href = url; a.download = name; document.body.appendChild(a); a.click();
+      setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); }, 1500);
+    }
+    const slugify = s => String(s||'carousel').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,40) || 'carousel';
+
+    async function downloadAll(post) {
+      const slides = post.slides || [];
+      if (!slides.length) { toast('No slides', 'err'); return; }
+      toast('Rendering…');
+      const zip = new JSZip();
+      for (let i=0;i<slides.length;i++){
+        const canvas = await renderSlideToCanvas(slides[i]);
+        const blob = await canvasToBlob(canvas);
+        zip.file(`${slugify(post.title)}-${String(i+1).padStart(2,'0')}.png`, blob);
+      }
+      const out = await zip.generateAsync({ type:'blob' });
+      downloadBlob(out, `${slugify(post.title)}.zip`);
+      toast(`Downloaded ${slides.length} slides`);
+    }
+    async function downloadOne(post, i){
+      const canvas = await renderSlideToCanvas(post.slides[i]);
+      const blob = await canvasToBlob(canvas);
+      downloadBlob(blob, `${slugify(post.title)}-${String(i+1).padStart(2,'0')}.png`);
+    }
+
+    // ---------- editor ----------
+    const scrimEl = document.getElementById('scrim');
+    const sheetEl = document.getElementById('sheet');
+    const sheetBody = document.getElementById('sheet-body');
+    const importSheet = document.getElementById('import-sheet');
+    function openSheet(el){ scrimEl.classList.add('on'); el.classList.add('on'); document.body.style.overflow='hidden'; }
+    function closeSheets(){ scrimEl.classList.remove('on'); sheetEl.classList.remove('on'); importSheet.classList.remove('on'); document.body.style.overflow=''; }
+    scrimEl.addEventListener('click', closeSheets);
+    document.addEventListener('keydown', e => { if (e.key==='Escape') closeSheets(); });
+    document.addEventListener('click', e => { if (e.target.closest('[data-action="close"],[data-action="close-import"]')) closeSheets(); });
+
+    let draft = null;       // working copy
+    let previewIdx = 0;
+
+    function blankSlide(){ return { bg:null, overlay:0, handle:false, blocks:[{ text:'', font:'serif', place:'lower' }] }; }
+    function blankPost(){ return { title:'Untitled', pillar:'juggling', format:'statement', caption:'', hashtags:[], slides:[blankSlide()], status:'queued', source:'manual' }; }
+
+    function opt(list, val){ return list.map(x => `<option value="${x}" ${x===val?'selected':''}>${x}</option>`).join(''); }
+
+    function editorHTML(p){
+      return `<h2>${p.id ? 'Edit' : 'New'} carousel</h2>
+      <div class="ed-layout">
+        <div>
+          <div class="form-grid" style="margin-bottom:1rem">
+            <div class="field"><label>Title</label><input id="f-title" value="${esc(p.title)}"></div>
+            <div class="field"><label>Status</label><select id="f-status">${opt(['queued','approved','posted'], p.status)}</select></div>
+            <div class="field"><label>Pillar</label><select id="f-pillar">${opt(PILLARS, p.pillar)}</select></div>
+            <div class="field"><label>Format</label><select id="f-format">${opt(FORMATS, p.format)}</select></div>
+          </div>
+          <div class="field" style="margin-bottom:1rem"><label>Caption</label><textarea id="f-caption" style="min-height:90px">${esc(p.caption)}</textarea></div>
+          <div class="field" style="margin-bottom:1rem"><label>Hashtags (space or comma separated)</label><input id="f-tags" value="${esc((p.hashtags||[]).join(' '))}"></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin:0.6rem 0 0.4rem">
+            <span class="mini">Slides</span>
+            <button class="iconbtn" id="add-slide">+ Slide</button>
+          </div>
+          <div class="slides-col" id="slides-col"></div>
+        </div>
+        <div class="preview-col">
+          <div class="stage-wrap">
+            <div class="stage-frame" id="stage-frame"></div>
+            <div class="slide-nav" id="slide-nav"></div>
+            <div class="dl-row">
+              <button class="btn small" id="dl-one">Download slide</button>
+              <button class="btn small primary" id="dl-all">Download all (zip)</button>
+            </div>
+            <div class="dl-row">
+              <button class="btn small" id="copy-cap">Copy caption</button>
+              <button class="btn small" id="save-post">Save</button>
+              ${p.id ? '<button class="btn small danger" id="del-post">Delete</button>' : ''}
+            </div>
+          </div>
+        </div>
+      </div>`;
+    }
+
+    function slideEdHTML(slide, i){
+      const blocks = (slide.blocks||[]).map((b, bi) => `
+        <div class="block-ed" data-bi="${bi}">
+          <div class="row2">
+            <div class="field"><label>Font</label><select data-k="font">${opt(FONTS, b.font)}</select></div>
+            <div class="field"><label>Place</label><select data-k="place">${opt(PLACES, b.place)}</select></div>
+            <button class="iconbtn" data-rmblock="${bi}" style="align-self:end">✕</button>
+          </div>
+          <div class="field"><textarea data-k="text" style="min-height:54px" placeholder="text · wrap a word in *stars* for italic">${esc(b.text)}</textarea></div>
+          <div class="field"><label>Size override (px, optional)</label><input data-k="size" type="number" value="${b.size||''}"></div>
+        </div>`).join('');
+      return `<div class="slide-ed" data-si="${i}">
+        <div class="sh">
+          <span class="n">Slide ${i+1}</span>
+          <span>
+            <button class="iconbtn" data-addblock="${i}">+ Text</button>
+            <button class="iconbtn" data-rmslide="${i}">Remove</button>
+          </span>
+        </div>
+        <div class="photo-row">
+          <div class="thumb" style="${slide.bg?`background-image:url('${esc(slide.bg)}')`:''}"></div>
+          <label class="iconbtn">Photo<input type="file" accept="image/*" data-photo="${i}" style="display:none"></label>
+          ${slide.bg?`<button class="iconbtn" data-rmphoto="${i}">Clear photo</button>`:''}
+          <label class="mini" style="display:flex;align-items:center;gap:0.3rem">overlay<input type="range" min="0" max="0.7" step="0.05" value="${slide.overlay||0}" data-overlay="${i}" style="width:80px"></label>
+          <label class="mini" style="display:flex;align-items:center;gap:0.3rem"><input type="checkbox" data-handle="${i}" ${slide.handle?'checked':''}>handle</label>
+        </div>
+        ${blocks}
+      </div>`;
+    }
+
+    function paintSlidesCol(){
+      const col = document.getElementById('slides-col');
+      col.innerHTML = draft.slides.map((s,i)=>slideEdHTML(s,i)).join('');
+    }
+
+    async function paintPreview(){
+      const frame = document.getElementById('stage-frame');
+      const nav = document.getElementById('slide-nav');
+      if (previewIdx >= draft.slides.length) previewIdx = 0;
+      nav.innerHTML = draft.slides.map((_,i)=>`<span class="dot ${i===previewIdx?'active':''}" data-go="${i}"></span>`).join('');
+      const canvas = await renderSlideToCanvas(draft.slides[previewIdx]);
+      frame.innerHTML = '';
+      canvas.style.width = '100%'; canvas.style.height = '100%'; canvas.style.objectFit = 'cover';
+      frame.appendChild(canvas);
+    }
+
+    function readFormIntoDraft(){
+      draft.title = document.getElementById('f-title').value.trim() || 'Untitled';
+      draft.status = document.getElementById('f-status').value;
+      draft.pillar = document.getElementById('f-pillar').value;
+      draft.format = document.getElementById('f-format').value;
+      draft.caption = document.getElementById('f-caption').value;
+      draft.hashtags = document.getElementById('f-tags').value.split(/[\s,]+/).map(t=>t.replace(/^#/,'')).filter(Boolean);
+    }
+
+    function openEditor(post){
+      draft = JSON.parse(JSON.stringify(post));
+      if (!draft.slides || !draft.slides.length) draft.slides = [blankSlide()];
+      previewIdx = 0;
+      sheetBody.innerHTML = editorHTML(draft);
+      paintSlidesCol();
+      paintPreview();
+      openSheet(sheetEl);
+
+      // ---- wire slide editor (event delegation on slides-col) ----
+      const col = document.getElementById('slides-col');
+      col.addEventListener('input', onSlideInput);
+      col.addEventListener('change', onSlideInput);
+      col.addEventListener('click', onSlideClick);
+
+      document.getElementById('add-slide').addEventListener('click', () => { draft.slides.push(blankSlide()); paintSlidesCol(); paintPreview(); });
+      document.getElementById('dl-one').addEventListener('click', async () => { readFormIntoDraft(); await downloadOne(draft, previewIdx); });
+      document.getElementById('dl-all').addEventListener('click', async () => { readFormIntoDraft(); await downloadAll(draft); });
+      document.getElementById('copy-cap').addEventListener('click', () => {
+        readFormIntoDraft();
+        const tags = draft.hashtags.map(t=>'#'+t).join(' ');
+        navigator.clipboard.writeText((draft.caption||'') + (tags?'\n\n'+tags:'')).then(()=>toast('Caption copied'));
+      });
+      document.getElementById('save-post').addEventListener('click', savePost);
+      document.getElementById('del-post')?.addEventListener('click', deletePost);
+    }
+
+    function onSlideInput(e){
+      const t = e.target;
+      const slideEl = t.closest('.slide-ed'); if (!slideEl) return;
+      const si = Number(slideEl.dataset.si);
+      const slide = draft.slides[si];
+      if (t.dataset.overlay != null) { slide.overlay = Number(t.value); paintPreview(); return; }
+      if (t.dataset.handle != null) { slide.handle = t.checked; paintPreview(); return; }
+      const blockEl = t.closest('.block-ed');
+      if (blockEl){
+        const bi = Number(blockEl.dataset.bi);
+        const k = t.dataset.k;
+        if (k){ draft.slides[si].blocks[bi][k] = (k==='size') ? (t.value?Number(t.value):undefined) : t.value; paintPreview(); }
+      }
+    }
+    async function onSlideClick(e){
+      const t = e.target;
+      const slideEl = t.closest('.slide-ed'); if (!slideEl) return;
+      const si = Number(slideEl.dataset.si);
+      if (t.dataset.addblock != null){ draft.slides[si].blocks.push({text:'',font:'capcut',place:'top'}); paintSlidesCol(); paintPreview(); return; }
+      if (t.dataset.rmslide != null){ if (draft.slides.length>1){ draft.slides.splice(si,1); if(previewIdx>=draft.slides.length)previewIdx=0; paintSlidesCol(); paintPreview(); } return; }
+      if (t.dataset.rmblock != null){ const bi=Number(t.dataset.rmblock); if(draft.slides[si].blocks.length>1){draft.slides[si].blocks.splice(bi,1); paintSlidesCol(); paintPreview();} return; }
+      if (t.dataset.rmphoto != null){ draft.slides[si].bg=null; paintSlidesCol(); paintPreview(); return; }
+    }
+    // file inputs (change) — separate listener because file inputs live in slides-col
+    document.getElementById('sheet').addEventListener('change', async e => {
+      const t = e.target;
+      if (t.dataset && t.dataset.photo != null && t.files && t.files[0]){
+        const si = Number(t.dataset.photo);
+        toast('Adding photo…');
+        draft.slides[si].bg = await fileToScaledDataURL(t.files[0]);
+        paintSlidesCol(); paintPreview();
+      }
+    });
+    document.getElementById('sheet').addEventListener('click', e => {
+      const d = e.target.closest('[data-go]'); if (d){ previewIdx = Number(d.dataset.go); paintPreview(); }
+    });
+
+    async function savePost(){
+      readFormIntoDraft();
+      const row = { title:draft.title, pillar:draft.pillar, format:draft.format, caption:draft.caption,
+                    hashtags:draft.hashtags, slides:draft.slides, status:draft.status, source:draft.source||'manual' };
+      let res;
+      if (draft.id){ res = await sb.from('carousel_posts').update(row).eq('id', draft.id); }
+      else { res = await sb.from('carousel_posts').insert(row); }
+      if (res.error){ toast(res.error.message,'err'); return; }
+      toast('Saved'); closeSheets(); await load();
+    }
+    async function deletePost(){
+      if (!draft.id) return;
+      if (!confirm('Delete this carousel? This cannot be undone.')) return;
+      const { error } = await sb.from('carousel_posts').delete().eq('id', draft.id);
+      if (error){ toast(error.message,'err'); return; }
+      toast('Deleted'); closeSheets(); await load();
+    }
+
+    // ---------- grid click ----------
+    grid.addEventListener('click', e => {
+      const card = e.target.closest('[data-id]'); if (!card) return;
+      const post = posts.find(p => p.id === card.dataset.id); if (post) openEditor(post);
+    });
+
+    // ---------- toolbar ----------
+    document.getElementById('status-filter').addEventListener('click', e => {
+      const b = e.target.closest('button[data-f]'); if (!b) return;
+      filter = b.dataset.f;
+      document.querySelectorAll('#status-filter button').forEach(x=>x.classList.toggle('active', x===b));
+      render();
+    });
+    document.getElementById('new-btn').addEventListener('click', () => {
+      if (!tableReady){ toast('Run the setup SQL first','err'); return; }
+      openEditor(blankPost());
+    });
+
+    // ---------- import ----------
+    document.getElementById('import-btn').addEventListener('click', () => openSheet(importSheet));
+    document.getElementById('import-sample').addEventListener('click', () => {
+      document.getElementById('import-text').value = JSON.stringify([{
+        title:'how to juggle it all', pillar:'juggling', format:'value-step',
+        caption:"i run a startup, a band, a 9-to-5 and a GPA. here's how i don't drop all of it.",
+        hashtags:['plugverse','juggling','founder'],
+        slides:[
+          { overlay:0.35, handle:true, blocks:[{text:'how to juggle\nit all',font:'serif',place:'lower'}] },
+          { overlay:0.3,  blocks:[{text:'pick the one\nthat pays rent first',font:'capcut',place:'top'},{text:'focus beats hustle, every time',font:'serif',place:'bottom'}] },
+          { overlay:0.3,  blocks:[{text:'drop the other four\nfor the week',font:'capcut',place:'center'}] }
+        ]
+      }], null, 2);
+    });
+    document.getElementById('import-go').addEventListener('click', async () => {
+      let arr;
+      try { arr = JSON.parse(document.getElementById('import-text').value); }
+      catch(e){ toast('Invalid JSON','err'); return; }
+      if (!Array.isArray(arr)) arr = [arr];
+      const rows = arr.map(p => ({
+        title:p.title||'Untitled', pillar:p.pillar||null, format:p.format||null,
+        caption:p.caption||'', hashtags:(p.hashtags||[]).map(t=>String(t).replace(/^#/,'')),
+        slides:p.slides||[], status:p.status||'queued', source:p.source||'agent'
+      }));
+      const { error } = await sb.from('carousel_posts').insert(rows);
+      if (error){ toast(error.message,'err'); return; }
+      toast(`Imported ${rows.length}`); closeSheets(); await load();
+    });
+
+    // ---------- realtime + boot ----------
+    try { subscribeTable('carousel_posts', () => load(), 400); } catch(e){}
+    await load();
+  </script>
+</body>
+</html>
