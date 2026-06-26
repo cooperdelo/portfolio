@@ -243,11 +243,12 @@ end $$;`;
         const themeBg = p.theme === 'plugverse'
           ? 'radial-gradient(120% 80% at 80% 0%, rgba(255,107,53,0.18), transparent 60%), linear-gradient(160deg,#161616,#0a0a0a)'
           : 'linear-gradient(160deg,#1a1714,#0a0908)';
-        const bg = first?.bg ? `background-image:url('${esc(first.bg)}')` : `background-image:${themeBg}`;
-        const n = (p.slides || []).length;
+        const thumb = p.thumb_url || (p.rendered_urls||[])[0] || first?.bg;
+        const bg = thumb ? `background-image:url('${esc(thumb)}')` : `background-image:${themeBg}`;
+        const n = (p.rendered_urls||[]).length || (p.slides || []).length;
         return `<div class="card ccard" data-id="${esc(p.id)}">
           <div class="preview" style="${bg}">
-            ${first?.bg ? '' : '<div class="ph">no photo yet</div>'}
+            ${thumb ? '' : '<div class="ph">no photo yet</div>'}
             <div class="badges">${statusPill(p.status)}${p.source==='agent'?'<span class="pill" style="color:var(--pastel-cyan)">agent</span>':''}</div>
           </div>
           <div class="body">
@@ -455,6 +456,31 @@ end $$;`;
       draft.hashtags = document.getElementById('f-tags').value.split(/[\s,]+/).map(t=>t.replace(/^#/,'')).filter(Boolean);
     }
 
+    // ---------- viewer for engine-rendered carousels (rendered_urls present) ----------
+    function openViewer(post){
+      const urls = post.rendered_urls || [];
+      const tags = (post.hashtags||[]).map(t=>'#'+t).join(' ');
+      sheetBody.innerHTML = `<h2>${esc(post.title)}</h2>
+        <div class="mini" style="margin-bottom:0.9rem">${esc(post.format_label||post.format||'carousel')} · ${urls.length} slides · ${esc(post.pillar||'')}</div>
+        <div style="display:flex;gap:0.6rem;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:0.6rem;margin:0 -0.3rem">
+          ${urls.map(u=>`<img src="${esc(u)}" crossorigin="anonymous" loading="lazy" style="height:min(64vh,820px);border-radius:10px;scroll-snap-align:center;flex:0 0 auto;background:#14110F">`).join('')}
+        </div>
+        <div class="field" style="margin-top:1rem"><label>Caption</label><textarea id="v-cap" style="min-height:96px">${esc(post.caption||'')}</textarea></div>
+        <div class="mini" style="margin-top:0.4rem">${esc(tags)}</div>
+        <div class="dl-row" style="justify-content:flex-start;margin-top:1rem">
+          <button class="btn small primary" id="v-copy">Copy caption</button>
+          <button class="btn small" id="v-dl">Download all</button>
+          <select id="v-status" class="btn small">${opt(['queued','approved','posted'], post.status==='ready'?'approved':(post.status==='draft'?'queued':post.status))}</select>
+          <button class="btn small" id="v-save">Save</button>
+          <button class="btn small danger" id="v-del">Delete</button>
+        </div>`;
+      openSheet(sheetEl);
+      document.getElementById('v-copy').addEventListener('click', ()=>{ const c=document.getElementById('v-cap').value; navigator.clipboard.writeText(c+(tags?'\n\n'+tags:'')).then(()=>toast('Caption copied')); });
+      document.getElementById('v-dl').addEventListener('click', async ()=>{ toast('Downloading…'); for(let i=0;i<urls.length;i++){ try{ const r=await fetch(urls[i]); const b=await r.blob(); downloadBlob(b, `${slugify(post.title)}-${String(i+1).padStart(2,'0')}.jpg`); }catch(e){ window.open(urls[i],'_blank'); } await new Promise(r=>setTimeout(r,700)); } toast(`Downloaded ${urls.length}`); });
+      document.getElementById('v-save').addEventListener('click', async ()=>{ const st=document.getElementById('v-status').value; const cap=document.getElementById('v-cap').value; const {error}=await sb.from('carousel_posts').update({status:st,caption:cap}).eq('id',post.id); if(error){toast(error.message,'err');return;} toast('Saved'); closeSheets(); await load(); });
+      document.getElementById('v-del').addEventListener('click', async ()=>{ if(!confirm('Delete this carousel? This cannot be undone.'))return; const {error}=await sb.from('carousel_posts').delete().eq('id',post.id); if(error){toast(error.message,'err');return;} toast('Deleted'); closeSheets(); await load(); });
+    }
+
     function openEditor(post){
       draft = JSON.parse(JSON.stringify(post));
       if (!draft.slides || !draft.slides.length) draft.slides = [blankSlide()];
@@ -547,7 +573,8 @@ end $$;`;
     // ---------- grid click ----------
     grid.addEventListener('click', e => {
       const card = e.target.closest('[data-id]'); if (!card) return;
-      const post = posts.find(p => p.id === card.dataset.id); if (post) openEditor(post);
+      const post = posts.find(p => p.id === card.dataset.id);
+      if (post) { if ((post.rendered_urls||[]).length) openViewer(post); else openEditor(post); }
     });
 
     // ---------- toolbar ----------
