@@ -264,7 +264,7 @@ end $$;`;
         const themeBg = p.theme === 'plugverse'
           ? 'radial-gradient(120% 80% at 80% 0%, rgba(255,107,53,0.18), transparent 60%), linear-gradient(160deg,#161616,#0a0a0a)'
           : 'linear-gradient(160deg,#1a1714,#0a0908)';
-        const thumb = p.thumb_url || (p.rendered_urls||[])[0] || first?.photo || first?.photoTop || first?.bg;
+        const thumb = first?.photo || first?.photoTop || p.thumb_url || (p.rendered_urls||[])[0] || first?.bg;
         const bg = thumb ? `background-image:url('${esc(thumb)}')` : `background-image:${themeBg}`;
         const n = (p.rendered_urls||[]).length || (p.slides || []).length;
         return `<div class="card ccard" data-id="${esc(p.id)}">
@@ -411,10 +411,12 @@ end $$;`;
       mono: 'linear-gradient(160deg,#1a1714,#0a0908)',
       plugverse: 'radial-gradient(120% 80% at 80% 0%, rgba(255,107,53,0.14), transparent 60%), linear-gradient(160deg,#161616,#0a0a0a)',
     };
-    function buildSlideNode(slide, theme = 'mono', isCover = false) {
+    function buildSlideNode(slide, theme = 'mono', isCover = false, editable = false) {
       const node = document.createElement('div');
       node.className = 'rslide';
       node.dataset.theme = theme;
+      const edAttr = (bi) => editable ? ` contenteditable="true" data-bi="${bi}" spellcheck="false"` : '';
+      const disp = (t) => editable ? esc(t||'').replace(/\n/g,'<br>') : italicize(t||'');
       // No handle/tag on the cover slide (Cooper: cover = photo + centered title only).
       const showHandle = slide.handle && !isCover;
       const handleLabel = theme === 'plugverse' ? 'plugverse.app' : 'cooperdelo';
@@ -426,7 +428,7 @@ end $$;`;
         const bl = slide.blocks || [];
         const topB = bl.find(b => b.place === 'top') || bl[0];
         const botB = bl.find(b => b.place === 'bottom') || bl.find(b => b !== topB) || bl[1];
-        const blockHTML = b => b ? `<div class="rblock place-center f-${esc(b.font||'capcut')}${b.accent?' accent':''}" style="${b.size?`font-size:${b.size}px;`:''}">${italicize(b.text||'')}</div>` : '';
+        const blockHTML = b => b ? `<div class="rblock place-center f-${esc(b.font||'capcut')}${b.accent?' accent':''}" style="${b.size?`font-size:${b.size}px;`:''}"${edAttr(bl.indexOf(b))}>${disp(b.text)}</div>` : '';
         const half = (photo, b, pos) => {
           const bgimg = photo ? `background-image:url('${photo}')` : `background-image:${fallbackBg}`;
           return `<div class="rhalf ${pos}"><div class="rhbg" style="${bgimg}"></div><div class="rhscrim"></div>${blockHTML(b)}</div>`;
@@ -444,10 +446,10 @@ end $$;`;
       const hasTop = (slide.blocks||[]).some(b => b.place==='top');
       const hasLow = (slide.blocks||[]).some(b => b.place==='lower' || b.place==='bottom');
       const scrim = (img ? (`${hasTop?'<div class="rscrim-t"></div>':''}${hasLow?'<div class="rscrim-b"></div>':''}`) : '');
-      const blocks = (slide.blocks||[]).map(b => {
+      const blocks = (slide.blocks||[]).map((b, bi) => {
         const sz = b.size ? `font-size:${b.size}px;` : '';
         const acc = b.accent ? ' accent' : '';
-        return `<div class="rblock place-${esc(b.place||'lower')} f-${esc(b.font||'serif')}${acc}" style="${sz}">${italicize(b.text||'')}</div>`;
+        return `<div class="rblock place-${esc(b.place||'lower')} f-${esc(b.font||'serif')}${acc}" style="${sz}"${edAttr(bi)}>${disp(b.text)}</div>`;
       }).join('');
       const handle = showHandle ? `<div class="rhandle">${handleLabel}</div>` : '';
       node.innerHTML = bg + (slide.overlay ? `<div style="position:absolute;inset:0;background:rgba(0,0,0,${Number(slide.overlay)})"></div>` : '') + scrim + `<div class="rgrain"></div>` + blocks + handle;
@@ -610,15 +612,19 @@ end $$;`;
       col.innerHTML = draft.slides.map((s,i)=>slideEdHTML(s,i)).join('');
     }
 
-    async function paintPreview(){
+    function paintPreview(){
       const frame = document.getElementById('stage-frame');
       const nav = document.getElementById('slide-nav');
       if (previewIdx >= draft.slides.length) previewIdx = 0;
       nav.innerHTML = draft.slides.map((_,i)=>`<span class="dot ${i===previewIdx?'active':''}" data-go="${i}"></span>`).join('');
-      const canvas = await renderSlideToCanvas(draft.slides[previewIdx], draft.theme || 'mono', previewIdx === 0);
+      // live, scaled, editable DOM (type directly on the slide)
+      const node = buildSlideNode(draft.slides[previewIdx], draft.theme || 'mono', previewIdx === 0, true);
       frame.innerHTML = '';
-      canvas.style.width = '100%'; canvas.style.height = '100%'; canvas.style.objectFit = 'cover';
-      frame.appendChild(canvas);
+      const scaler = document.createElement('div');
+      scaler.style.cssText = 'position:absolute;top:0;left:0;width:1080px;height:1350px;transform-origin:top left;';
+      scaler.appendChild(node);
+      frame.appendChild(scaler);
+      requestAnimationFrame(() => { const fw = frame.clientWidth || 360; scaler.style.transform = `scale(${fw/1080})`; });
     }
 
     function readFormIntoDraft(){
@@ -672,6 +678,12 @@ end $$;`;
       col.addEventListener('click', onSlideClick);
 
       document.getElementById('f-theme').addEventListener('change', e => { draft.theme = e.target.value; paintPreview(); });
+      // type directly on the slide preview -> updates the slide text live
+      document.getElementById('stage-frame').addEventListener('input', e => {
+        const el = e.target.closest('.rblock[data-bi]'); if (!el) return;
+        const slide = draft.slides[previewIdx]; const bi = Number(el.dataset.bi);
+        if (slide && slide.blocks[bi]) slide.blocks[bi].text = el.innerText.replace(/ /g,' ');
+      });
       document.getElementById('add-slide').addEventListener('click', () => { draft.slides.push(blankSlide()); paintSlidesCol(); paintPreview(); });
       document.getElementById('dl-one').addEventListener('click', async () => { readFormIntoDraft(); await downloadOne(draft, previewIdx); });
       document.getElementById('dl-all').addEventListener('click', async () => { readFormIntoDraft(); await downloadAll(draft); });
@@ -759,7 +771,9 @@ end $$;`;
     grid.addEventListener('click', e => {
       const card = e.target.closest('[data-id]'); if (!card) return;
       const post = posts.find(p => p.id === card.dataset.id);
-      if (post) { if ((post.rendered_urls||[]).length) openViewer(post); else openEditor(post); }
+      // Prefer the live editable editor whenever slide data exists (so every carousel
+      // re-renders with the current font/cover/spacing and stays fully editable).
+      if (post) { if ((post.slides||[]).length) openEditor(post); else if ((post.rendered_urls||[]).length) openViewer(post); else openEditor(post); }
     });
 
     // ---------- toolbar ----------
