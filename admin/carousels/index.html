@@ -7,7 +7,7 @@
 <title>Carousels · CD Admin</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo+Black&family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Playfair+Display:ital,wght@0,400..800;1,400..700&family=Plus+Jakarta+Sans:wght@400..800&family=Space+Mono:wght@400;700&family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Geist+Mono:wght@300..700&family=Geist:wght@300..700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo+Black&family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Playfair+Display:ital,wght@0,400..800;1,400..700&family=Plus+Jakarta+Sans:wght@400..800&family=Hanken+Grotesk:wght@500;700;800&family=Space+Mono:wght@400;700&family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Geist+Mono:wght@300..700&family=Geist:wght@300..700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/admin/_shell/admin-shell.css" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
@@ -76,6 +76,16 @@
   .rslide { width:1080px; height:1350px; position:relative; overflow:hidden; background:#0a0908; }
   .rbg { position:absolute; inset:0; background-size:cover; background-position:center; }
   .rgrain { position:absolute; inset:0; opacity:0.06; mix-blend-mode:overlay; background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' seed='7'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>"); }
+  /* "CapCut" punch font = DFP King Gothic Medium. We never host the commercial
+     font; local() uses Cooper's installed/CapCut copy on his own device. Web
+     fallback = Hanken Grotesk (closest free humanist match). If Cooper licenses
+     a webfont file, drop it in /admin/carousels/_fonts/ and add a url() src below. */
+  @font-face {
+    font-family: "KingGothic";
+    src: local("DFP King Gothic Medium"), local("DFPKingGothicGB-Medium"),
+         local("DFPKingGothic-Md"), local("King Gothic Medium"), local("HYQiHei-Medium");
+    font-weight: 500 800; font-display: swap;
+  }
   .rblock { position:absolute; left:90px; right:90px; }
   .rblock.place-top    { top:96px; }
   .rblock.place-center { top:50%; transform:translateY(-50%); text-align:center; }
@@ -83,7 +93,7 @@
   .rblock.place-bottom { bottom:80px; }
   .rblock.f-serif  { font-family:"Bodoni Moda","Playfair Display",serif; font-weight:500; color:#f4f1ea; font-size:66px; line-height:1.12; letter-spacing:-0.01em; text-shadow:0 2px 26px rgba(0,0,0,0.5); }
   .rblock.f-serif em { font-style:italic; }
-  .rblock.f-capcut { font-family:"Helvetica Neue",Arial,sans-serif; font-weight:800; color:#fff; font-size:58px; line-height:1.08; text-shadow:0 2px 10px rgba(0,0,0,0.6), 0 1px 2px rgba(0,0,0,0.7); }
+  .rblock.f-capcut { font-family:"KingGothic","Hanken Grotesk","Helvetica Neue",Arial,sans-serif; font-weight:700; color:#fff; font-size:58px; line-height:1.08; text-shadow:0 2px 10px rgba(0,0,0,0.6), 0 1px 2px rgba(0,0,0,0.7); }
   .rblock.f-stat   { font-family:"Archivo Black","Archivo",sans-serif; color:#fff; font-size:150px; line-height:0.95; letter-spacing:-0.02em; text-shadow:0 2px 18px rgba(0,0,0,0.5); }
   /* Plugverse theme overrides (orange / glass / Archivo Black) */
   .rslide[data-theme="plugverse"] .rblock.f-serif  { font-family:"Plus Jakarta Sans",sans-serif; font-weight:700; color:#fafafa; letter-spacing:-0.015em; text-shadow:0 2px 20px rgba(0,0,0,0.5); }
@@ -286,12 +296,13 @@ end $$;`;
       const node = document.createElement('div');
       node.className = 'rslide';
       node.dataset.theme = theme;
-      const bg = slide.bg
-        ? `<div class="rbg" style="background-image:url('${slide.bg}')"></div>`
+      const img = slide.photo || slide.bg;
+      const bg = img
+        ? `<div class="rbg" style="background-image:url('${img}')"></div>`
         : `<div class="rbg" style="background-image:${THEME_BG[theme]||THEME_BG.mono}"></div>`;
       const hasTop = (slide.blocks||[]).some(b => b.place==='top');
       const hasLow = (slide.blocks||[]).some(b => b.place==='lower' || b.place==='bottom');
-      const scrim = (slide.bg ? (`${hasTop?'<div class="rscrim-t"></div>':''}${hasLow?'<div class="rscrim-b"></div>':''}`) : '');
+      const scrim = (img ? (`${hasTop?'<div class="rscrim-t"></div>':''}${hasLow?'<div class="rscrim-b"></div>':''}`) : '');
       const handleLabel = theme === 'plugverse' ? 'plugverse.app' : 'cooperdelo';
       const blocks = (slide.blocks||[]).map(b => {
         const sz = b.size ? `font-size:${b.size}px;` : '';
@@ -355,7 +366,7 @@ end $$;`;
     let draft = null;       // working copy
     let previewIdx = 0;
 
-    function blankSlide(){ return { bg:null, overlay:0, handle:false, blocks:[{ text:'', font:'serif', place:'lower' }] }; }
+    function blankSlide(){ return { photo:null, overlay:0, handle:false, blocks:[{ text:'', font:'serif', place:'lower' }] }; }
     function blankPost(){ return { title:'Untitled', theme:'mono', pillar:'juggling', format:'statement', caption:'', hashtags:[], slides:[blankSlide()], status:'queued', source:'manual' }; }
 
     function opt(list, val){ return list.map(x => `<option value="${x}" ${x===val?'selected':''}>${x}</option>`).join(''); }
@@ -420,11 +431,14 @@ end $$;`;
           </span>
         </div>
         <div class="photo-row">
-          <div class="thumb" style="${slide.bg?`background-image:url('${esc(slide.bg)}')`:''}"></div>
-          <label class="iconbtn">Photo<input type="file" accept="image/*" data-photo="${i}" style="display:none"></label>
-          ${slide.bg?`<button class="iconbtn" data-rmphoto="${i}">Clear photo</button>`:''}
+          <div class="thumb" style="${slide.photo?`background-image:url('${esc(slide.photo)}')`:''}"></div>
+          <label class="iconbtn">Upload photo<input type="file" accept="image/*" data-photo="${i}" style="display:none"></label>
+          ${slide.photo?`<button class="iconbtn" data-rmphoto="${i}">Clear</button>`:''}
           <label class="mini" style="display:flex;align-items:center;gap:0.3rem">overlay<input type="range" min="0" max="0.7" step="0.05" value="${slide.overlay||0}" data-overlay="${i}" style="width:80px"></label>
           <label class="mini" style="display:flex;align-items:center;gap:0.3rem"><input type="checkbox" data-handle="${i}" ${slide.handle?'checked':''}>handle</label>
+        </div>
+        <div class="photo-row" style="margin-top:0.35rem">
+          <input data-photourl="${i}" placeholder="or paste your own photo URL (overrides the AI pick)" value="${slide.photo && /^https?:/.test(slide.photo) ? esc(slide.photo) : ''}" style="flex:1;min-width:0;font-family:'Geist Mono',monospace;font-size:0.62rem;background:rgba(20,17,15,0.65);border:1px solid var(--card-border);color:var(--ink);padding:0.45rem 0.6rem;border-radius:8px">
         </div>
         ${blocks}
       </div>`;
@@ -516,6 +530,7 @@ end $$;`;
       const slide = draft.slides[si];
       if (t.dataset.overlay != null) { slide.overlay = Number(t.value); paintPreview(); return; }
       if (t.dataset.handle != null) { slide.handle = t.checked; paintPreview(); return; }
+      if (t.dataset.photourl != null) { slide.photo = t.value.trim() || null; paintPreview(); return; }
       const blockEl = t.closest('.block-ed');
       if (blockEl){
         const bi = Number(blockEl.dataset.bi);
@@ -536,7 +551,7 @@ end $$;`;
       if (t.dataset.addblock != null){ draft.slides[si].blocks.push({text:'',font:'capcut',place:'top'}); paintSlidesCol(); paintPreview(); return; }
       if (t.dataset.rmslide != null){ if (draft.slides.length>1){ draft.slides.splice(si,1); if(previewIdx>=draft.slides.length)previewIdx=0; paintSlidesCol(); paintPreview(); } return; }
       if (t.dataset.rmblock != null){ const bi=Number(t.dataset.rmblock); if(draft.slides[si].blocks.length>1){draft.slides[si].blocks.splice(bi,1); paintSlidesCol(); paintPreview();} return; }
-      if (t.dataset.rmphoto != null){ draft.slides[si].bg=null; paintSlidesCol(); paintPreview(); return; }
+      if (t.dataset.rmphoto != null){ draft.slides[si].photo=null; paintSlidesCol(); paintPreview(); return; }
     }
     // file inputs (change) — separate listener because file inputs live in slides-col
     document.getElementById('sheet').addEventListener('change', async e => {
@@ -544,7 +559,7 @@ end $$;`;
       if (t.dataset && t.dataset.photo != null && t.files && t.files[0]){
         const si = Number(t.dataset.photo);
         toast('Adding photo…');
-        draft.slides[si].bg = await fileToScaledDataURL(t.files[0]);
+        draft.slides[si].photo = await fileToScaledDataURL(t.files[0]);
         paintSlidesCol(); paintPreview();
       }
     });
