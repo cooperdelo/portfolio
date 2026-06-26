@@ -85,11 +85,11 @@
   .rblock.place-center { top:50%; transform:translateY(-50%); text-align:center; }
   .rblock.place-lower  { bottom:150px; }
   .rblock.place-bottom { bottom:80px; }
-  .rblock.f-serif  { font-family:"Hanken Grotesk","Helvetica Neue",Arial,sans-serif; font-weight:600; color:#f4f1ea; font-size:60px; line-height:1.02; letter-spacing:-0.01em; text-shadow:0 2px 26px rgba(0,0,0,0.5); }
+  .rblock.f-serif  { font-family:"Hanken Grotesk","Helvetica Neue",Arial,sans-serif; font-weight:600; color:#f4f1ea; font-size:60px; line-height:1.02; letter-spacing:-0.01em; text-shadow:0 2px 8px rgba(0,0,0,0.55), 0 1px 2px rgba(0,0,0,0.65); }
   .rblock.f-serif em { font-style:normal; text-decoration:underline; text-underline-offset:8px; }
-  .rblock.f-capcut { font-family:"Hanken Grotesk","Helvetica Neue",Arial,sans-serif; font-weight:700; color:#fff; font-size:58px; line-height:0.98; letter-spacing:-0.01em; text-shadow:0 2px 10px rgba(0,0,0,0.6), 0 1px 2px rgba(0,0,0,0.7); }
-  .rblock.f-stat   { font-family:"Archivo Black","Archivo",sans-serif; color:#fff; font-size:118px; line-height:0.9; letter-spacing:-0.02em; text-shadow:0 2px 18px rgba(0,0,0,0.5); }
-  .rslide.cover .rblock { font-family:"Archivo Black","Archivo",sans-serif; font-weight:400; color:#fff; font-size:82px; line-height:0.96; letter-spacing:-0.02em; }
+  .rblock.f-capcut { font-family:"Hanken Grotesk","Helvetica Neue",Arial,sans-serif; font-weight:700; color:#fff; font-size:58px; line-height:0.98; letter-spacing:-0.01em; text-shadow:0 2px 8px rgba(0,0,0,0.6), 0 1px 2px rgba(0,0,0,0.7); }
+  .rblock.f-stat   { font-family:"Archivo Black","Archivo",sans-serif; color:#fff; font-size:118px; line-height:0.9; letter-spacing:-0.02em; text-shadow:0 2px 8px rgba(0,0,0,0.55), 0 1px 2px rgba(0,0,0,0.65); }
+  .rslide.cover .rblock { font-family:"Archivo Black","Archivo",sans-serif; font-weight:400; color:#fff; font-size:82px; line-height:0.96; letter-spacing:-0.02em; text-shadow:0 2px 8px rgba(0,0,0,0.6), 0 1px 2px rgba(0,0,0,0.7); }
   /* Plugverse theme overrides (orange / glass / Archivo Black) */
   .rslide[data-theme="plugverse"] .rblock.f-serif  { font-family:"Plus Jakarta Sans",sans-serif; font-weight:700; color:#fafafa; letter-spacing:-0.015em; text-shadow:0 2px 20px rgba(0,0,0,0.5); }
   .rslide[data-theme="plugverse"] .rblock.f-serif em { font-style:normal; color:#FF6B35; }
@@ -166,8 +166,13 @@
   <!-- Photo picker sheet -->
   <div class="sheet" id="picker-sheet">
     <button class="close" data-action="close-picker">Close</button>
-    <h2>Choose a photo</h2>
-    <input id="picker-search" placeholder="filter by category / mood / pillar / description…" style="width:100%;margin-bottom:0.8rem;font-family:'Geist Mono',monospace;font-size:0.72rem;background:rgba(20,17,15,0.65);border:1px solid var(--card-border);color:var(--ink);padding:0.6rem 0.8rem;border-radius:10px">
+    <h2>Choose from your roll</h2>
+    <div class="seg" id="picker-mode" style="margin-bottom:0.6rem">
+      <button class="active" data-m="photo">Photos</button>
+      <button data-m="video">Videos</button>
+      <span class="mini" id="picker-count" style="margin-left:auto;align-self:center"></span>
+    </div>
+    <input id="picker-search" placeholder="filter by name (guitar, gym, golf, founder, travel…)" style="width:100%;margin-bottom:0.8rem;font-family:'Geist Mono',monospace;font-size:0.72rem;background:rgba(20,17,15,0.65);border:1px solid var(--card-border);color:var(--ink);padding:0.6rem 0.8rem;border-radius:10px">
     <div id="picker-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:0.5rem;max-height:64vh;overflow:auto"></div>
   </div>
 
@@ -299,13 +304,19 @@ end $$;`;
     }
 
     // ---------- auto-photos: varied + matched, no repeats across posts ----------
-    let _broll = null;
+    let _broll = null, _brollVideos = [];
     async function loadBroll(){
       if (_broll) return _broll;
-      const { data, error } = await sb.from('broll_assets')
-        .select('id,category,description,mood,pillars,orientation,media_url,usable_as_broll,media_host');
-      if (error){ toast('b-roll: '+error.message,'err'); _broll = []; return _broll; }
-      _broll = (data||[]).filter(a => a.media_url && a.media_host==='supabase' && a.usable_as_broll !== false);
+      // Primary: the bundled roll shipped with the Studio (no DB dependency).
+      try {
+        const r = await fetch('/admin/carousels/_broll.json', { cache:'no-cache' });
+        if (r.ok){ const j = await r.json(); _broll = (j.photos||[]).filter(p=>p.media_url); _brollVideos = j.videos||[]; }
+      } catch(e){}
+      // Fallback: the DB catalog, if it's populated.
+      if (!_broll || !_broll.length){
+        try { const { data } = await sb.from('broll_assets').select('id,category,description,mood,pillars,orientation,media_url,usable_as_broll,media_host');
+          _broll = (data||[]).filter(a => a.media_url && a.media_host==='supabase' && a.usable_as_broll !== false); } catch(e){ _broll = _broll||[]; }
+      }
       return _broll;
     }
     function usedPhotosAcrossPosts(excludeId){
@@ -382,20 +393,32 @@ end $$;`;
 
     // ---------- photo picker (click a slide -> pick from the full b-roll) ----------
     const pickerSheet = document.getElementById('picker-sheet');
-    let pickerCb = null;
+    let pickerCb = null, pickerMode = 'photo';
     async function openPicker(cb){
       pickerCb = cb;
-      const pool = await loadBroll();
+      await loadBroll();
       const grid = document.getElementById('picker-grid');
-      const draw = (q='') => {
-        const qq = q.toLowerCase().trim();
-        const items = pool.filter(a => !qq || (((a.category||'')+' '+(a.mood||'')+' '+(a.description||'')+' '+((a.pillars||[]).join(' '))).toLowerCase().includes(qq)));
-        grid.innerHTML = items.slice(0,500).map(a =>
-          `<div data-url="${esc(a.media_url)}" title="${esc(a.category||'')}" style="aspect-ratio:4/5;border-radius:8px;background:#14110F center/cover no-repeat;background-image:url('${esc(a.thumb_url||a.media_url)}');cursor:pointer;border:1px solid var(--card-border)"></div>`
+      const search = document.getElementById('picker-search');
+      const count = document.getElementById('picker-count');
+      const draw = () => {
+        const qq = (search.value||'').toLowerCase().trim();
+        if (pickerMode === 'video'){
+          grid.style.gridTemplateColumns = '1fr';
+          const items = (_brollVideos||[]).filter(v => !qq || (v.description||'').toLowerCase().includes(qq));
+          count.textContent = `${items.length} videos`;
+          grid.innerHTML = items.slice(0,600).map(v => `<div class="mini" style="padding:0.55rem 0.75rem;border:0.5px solid var(--card-border);border-radius:8px;color:var(--ink-2);text-transform:none;letter-spacing:0.02em">${esc(v.description)}</div>`).join('') || '<div class="empty">no videos</div>';
+          return;
+        }
+        grid.style.gridTemplateColumns = 'repeat(auto-fill,minmax(88px,1fr))';
+        const items = (_broll||[]).filter(a => !qq || ((a.description||'')+' '+(a.category||'')).toLowerCase().includes(qq));
+        count.textContent = `${items.length} photos`;
+        grid.innerHTML = items.slice(0,400).map(a =>
+          `<div data-url="${esc(a.media_url)}" title="${esc(a.description||'')}" style="aspect-ratio:4/5;border-radius:8px;background:#14110F center/cover no-repeat;background-image:url('${esc(a.media_url)}');cursor:pointer;border:1px solid var(--card-border)"></div>`
         ).join('') || '<div class="empty" style="grid-column:1/-1">no matches</div>';
       };
       draw();
-      const search = document.getElementById('picker-search'); search.value=''; search.oninput = () => draw(search.value);
+      search.value=''; search.oninput = draw;
+      document.querySelectorAll('#picker-mode button').forEach(b => b.onclick = () => { pickerMode=b.dataset.m; document.querySelectorAll('#picker-mode button').forEach(x=>x.classList.toggle('active', x===b)); draw(); });
       openSheet(pickerSheet);
     }
     function closePicker(){ pickerSheet.classList.remove('on'); pickerCb = null; }
