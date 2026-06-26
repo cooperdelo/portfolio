@@ -107,6 +107,14 @@
   .rslide[data-theme="plugverse"] .rhandle { font-family:"Space Mono",monospace; color:rgba(255,107,53,0.85); }
   .rscrim-b { position:absolute; left:0; right:0; bottom:0; height:55%; background:linear-gradient(to top, rgba(0,0,0,0.6), rgba(0,0,0,0)); }
   .rscrim-t { position:absolute; left:0; right:0; top:0; height:45%; background:linear-gradient(to bottom, rgba(0,0,0,0.45), rgba(0,0,0,0)); }
+  /* split-screen (two stacked photos per slide) */
+  .rslide.split .rhalf { position:absolute; left:0; right:0; height:50%; overflow:hidden; }
+  .rslide.split .rhalf.top { top:0; } .rslide.split .rhalf.bottom { bottom:0; }
+  .rslide.split .rhbg { position:absolute; inset:0; background-size:cover; background-position:center; }
+  .rslide.split .rhscrim { position:absolute; inset:0; background:rgba(0,0,0,0.34); }
+  .rslide.split .rgrain { z-index:2; }
+  .rslide.split .rsplit-divider { position:absolute; left:0; right:0; top:50%; height:3px; transform:translateY(-1.5px); background:rgba(244,239,230,0.55); z-index:3; }
+  .rslide.split .rhalf .rblock { z-index:4; }
 </style>
 </head>
 <body>
@@ -253,7 +261,7 @@ end $$;`;
         const themeBg = p.theme === 'plugverse'
           ? 'radial-gradient(120% 80% at 80% 0%, rgba(255,107,53,0.18), transparent 60%), linear-gradient(160deg,#161616,#0a0a0a)'
           : 'linear-gradient(160deg,#1a1714,#0a0908)';
-        const thumb = p.thumb_url || (p.rendered_urls||[])[0] || first?.bg;
+        const thumb = p.thumb_url || (p.rendered_urls||[])[0] || first?.photo || first?.photoTop || first?.bg;
         const bg = thumb ? `background-image:url('${esc(thumb)}')` : `background-image:${themeBg}`;
         const n = (p.rendered_urls||[]).length || (p.slides || []).length;
         return `<div class="card ccard" data-id="${esc(p.id)}">
@@ -296,6 +304,26 @@ end $$;`;
       const node = document.createElement('div');
       node.className = 'rslide';
       node.dataset.theme = theme;
+      const handleLabel = theme === 'plugverse' ? 'plugverse.app' : 'cooperdelo';
+      const fallbackBg = THEME_BG[theme] || THEME_BG.mono;
+
+      // ---- split-screen: two stacked photos, one text block per half ----
+      if (slide.split) {
+        node.classList.add('split');
+        const bl = slide.blocks || [];
+        const topB = bl.find(b => b.place === 'top') || bl[0];
+        const botB = bl.find(b => b.place === 'bottom') || bl.find(b => b !== topB) || bl[1];
+        const blockHTML = b => b ? `<div class="rblock place-center f-${esc(b.font||'capcut')}${b.accent?' accent':''}" style="${b.size?`font-size:${b.size}px;`:''}">${italicize(b.text||'')}</div>` : '';
+        const half = (photo, b, pos) => {
+          const bgimg = photo ? `background-image:url('${photo}')` : `background-image:${fallbackBg}`;
+          return `<div class="rhalf ${pos}"><div class="rhbg" style="${bgimg}"></div><div class="rhscrim"></div>${blockHTML(b)}</div>`;
+        };
+        const handle = slide.handle ? `<div class="rhandle">${handleLabel}</div>` : '';
+        node.innerHTML = half(slide.photoTop, topB, 'top') + half(slide.photoBottom, botB, 'bottom')
+          + `<div class="rsplit-divider"></div><div class="rgrain"></div>` + handle;
+        return node;
+      }
+
       const img = slide.photo || slide.bg;
       const bg = img
         ? `<div class="rbg" style="background-image:url('${img}')"></div>`
@@ -303,7 +331,6 @@ end $$;`;
       const hasTop = (slide.blocks||[]).some(b => b.place==='top');
       const hasLow = (slide.blocks||[]).some(b => b.place==='lower' || b.place==='bottom');
       const scrim = (img ? (`${hasTop?'<div class="rscrim-t"></div>':''}${hasLow?'<div class="rscrim-b"></div>':''}`) : '');
-      const handleLabel = theme === 'plugverse' ? 'plugverse.app' : 'cooperdelo';
       const blocks = (slide.blocks||[]).map(b => {
         const sz = b.size ? `font-size:${b.size}px;` : '';
         const acc = b.accent ? ' accent' : '';
@@ -431,15 +458,32 @@ end $$;`;
           </span>
         </div>
         <div class="photo-row">
+          <label class="mini" style="display:flex;align-items:center;gap:0.3rem"><input type="checkbox" data-split="${i}" ${slide.split?'checked':''}>split (two photos)</label>
+          <label class="mini" style="display:flex;align-items:center;gap:0.3rem"><input type="checkbox" data-handle="${i}" ${slide.handle?'checked':''}>handle</label>
+          ${slide.split?'':`<label class="mini" style="display:flex;align-items:center;gap:0.3rem">overlay<input type="range" min="0" max="0.7" step="0.05" value="${slide.overlay||0}" data-overlay="${i}" style="width:80px"></label>`}
+        </div>
+        ${slide.split ? `
+        <div class="photo-row"><span class="mini" style="width:3.2rem">top</span>
+          <div class="thumb" style="${slide.photoTop?`background-image:url('${esc(slide.photoTop)}')`:''}"></div>
+          <label class="iconbtn">Upload<input type="file" accept="image/*" data-phototop="${i}" style="display:none"></label>
+          <input data-phototopurl="${i}" placeholder="top photo URL" value="${slide.photoTop && /^https?:/.test(slide.photoTop)?esc(slide.photoTop):''}" style="flex:1;min-width:0;font-family:'Geist Mono',monospace;font-size:0.6rem;background:rgba(20,17,15,0.65);border:1px solid var(--card-border);color:var(--ink);padding:0.4rem 0.55rem;border-radius:8px">
+        </div>
+        <div class="photo-row" style="margin-top:0.3rem"><span class="mini" style="width:3.2rem">bottom</span>
+          <div class="thumb" style="${slide.photoBottom?`background-image:url('${esc(slide.photoBottom)}')`:''}"></div>
+          <label class="iconbtn">Upload<input type="file" accept="image/*" data-photobottom="${i}" style="display:none"></label>
+          <input data-photobottomurl="${i}" placeholder="bottom photo URL" value="${slide.photoBottom && /^https?:/.test(slide.photoBottom)?esc(slide.photoBottom):''}" style="flex:1;min-width:0;font-family:'Geist Mono',monospace;font-size:0.6rem;background:rgba(20,17,15,0.65);border:1px solid var(--card-border);color:var(--ink);padding:0.4rem 0.55rem;border-radius:8px">
+        </div>
+        <div class="mini" style="margin-top:0.3rem;opacity:0.7">split: text block placed "top" shows on the top photo, "bottom" on the bottom photo.</div>
+        ` : `
+        <div class="photo-row">
           <div class="thumb" style="${slide.photo?`background-image:url('${esc(slide.photo)}')`:''}"></div>
           <label class="iconbtn">Upload photo<input type="file" accept="image/*" data-photo="${i}" style="display:none"></label>
           ${slide.photo?`<button class="iconbtn" data-rmphoto="${i}">Clear</button>`:''}
-          <label class="mini" style="display:flex;align-items:center;gap:0.3rem">overlay<input type="range" min="0" max="0.7" step="0.05" value="${slide.overlay||0}" data-overlay="${i}" style="width:80px"></label>
-          <label class="mini" style="display:flex;align-items:center;gap:0.3rem"><input type="checkbox" data-handle="${i}" ${slide.handle?'checked':''}>handle</label>
         </div>
         <div class="photo-row" style="margin-top:0.35rem">
           <input data-photourl="${i}" placeholder="or paste your own photo URL (overrides the AI pick)" value="${slide.photo && /^https?:/.test(slide.photo) ? esc(slide.photo) : ''}" style="flex:1;min-width:0;font-family:'Geist Mono',monospace;font-size:0.62rem;background:rgba(20,17,15,0.65);border:1px solid var(--card-border);color:var(--ink);padding:0.45rem 0.6rem;border-radius:8px">
         </div>
+        `}
         ${blocks}
       </div>`;
     }
@@ -531,6 +575,9 @@ end $$;`;
       if (t.dataset.overlay != null) { slide.overlay = Number(t.value); paintPreview(); return; }
       if (t.dataset.handle != null) { slide.handle = t.checked; paintPreview(); return; }
       if (t.dataset.photourl != null) { slide.photo = t.value.trim() || null; paintPreview(); return; }
+      if (t.dataset.split != null) { slide.split = t.checked; paintSlidesCol(); paintPreview(); return; }
+      if (t.dataset.phototopurl != null) { slide.photoTop = t.value.trim() || null; paintPreview(); return; }
+      if (t.dataset.photobottomurl != null) { slide.photoBottom = t.value.trim() || null; paintPreview(); return; }
       const blockEl = t.closest('.block-ed');
       if (blockEl){
         const bi = Number(blockEl.dataset.bi);
@@ -555,13 +602,15 @@ end $$;`;
     }
     // file inputs (change) — separate listener because file inputs live in slides-col
     document.getElementById('sheet').addEventListener('change', async e => {
-      const t = e.target;
-      if (t.dataset && t.dataset.photo != null && t.files && t.files[0]){
-        const si = Number(t.dataset.photo);
-        toast('Adding photo…');
-        draft.slides[si].photo = await fileToScaledDataURL(t.files[0]);
-        paintSlidesCol(); paintPreview();
-      }
+      const t = e.target; if (!t.dataset || !t.files || !t.files[0]) return;
+      const field = t.dataset.photo != null ? 'photo'
+        : t.dataset.phototop != null ? 'photoTop'
+        : t.dataset.photobottom != null ? 'photoBottom' : null;
+      if (!field) return;
+      const si = Number(t.dataset.photo ?? t.dataset.phototop ?? t.dataset.photobottom);
+      toast('Adding photo…');
+      draft.slides[si][field] = await fileToScaledDataURL(t.files[0]);
+      paintSlidesCol(); paintPreview();
     });
     document.getElementById('sheet').addEventListener('click', e => {
       const d = e.target.closest('[data-go]'); if (d){ previewIdx = Number(d.dataset.go); paintPreview(); }
