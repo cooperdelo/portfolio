@@ -133,6 +133,7 @@
       </div>
       <div class="actions">
         <span class="live-dot" id="live">Loading</span>
+        <button class="btn" id="fix-all">Fix all photos</button>
         <button class="btn" id="import-btn">Import JSON</button>
         <button class="btn primary" id="new-btn">New carousel</button>
       </div>
@@ -172,6 +173,14 @@
       <button class="btn primary" id="import-go">Import</button>
       <button class="btn" id="import-sample">Load sample</button>
     </div>
+  </div>
+
+  <!-- Photo picker sheet -->
+  <div class="sheet" id="picker-sheet">
+    <button class="close" data-action="close-picker">Close</button>
+    <h2>Choose a photo</h2>
+    <input id="picker-search" placeholder="filter by category / mood / pillar / description…" style="width:100%;margin-bottom:0.8rem;font-family:'Geist Mono',monospace;font-size:0.72rem;background:rgba(20,17,15,0.65);border:1px solid var(--card-border);color:var(--ink);padding:0.6rem 0.8rem;border-radius:10px">
+    <div id="picker-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:0.5rem;max-height:64vh;overflow:auto"></div>
   </div>
 
   <div id="render-stage"></div>
@@ -330,36 +339,84 @@ end $$;`;
       const txt = (slide.blocks||[]).map(b=>b.text||'').join(' ').toLowerCase();
       const ks = []; for (const m of KW){ if (m.re.test(txt)) ks.push(...m.k); } return ks;
     }
+    // pick the best UNUSED photo for a slide; mutates usedSet
+    function scorePick(pool, pillar, slide, usedSet){
+      const kws = keywordsForSlide(slide);
+      let best=null, bestScore=-1;
+      for (const a of pool){
+        if (usedSet.has(a.media_url)) continue;
+        let s = Math.random()*0.5;
+        if (Array.isArray(a.pillars) && pillar && a.pillars.includes(pillar)) s += 3;
+        const hay = ((a.category||'')+' '+(a.description||'')+' '+(a.mood||'')).toLowerCase();
+        for (const k of kws){ if (hay.includes(k)){ s += 2.5; break; } }
+        if (a.orientation==='portrait') s += 0.5;
+        if (s > bestScore){ bestScore=s; best=a; }
+      }
+      if (best){ usedSet.add(best.media_url); return best.media_url; }
+      return null;
+    }
+
+    // assign varied, matched photos to the OPEN draft (excludes photos used by other posts)
     async function autoPhotos(){
       const pool = await loadBroll();
       if (!pool.length){ toast('No b-roll photos found in broll_assets','err'); return; }
       readFormIntoDraft();
-      const used = usedPhotosAcrossPosts(draft.id);
-      const pillar = draft.pillar;
-      const avoid = new Set();
-      const pick = (slide) => {
-        const kws = keywordsForSlide(slide);
-        let best=null, bestScore=-1;
-        for (const a of pool){
-          if (used.has(a.media_url) || avoid.has(a.media_url)) continue;
-          let s = Math.random()*0.5;
-          if (Array.isArray(a.pillars) && pillar && a.pillars.includes(pillar)) s += 3;
-          const hay = ((a.category||'')+' '+(a.description||'')+' '+(a.mood||'')).toLowerCase();
-          for (const k of kws){ if (hay.includes(k)){ s += 2.5; break; } }
-          if (a.orientation==='portrait') s += 0.5;
-          if (s > bestScore){ bestScore=s; best=a; }
-        }
-        if (best){ avoid.add(best.media_url); }
-        return best;
-      };
+      const usedSet = new Set(usedPhotosAcrossPosts(draft.id));
       let n=0;
       for (const slide of draft.slides){
-        if (slide.split){ const t=pick(slide); if(t){slide.photoTop=t.media_url;n++;} const b=pick(slide); if(b){slide.photoBottom=b.media_url;n++;} }
-        else { const a=pick(slide); if(a){ slide.photo=a.media_url; n++; } }
+        if (slide.split){ const t=scorePick(pool,draft.pillar,slide,usedSet); if(t){slide.photoTop=t;n++;} const b=scorePick(pool,draft.pillar,slide,usedSet); if(b){slide.photoBottom=b;n++;} }
+        else { const a=scorePick(pool,draft.pillar,slide,usedSet); if(a){ slide.photo=a; n++; } }
       }
       paintSlidesCol(); paintPreview();
       toast(n ? 'Assigned varied photos - Save to keep' : 'No unused photos matched', n?'ok':'err');
     }
+
+    // one-click: fix photos on ALL carousels at once, no repeats anywhere, then save
+    async function autoPhotosAll(){
+      if (!tableReady){ toast('Run the setup SQL first','err'); return; }
+      if (!confirm('Assign varied, matched photos to ALL carousels (no repeats across any of them) and save? This overwrites current photo picks.')) return;
+      const pool = await loadBroll();
+      if (!pool.length){ toast('No b-roll photos found','err'); return; }
+      const usedSet = new Set();
+      let count=0;
+      for (const p of posts){
+        const slides = p.slides || []; if (!slides.length) continue;
+        for (const slide of slides){
+          if (slide.split){ const t=scorePick(pool,p.pillar,slide,usedSet); if(t)slide.photoTop=t; const b=scorePick(pool,p.pillar,slide,usedSet); if(b)slide.photoBottom=b; }
+          else { const a=scorePick(pool,p.pillar,slide,usedSet); if(a)slide.photo=a; }
+        }
+        const { error } = await sb.from('carousel_posts').update({ slides }).eq('id', p.id);
+        if (!error) count++;
+      }
+      toast(`Fixed photos on ${count} carousel${count===1?'':'s'}`);
+      await load();
+    }
+
+    // ---------- photo picker (click a slide -> pick from the full b-roll) ----------
+    const pickerSheet = document.getElementById('picker-sheet');
+    let pickerCb = null;
+    async function openPicker(cb){
+      pickerCb = cb;
+      const pool = await loadBroll();
+      const grid = document.getElementById('picker-grid');
+      const draw = (q='') => {
+        const qq = q.toLowerCase().trim();
+        const items = pool.filter(a => !qq || (((a.category||'')+' '+(a.mood||'')+' '+(a.description||'')+' '+((a.pillars||[]).join(' '))).toLowerCase().includes(qq)));
+        grid.innerHTML = items.slice(0,500).map(a =>
+          `<div data-url="${esc(a.media_url)}" title="${esc(a.category||'')}" style="aspect-ratio:4/5;border-radius:8px;background:#14110F center/cover no-repeat;background-image:url('${esc(a.thumb_url||a.media_url)}');cursor:pointer;border:1px solid var(--card-border)"></div>`
+        ).join('') || '<div class="empty" style="grid-column:1/-1">no matches</div>';
+      };
+      draw();
+      const search = document.getElementById('picker-search'); search.value=''; search.oninput = () => draw(search.value);
+      openSheet(pickerSheet);
+    }
+    function closePicker(){ pickerSheet.classList.remove('on'); pickerCb = null; }
+    document.getElementById('picker-grid').addEventListener('click', e => {
+      const t = e.target.closest('[data-url]'); if (!t) return;
+      if (pickerCb) pickerCb(t.dataset.url);
+      closePicker();
+    });
+    document.addEventListener('click', e => { if (e.target.closest('[data-action="close-picker"]')) closePicker(); });
 
     // ---------- render a slide to a DOM node (exact 1080x1350) ----------
     function italicize(text){ return esc(text).replace(/\*(.+?)\*/g, '<em>$1</em>').replace(/\n/g,'<br>'); }
@@ -535,11 +592,13 @@ end $$;`;
         ${slide.split ? `
         <div class="photo-row"><span class="mini" style="width:3.2rem">top</span>
           <div class="thumb" style="${slide.photoTop?`background-image:url('${esc(slide.photoTop)}')`:''}"></div>
+          <button class="iconbtn" data-picktop="${i}">Choose</button>
           <label class="iconbtn">Upload<input type="file" accept="image/*" data-phototop="${i}" style="display:none"></label>
           <input data-phototopurl="${i}" placeholder="top photo URL" value="${slide.photoTop && /^https?:/.test(slide.photoTop)?esc(slide.photoTop):''}" style="flex:1;min-width:0;font-family:'Geist Mono',monospace;font-size:0.6rem;background:rgba(20,17,15,0.65);border:1px solid var(--card-border);color:var(--ink);padding:0.4rem 0.55rem;border-radius:8px">
         </div>
         <div class="photo-row" style="margin-top:0.3rem"><span class="mini" style="width:3.2rem">bottom</span>
           <div class="thumb" style="${slide.photoBottom?`background-image:url('${esc(slide.photoBottom)}')`:''}"></div>
+          <button class="iconbtn" data-pickbot="${i}">Choose</button>
           <label class="iconbtn">Upload<input type="file" accept="image/*" data-photobottom="${i}" style="display:none"></label>
           <input data-photobottomurl="${i}" placeholder="bottom photo URL" value="${slide.photoBottom && /^https?:/.test(slide.photoBottom)?esc(slide.photoBottom):''}" style="flex:1;min-width:0;font-family:'Geist Mono',monospace;font-size:0.6rem;background:rgba(20,17,15,0.65);border:1px solid var(--card-border);color:var(--ink);padding:0.4rem 0.55rem;border-radius:8px">
         </div>
@@ -547,7 +606,8 @@ end $$;`;
         ` : `
         <div class="photo-row">
           <div class="thumb" style="${slide.photo?`background-image:url('${esc(slide.photo)}')`:''}"></div>
-          <label class="iconbtn">Upload photo<input type="file" accept="image/*" data-photo="${i}" style="display:none"></label>
+          <button class="iconbtn" data-pick="${i}">Choose</button>
+          <label class="iconbtn">Upload<input type="file" accept="image/*" data-photo="${i}" style="display:none"></label>
           ${slide.photo?`<button class="iconbtn" data-rmphoto="${i}">Clear</button>`:''}
         </div>
         <div class="photo-row" style="margin-top:0.35rem">
@@ -670,6 +730,9 @@ end $$;`;
       if (t.dataset.rmslide != null){ if (draft.slides.length>1){ draft.slides.splice(si,1); if(previewIdx>=draft.slides.length)previewIdx=0; paintSlidesCol(); paintPreview(); } return; }
       if (t.dataset.rmblock != null){ const bi=Number(t.dataset.rmblock); if(draft.slides[si].blocks.length>1){draft.slides[si].blocks.splice(bi,1); paintSlidesCol(); paintPreview();} return; }
       if (t.dataset.rmphoto != null){ draft.slides[si].photo=null; paintSlidesCol(); paintPreview(); return; }
+      if (t.dataset.pick != null){ openPicker(url=>{ draft.slides[si].photo=url; paintSlidesCol(); paintPreview(); }); return; }
+      if (t.dataset.picktop != null){ openPicker(url=>{ draft.slides[si].photoTop=url; paintSlidesCol(); paintPreview(); }); return; }
+      if (t.dataset.pickbot != null){ openPicker(url=>{ draft.slides[si].photoBottom=url; paintSlidesCol(); paintPreview(); }); return; }
     }
     // file inputs (change) — separate listener because file inputs live in slides-col
     document.getElementById('sheet').addEventListener('change', async e => {
@@ -725,6 +788,7 @@ end $$;`;
     });
 
     // ---------- import ----------
+    document.getElementById('fix-all').addEventListener('click', autoPhotosAll);
     document.getElementById('import-btn').addEventListener('click', () => openSheet(importSheet));
     document.getElementById('import-sample').addEventListener('click', () => {
       document.getElementById('import-text').value = JSON.stringify([{
