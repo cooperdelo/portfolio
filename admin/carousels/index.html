@@ -123,6 +123,7 @@
         <span class="live-dot" id="live">Loading</span>
         <button class="btn" id="fix-all">Fix all photos</button>
         <button class="btn" id="import-btn">Import JSON</button>
+        <button class="btn" id="new-cover-btn">New video cover</button>
         <button class="btn primary" id="new-btn">New carousel</button>
       </div>
     </div>
@@ -435,10 +436,14 @@ end $$;`;
       mono: 'linear-gradient(160deg,#1a1714,#0a0908)',
       plugverse: 'radial-gradient(120% 80% at 80% 0%, rgba(255,107,53,0.14), transparent 60%), linear-gradient(160deg,#161616,#0a0a0a)',
     };
-    function buildSlideNode(slide, theme = 'mono', isCover = false, editable = false) {
+    const RATIO_H = { '4:5':1350, '9:16':1920, '1:1':1080 };
+    const postRatio = p => (p && (p.ratio || (p.slides && p.slides[0] && p.slides[0].ratio))) || '4:5';
+    const postH = p => RATIO_H[postRatio(p)] || 1350;
+    function buildSlideNode(slide, theme = 'mono', isCover = false, editable = false, h = 1350) {
       const node = document.createElement('div');
       node.className = 'rslide';
       node.dataset.theme = theme;
+      node.style.height = h + 'px';
       if (isCover) node.classList.add('cover');
       const edAttr = (bi) => editable ? ` contenteditable="true" data-bi="${bi}" spellcheck="false"` : '';
       const disp = (t) => editable ? esc(t||'').replace(/\n/g,'<br>') : italicize(t||'');
@@ -481,13 +486,13 @@ end $$;`;
       return node;
     }
 
-    async function renderSlideToCanvas(slide, theme = 'mono', isCover = false) {
-      const node = buildSlideNode(slide, theme, isCover);
+    async function renderSlideToCanvas(slide, theme = 'mono', isCover = false, h = 1350) {
+      const node = buildSlideNode(slide, theme, isCover, false, h);
       renderStage.appendChild(node);
       // wait a tick for fonts/images to settle
       if (document.fonts && document.fonts.ready) { try { await document.fonts.ready; } catch(e){} }
       await new Promise(r => setTimeout(r, 60));
-      const canvas = await html2canvas(node, { width:1080, height:1350, scale:1, useCORS:true, backgroundColor:'#0a0908', logging:false });
+      const canvas = await html2canvas(node, { width:1080, height:h, scale:1, useCORS:true, backgroundColor:'#0a0908', logging:false });
       renderStage.removeChild(node);
       return canvas;
     }
@@ -505,7 +510,7 @@ end $$;`;
       if (!slides.length) { toast('No slides', 'err'); return; }
       toast('Rendering…');
       for (let i=0;i<slides.length;i++){
-        const canvas = await renderSlideToCanvas(slides[i], post.theme || 'mono', i === 0);
+        const canvas = await renderSlideToCanvas(slides[i], post.theme || 'mono', i === 0, postH(post));
         const blob = await canvasToBlob(canvas);
         downloadBlob(blob, `${slugify(post.title)}-${String(i+1).padStart(2,'0')}.png`);
         // space the downloads so the browser (esp. mobile) saves each one
@@ -514,7 +519,7 @@ end $$;`;
       toast(`Downloaded ${slides.length} slides`);
     }
     async function downloadOne(post, i){
-      const canvas = await renderSlideToCanvas(post.slides[i], post.theme || 'mono', i === 0);
+      const canvas = await renderSlideToCanvas(post.slides[i], post.theme || 'mono', i === 0, postH(post));
       const blob = await canvasToBlob(canvas);
       downloadBlob(blob, `${slugify(post.title)}-${String(i+1).padStart(2,'0')}.png`);
     }
@@ -534,7 +539,9 @@ end $$;`;
     let previewIdx = 0;
 
     function blankSlide(){ return { photo:null, overlay:0, handle:false, blocks:[{ text:'', font:'serif', place:'lower' }] }; }
-    function blankPost(){ return { title:'Untitled', theme:'mono', pillar:'juggling', format:'statement', caption:'', hashtags:[], slides:[blankSlide()], status:'queued', source:'manual' }; }
+    function blankPost(){ return { title:'Untitled', theme:'mono', ratio:'4:5', pillar:'juggling', format:'statement', caption:'', hashtags:[], slides:[blankSlide()], status:'queued', source:'manual' }; }
+    function newVideoCover(){ return { title:'Video cover', theme:'mono', ratio:'9:16', pillar:'juggling', format:'statement', caption:'', hashtags:[], status:'queued', source:'manual',
+      slides:[{ photo:null, overlay:0.35, handle:false, ratio:'9:16', blocks:[{ text:'your title here', font:'serif', place:'center' }] }] }; }
 
     function opt(list, val){ return list.map(x => `<option value="${x}" ${x===val?'selected':''}>${x}</option>`).join(''); }
 
@@ -545,6 +552,7 @@ end $$;`;
           <div class="form-grid" style="margin-bottom:1rem">
             <div class="field"><label>Title</label><input id="f-title" value="${esc(p.title)}"></div>
             <div class="field"><label>Theme / brand</label><select id="f-theme">${opt(['mono','plugverse'], p.theme||'mono')}</select></div>
+            <div class="field"><label>Size</label><select id="f-ratio">${opt(['4:5','9:16','1:1'], postRatio(p))}</select></div>
             <div class="field"><label>Status</label><select id="f-status">${opt(['queued','approved','posted'], p.status)}</select></div>
             <div class="field"><label>Pillar</label><select id="f-pillar">${opt(PILLARS, p.pillar)}</select></div>
             <div class="field"><label>Format</label><select id="f-format">${opt(FORMATS, p.format)}</select></div>
@@ -642,11 +650,13 @@ end $$;`;
       const nav = document.getElementById('slide-nav');
       if (previewIdx >= draft.slides.length) previewIdx = 0;
       nav.innerHTML = draft.slides.map((_,i)=>`<span class="dot ${i===previewIdx?'active':''}" data-go="${i}"></span>`).join('');
+      const h = postH(draft);
+      frame.style.aspectRatio = `1080 / ${h}`;
       // live, scaled, editable DOM (type directly on the slide)
-      const node = buildSlideNode(draft.slides[previewIdx], draft.theme || 'mono', previewIdx === 0, true);
+      const node = buildSlideNode(draft.slides[previewIdx], draft.theme || 'mono', previewIdx === 0, true, h);
       frame.innerHTML = '';
       const scaler = document.createElement('div');
-      scaler.style.cssText = 'position:absolute;top:0;left:0;width:1080px;height:1350px;transform-origin:top left;';
+      scaler.style.cssText = `position:absolute;top:0;left:0;width:1080px;height:${h}px;transform-origin:top left;`;
       scaler.appendChild(node);
       frame.appendChild(scaler);
       requestAnimationFrame(() => { const fw = frame.clientWidth || 360; scaler.style.transform = `scale(${fw/1080})`; });
@@ -655,6 +665,8 @@ end $$;`;
     function readFormIntoDraft(){
       draft.title = document.getElementById('f-title').value.trim() || 'Untitled';
       draft.theme = document.getElementById('f-theme').value;
+      draft.ratio = document.getElementById('f-ratio').value;
+      if (draft.slides[0]) draft.slides[0].ratio = draft.ratio;
       draft.status = document.getElementById('f-status').value;
       draft.pillar = document.getElementById('f-pillar').value;
       draft.format = document.getElementById('f-format').value;
@@ -703,6 +715,7 @@ end $$;`;
       col.addEventListener('click', onSlideClick);
 
       document.getElementById('f-theme').addEventListener('change', e => { draft.theme = e.target.value; paintPreview(); });
+      document.getElementById('f-ratio').addEventListener('change', e => { draft.ratio = e.target.value; if(draft.slides[0]) draft.slides[0].ratio = e.target.value; paintPreview(); });
       // type directly on the slide preview -> updates the slide text live
       document.getElementById('stage-frame').addEventListener('input', e => {
         const el = e.target.closest('.rblock[data-bi]'); if (!el) return;
@@ -811,6 +824,10 @@ end $$;`;
     document.getElementById('new-btn').addEventListener('click', () => {
       if (!tableReady){ toast('Run the setup SQL first','err'); return; }
       openEditor(blankPost());
+    });
+    document.getElementById('new-cover-btn').addEventListener('click', () => {
+      if (!tableReady){ toast('Run the setup SQL first','err'); return; }
+      openEditor(newVideoCover());
     });
 
     // ---------- import ----------
