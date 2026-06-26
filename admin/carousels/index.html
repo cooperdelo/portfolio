@@ -301,6 +301,66 @@ end $$;`;
       });
     }
 
+    // ---------- auto-photos: varied + matched, no repeats across posts ----------
+    let _broll = null;
+    async function loadBroll(){
+      if (_broll) return _broll;
+      const { data, error } = await sb.from('broll_assets')
+        .select('id,category,description,mood,pillars,orientation,media_url,usable_as_broll,media_host');
+      if (error){ toast('b-roll: '+error.message,'err'); _broll = []; return _broll; }
+      _broll = (data||[]).filter(a => a.media_url && a.media_host==='supabase' && a.usable_as_broll !== false);
+      return _broll;
+    }
+    function usedPhotosAcrossPosts(excludeId){
+      const used = new Set();
+      for (const p of posts){ if (excludeId && p.id===excludeId) continue;
+        for (const s of (p.slides||[])){ [s.photo,s.photoTop,s.photoBottom].forEach(u=>u&&used.add(u)); } }
+      return used;
+    }
+    const KW = [
+      { re:/gym|lift|rep|workout|7\s*am|disciplin|sweat/i, k:['gym','lift','workout'] },
+      { re:/guitar|band|music|gig|song|stage|rubber/i, k:['guitar','music','band','stage'] },
+      { re:/startup|build|ship|app|launch|found|cod(e|ing)|laptop|product|sell/i, k:['founder','desk','laptop','screen','build','startup'] },
+      { re:/friend|people|degenerate|hang|call them|out living/i, k:['friend','people','group'] },
+      { re:/golf/i, k:['golf'] },
+      { re:/doubt|morning|wake|alone|scared|hide|perceiv|judge|weird/i, k:['selfie','face','walk','window','solo','lifestyle','scenery'] },
+      { re:/truist|intern/i, k:['truist','office'] },
+    ];
+    function keywordsForSlide(slide){
+      const txt = (slide.blocks||[]).map(b=>b.text||'').join(' ').toLowerCase();
+      const ks = []; for (const m of KW){ if (m.re.test(txt)) ks.push(...m.k); } return ks;
+    }
+    async function autoPhotos(){
+      const pool = await loadBroll();
+      if (!pool.length){ toast('No b-roll photos found in broll_assets','err'); return; }
+      readFormIntoDraft();
+      const used = usedPhotosAcrossPosts(draft.id);
+      const pillar = draft.pillar;
+      const avoid = new Set();
+      const pick = (slide) => {
+        const kws = keywordsForSlide(slide);
+        let best=null, bestScore=-1;
+        for (const a of pool){
+          if (used.has(a.media_url) || avoid.has(a.media_url)) continue;
+          let s = Math.random()*0.5;
+          if (Array.isArray(a.pillars) && pillar && a.pillars.includes(pillar)) s += 3;
+          const hay = ((a.category||'')+' '+(a.description||'')+' '+(a.mood||'')).toLowerCase();
+          for (const k of kws){ if (hay.includes(k)){ s += 2.5; break; } }
+          if (a.orientation==='portrait') s += 0.5;
+          if (s > bestScore){ bestScore=s; best=a; }
+        }
+        if (best){ avoid.add(best.media_url); }
+        return best;
+      };
+      let n=0;
+      for (const slide of draft.slides){
+        if (slide.split){ const t=pick(slide); if(t){slide.photoTop=t.media_url;n++;} const b=pick(slide); if(b){slide.photoBottom=b.media_url;n++;} }
+        else { const a=pick(slide); if(a){ slide.photo=a.media_url; n++; } }
+      }
+      paintSlidesCol(); paintPreview();
+      toast(n ? 'Assigned varied photos - Save to keep' : 'No unused photos matched', n?'ok':'err');
+    }
+
     // ---------- render a slide to a DOM node (exact 1080x1350) ----------
     function italicize(text){ return esc(text).replace(/\*(.+?)\*/g, '<em>$1</em>').replace(/\n/g,'<br>'); }
     const THEME_BG = {
@@ -435,6 +495,7 @@ end $$;`;
               <button class="btn small primary" id="dl-all">Download all slides</button>
             </div>
             <div class="dl-row">
+              <button class="btn small" id="auto-photos">Auto-photos</button>
               <button class="btn small" id="copy-cap">Copy caption</button>
               <button class="btn small" id="save-post">Save</button>
               ${p.id ? '<button class="btn small danger" id="del-post">Delete</button>' : ''}
@@ -572,6 +633,7 @@ end $$;`;
         const tags = draft.hashtags.map(t=>'#'+t).join(' ');
         navigator.clipboard.writeText((draft.caption||'') + (tags?'\n\n'+tags:'')).then(()=>toast('Caption copied'));
       });
+      document.getElementById('auto-photos').addEventListener('click', autoPhotos);
       document.getElementById('save-post').addEventListener('click', savePost);
       document.getElementById('del-post')?.addEventListener('click', deletePost);
     }
