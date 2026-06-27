@@ -763,6 +763,24 @@ end $$;`;
       return canvas;
     }
 
+    // ---- Factory capture hook: render machine (Playwright) drives this so MP4/JPG match the preview exactly ----
+    window.studioCapture = async function(slide, theme='plugverse', h=1350, mode='static'){
+      let root = document.getElementById('capture-root');
+      if (!root){ root = document.createElement('div'); root.id='capture-root'; document.body.appendChild(root); }
+      root.style.cssText = `position:fixed; left:0; top:0; width:1080px; height:${h}px; z-index:2147483647; overflow:hidden; background:#000;`;
+      root.innerHTML = '';
+      window.__captureReady = false;
+      const node = buildSlideNode(slide, theme, false, false, h);
+      node.style.margin = '0';
+      if (mode === 'static') node.classList.add('capturing'); // flat-silver metal for crisp still
+      root.appendChild(node);
+      try { await document.fonts.ready; } catch(e){}
+      await new Promise(r => setTimeout(r, mode === 'static' ? 140 : 60));
+      window.__captureReady = true;
+      return { w:1080, h };
+    };
+    window.studioCaptureClear = function(){ const r=document.getElementById('capture-root'); if(r) r.remove(); window.__captureReady=false; };
+
     function canvasToBlob(canvas){ return new Promise(res => canvas.toBlob(res, 'image/png')); }
     function downloadBlob(blob, name){
       const a = document.createElement('a'); const url = URL.createObjectURL(blob);
