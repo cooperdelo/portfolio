@@ -278,7 +278,8 @@
         <button class="btn" id="upload-lib-btn">Upload photos</button>
         <button class="btn" id="fix-all">Fix all photos</button>
         <button class="btn" id="import-btn">Import JSON</button>
-        <button class="btn" id="new-cover-btn">New video cover</button>
+        <button class="btn" id="new-cover-personal">Video cover · personal</button>
+        <button class="btn" id="new-cover-plug">Video cover · plugverse</button>
         <button class="btn" id="new-explainer-btn">New UI explainer</button>
         <button class="btn primary" id="new-btn">New carousel</button>
       </div>
@@ -884,8 +885,10 @@ end $$;`;
 
     function blankSlide(){ return { photo:null, overlay:0, handle:false, blocks:[{ text:'', font:'serif', place:'lower' }] }; }
     function blankPost(){ return { title:'Untitled', theme:'mono', ratio:'4:5', pillar:'juggling', format:'statement', caption:'', hashtags:[], slides:[blankSlide()], status:'queued', source:'manual' }; }
-    function newVideoCover(){ return { title:'Video cover', theme:'mono', ratio:'9:16', pillar:'juggling', format:'statement', caption:'', hashtags:[], status:'queued', source:'manual',
-      slides:[{ photo:null, overlay:0.35, handle:false, ratio:'9:16', blocks:[{ text:'your title here', font:'serif', place:'center' }] }] }; }
+    function newVideoCover(theme='personal'){ const personal=(theme==='personal'||theme==='mono');
+      const slide={ photo:null, layout:'cover', theme, ratio:'9:16', blocks:[{ text:'your *title* here', font:'stat' }, { text:'a short supporting line', font:'serif' }] };
+      if(!personal) slide.kicker='PLUGVERSE';
+      return { title:(personal?'Video cover · personal':'Video cover · plugverse'), theme, ratio:'9:16', pillar:'figuring-it-out', format:'statement', caption:'', hashtags: personal?[]:['plugverse'], status:'queued', source:'manual', slides:[slide] }; }
     function newExplainer(){ return { title:'UI explainer', theme:'plugverse', ratio:'4:5', pillar:'figuring-it-out', format:'value-step', caption:'', hashtags:['plugverse'], status:'queued', source:'manual',
       slides:[{ photo:null, frame:'window', handle:true, theme:'plugverse', ratio:'4:5', callout:'one tap', calloutPos:'br', kicker:'PLUGVERSE · FEATURE 01',
         blocks:[{ text:'how *one-tap booking* works', font:'stat', place:'top' }, { text:'send one link. the artist onboards, accepts, and you’re booked.', font:'serif', place:'bottom' }] }] }; }
@@ -1273,9 +1276,13 @@ end $$;`;
       if (!tableReady){ toast('Run the setup SQL first','err'); return; }
       openEditor(newTemplate(v));
     });
-    document.getElementById('new-cover-btn').addEventListener('click', () => {
+    document.getElementById('new-cover-personal').addEventListener('click', () => {
       if (!tableReady){ toast('Run the setup SQL first','err'); return; }
-      openEditor(newVideoCover());
+      openEditor(newVideoCover('personal'));
+    });
+    document.getElementById('new-cover-plug').addEventListener('click', () => {
+      if (!tableReady){ toast('Run the setup SQL first','err'); return; }
+      openEditor(newVideoCover('plugverse'));
     });
     document.getElementById('new-explainer-btn').addEventListener('click', () => {
       if (!tableReady){ toast('Run the setup SQL first','err'); return; }
