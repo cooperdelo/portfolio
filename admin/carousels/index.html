@@ -252,6 +252,18 @@
   .rslide.framed .rscreen { position:absolute; inset:0; background-size:cover; background-position:top center; background-repeat:no-repeat; background-color:#101010; }
   .rslide.framed .rdevice.window .rscreen { top:40px; }
   .rslide.framed .rcallout { position:absolute; z-index:5; font-family:"Space Mono",monospace; font-size:24px; letter-spacing:0.04em; text-transform:uppercase; color:#f2f2f5; background:rgba(255,255,255,0.07); backdrop-filter:blur(18px) saturate(135%); -webkit-backdrop-filter:blur(18px) saturate(135%); border:1px solid rgba(255,255,255,0.18); border-radius:999px; padding:13px 22px; box-shadow:inset 0 1px 0 rgba(255,255,255,0.18),0 10px 34px rgba(0,0,0,0.55); max-width:380px; }
+  /* ---- glassmorphic Studio UI polish (visual only — nothing removed) ---- */
+  .slide-ed{ background:rgba(255,255,255,0.045)!important; backdrop-filter:blur(16px) saturate(130%); -webkit-backdrop-filter:blur(16px) saturate(130%); border:1px solid rgba(255,255,255,0.10)!important; border-radius:16px!important; padding:1.05rem 1.15rem!important; box-shadow:0 8px 30px rgba(0,0,0,0.28); }
+  .slide-ed .sh .n{ color:#f0eee9!important; }
+  .block-ed{ background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.10)!important; border-radius:12px!important; padding:0.7rem 0.8rem!important; }
+  .btn, .seg button{ backdrop-filter:blur(12px) saturate(130%); -webkit-backdrop-filter:blur(12px) saturate(130%); border-radius:11px!important; transition:all .16s ease; }
+  .btn:hover, .seg button:hover{ background:rgba(255,255,255,0.09); }
+  .btn.primary{ box-shadow:0 6px 20px rgba(252,86,3,0.28); }
+  .iconbtn{ border-radius:9px!important; }
+  .field input, .field select, .field textarea, .block-ed input, .block-ed select{ border-radius:10px!important; background:rgba(255,255,255,0.045)!important; border:1px solid rgba(255,255,255,0.12)!important; }
+  .field input:focus, .field select:focus, .field textarea:focus, .block-ed input:focus, .block-ed select:focus{ outline:none; border-color:rgba(252,86,3,0.55)!important; }
+  .sheet{ background:rgba(16,14,13,0.86)!important; backdrop-filter:blur(28px) saturate(135%); -webkit-backdrop-filter:blur(28px) saturate(135%); }
+  .photo-row .thumb{ border-radius:8px!important; width:46px!important; height:58px!important; }
 </style>
 </head>
 <body>
@@ -266,21 +278,6 @@
         <button class="btn" id="upload-lib-btn">Upload photos</button>
         <button class="btn" id="fix-all">Fix all photos</button>
         <button class="btn" id="import-btn">Import JSON</button>
-        <select class="btn" id="tpl-pick" title="New from EDITIONS template" style="cursor:pointer">
-          <option value="">+ New template…</option>
-          <option value="cover">Cover / masthead</option>
-          <option value="behind">Text behind subject</option>
-          <option value="around">Text around subject</option>
-          <option value="duotone">Duotone feature</option>
-          <option value="pullquote">Pull quote</option>
-          <option value="stat">Stat hero</option>
-          <option value="contents">Index / contents</option>
-          <option value="oldnew">Old way vs Plugverse</option>
-          <option value="receipt">Booking receipt</option>
-          <option value="ticket">Ticket stub</option>
-          <option value="vertical">Vertical edge type</option>
-          <option value="diptych">Diptych spread</option>
-        </select>
         <button class="btn" id="new-cover-btn">New video cover</button>
         <button class="btn" id="new-explainer-btn">New UI explainer</button>
         <button class="btn primary" id="new-btn">New carousel</button>
@@ -1270,7 +1267,7 @@ end $$;`;
       if (!tableReady){ toast('Run the setup SQL first','err'); return; }
       openEditor(blankPost());
     });
-    document.getElementById('tpl-pick').addEventListener('change', (e) => {
+    document.getElementById('tpl-pick')?.addEventListener('change', (e) => {
       const v = e.target.value; e.target.value = '';
       if (!v) return;
       if (!tableReady){ toast('Run the setup SQL first','err'); return; }
