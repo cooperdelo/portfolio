@@ -88,8 +88,8 @@
   .rblock.f-serif  { font-family:"Hanken Grotesk","Helvetica Neue",Arial,sans-serif; font-weight:600; color:#f4f1ea; font-size:60px; line-height:1.02; letter-spacing:-0.01em; text-shadow:0 2px 8px rgba(0,0,0,0.55), 0 1px 2px rgba(0,0,0,0.65); }
   .rblock.f-serif em { font-style:normal; text-decoration:underline; text-underline-offset:8px; }
   .rblock.f-capcut { font-family:"Hanken Grotesk","Helvetica Neue",Arial,sans-serif; font-weight:700; color:#fff; font-size:58px; line-height:0.98; letter-spacing:-0.01em; text-shadow:0 2px 8px rgba(0,0,0,0.6), 0 1px 2px rgba(0,0,0,0.7); }
-  .rblock.f-stat   { font-family:"Archivo Black","Archivo",sans-serif; color:#fff; font-size:118px; line-height:0.9; letter-spacing:-0.02em; text-shadow:0 2px 8px rgba(0,0,0,0.55), 0 1px 2px rgba(0,0,0,0.65); }
-  .rslide.cover .rblock { font-family:"Archivo Black","Archivo",sans-serif; font-weight:400; color:#fff; font-size:82px; line-height:0.96; letter-spacing:-0.02em; text-shadow:0 2px 8px rgba(0,0,0,0.6), 0 1px 2px rgba(0,0,0,0.7); }
+  .rblock.f-stat   { font-family:"Archivo Black","Archivo",sans-serif; color:#fff; font-size:100px; line-height:0.9; letter-spacing:-0.02em; text-shadow:0 5px 18px rgba(0,0,0,0.7), 0 2px 6px rgba(0,0,0,0.8), 0 1px 2px rgba(0,0,0,0.9); }
+  .rslide.cover .rblock { font-size:84px; line-height:0.96; }
   /* Plugverse theme overrides (orange / glass / Archivo Black) */
   .rslide[data-theme="plugverse"] .rblock.f-serif  { font-family:"Plus Jakarta Sans",sans-serif; font-weight:700; color:#fafafa; letter-spacing:-0.015em; text-shadow:0 2px 20px rgba(0,0,0,0.5); }
   .rslide[data-theme="plugverse"] .rblock.f-serif em { font-style:normal; color:#FF6B35; }
@@ -268,7 +268,7 @@ end $$;`;
       if (!list.length) { grid.innerHTML = `<div class="empty" style="grid-column:1/-1;">No carousels ${filter==='all'?'yet':'in '+filter}. Hit “New carousel” or “Import JSON”.</div>`; return; }
       grid.innerHTML = list.map(p => {
         const first = (p.slides || [])[0];
-        const themeBg = p.theme === 'plugverse'
+        const themeBg = postTheme(p) === 'plugverse'
           ? 'radial-gradient(120% 80% at 80% 0%, rgba(255,107,53,0.18), transparent 60%), linear-gradient(160deg,#161616,#0a0a0a)'
           : 'linear-gradient(160deg,#1a1714,#0a0908)';
         const thumb = first?.photo || first?.photoTop || p.thumb_url || (p.rendered_urls||[])[0] || first?.bg;
@@ -441,14 +441,17 @@ end $$;`;
     const RATIO_H = { '4:5':1350, '9:16':1920, '1:1':1080 };
     const postRatio = p => (p && (p.ratio || (p.slides && p.slides[0] && p.slides[0].ratio))) || '4:5';
     const postH = p => RATIO_H[postRatio(p)] || 1350;
+    const postTheme = p => (p && (p.theme || (p.slides && p.slides[0] && p.slides[0].theme))) || 'mono';
     function buildSlideNode(slide, theme = 'mono', isCover = false, editable = false, h = 1350) {
       const node = document.createElement('div');
       node.className = 'rslide';
       node.dataset.theme = theme;
       node.style.height = h + 'px';
       if (isCover) node.classList.add('cover');
+      const emColor = slide.emColor || '#E8B24A';
       const edAttr = (bi) => editable ? ` contenteditable="true" data-bi="${bi}" spellcheck="false"` : '';
-      const disp = (t) => editable ? esc(t||'').replace(/\n/g,'<br>') : italicize(t||'');
+      const disp = (t) => editable ? esc(t||'').replace(/\n/g,'<br>') : esc(t||'').replace(/\*(.+?)\*/g, `<span style="color:${emColor}">$1</span>`).replace(/\n/g,'<br>');
+      const lite = (u) => (editable && u && u.indexOf('/object/public/')>-1) ? u.replace('/object/public/','/render/image/public/') + '?width=720&quality=70' : u;
       // No handle/tag on the cover slide (Cooper: cover = photo + centered title only).
       const showHandle = slide.handle && !isCover;
       const handleLabel = theme === 'plugverse' ? 'plugverse.app' : 'cooperdelo';
@@ -462,7 +465,7 @@ end $$;`;
         const botB = bl.find(b => b.place === 'bottom') || bl.find(b => b !== topB) || bl[1];
         const blockHTML = b => b ? `<div class="rblock place-center f-${esc(b.font||'capcut')}${b.accent?' accent':''}" style="${b.size?`font-size:${b.size}px;`:''}"${edAttr(bl.indexOf(b))}>${disp(b.text)}</div>` : '';
         const half = (photo, b, pos) => {
-          const bgimg = photo ? `background-image:url('${photo}')` : `background-image:${fallbackBg}`;
+          const bgimg = photo ? `background-image:url('${lite(photo)}')` : `background-image:${fallbackBg}`;
           return `<div class="rhalf ${pos}"><div class="rhbg" style="${bgimg}"></div><div class="rhscrim"></div>${blockHTML(b)}</div>`;
         };
         const handle = showHandle ? `<div class="rhandle">${handleLabel}</div>` : '';
@@ -473,7 +476,7 @@ end $$;`;
 
       const img = slide.photo || slide.bg;
       const bg = img
-        ? `<div class="rbg" style="background-image:url('${img}')"></div>`
+        ? `<div class="rbg" style="background-image:url('${lite(img)}')"></div>`
         : `<div class="rbg" style="background-image:${THEME_BG[theme]||THEME_BG.mono}"></div>`;
       const hasTop = (slide.blocks||[]).some(b => b.place==='top');
       const hasLow = (slide.blocks||[]).some(b => b.place==='lower' || b.place==='bottom');
@@ -594,7 +597,7 @@ end $$;`;
             <div class="field"><label>Place</label><select data-k="place">${opt(PLACES, b.place)}</select></div>
             <button class="iconbtn" data-rmblock="${bi}" style="align-self:end">✕</button>
           </div>
-          <div class="field"><textarea data-k="text" style="min-height:54px" placeholder="text · wrap a word in *stars* for italic/accent">${esc(b.text)}</textarea></div>
+          <div class="field"><textarea data-k="text" style="min-height:54px" placeholder="text · wrap a word in *stars* to color it (pick the color below)">${esc(b.text)}</textarea></div>
           <div class="row2" style="grid-template-columns:1fr auto">
             <div class="field"><label>Size override (px, optional)</label><input data-k="size" type="number" value="${b.size||''}"></div>
             <label class="mini" style="display:flex;align-items:center;gap:0.3rem;align-self:end;padding-bottom:0.7rem"><input type="checkbox" data-k="accent" ${b.accent?'checked':''}>accent</label>
@@ -611,6 +614,7 @@ end $$;`;
         <div class="photo-row">
           <label class="mini" style="display:flex;align-items:center;gap:0.3rem"><input type="checkbox" data-split="${i}" ${slide.split?'checked':''}>split (two photos)</label>
           <label class="mini" style="display:flex;align-items:center;gap:0.3rem"><input type="checkbox" data-handle="${i}" ${slide.handle?'checked':''}>handle</label>
+          <label class="mini" style="display:flex;align-items:center;gap:0.3rem" title="color for words wrapped in *stars*">*word* color<input type="color" value="${slide.emColor||'#E8B24A'}" data-emcolor="${i}" style="width:26px;height:20px;padding:0;border:none;background:none;cursor:pointer"></label>
           ${slide.split?'':`<label class="mini" style="display:flex;align-items:center;gap:0.3rem">overlay<input type="range" min="0" max="0.7" step="0.05" value="${slide.overlay||0}" data-overlay="${i}" style="width:80px"></label>`}
         </div>
         ${slide.split ? `
@@ -668,7 +672,7 @@ end $$;`;
       draft.title = document.getElementById('f-title').value.trim() || 'Untitled';
       draft.theme = document.getElementById('f-theme').value;
       draft.ratio = document.getElementById('f-ratio').value;
-      if (draft.slides[0]) draft.slides[0].ratio = draft.ratio;
+      if (draft.slides[0]) { draft.slides[0].ratio = draft.ratio; draft.slides[0].theme = draft.theme; }
       draft.status = document.getElementById('f-status').value;
       draft.pillar = document.getElementById('f-pillar').value;
       draft.format = document.getElementById('f-format').value;
@@ -704,6 +708,7 @@ end $$;`;
     function openEditor(post){
       draft = JSON.parse(JSON.stringify(post));
       if (!draft.slides || !draft.slides.length) draft.slides = [blankSlide()];
+      draft.theme = postTheme(draft); draft.ratio = postRatio(draft);
       previewIdx = 0;
       sheetBody.innerHTML = editorHTML(draft);
       paintSlidesCol();
@@ -737,17 +742,19 @@ end $$;`;
       document.getElementById('del-post')?.addEventListener('click', deletePost);
     }
 
+    let _ptTimer; function paintPreviewSoon(){ clearTimeout(_ptTimer); _ptTimer = setTimeout(paintPreview, 130); }
     function onSlideInput(e){
       const t = e.target;
       const slideEl = t.closest('.slide-ed'); if (!slideEl) return;
       const si = Number(slideEl.dataset.si);
       const slide = draft.slides[si];
-      if (t.dataset.overlay != null) { slide.overlay = Number(t.value); paintPreview(); return; }
-      if (t.dataset.handle != null) { slide.handle = t.checked; paintPreview(); return; }
-      if (t.dataset.photourl != null) { slide.photo = t.value.trim() || null; paintPreview(); return; }
+      if (t.dataset.overlay != null) { slide.overlay = Number(t.value); paintPreviewSoon(); return; }
+      if (t.dataset.handle != null) { slide.handle = t.checked; paintPreviewSoon(); return; }
+      if (t.dataset.emcolor != null) { slide.emColor = t.value; paintPreviewSoon(); return; }
+      if (t.dataset.photourl != null) { slide.photo = t.value.trim() || null; paintPreviewSoon(); return; }
       if (t.dataset.split != null) { slide.split = t.checked; paintSlidesCol(); paintPreview(); return; }
-      if (t.dataset.phototopurl != null) { slide.photoTop = t.value.trim() || null; paintPreview(); return; }
-      if (t.dataset.photobottomurl != null) { slide.photoBottom = t.value.trim() || null; paintPreview(); return; }
+      if (t.dataset.phototopurl != null) { slide.photoTop = t.value.trim() || null; paintPreviewSoon(); return; }
+      if (t.dataset.photobottomurl != null) { slide.photoBottom = t.value.trim() || null; paintPreviewSoon(); return; }
       const blockEl = t.closest('.block-ed');
       if (blockEl){
         const bi = Number(blockEl.dataset.bi);
@@ -791,7 +798,7 @@ end $$;`;
 
     async function savePost(){
       readFormIntoDraft();
-      const row = { title:draft.title, theme:draft.theme||'mono', pillar:draft.pillar, format:draft.format, caption:draft.caption,
+      const row = { title:draft.title, pillar:draft.pillar, format:draft.format, caption:draft.caption,
                     hashtags:draft.hashtags, slides:draft.slides, status:draft.status, source:draft.source||'manual' };
       let res;
       if (draft.id){ res = await sb.from('carousel_posts').update(row).eq('id', draft.id); }
@@ -852,11 +859,13 @@ end $$;`;
       try { arr = JSON.parse(document.getElementById('import-text').value); }
       catch(e){ toast('Invalid JSON','err'); return; }
       if (!Array.isArray(arr)) arr = [arr];
-      const rows = arr.map(p => ({
-        title:p.title||'Untitled', theme:p.theme||'mono', pillar:p.pillar||null, format:p.format||null,
-        caption:p.caption||'', hashtags:(p.hashtags||[]).map(t=>String(t).replace(/^#/,'')),
-        slides:p.slides||[], status:p.status||'queued', source:p.source||'agent'
-      }));
+      const rows = arr.map(p => {
+        const slides = p.slides||[];
+        if (slides[0]) { slides[0].theme = p.theme||slides[0].theme||'mono'; slides[0].ratio = p.ratio||slides[0].ratio||'4:5'; }
+        return { title:p.title||'Untitled', pillar:p.pillar||null, format:p.format||null,
+          caption:p.caption||'', hashtags:(p.hashtags||[]).map(t=>String(t).replace(/^#/,'')),
+          slides, status:p.status||'queued', source:p.source||'agent' };
+      });
       const { error } = await sb.from('carousel_posts').insert(rows);
       if (error){ toast(error.message,'err'); return; }
       toast(`Imported ${rows.length}`); closeSheets(); await load();
