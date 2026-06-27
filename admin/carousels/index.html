@@ -676,7 +676,12 @@ end $$;`;
           <label class="iconbtn">Upload<input type="file" accept="image/*" data-photobottom="${i}" style="display:none"></label>
           <input data-photobottomurl="${i}" placeholder="bottom photo URL" value="${slide.photoBottom && /^https?:/.test(slide.photoBottom)?esc(slide.photoBottom):''}" style="flex:1;min-width:0;font-family:'Geist Mono',monospace;font-size:0.6rem;background:rgba(20,17,15,0.65);border:1px solid var(--card-border);color:var(--ink);padding:0.4rem 0.55rem;border-radius:8px">
         </div>
-        <div class="mini" style="margin-top:0.3rem;opacity:0.7">split: set a text block's Place to "top" or "bottom" to sit on each photo, or "center" to put it on the line between them. Add more with + Text.</div>
+        <div class="mini" style="margin-top:0.3rem;opacity:0.7">split: add text to the top photo, the bottom photo, or on the line between them. Each is its own editable block below.</div>
+        <div class="photo-row" style="margin-top:0.35rem">
+          <button class="iconbtn" data-addtext="top">+ text on top</button>
+          <button class="iconbtn" data-addtext="center">+ text on line</button>
+          <button class="iconbtn" data-addtext="bottom">+ text on bottom</button>
+        </div>
         ` : `
         <div class="photo-row">
           <div class="thumb" style="${slide.photo?`background-image:url('${esc(slide.photo)}')`:''}"></div>
@@ -821,8 +826,9 @@ end $$;`;
       const slideEl = t.closest('.slide-ed'); if (!slideEl) return;
       const si = Number(slideEl.dataset.si);
       if (t.dataset.addblock != null){ draft.slides[si].blocks.push({text:'',font:'capcut',place:'top'}); paintSlidesCol(); paintPreview(); return; }
+      if (t.dataset.addtext != null){ draft.slides[si].blocks.push({text:'new text',font: draft.slides[si].split?'capcut':'serif', place:t.dataset.addtext}); paintSlidesCol(); paintPreview(); return; }
       if (t.dataset.rmslide != null){ if (draft.slides.length>1){ draft.slides.splice(si,1); if(previewIdx>=draft.slides.length)previewIdx=0; paintSlidesCol(); paintPreview(); } return; }
-      if (t.dataset.rmblock != null){ const bi=Number(t.dataset.rmblock); if(draft.slides[si].blocks.length>1){draft.slides[si].blocks.splice(bi,1); paintSlidesCol(); paintPreview();} return; }
+      if (t.dataset.rmblock != null){ const bi=Number(t.dataset.rmblock); draft.slides[si].blocks.splice(bi,1); paintSlidesCol(); paintPreview(); return; }
       if (t.dataset.resetsize != null){ const bi=Number(t.dataset.resetsize); draft.slides[si].blocks[bi].size=undefined; paintSlidesCol(); paintPreview(); return; }
       if (t.dataset.rmphoto != null){ draft.slides[si].photo=null; paintSlidesCol(); paintPreview(); return; }
       if (t.dataset.pick != null){ openPicker(url=>{ draft.slides[si].photo=url; paintSlidesCol(); paintPreview(); }); return; }
