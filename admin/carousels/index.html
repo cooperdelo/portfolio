@@ -886,6 +886,8 @@ end $$;`;
             <div class="dl-row">
               <button class="btn small" id="auto-photos">Auto-photos</button>
               <button class="btn small" id="copy-cap">Copy caption</button>
+              <button class="btn small" id="render-factory" title="Queue for the local render machine (final metal JPGs; check the box for MP4s)">⚡ Render</button>
+              <label class="mini" style="display:flex;align-items:center;gap:0.3rem"><input type="checkbox" id="render-video-cb">+ video</label>
               <button class="btn small" id="save-post">Save</button>
               ${p.id ? '<button class="btn small danger" id="del-post">Delete</button>' : ''}
             </div>
@@ -1064,6 +1066,13 @@ end $$;`;
         navigator.clipboard.writeText((draft.caption||'') + (tags?'\n\n'+tags:'')).then(()=>toast('Caption copied'));
       });
       document.getElementById('auto-photos').addEventListener('click', autoPhotos);
+      document.getElementById('render-factory')?.addEventListener('click', async ()=>{
+        if(!draft.id){ toast('Save the post first, then Render','err'); return; }
+        const vid = document.getElementById('render-video-cb')?.checked;
+        const res = await sb.from('carousel_posts').update({ render_requested:true, render_video:!!vid }).eq('id', draft.id);
+        if(res.error){ toast(res.error.message,'err'); return; }
+        toast('Queued for the render machine'+(vid?' (JPG + MP4)':' (JPG)'));
+      });
       document.getElementById('save-post').addEventListener('click', savePost);
       document.getElementById('del-post')?.addEventListener('click', deletePost);
     }
