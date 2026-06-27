@@ -430,7 +430,8 @@ end $$;`;
       ['receipt','Booking receipt'],['ticket','Ticket stub'],['diptych','Diptych spread'],['vertical','Vertical edge type'],
     ];
     const PERSONAL_TEMPLATES = [
-      ['single-cover','Cover — centered title'],['split-mid','Split — text on the line'],
+      ['single-cover','Cover — centered title'],['reflective','Reflective build (cover + 4 + end)'],
+      ['split-mid','Split — text on the line'],
       ['split-topbottom','Split — text top & bottom'],['behind','Word behind subject'],
       ['around','Text around subject'],['duotone','Duotone feature'],['pullquote','Pull quote'],
       ['stat','Stat hero'],['contents','Index / contents'],['diptych','Diptych spread'],
@@ -930,6 +931,17 @@ end $$;`;
         return mkPost([{ split:true, photoTop:null, photoBottom:null, theme, ratio:'4:5', blocks:[{ text: personal?'the plan':'before', font:'capcut', place:'top' }, { text: personal?'the reality':'after', font:'capcut', place:'bottom' }] }]);
       if (kind === 'ui-explainer')
         return mkPost([{ photo:null, frame:'window', handle:true, theme:'plugverse', ratio:'4:5', callout:'one tap', calloutPos:'br', kicker:'PLUGVERSE · FEATURE 01', blocks:[{ text:'how *one-tap booking* works', font:'stat', place:'top' }, { text:'send one link. the artist onboards, accepts, and you’re booked.', font:'serif', place:'bottom' }] }]);
+      if (kind === 'reflective'){
+        const beat = (t, place='lower') => ({ photo:null, overlay:0.4, theme, ratio:'4:5', blocks:[{ text:t, font:'serif', place }] });
+        return mkPost([
+          { photo:null, layout:'cover', theme, ratio:'4:5', blocks:[{ text:'your *headline* here', font:'stat' }, { text:'a short supporting line', font:'serif' }] },
+          beat('the honest first beat.'),
+          beat('the second beat, going deeper.'),
+          beat('the third beat, the messy truth.'),
+          beat('the fourth beat, the small turn.'),
+          beat('the line that lands. not a tidy lesson.', 'center'),
+        ]);
+      }
       // ---- layout (EDITIONS) formats ----
       const seeds = personal ? PERS_SEEDS : PLUG_SEEDS;
       const s = seeds[kind] || PLUG_SEEDS[kind] || { blocks:['headline','subhead'] };
