@@ -230,10 +230,10 @@
   .rslide.ed[data-theme="personal"].lay-around .la-word,.rslide.ed[data-theme="mono"].lay-around .la-word{ font-family:"Hanken Grotesk",sans-serif; font-weight:800; }
   .rslide.ed.lay-cover{ background:#0a0a0b !important; }
   .rslide.lay-cover .edpad{ justify-content:center; align-items:center; text-align:center; padding:80px; }
-  .rslide.lay-cover .ed-head{ font-family:"Anton","Archivo Black",Impact,sans-serif!important; font-weight:400!important; font-size:158px; line-height:0.86; text-transform:uppercase; }
-  .rslide.lay-cover .ed-sub{ text-align:center; margin-top:28px; max-width:80%; }
+  .rslide.lay-cover .ed-tag{ margin-bottom:38px; }
+  .rslide.lay-cover .ed-head{ font-family:"Anton","Archivo Black",Impact,sans-serif!important; font-weight:400!important; font-size:158px; line-height:0.88!important; letter-spacing:0.005em; text-transform:uppercase; }
+  .rslide.lay-cover .ed-sub{ text-align:center; margin-top:30px; max-width:80%; }
   .rslide.lay-cover .ed-coverscrim{ position:absolute; inset:0; z-index:1; background:radial-gradient(ellipse at 50% 42%, rgba(0,0,0,0.30), rgba(0,0,0,0.66) 100%); }
-  .rslide.lay-cover .ed-hairline{ position:absolute; inset:54px; z-index:2; border:1px solid rgba(255,255,255,0.22); pointer-events:none; }
 
   /* device-frame (UI explainer): real screenshot on dark glass + ember glow, metal headline */
   .rslide.framed { background:radial-gradient(ellipse at 72% 8%,rgba(252,86,3,.20),transparent 55%),radial-gradient(ellipse at 22% 92%,rgba(196,58,2,.16),transparent 60%),linear-gradient(160deg,#1b1b1f,#070708); }
@@ -741,7 +741,7 @@ end $$;`;
           inner = `<div class="lb-bg" style="${photoCSS}"></div><div class="lb-scrim"></div>${cut}<div class="la-word ${M}"${edAttr(0)} style="${sz(0)}">${md(T(0))}</div>${grain}<div class="lb-front">${tag}<div class="ed-sub"${edAttr(1)}>${md(T(1))}</div></div>`;
         } else if (L === 'cover') {
           const scrim = slide.photo ? `<div class="ed-photo" style="${photoCSS}"></div><div class="ed-coverscrim"></div>` : '';
-          inner = `${scrim}${grain}<div class="ed-hairline"></div><div class="edpad">${tag}<div class="ed-head ${M}"${edAttr(0)} style="${sz(0)}">${md(T(0))}</div><div class="ed-sub"${edAttr(1)}>${md(T(1))}</div></div>`;
+          inner = `${scrim}${grain}<div class="edpad">${tag}<div class="ed-head ${M}"${edAttr(0)} style="${sz(0)}">${md(T(0))}</div><div class="ed-sub"${edAttr(1)}>${md(T(1))}</div></div>`;
         } else {
           inner = `${(slide.photo?`<div class="ed-photo" style="${photoCSS}"></div><div class="ed-vign"></div>`:'')}${grain}<div class="edpad" style="justify-content:flex-end">${tag}<div class="ed-head ${M}"${edAttr(0)} style="${sz(0)}">${md(T(0))}</div><div class="ed-sub" style="margin-top:18px"${edAttr(1)}>${md(T(1))}</div></div>`;
         }
