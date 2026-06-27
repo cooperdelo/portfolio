@@ -8,6 +8,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo+Black&family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Playfair+Display:ital,wght@0,400..800;1,400..700&family=Plus+Jakarta+Sans:wght@400..800&family=Hanken+Grotesk:wght@500;700;800&family=Space+Mono:wght@400;700&family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Geist+Mono:wght@300..700&family=Geist:wght@300..700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Bowlby+One&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
+<link href="https://api.fontshare.com/v2/css?f[]=tanker@400&f[]=satoshi@900,700,500,400&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/admin/_shell/admin-shell.css" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
@@ -112,12 +114,18 @@
   .rslide.split .rhalf .rblock { z-index:4; }
   .rslide.split .split-mid { position:absolute; left:80px; right:80px; top:50%; transform:translateY(-50%); text-align:center; z-index:6; }
   /* device-frame (UI explainer): real screenshot floated on dark + one orange glow */
-  .rslide.framed .rframe-glow { position:absolute; inset:0; background:radial-gradient(78% 52% at 78% 6%, rgba(255,107,53,0.30), transparent 60%); z-index:0; }
-  .rslide.framed .rframe-head { position:absolute; top:90px; left:96px; right:96px; z-index:3; font-family:"Archivo Black","Archivo",sans-serif; color:#fafafa; font-size:78px; line-height:0.96; letter-spacing:-0.02em; text-shadow:0 3px 12px rgba(0,0,0,0.55); }
-  .rslide.framed .rframe-sub { position:absolute; left:96px; right:96px; top:300px; z-index:3; font-family:"Inter","Geist",sans-serif; font-weight:400; color:#a3a3a3; font-size:32px; line-height:1.35; }
+  .rslide.framed .rframe-glow { position:absolute; inset:0; background:radial-gradient(78% 50% at 82% 6%, rgba(255,107,53,0.16), transparent 60%); z-index:0; }
+  .rslide.framed .rframe-kicker { position:absolute; top:88px; left:96px; right:96px; z-index:3; font-family:"Inter",sans-serif; font-weight:700; font-size:24px; letter-spacing:0.24em; text-transform:uppercase; color:#FF6B1A; }
+  .rslide.framed .rframe-rule { position:absolute; top:142px; left:96px; right:96px; height:2px; background:rgba(255,255,255,0.2); z-index:3; }
+  .rslide.framed .rframe-head { position:absolute; top:96px; left:96px; right:96px; z-index:3; font-family:"Tanker","Bowlby One",Impact,sans-serif; font-weight:400; color:#fff; font-size:90px; line-height:0.9; letter-spacing:-0.01em; text-transform:uppercase; text-shadow:0 3px 14px rgba(0,0,0,0.5); }
+  .rslide.framed.kicked .rframe-head { top:172px; }
+  .rslide.framed .rframe-head em { font-style:normal; color:#FF6B1A; }
+  .rslide.framed .rframe-sub { position:absolute; left:96px; right:96px; top:300px; z-index:3; font-family:"Satoshi","Inter",sans-serif; font-weight:500; color:#cfc8bd; font-size:26px; line-height:1.45; letter-spacing:0.05em; text-transform:uppercase; }
+  .rslide.framed.kicked .rframe-sub { top:392px; }
+  .rslide.framed .rgrain { opacity:0.12; }
   .rslide.framed .rdevice { position:absolute; left:50%; transform:translateX(-50%); overflow:hidden; z-index:2; box-shadow:0 50px 130px rgba(0,0,0,0.65); }
-  .rslide.framed .rdevice.phone { width:470px; height:940px; top:380px; border-radius:58px; background:#0c0c0c; border:13px solid #1b1b1b; }
-  .rslide.framed .rdevice.window { width:888px; height:556px; top:470px; border-radius:18px; background:#0d0d0d; border:1px solid rgba(255,255,255,0.12); }
+  .rslide.framed .rdevice.phone { width:470px; height:820px; top:470px; border-radius:58px; background:#0c0c0c; border:13px solid #1b1b1b; }
+  .rslide.framed .rdevice.window { width:888px; height:556px; top:520px; border-radius:18px; background:#0d0d0d; border:1px solid rgba(255,255,255,0.12); }
   .rslide.framed .rwin-bar { position:absolute; top:0; left:0; right:0; height:40px; background:rgba(255,255,255,0.04); border-bottom:1px solid rgba(255,255,255,0.07); z-index:2; }
   .rslide.framed .rscreen { position:absolute; inset:0; background-size:cover; background-position:top center; background-repeat:no-repeat; background-color:#101010; }
   .rslide.framed .rdevice.window .rscreen { top:40px; }
@@ -532,9 +540,10 @@ end $$;`;
       // ---- device frame (UI explainer): screenshot in a phone/window frame ----
       if (slide.frame) {
         node.classList.add('framed');
+        if (slide.kicker) node.classList.add('kicked');
         const bl = slide.blocks || [];
         const head = bl[0], sub = bl[1];
-        const fdisp = (t) => esc(t||'').replace(/\*(.+?)\*/g, '<span style="color:#FF6B35">$1</span>').replace(/\n/g,'<br>');
+        const fdisp = (t) => esc(t||'').replace(/\*(.+?)\*/g, '<em>$1</em>').replace(/\n/g,'<br>');
         const screen = slide.photo ? `background-image:url('${slide.photo}')` : '';
         const dev = slide.frame === 'phone'
           ? `<div class="rdevice phone"><div class="rscreen" style="${screen}"></div></div>`
@@ -546,7 +555,8 @@ end $$;`;
           const pos = p==='tr'?'top:430px;right:110px':p==='tl'?'top:430px;left:110px':p==='bl'?'bottom:160px;left:110px':'bottom:160px;right:110px';
           calloutHTML = `<div class="rcallout" style="${pos}">${esc(slide.callout)}</div>`; }
         const handle = showHandle ? `<div class="rhandle">${handleLabel}</div>` : '';
-        node.innerHTML = `<div class="rframe-glow"></div>` + dev + headHTML + subHTML + calloutHTML + `<div class="rgrain"></div>` + handle;
+        const kickHTML = slide.kicker ? `<div class="rframe-kicker">${esc(slide.kicker)}</div><div class="rframe-rule"></div>` : '';
+        node.innerHTML = `<div class="rframe-glow"></div>` + kickHTML + dev + headHTML + subHTML + calloutHTML + `<div class="rgrain"></div>` + handle;
         return node;
       }
 
@@ -624,7 +634,7 @@ end $$;`;
     function newVideoCover(){ return { title:'Video cover', theme:'mono', ratio:'9:16', pillar:'juggling', format:'statement', caption:'', hashtags:[], status:'queued', source:'manual',
       slides:[{ photo:null, overlay:0.35, handle:false, ratio:'9:16', blocks:[{ text:'your title here', font:'serif', place:'center' }] }] }; }
     function newExplainer(){ return { title:'UI explainer', theme:'plugverse', ratio:'4:5', pillar:'figuring-it-out', format:'value-step', caption:'', hashtags:['plugverse'], status:'queued', source:'manual',
-      slides:[{ photo:null, frame:'window', handle:true, theme:'plugverse', ratio:'4:5', callout:'one tap', calloutPos:'br',
+      slides:[{ photo:null, frame:'window', handle:true, theme:'plugverse', ratio:'4:5', callout:'one tap', calloutPos:'br', kicker:'PLUGVERSE · FEATURE 01',
         blocks:[{ text:'how *one-tap booking* works', font:'stat', place:'top' }, { text:'send one link. the artist onboards, accepts, and you’re booked.', font:'serif', place:'bottom' }] }] }; }
 
     function opt(list, val){ return list.map(x => `<option value="${x}" ${x===val?'selected':''}>${x}</option>`).join(''); }
@@ -731,7 +741,10 @@ end $$;`;
         </div>
         `}
         ${slide.frame ? `
-        <div class="photo-row" style="margin-top:0.35rem"><span class="mini" style="width:3.2rem">callout</span>
+        <div class="photo-row" style="margin-top:0.35rem"><span class="mini" style="width:3.2rem">kicker</span>
+          <input data-kicker="${i}" placeholder="PLUGVERSE · FEATURE 01 (optional)" value="${esc(slide.kicker||'')}" style="flex:1;min-width:0;font-family:'Geist Mono',monospace;font-size:0.6rem;background:rgba(20,17,15,0.65);border:1px solid var(--card-border);color:var(--ink);padding:0.4rem 0.55rem;border-radius:8px">
+        </div>
+        <div class="photo-row" style="margin-top:0.3rem"><span class="mini" style="width:3.2rem">callout</span>
           <input data-callout="${i}" placeholder="one short callout (optional)" value="${esc(slide.callout||'')}" style="flex:1;min-width:0;font-family:'Geist Mono',monospace;font-size:0.6rem;background:rgba(20,17,15,0.65);border:1px solid var(--card-border);color:var(--ink);padding:0.4rem 0.55rem;border-radius:8px">
           <select data-calloutpos="${i}">${opt(['br','bl','tr','tl'], slide.calloutPos||'br')}</select>
         </div>
@@ -849,6 +862,7 @@ end $$;`;
       if (t.dataset.photourl != null) { slide.photo = t.value.trim() || null; paintPreviewSoon(); return; }
       if (t.dataset.split != null) { slide.split = t.checked; paintSlidesCol(); paintPreview(); return; }
       if (t.dataset.frame != null) { slide.frame = t.value || undefined; paintSlidesCol(); paintPreview(); return; }
+      if (t.dataset.kicker != null) { const had = !!slide.kicker; slide.kicker = t.value.trim() || undefined; (had === !!slide.kicker) ? paintPreviewSoon() : paintPreview(); return; }
       if (t.dataset.callout != null) { slide.callout = t.value.trim() || undefined; paintPreviewSoon(); return; }
       if (t.dataset.calloutpos != null) { slide.calloutPos = t.value; paintPreview(); return; }
       if (t.dataset.phototopurl != null) { slide.photoTop = t.value.trim() || null; paintPreviewSoon(); return; }
