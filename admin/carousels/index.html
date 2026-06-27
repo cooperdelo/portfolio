@@ -8,8 +8,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo+Black&family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Playfair+Display:ital,wght@0,400..800;1,400..700&family=Plus+Jakarta+Sans:wght@400..800&family=Hanken+Grotesk:wght@500;700;800&family=Space+Mono:wght@400;700&family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Geist+Mono:wght@300..700&family=Geist:wght@300..700&display=swap" rel="stylesheet" />
-<link href="https://fonts.googleapis.com/css2?family=Bowlby+One&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
-<link href="https://api.fontshare.com/v2/css?f[]=tanker@400&f[]=satoshi@900,700,500,400&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Bowlby+One&family=Archivo:wght@400;500;600;700;800;900&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
+<link href="https://api.fontshare.com/v2/css?f[]=tanker@400&f[]=satoshi@900,700,500,400&f[]=general-sans@500,600,700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/admin/_shell/admin-shell.css" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
@@ -94,14 +94,14 @@
   .rslide.cover .rblock { font-size:62px; line-height:0.98; }
   /* Plugverse theme overrides (orange / glass / Archivo Black) */
   .rslide[data-theme="plugverse"] .rblock.f-serif  { font-family:"Plus Jakarta Sans",sans-serif; font-weight:700; color:#fafafa; letter-spacing:-0.015em; text-shadow:0 2px 20px rgba(0,0,0,0.5); }
-  .rslide[data-theme="plugverse"] .rblock.f-serif em { font-style:normal; color:#FF6B35; }
+  .rslide[data-theme="plugverse"] .rblock.f-serif em { font-style:normal; color:#ffffff; }
   .rslide[data-theme="plugverse"] .rblock.f-capcut { font-family:"Archivo Black","Impact",sans-serif; font-weight:400; color:#fafafa; letter-spacing:-0.01em; text-shadow:0 2px 14px rgba(0,0,0,0.55); }
   .rslide[data-theme="plugverse"] .rblock.f-stat   { font-family:"Space Mono",monospace; font-weight:700; color:#fafafa; letter-spacing:-0.01em; }
-  .rslide[data-theme="plugverse"] .rblock.accent   { color:#FF6B35; }
+  .rslide[data-theme="plugverse"] .rblock.accent   { color:#ffffff; }
   .rslide[data-theme="mono"] .rblock.accent em,
   .rslide[data-theme="mono"] .rblock.accent        { font-style:italic; }
   .rhandle { position:absolute; left:90px; bottom:54px; font-family:"Geist Mono",monospace; font-size:24px; letter-spacing:0.18em; color:rgba(244,239,230,0.78); }
-  .rslide[data-theme="plugverse"] .rhandle { font-family:"Space Mono",monospace; color:rgba(255,107,53,0.85); }
+  .rslide[data-theme="plugverse"] .rhandle { font-family:"Space Mono",monospace; color:rgba(236,236,241,0.7); }
   .rscrim-b { position:absolute; left:0; right:0; bottom:0; height:55%; background:linear-gradient(to top, rgba(0,0,0,0.6), rgba(0,0,0,0)); }
   .rscrim-t { position:absolute; left:0; right:0; top:0; height:45%; background:linear-gradient(to bottom, rgba(0,0,0,0.45), rgba(0,0,0,0)); }
   /* split-screen (two stacked photos per slide) */
@@ -113,15 +113,34 @@
   .rslide.split .rsplit-divider { position:absolute; left:0; right:0; top:50%; height:3px; transform:translateY(-1.5px); background:rgba(244,239,230,0.55); z-index:3; }
   .rslide.split .rhalf .rblock { z-index:4; }
   .rslide.split .split-mid { position:absolute; left:80px; right:80px; top:50%; transform:translateY(-50%); text-align:center; z-index:6; }
-  /* device-frame (UI explainer): real screenshot floated on dark + one orange glow */
-  .rslide.framed .rframe-glow { position:absolute; inset:0; background:radial-gradient(78% 50% at 82% 6%, rgba(255,107,53,0.16), transparent 60%); z-index:0; }
-  .rslide.framed .rframe-kicker { position:absolute; top:88px; left:96px; right:96px; z-index:3; font-family:"Inter",sans-serif; font-weight:700; font-size:24px; letter-spacing:0.24em; text-transform:uppercase; color:#FF6B1A; }
-  .rslide.framed .rframe-rule { position:absolute; top:142px; left:96px; right:96px; height:2px; background:rgba(255,255,255,0.2); z-index:3; }
-  .rslide.framed .rframe-head { position:absolute; top:96px; left:96px; right:96px; z-index:3; font-family:"Tanker","Bowlby One",Impact,sans-serif; font-weight:400; color:#fff; font-size:90px; line-height:0.9; letter-spacing:-0.01em; text-transform:uppercase; text-shadow:0 3px 14px rgba(0,0,0,0.5); }
+  /* ---- EDITIONS foundation: metal type / glass / ember ---- */
+  .metal{
+    background:
+      linear-gradient(105deg,transparent 0%,transparent 38%,rgba(255,255,255,.95) 48%,rgba(255,255,255,.55) 52%,transparent 62%,transparent 100%),
+      linear-gradient(177deg,#fff 0%,#ececf1 20%,#b6b6c0 48%,#f6f6fa 64%,#9fa0a8 100%);
+    background-size:220% 100%,100% 100%; background-position:220% 0,0 0;
+    -webkit-background-clip:text; background-clip:text;
+    color:transparent; -webkit-text-fill-color:transparent;
+    filter:drop-shadow(0 2px 2px rgba(0,0,0,.45));
+    animation:metal-sheen 6s ease-in-out infinite;
+  }
+  @keyframes metal-sheen{0%{background-position:220% 0,0 0}55%{background-position:-120% 0,0 0}100%{background-position:-120% 0,0 0}}
+  .metal-dark{ background:linear-gradient(177deg,#3a3a40,#0c0c0e 45%,#5a5a62 70%,#14141a); -webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent; }
+  /* html2canvas can't clip gradient to text -> flat silver only during PNG capture */
+  .capturing .metal{ background:none!important; -webkit-background-clip:border-box!important; background-clip:border-box!important; color:#e9e9ee!important; -webkit-text-fill-color:#e9e9ee!important; animation:none!important; filter:drop-shadow(0 2px 2px rgba(0,0,0,.5)); }
+  .capturing .metal-dark{ background:none!important; -webkit-background-clip:border-box!important; background-clip:border-box!important; color:#26262b!important; -webkit-text-fill-color:#26262b!important; }
+  .glass{ background:rgba(255,255,255,.06); backdrop-filter:blur(22px) saturate(135%); -webkit-backdrop-filter:blur(22px) saturate(135%); border:1px solid rgba(255,255,255,.14); box-shadow:inset 0 1px 0 rgba(255,255,255,.20),inset 0 -1px 0 rgba(0,0,0,.30),0 24px 60px rgba(0,0,0,.5); }
+
+  /* device-frame (UI explainer): real screenshot on dark glass + ember glow, metal headline */
+  .rslide.framed { background:radial-gradient(ellipse at 72% 8%,rgba(252,86,3,.20),transparent 55%),radial-gradient(ellipse at 22% 92%,rgba(196,58,2,.16),transparent 60%),linear-gradient(160deg,#1b1b1f,#070708); }
+  .rslide.framed .rframe-glow { position:absolute; inset:0; background:radial-gradient(78% 50% at 82% 6%, rgba(252,86,3,0.16), transparent 60%); z-index:0; }
+  .rslide.framed .rframe-kicker { position:absolute; top:88px; left:96px; right:96px; z-index:3; font-family:"Inter",sans-serif; font-weight:700; font-size:24px; letter-spacing:0.26em; text-transform:uppercase; color:rgba(236,236,241,0.66); }
+  .rslide.framed .rframe-rule { position:absolute; top:142px; left:96px; right:96px; height:1px; background:rgba(255,255,255,0.18); z-index:3; }
+  .rslide.framed .rframe-head { position:absolute; top:96px; left:96px; right:96px; z-index:3; font-family:"Anton","Archivo Black",Impact,sans-serif; font-weight:400; font-size:96px; line-height:0.92; letter-spacing:0.005em; text-transform:uppercase; }
   .rslide.framed.kicked .rframe-head { top:172px; }
-  .rslide.framed .rframe-head em { font-style:normal; color:#FF6B1A; }
-  .rslide.framed .rframe-sub { position:absolute; left:96px; right:96px; top:300px; z-index:3; font-family:"Satoshi","Inter",sans-serif; font-weight:500; color:#cfc8bd; font-size:26px; line-height:1.45; letter-spacing:0.05em; text-transform:uppercase; }
-  .rslide.framed.kicked .rframe-sub { top:392px; }
+  .rslide.framed .rframe-head em { font-style:normal; }
+  .rslide.framed .rframe-sub { position:absolute; left:96px; right:96px; top:312px; z-index:3; font-family:"Satoshi","Inter",sans-serif; font-weight:500; color:#cbccd2; font-size:26px; line-height:1.45; letter-spacing:0.05em; text-transform:uppercase; }
+  .rslide.framed.kicked .rframe-sub { top:404px; }
   .rslide.framed .rgrain { opacity:0.12; }
   .rslide.framed .rdevice { position:absolute; left:50%; transform:translateX(-50%); overflow:hidden; z-index:2; box-shadow:0 50px 130px rgba(0,0,0,0.65); }
   .rslide.framed .rdevice.phone { width:470px; height:820px; top:470px; border-radius:58px; background:#0c0c0c; border:13px solid #1b1b1b; }
@@ -129,7 +148,7 @@
   .rslide.framed .rwin-bar { position:absolute; top:0; left:0; right:0; height:40px; background:rgba(255,255,255,0.04); border-bottom:1px solid rgba(255,255,255,0.07); z-index:2; }
   .rslide.framed .rscreen { position:absolute; inset:0; background-size:cover; background-position:top center; background-repeat:no-repeat; background-color:#101010; }
   .rslide.framed .rdevice.window .rscreen { top:40px; }
-  .rslide.framed .rcallout { position:absolute; z-index:5; font-family:"Space Mono",monospace; font-size:24px; color:#fff; background:rgba(18,18,18,0.86); border:1px solid rgba(255,107,53,0.6); border-radius:999px; padding:13px 22px; box-shadow:0 10px 34px rgba(0,0,0,0.55); max-width:380px; }
+  .rslide.framed .rcallout { position:absolute; z-index:5; font-family:"Space Mono",monospace; font-size:24px; letter-spacing:0.04em; text-transform:uppercase; color:#f2f2f5; background:rgba(255,255,255,0.07); backdrop-filter:blur(18px) saturate(135%); -webkit-backdrop-filter:blur(18px) saturate(135%); border:1px solid rgba(255,255,255,0.18); border-radius:999px; padding:13px 22px; box-shadow:inset 0 1px 0 rgba(255,255,255,0.18),0 10px 34px rgba(0,0,0,0.55); max-width:380px; }
 </style>
 </head>
 <body>
@@ -548,7 +567,7 @@ end $$;`;
         const dev = slide.frame === 'phone'
           ? `<div class="rdevice phone"><div class="rscreen" style="${screen}"></div></div>`
           : `<div class="rdevice window"><div class="rwin-bar"></div><div class="rscreen" style="${screen}"></div></div>`;
-        const headHTML = head ? `<div class="rframe-head"${edAttr(0)} style="${head.size?`font-size:${head.size}px;`:''}">${fdisp(head.text)}</div>` : '';
+        const headHTML = head ? `<div class="rframe-head metal"${edAttr(0)} style="${head.size?`font-size:${head.size}px;`:''}">${fdisp(head.text)}</div>` : '';
         const subHTML  = sub  ? `<div class="rframe-sub"${edAttr(1)} style="${sub.size?`font-size:${sub.size}px;`:''}">${fdisp(sub.text)}</div>` : '';
         let calloutHTML = '';
         if (slide.callout){ const p=slide.calloutPos||'br';
@@ -579,6 +598,7 @@ end $$;`;
 
     async function renderSlideToCanvas(slide, theme = 'mono', isCover = false, h = 1350) {
       const node = buildSlideNode(slide, theme, isCover, false, h);
+      node.classList.add('capturing');
       renderStage.appendChild(node);
       // wait a tick for fonts/images to settle
       if (document.fonts && document.fonts.ready) { try { await document.fonts.ready; } catch(e){} }
