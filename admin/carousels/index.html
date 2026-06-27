@@ -122,6 +122,7 @@
       </div>
       <div class="actions">
         <span class="live-dot" id="live">Loading</span>
+        <button class="btn" id="upload-lib-btn">Upload photos</button>
         <button class="btn" id="fix-all">Fix all photos</button>
         <button class="btn" id="import-btn">Import JSON</button>
         <button class="btn" id="new-cover-btn">New video cover</button>
@@ -178,6 +179,7 @@
     <div id="picker-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:0.5rem;max-height:64vh;overflow:auto"></div>
   </div>
 
+  <input type="file" id="upload-lib-input" accept="image/*" multiple style="display:none">
   <div id="render-stage"></div>
 
   <script type="module">
@@ -306,6 +308,37 @@ end $$;`;
       });
     }
 
+    // ---------- upload photos to the library (works from phone) ----------
+    function fileToScaledBlob(file, maxW=1600){
+      return new Promise((resolve,reject)=>{
+        const img=new Image(); const url=URL.createObjectURL(file);
+        img.onload=()=>{ const scale=Math.min(1,maxW/img.width); const w=Math.round(img.width*scale), h=Math.round(img.height*scale);
+          const c=document.createElement('canvas'); c.width=w; c.height=h; c.getContext('2d').drawImage(img,0,0,w,h);
+          URL.revokeObjectURL(url); c.toBlob(b=>resolve(b),'image/jpeg',0.85); };
+        img.onerror=reject; img.src=url;
+      });
+    }
+    async function uploadToLibrary(files){
+      if(!files||!files.length) return;
+      let ok=0, fail=0, stop=false;
+      for(const f of files){
+        if(stop) break;
+        try{
+          const blob=await fileToScaledBlob(f);
+          const path=`up-${Date.now()}-${Math.random().toString(36).slice(2,8)}.jpg`;
+          const { error:upErr }=await sb.storage.from('broll-up').upload(path, blob, { contentType:'image/jpeg', upsert:false });
+          if(upErr) throw upErr;
+          const { data:pub }=sb.storage.from('broll-up').getPublicUrl(path);
+          const desc=(f.name||'upload').replace(/\.[a-z0-9]+$/i,'').slice(0,60);
+          const { error:rowErr }=await sb.from('broll_uploads').insert({ media_url:pub.publicUrl, description:desc });
+          if(rowErr) throw rowErr;
+          ok++; toast(`Uploading… ${ok} done`);
+        }catch(e){ fail++; if(/bucket|not found|does not exist|row-level|violates/i.test(e.message||'')){ toast('Run the upload setup SQL once (admin/carousels/_supabase/broll-uploads.sql)','err'); stop=true; } }
+      }
+      _broll=null; // refresh pool on next open
+      if(ok) toast(`Uploaded ${ok} photo${ok===1?'':'s'} to your library`);
+    }
+
     // ---------- auto-photos: varied + matched, no repeats across posts ----------
     let _broll = null, _brollVideos = [];
     async function loadBroll(){
@@ -320,6 +353,11 @@ end $$;`;
         try { const { data } = await sb.from('broll_assets').select('id,category,description,mood,pillars,orientation,media_url,usable_as_broll,media_host');
           _broll = (data||[]).filter(a => a.media_url && a.media_host==='supabase' && a.usable_as_broll !== false); } catch(e){ _broll = _broll||[]; }
       }
+      // Merge in photos Cooper uploaded from his phone (newest first), if that table exists.
+      try {
+        const { data:up } = await sb.from('broll_uploads').select('media_url,description').order('created_at',{ascending:false});
+        if (up && up.length) _broll = up.map(u=>({ media_url:u.media_url, description:((u.description||'upload')+' upload'), category:'upload' })).concat(_broll||[]);
+      } catch(e){}
       return _broll;
     }
     function usedPhotosAcrossPosts(excludeId){
@@ -851,6 +889,8 @@ end $$;`;
     });
 
     // ---------- import ----------
+    document.getElementById('upload-lib-btn').addEventListener('click', () => document.getElementById('upload-lib-input').click());
+    document.getElementById('upload-lib-input').addEventListener('change', e => { const fs=[...e.target.files]; uploadToLibrary(fs).then(()=>{ e.target.value=''; }); });
     document.getElementById('fix-all').addEventListener('click', autoPhotosAll);
     document.getElementById('import-btn').addEventListener('click', () => openSheet(importSheet));
     document.getElementById('import-sample').addEventListener('click', () => {
