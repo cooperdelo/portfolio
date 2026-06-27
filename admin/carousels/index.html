@@ -283,6 +283,7 @@
         <button data-f="queued">Queued</button>
         <button data-f="approved">Approved</button>
         <button data-f="posted">Posted</button>
+        <button data-f="templates" style="border-color:rgba(252,86,3,0.4)">✦ Templates</button>
       </div>
       <div class="spacer"></div>
       <span class="mini" id="count">—</span>
@@ -411,7 +412,45 @@ end $$;`;
     // ---------- grid render ----------
     function statusPill(s){ return `<span class="pill st-${esc(s)}">${esc(s)}</span>`; }
 
+    const TEMPLATES = [
+      ['cover','Cover / masthead'],['behind','Text behind subject'],['around','Text around subject'],
+      ['duotone','Duotone feature'],['pullquote','Pull quote'],['stat','Stat hero'],
+      ['contents','Index / contents'],['oldnew','Old way vs Plugverse'],['receipt','Booking receipt'],
+      ['ticket','Ticket stub'],['vertical','Vertical edge type'],['diptych','Diptych spread'],
+    ];
+    function renderTemplates(){
+      document.getElementById('count').textContent = `${TEMPLATES.length} templates × 2 brands`;
+      grid.innerHTML = '';
+      const section = (title, theme, sub) => {
+        const h = document.createElement('div');
+        h.style.cssText = 'grid-column:1/-1;margin:0.6rem 0 0.1rem;display:flex;align-items:baseline;gap:0.6rem';
+        h.innerHTML = `<div class="meta" style="font-size:0.66rem;letter-spacing:0.22em;color:var(--ink)">${title}</div><div class="mini" style="opacity:0.6">${sub}</div>`;
+        grid.appendChild(h);
+        for (const [layout, label] of TEMPLATES){
+          const card = document.createElement('div');
+          card.className = 'card ccard'; card.style.cssText = 'cursor:pointer'; card.dataset.tpl = layout; card.dataset.tpltheme = theme;
+          const box = document.createElement('div'); box.className = 'preview'; box.style.cssText = 'position:relative;aspect-ratio:4/5;overflow:hidden;background:#0a0908';
+          try {
+            const node = buildSlideNode(newTemplate(layout, theme).slides[0], theme, false, false, 1350);
+            node.classList.add('capturing');
+            node.style.cssText += ';width:1080px;height:1350px;margin:0;transform:none';
+            const wrap = document.createElement('div');
+            wrap.style.cssText = 'position:absolute;top:0;left:0;width:1080px;height:1350px;transform-origin:top left';
+            wrap.appendChild(node);
+            box.appendChild(wrap);
+            requestAnimationFrame(() => { const sc = box.clientWidth / 1080; wrap.style.transform = `scale(${sc})`; });
+          } catch(e){ box.innerHTML = `<div class="ph">${label}</div>`; }
+          const body = document.createElement('div'); body.className = 'body';
+          body.innerHTML = `<div class="t">${label}</div><div class="meta">${theme} · use →</div>`;
+          card.appendChild(box); card.appendChild(body); grid.appendChild(card);
+        }
+      };
+      section('PLUGVERSE TEMPLATES', 'plugverse', 'dark glass · ember · metal');
+      section('PERSONAL BRAND TEMPLATES', 'personal', 'bone · mono · dark-metal');
+    }
+
     function render() {
+      if (filter === 'templates') { renderTemplates(); return; }
       const list = posts.filter(p => filter === 'all' || p.status === filter);
       document.getElementById('count').textContent = `${list.length} carousel${list.length===1?'':'s'}`;
       if (!list.length) { grid.innerHTML = `<div class="empty" style="grid-column:1/-1;">No carousels ${filter==='all'?'yet':'in '+filter}. Hit “New carousel” or “Import JSON”.</div>`; return; }
@@ -830,7 +869,7 @@ end $$;`;
       slides:[{ photo:null, frame:'window', handle:true, theme:'plugverse', ratio:'4:5', callout:'one tap', calloutPos:'br', kicker:'PLUGVERSE · FEATURE 01',
         blocks:[{ text:'how *one-tap booking* works', font:'stat', place:'top' }, { text:'send one link. the artist onboards, accepts, and you’re booked.', font:'serif', place:'bottom' }] }] }; }
 
-    function newTemplate(layout){
+    function newTemplate(layout, theme = 'plugverse'){
       const seeds = {
         cover:    { kicker:'PLUGVERSE EDITION 001', blocks:['RUBBER *BAND*','Chapel Hill · Indie Rock'] },
         behind:   { kicker:'PLUGVERSE EDITION 001', cutout:null, blocks:['RUBBER BAND','book on plugverse'] },
@@ -847,10 +886,11 @@ end $$;`;
       };
       const s = seeds[layout] || { blocks:['headline','subhead'] };
       const blocks = s.blocks.map(t => ({ text:t, font:'stat', place:'lower' }));
-      const slide = { photo:null, layout, theme:'plugverse', ratio:'4:5', blocks };
-      if (s.kicker) slide.kicker = s.kicker;
+      const slide = { photo:null, layout, theme, ratio:'4:5', blocks };
+      if (s.kicker && theme === 'plugverse') slide.kicker = s.kicker; // personal = no kicker (locked rule)
       if ('cutout' in s) slide.cutout = s.cutout;
-      return { title:'EDITION — '+layout, theme:'plugverse', ratio:'4:5', pillar:'figuring-it-out', format:'statement', caption:'', hashtags:['plugverse'], status:'queued', source:'manual', slides:[slide] };
+      const tags = theme === 'plugverse' ? ['plugverse'] : [];
+      return { title:(theme==='plugverse'?'EDITION':'PERSONAL')+' — '+layout, theme, ratio:'4:5', pillar:'figuring-it-out', format:'statement', caption:'', hashtags:tags, status:'queued', source:'manual', slides:[slide] };
     }
 
     function opt(list, val){ return list.map(x => `<option value="${x}" ${x===val?'selected':''}>${x}</option>`).join(''); }
@@ -1174,6 +1214,11 @@ end $$;`;
       filter = b.dataset.f;
       document.querySelectorAll('#status-filter button').forEach(x=>x.classList.toggle('active', x===b));
       render();
+    });
+    document.getElementById('grid').addEventListener('click', e => {
+      const tt = e.target.closest('[data-tpl]'); if (!tt) return;
+      if (!tableReady){ toast('Run the setup SQL first','err'); return; }
+      openEditor(newTemplate(tt.dataset.tpl, tt.dataset.tpltheme));
     });
     document.getElementById('new-btn').addEventListener('click', () => {
       if (!tableReady){ toast('Run the setup SQL first','err'); return; }
