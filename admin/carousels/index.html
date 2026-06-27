@@ -206,7 +206,7 @@
   .rslide.ed[data-theme="personal"].lay-receipt .rc-row,.rslide.ed[data-theme="mono"].lay-receipt .rc-row{ color:#2a2722; border-bottom:1px dashed rgba(20,18,16,0.25); }
   .rslide.lay-receipt .rc-row .k{ color:#9a9aa1; } .rslide.ed[data-theme="personal"].lay-receipt .rc-row .k,.rslide.ed[data-theme="mono"].lay-receipt .rc-row .k{ color:#6a655c; }
   /* vertical edge type */
-  .rslide.lay-vertical .v-head{ position:absolute; left:74px; bottom:90px; transform:rotate(-90deg); transform-origin:left bottom; font-family:"Anton","Archivo Black",sans-serif; font-size:150px; line-height:0.86; text-transform:uppercase; white-space:nowrap; z-index:3; }
+  .rslide.lay-vertical .v-head{ position:absolute; left:96px; bottom:96px; transform:rotate(-90deg); transform-origin:left bottom; font-family:"Anton","Archivo Black",sans-serif; font-size:108px; line-height:0.9; letter-spacing:0.01em; text-transform:uppercase; white-space:nowrap; z-index:3; }
   .rslide.ed[data-theme="personal"].lay-vertical .v-head,.rslide.ed[data-theme="mono"].lay-vertical .v-head{ font-family:"Hanken Grotesk",sans-serif; font-weight:800; }
   /* diptych spread (top photo / bottom text) */
   .rslide.lay-diptych .dp-photo{ position:absolute; top:0; left:0; right:0; height:58%; background-size:cover; background-position:center; z-index:1; }
@@ -412,26 +412,32 @@ end $$;`;
     // ---------- grid render ----------
     function statusPill(s){ return `<span class="pill st-${esc(s)}">${esc(s)}</span>`; }
 
-    const TEMPLATES = [
+    const PLUGVERSE_TEMPLATES = [
       ['cover','Cover / masthead'],['behind','Text behind subject'],['around','Text around subject'],
-      ['duotone','Duotone feature'],['pullquote','Pull quote'],['stat','Stat hero'],
-      ['contents','Index / contents'],['oldnew','Old way vs Plugverse'],['receipt','Booking receipt'],
-      ['ticket','Ticket stub'],['vertical','Vertical edge type'],['diptych','Diptych spread'],
+      ['duotone','Duotone feature'],['ui-explainer','UI explainer'],['pullquote','Pull quote'],
+      ['stat','Stat hero'],['contents','Index / contents'],['oldnew','Old way vs Plugverse'],
+      ['receipt','Booking receipt'],['ticket','Ticket stub'],['diptych','Diptych spread'],['vertical','Vertical edge type'],
+    ];
+    const PERSONAL_TEMPLATES = [
+      ['single-cover','Cover — centered title'],['split-mid','Split — text on the line'],
+      ['split-topbottom','Split — text top & bottom'],['behind','Word behind subject'],
+      ['around','Text around subject'],['duotone','Duotone feature'],['pullquote','Pull quote'],
+      ['stat','Stat hero'],['contents','Index / contents'],['diptych','Diptych spread'],
     ];
     function renderTemplates(){
-      document.getElementById('count').textContent = `${TEMPLATES.length} templates × 2 brands`;
+      document.getElementById('count').textContent = `${PLUGVERSE_TEMPLATES.length + PERSONAL_TEMPLATES.length} templates`;
       grid.innerHTML = '';
-      const section = (title, theme, sub) => {
+      const section = (title, theme, sub, list) => {
         const h = document.createElement('div');
         h.style.cssText = 'grid-column:1/-1;margin:0.6rem 0 0.1rem;display:flex;align-items:baseline;gap:0.6rem';
         h.innerHTML = `<div class="meta" style="font-size:0.66rem;letter-spacing:0.22em;color:var(--ink)">${title}</div><div class="mini" style="opacity:0.6">${sub}</div>`;
         grid.appendChild(h);
-        for (const [layout, label] of TEMPLATES){
+        for (const [kind, label] of list){
           const card = document.createElement('div');
-          card.className = 'card ccard'; card.style.cssText = 'cursor:pointer'; card.dataset.tpl = layout; card.dataset.tpltheme = theme;
+          card.className = 'card ccard'; card.style.cssText = 'cursor:pointer'; card.dataset.tpl = kind; card.dataset.tpltheme = theme;
           const box = document.createElement('div'); box.className = 'preview'; box.style.cssText = 'position:relative;aspect-ratio:4/5;overflow:hidden;background:#0a0908';
           try {
-            const node = buildSlideNode(newTemplate(layout, theme).slides[0], theme, false, false, 1350);
+            const node = buildSlideNode(newTemplate(kind, theme).slides[0], theme, false, false, 1350);
             node.classList.add('capturing');
             node.style.cssText += ';width:1080px;height:1350px;margin:0;transform:none';
             const wrap = document.createElement('div');
@@ -445,8 +451,8 @@ end $$;`;
           card.appendChild(box); card.appendChild(body); grid.appendChild(card);
         }
       };
-      section('PLUGVERSE TEMPLATES', 'plugverse', 'dark glass · ember · metal');
-      section('PERSONAL BRAND TEMPLATES', 'personal', 'bone · mono · dark-metal');
+      section('PLUGVERSE TEMPLATES', 'plugverse', 'dark glass · ember · metal', PLUGVERSE_TEMPLATES);
+      section('PERSONAL BRAND TEMPLATES', 'personal', 'bone · serif · mono', PERSONAL_TEMPLATES);
     }
 
     function render() {
@@ -869,28 +875,50 @@ end $$;`;
       slides:[{ photo:null, frame:'window', handle:true, theme:'plugverse', ratio:'4:5', callout:'one tap', calloutPos:'br', kicker:'PLUGVERSE · FEATURE 01',
         blocks:[{ text:'how *one-tap booking* works', font:'stat', place:'top' }, { text:'send one link. the artist onboards, accepts, and you’re booked.', font:'serif', place:'bottom' }] }] }; }
 
-    function newTemplate(layout, theme = 'plugverse'){
-      const seeds = {
-        cover:    { kicker:'PLUGVERSE EDITION 001', blocks:['RUBBER *BAND*','Chapel Hill · Indie Rock'] },
-        behind:   { kicker:'PLUGVERSE EDITION 001', cutout:null, blocks:['RUBBER BAND','book on plugverse'] },
-        around:   { kicker:'PLUGVERSE EDITION 001', cutout:null, blocks:['RUBBER BAND','from dorm-room jams to 200-cap venues'] },
-        duotone:  { kicker:'THE SCENE', blocks:['every *night* needs a band','and every band needs a booking that actually works'] },
-        pullquote:{ blocks:['booking used to take *ten emails*. now it takes one link.','— a venue that switched'] },
-        stat:     { kicker:'BY THE NUMBERS', blocks:['$0','booking fees, ever'] },
-        contents: { kicker:'INSIDE THIS EDITION', blocks:['WHAT YOU GET','one-tap booking','auto-contracts + escrow','real artist profiles','instant payouts'] },
-        oldnew:   { blocks:['ten emails, a deposit nobody chases, a contract nobody signs','one link. signed, paid, booked.'] },
-        receipt:  { kicker:'PLUGVERSE', blocks:['BOOKING CONFIRMED','Artist | Rubber Band','Date | Fri, Aug 14','Venue | The Cradle','Deposit | Held in escrow','Fees | $0'] },
-        ticket:   { blocks:["you're *booked*",'admit one · plugverse.app'] },
-        vertical: { kicker:'PLUGVERSE EDITION', blocks:['RUBBER BAND','chapel hill · indie rock'] },
-        diptych:  { kicker:'FEATURED', blocks:['meet the band','rubber band — chapel hill indie rock, booked three times this month on plugverse.'] },
-      };
-      const s = seeds[layout] || { blocks:['headline','subhead'] };
+    const PLUG_SEEDS = {
+      cover:    { kicker:'PLUGVERSE EDITION 001', blocks:['RUBBER *BAND*','Chapel Hill · Indie Rock'] },
+      behind:   { kicker:'PLUGVERSE EDITION 001', cutout:null, blocks:['RUBBER BAND','book on plugverse'] },
+      around:   { kicker:'PLUGVERSE EDITION 001', cutout:null, blocks:['RUBBER BAND','from dorm-room jams to 200-cap venues'] },
+      duotone:  { kicker:'THE SCENE', blocks:['every *night* needs a band','and every band needs a booking that actually works'] },
+      pullquote:{ blocks:['booking used to take *ten emails*. now it takes one link.','— a venue that switched'] },
+      stat:     { kicker:'BY THE NUMBERS', blocks:['$0','booking fees, ever'] },
+      contents: { kicker:'INSIDE THIS EDITION', blocks:['WHAT YOU GET','one-tap booking','auto-contracts + escrow','real artist profiles','instant payouts'] },
+      oldnew:   { blocks:['ten emails, a deposit nobody chases, a contract nobody signs','one link. signed, paid, booked.'] },
+      receipt:  { kicker:'PLUGVERSE', blocks:['BOOKING CONFIRMED','Artist | Rubber Band','Date | Fri, Aug 14','Venue | The Cradle','Deposit | Held in escrow','Fees | $0'] },
+      ticket:   { blocks:["you're *booked*",'admit one · plugverse.app'] },
+      vertical: { kicker:'PLUGVERSE', blocks:['RUBBER BAND','chapel hill · indie rock'] },
+      diptych:  { kicker:'FEATURED', blocks:['meet the band','rubber band — chapel hill indie rock, booked three times this month on plugverse.'] },
+    };
+    const PERS_SEEDS = {
+      behind:   { cutout:null, blocks:['SHOW UP','the part nobody posts'] },
+      around:   { cutout:null, blocks:["you're not\nbehind",'the timeline is made up'] },
+      duotone:  { blocks:['the work *nobody* sees','it’s mostly this. quietly. daily.'] },
+      pullquote:{ blocks:['you don’t need more time. you need to *start*.','— note to self'] },
+      stat:     { blocks:['5','things i run without dropping all of it'] },
+      contents: { blocks:['what this year taught me','start before you’re ready','consistency beats intensity','post the ugly version','done beats perfect'] },
+      diptych:  { blocks:['the version i posted','vs the 14 takes nobody saw'] },
+      vertical: { blocks:['figuring it out','one post at a time'] },
+    };
+    function newTemplate(kind, theme = 'plugverse'){
+      const personal = (theme === 'personal' || theme === 'mono');
+      const mkPost = (slides) => ({ title:(personal?'PERSONAL':'EDITION')+' — '+kind, theme, ratio:'4:5', pillar:'figuring-it-out', format:'statement', caption:'', hashtags: personal?[]:['plugverse'], status:'queued', source:'manual', slides });
+      // ---- non-layout formats from the existing system ----
+      if (kind === 'single-cover')
+        return mkPost([{ photo:null, overlay:0.35, theme, ratio:'4:5', blocks:[{ text: personal?'post the ugly version':'PLUGVERSE EDITION 001', font: personal?'serif':'stat', place:'center' }] }]);
+      if (kind === 'split-mid')
+        return mkPost([{ split:true, photoTop:null, photoBottom:null, theme, ratio:'4:5', blocks:[{ text: personal?'what i thought':'the old way', font:'capcut', place:'center' }] }]);
+      if (kind === 'split-topbottom')
+        return mkPost([{ split:true, photoTop:null, photoBottom:null, theme, ratio:'4:5', blocks:[{ text: personal?'the plan':'before', font:'capcut', place:'top' }, { text: personal?'the reality':'after', font:'capcut', place:'bottom' }] }]);
+      if (kind === 'ui-explainer')
+        return mkPost([{ photo:null, frame:'window', handle:true, theme:'plugverse', ratio:'4:5', callout:'one tap', calloutPos:'br', kicker:'PLUGVERSE · FEATURE 01', blocks:[{ text:'how *one-tap booking* works', font:'stat', place:'top' }, { text:'send one link. the artist onboards, accepts, and you’re booked.', font:'serif', place:'bottom' }] }]);
+      // ---- layout (EDITIONS) formats ----
+      const seeds = personal ? PERS_SEEDS : PLUG_SEEDS;
+      const s = seeds[kind] || PLUG_SEEDS[kind] || { blocks:['headline','subhead'] };
       const blocks = s.blocks.map(t => ({ text:t, font:'stat', place:'lower' }));
-      const slide = { photo:null, layout, theme, ratio:'4:5', blocks };
-      if (s.kicker && theme === 'plugverse') slide.kicker = s.kicker; // personal = no kicker (locked rule)
+      const slide = { photo:null, layout:kind, theme, ratio:'4:5', blocks };
+      if (s.kicker && !personal) slide.kicker = s.kicker; // personal = no kicker (locked rule)
       if ('cutout' in s) slide.cutout = s.cutout;
-      const tags = theme === 'plugverse' ? ['plugverse'] : [];
-      return { title:(theme==='plugverse'?'EDITION':'PERSONAL')+' — '+layout, theme, ratio:'4:5', pillar:'figuring-it-out', format:'statement', caption:'', hashtags:tags, status:'queued', source:'manual', slides:[slide] };
+      return mkPost([slide]);
     }
 
     function opt(list, val){ return list.map(x => `<option value="${x}" ${x===val?'selected':''}>${x}</option>`).join(''); }
