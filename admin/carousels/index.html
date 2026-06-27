@@ -121,15 +121,23 @@
     background-size:220% 100%,100% 100%; background-position:220% 0,0 0;
     -webkit-background-clip:text; background-clip:text;
     color:transparent; -webkit-text-fill-color:transparent;
-    filter:drop-shadow(0 2px 2px rgba(0,0,0,.45));
+    /* layered shadow: crisp dark edge + depth so silver reads on BOTH light and dark photos */
+    filter:drop-shadow(0 1px 0 rgba(0,0,0,.6)) drop-shadow(0 3px 3px rgba(0,0,0,.5)) drop-shadow(0 8px 22px rgba(0,0,0,.45));
     animation:metal-sheen 6s ease-in-out infinite;
   }
   @keyframes metal-sheen{0%{background-position:220% 0,0 0}55%{background-position:-120% 0,0 0}100%{background-position:-120% 0,0 0}}
-  .metal-dark{ background:linear-gradient(177deg,#3a3a40,#0c0c0e 45%,#5a5a62 70%,#14141a); -webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent; }
+  .metal-dark{ background:linear-gradient(177deg,#3a3a40,#0c0c0e 45%,#5a5a62 70%,#14141a); -webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent; filter:drop-shadow(0 1px 0 rgba(255,255,255,.35)); }
   /* html2canvas can't clip gradient to text -> flat silver only during PNG capture */
-  .capturing .metal{ background:none!important; -webkit-background-clip:border-box!important; background-clip:border-box!important; color:#e9e9ee!important; -webkit-text-fill-color:#e9e9ee!important; animation:none!important; filter:drop-shadow(0 2px 2px rgba(0,0,0,.5)); }
+  .capturing .metal{ background:none!important; -webkit-background-clip:border-box!important; background-clip:border-box!important; color:#eaeaef!important; -webkit-text-fill-color:#eaeaef!important; animation:none!important; filter:drop-shadow(0 1px 0 rgba(0,0,0,.6)) drop-shadow(0 4px 14px rgba(0,0,0,.55)); }
   .capturing .metal-dark{ background:none!important; -webkit-background-clip:border-box!important; background-clip:border-box!important; color:#26262b!important; -webkit-text-fill-color:#26262b!important; }
   .glass{ background:rgba(255,255,255,.06); backdrop-filter:blur(22px) saturate(135%); -webkit-backdrop-filter:blur(22px) saturate(135%); border:1px solid rgba(255,255,255,.14); box-shadow:inset 0 1px 0 rgba(255,255,255,.20),inset 0 -1px 0 rgba(0,0,0,.30),0 24px 60px rgba(0,0,0,.5); }
+  /* full editorial font palette (selectable per text block — incl. video covers) */
+  .rblock.f-anton{ font-family:"Anton","Archivo Black",Impact,sans-serif; font-weight:400; text-transform:uppercase; letter-spacing:0.005em; }
+  .rblock.f-archivo{ font-family:"Archivo Black","Anton",sans-serif; font-weight:400; }
+  .rblock.f-satoshi{ font-family:"Satoshi","Inter",sans-serif; font-weight:700; }
+  .rblock.f-general{ font-family:"General Sans","Inter",sans-serif; font-weight:600; }
+  .rblock.f-hanken{ font-family:"Hanken Grotesk",sans-serif; font-weight:800; letter-spacing:-0.02em; }
+  .rblock.f-fraunces{ font-family:"Fraunces",serif; font-weight:600; }
 
   /* ---- EDITIONS layouts (data-driven template library) ---- */
   .rslide.ed{ background:radial-gradient(ellipse at 74% 8%,rgba(252,86,3,.20),transparent 55%),radial-gradient(ellipse at 20% 92%,rgba(196,58,2,.15),transparent 60%),linear-gradient(160deg,#1b1b1f,#070708); }
@@ -220,7 +228,11 @@
   .rslide.lay-behind .lb-front,.rslide.lay-around .lb-front{ position:absolute; left:90px; right:90px; bottom:96px; z-index:4; }
   .rslide.lay-around .la-word{ position:absolute; z-index:4; left:80px; top:120px; max-width:46%; font-family:"Anton","Archivo Black",sans-serif; font-size:150px; line-height:0.84; text-transform:uppercase; }
   .rslide.ed[data-theme="personal"].lay-around .la-word,.rslide.ed[data-theme="mono"].lay-around .la-word{ font-family:"Hanken Grotesk",sans-serif; font-weight:800; }
-  .rslide.lay-cover .edpad{ justify-content:flex-end; }
+  .rslide.lay-cover .edpad{ justify-content:center; align-items:center; text-align:center; padding:80px; }
+  .rslide.lay-cover .ed-head{ font-size:158px; line-height:0.86; }
+  .rslide.lay-cover .ed-sub{ text-align:center; margin-top:28px; max-width:80%; }
+  .rslide.lay-cover .ed-coverscrim{ position:absolute; inset:0; z-index:1; background:radial-gradient(ellipse at 50% 42%, rgba(0,0,0,0.30), rgba(0,0,0,0.66) 100%); }
+  .rslide.lay-cover .ed-hairline{ position:absolute; inset:54px; z-index:2; border:1px solid rgba(255,255,255,0.22); pointer-events:none; }
 
   /* device-frame (UI explainer): real screenshot on dark glass + ember glow, metal headline */
   .rslide.framed { background:radial-gradient(ellipse at 72% 8%,rgba(252,86,3,.20),transparent 55%),radial-gradient(ellipse at 22% 92%,rgba(196,58,2,.16),transparent 60%),linear-gradient(160deg,#1b1b1f,#070708); }
@@ -346,9 +358,9 @@
     const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
     const PILLARS = ['juggling','discipline','behind','perceived','figuring-it-out'];
     const FORMATS = ['statement','one-liner','two-part','stat','value-step','reflective','framework','save-carousel'];
-    const FONTS   = ['serif','capcut','stat'];
+    const FONTS   = ['serif','capcut','stat','anton','archivo','satoshi','general','hanken','fraunces'];
     const PLACES  = ['top','center','lower','bottom'];
-    const SIZE_DEFAULT = { serif:60, capcut:58, stat:88 };
+    const SIZE_DEFAULT = { serif:60, capcut:58, stat:88, anton:96, archivo:80, satoshi:34, general:34, hanken:84, fraunces:56 };
 
     // ---------- data ----------
     async function load() {
@@ -690,7 +702,8 @@ end $$;`;
       // ---- EDITIONS layouts (data-driven template library) ----
       if (slide.layout) {
         const personal = (theme === 'personal' || theme === 'mono');
-        const M = personal ? 'metal-dark' : 'metal';
+        const photoMetal = ['cover','behind','around','duotone']; // sit on photos -> silver metal even for personal
+        const M = (personal && !photoMetal.includes(slide.layout)) ? 'metal-dark' : 'metal';
         const B = slide.blocks || [];
         const T = (i) => (B[i] && B[i].text) || '';
         const md = (t) => esc(t || '').replace(/\*(.+?)\*/g, '<em>$1</em>').replace(/\n/g, '<br>');
@@ -728,7 +741,8 @@ end $$;`;
           const cut = slide.cutout ? `<div class="lb-cut" style="background-image:url('${slide.cutout}')"></div>` : '';
           inner = `<div class="lb-bg" style="${photoCSS}"></div><div class="lb-scrim"></div>${cut}<div class="la-word ${M}"${edAttr(0)} style="${sz(0)}">${md(T(0))}</div>${grain}<div class="lb-front">${tag}<div class="ed-sub"${edAttr(1)}>${md(T(1))}</div></div>`;
         } else if (L === 'cover') {
-          inner = `${(slide.photo?`<div class="ed-photo" style="${photoCSS}"></div><div class="ed-vign"></div>`:'')}${grain}<div class="edpad">${tag}<div class="ed-rule"></div><div class="ed-head ${M}"${edAttr(0)} style="${sz(0)}">${md(T(0))}</div><div class="ed-sub" style="margin-top:22px"${edAttr(1)}>${md(T(1))}</div></div>`;
+          const scrim = slide.photo ? `<div class="ed-photo" style="${photoCSS}"></div><div class="ed-coverscrim"></div>` : '';
+          inner = `${scrim}${grain}<div class="ed-hairline"></div><div class="edpad">${tag}<div class="ed-head ${M}"${edAttr(0)} style="${sz(0)}">${md(T(0))}</div><div class="ed-sub"${edAttr(1)}>${md(T(1))}</div></div>`;
         } else {
           inner = `${(slide.photo?`<div class="ed-photo" style="${photoCSS}"></div><div class="ed-vign"></div>`:'')}${grain}<div class="edpad" style="justify-content:flex-end">${tag}<div class="ed-head ${M}"${edAttr(0)} style="${sz(0)}">${md(T(0))}</div><div class="ed-sub" style="margin-top:18px"${edAttr(1)}>${md(T(1))}</div></div>`;
         }
