@@ -454,25 +454,27 @@
       setK('last_post_sub',    latest ? `${escapeHtml(latest.media_type || '')}` : 'No posts yet');
     }
 
-    // ---- LinkedIn: no live API. Posts are imported from the LinkedIn data
-    // export (Shares.csv) into social_posts. We read them straight from the DB. ----
-    async function loadLinkedIn() {
-      indicator.textContent = 'Loading linkedin';
+    // ---- Import-backed platforms (LinkedIn + TikTok). No usable live API, so
+    // posts are imported from each platform's official data export into
+    // social_posts. We read them straight from the DB. ----
+    async function loadImported(platform) {
+      const noun = platform === 'linkedin' ? 'LinkedIn' : 'TikTok';
+      indicator.textContent = `Loading ${platform}`;
       const { data: rows, error } = await sb
         .from('social_posts')
         .select('id, caption, posted_at, permalink, media_type, media_url, thumbnail_url, hashtags, platform, account_handle')
-        .eq('platform', 'linkedin')
+        .eq('platform', platform)
         .order('posted_at', { ascending: false })
         .limit(500);
 
-      if (error) { renderError('linkedin', error.message); indicator.textContent = 'Error'; return; }
+      if (error) { renderError(platform, error.message); indicator.textContent = 'Error'; return; }
 
       currentPosts = (rows || []).map(p => ({ ...p, latest: {} }));
 
       if (!currentPosts.length) {
         document.getElementById('post-grid').innerHTML = `
           <div class="card connect-cta" style="grid-column:1/-1;padding:1.6rem 1.7rem;">
-            <div class="text">No LinkedIn posts imported yet. Run the LinkedIn data-export import.</div>
+            <div class="text">No ${noun} posts imported yet. Run the ${noun} data-export import.</div>
           </div>`;
         setK('followers','—'); setK('posts_total','0'); setK('last_post','—'); setK('total_likes','—');
         document.getElementById('top-row').innerHTML = '';
@@ -482,16 +484,16 @@
       }
 
       const handle = currentPosts[0].account_handle;
-      setK('followers','—'); setK('followers_sub', handle ? `@${handle}` : 'LinkedIn');
+      setK('followers','—'); setK('followers_sub', handle ? `@${handle}` : noun);
       setK('posts_total', fmtN(currentPosts.length));
       setK('total_likes','—');
       setK('last_post', daysSince(currentPosts[0].posted_at));
       setK('last_post_sub', 'Imported from export');
 
-      // No view metrics on LinkedIn imports, so the Top-5-by-views row is N/A.
+      // No view metrics on data-export imports, so the Top-5-by-views row is N/A.
       document.getElementById('top-row').innerHTML =
-        `<div class="empty" style="grid-column:1/-1;padding:1.4rem 1rem;">LinkedIn export has captions + dates, no view metrics.</div>`;
-      renderWatchTime('linkedin', currentPosts);
+        `<div class="empty" style="grid-column:1/-1;padding:1.4rem 1rem;">${noun} export has captions + dates, no view metrics.</div>`;
+      renderWatchTime(platform, currentPosts);
       renderHashtags(currentPosts);
 
       // Caption-first cards (no stat grid).
@@ -505,7 +507,7 @@
           </div>
         </div>`;
       }).join('');
-      indicator.textContent = `Loaded · linkedin (${currentPosts.length})`;
+      indicator.textContent = `Loaded · ${platform} (${currentPosts.length})`;
     }
 
     async function syncPlatform(platform) {
@@ -513,7 +515,7 @@
       refreshBtn.disabled = true;
       clearError();
       if (platform === 'linkedin') {
-        try { await loadLinkedIn(); } catch (e) { renderError('linkedin', e?.message || String(e)); }
+        try { await loadImported('linkedin'); } catch (e) { renderError('linkedin', e?.message || String(e)); }
         refreshBtn.disabled = false;
         return;
       }
@@ -526,6 +528,8 @@
         const j = await r.json();
         if (!r.ok) {
           if (String(j.error || '').match(/No (Instagram|TikTok) account connected/i)) {
+            // TikTok runs on data-export imports (no live API), so fall back to the DB.
+            if (platform === 'tiktok') { await loadImported('tiktok'); return; }
             renderConnectCTA(platform);
             setK('followers','—'); setK('posts_total','—'); setK('last_post','—'); setK('total_likes','—');
             indicator.textContent = `Not connected`;
