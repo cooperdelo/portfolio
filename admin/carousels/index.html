@@ -732,6 +732,10 @@ end $$;`;
         } else {
           inner = `${(slide.photo?`<div class="ed-photo" style="${photoCSS}"></div><div class="ed-vign"></div>`:'')}${grain}<div class="edpad" style="justify-content:flex-end">${tag}<div class="ed-head ${M}"${edAttr(0)} style="${sz(0)}">${md(T(0))}</div><div class="ed-sub" style="margin-top:18px"${edAttr(1)}>${md(T(1))}</div></div>`;
         }
+        // any layout that doesn't build its own photo: drop the uploaded image in as a full-bleed bg
+        if (slide.photo && ['pullquote','stat','contents','oldnew','receipt','ticket'].includes(L)) {
+          inner = `<div class="ed-photo" style="${photoCSS}"></div><div class="ed-vign"></div>` + inner;
+        }
         node.innerHTML = inner;
         return node;
       }
