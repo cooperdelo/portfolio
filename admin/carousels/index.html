@@ -413,9 +413,11 @@ end $$;`;
         grid.style.gridTemplateColumns = 'repeat(auto-fill,minmax(88px,1fr))';
         const items = (_broll||[]).filter(a => !qq || ((a.description||'')+' '+(a.category||'')).toLowerCase().includes(qq));
         count.textContent = `${items.length} photos`;
-        grid.innerHTML = items.slice(0,400).map(a =>
-          `<div data-url="${esc(a.media_url)}" title="${esc(a.description||'')}" style="aspect-ratio:4/5;border-radius:8px;background:#14110F center/cover no-repeat;background-image:url('${esc(a.media_url)}');cursor:pointer;border:1px solid var(--card-border)"></div>`
-        ).join('') || '<div class="empty" style="grid-column:1/-1">no matches</div>';
+        grid.innerHTML = items.slice(0,400).map(a => {
+          const full = esc(a.media_url);
+          const thumb = full.replace('/object/public/','/render/image/public/') + '?width=200&quality=55&resize=cover';
+          return `<img data-url="${full}" loading="lazy" decoding="async" src="${thumb}" title="${esc(a.description||'')}" onerror="this.onerror=null;this.src='${full}'" style="aspect-ratio:4/5;width:100%;object-fit:cover;border-radius:8px;background:#14110F;cursor:pointer;border:1px solid var(--card-border)">`;
+        }).join('') || '<div class="empty" style="grid-column:1/-1">no matches</div>';
       };
       draw();
       search.value=''; search.oninput = draw;
