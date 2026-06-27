@@ -112,6 +112,7 @@
     <div class="tabs">
       <button class="tab active" data-tab="instagram">Instagram</button>
       <button class="tab" data-tab="tiktok">TikTok</button>
+      <button class="tab" data-tab="linkedin">LinkedIn</button>
     </div>
 
     <div id="error-slot"></div>
@@ -358,7 +359,9 @@
     function renderConnectCTA(platform) {
       const oauthUrl = platform === 'instagram'
         ? 'https://www.instagram.com/oauth/authorize?force_reauth=true&client_id=946685798340166&redirect_uri=https://www.cooperdelo.com/api/instagram-oauth&response_type=code&scope=instagram_business_basic%2Cinstagram_business_manage_messages%2Cinstagram_business_manage_comments%2Cinstagram_business_content_publish%2Cinstagram_business_manage_insights'
-        : '#'; // TikTok URL filled after user pastes client_key — see below
+        : platform === 'tiktok'
+        ? '/api/tiktok-auth-start'   // server builds the authorize URL from TIKTOK_CLIENT_KEY env
+        : '#';
       document.getElementById('post-grid').innerHTML = `
         <div class="card connect-cta" style="grid-column:1/-1;padding:1.6rem 1.7rem;">
           <div class="text">No ${platform} account connected yet.</div>
@@ -451,10 +454,69 @@
       setK('last_post_sub',    latest ? `${escapeHtml(latest.media_type || '')}` : 'No posts yet');
     }
 
+    // ---- LinkedIn: no live API. Posts are imported from the LinkedIn data
+    // export (Shares.csv) into social_posts. We read them straight from the DB. ----
+    async function loadLinkedIn() {
+      indicator.textContent = 'Loading linkedin';
+      const { data: rows, error } = await sb
+        .from('social_posts')
+        .select('id, caption, posted_at, permalink, media_type, media_url, thumbnail_url, hashtags, platform, account_handle')
+        .eq('platform', 'linkedin')
+        .order('posted_at', { ascending: false })
+        .limit(500);
+
+      if (error) { renderError('linkedin', error.message); indicator.textContent = 'Error'; return; }
+
+      currentPosts = (rows || []).map(p => ({ ...p, latest: {} }));
+
+      if (!currentPosts.length) {
+        document.getElementById('post-grid').innerHTML = `
+          <div class="card connect-cta" style="grid-column:1/-1;padding:1.6rem 1.7rem;">
+            <div class="text">No LinkedIn posts imported yet. Run the LinkedIn data-export import.</div>
+          </div>`;
+        setK('followers','—'); setK('posts_total','0'); setK('last_post','—'); setK('total_likes','—');
+        document.getElementById('top-row').innerHTML = '';
+        document.getElementById('hashtag-tbody').innerHTML = `<tr><td colspan="5" class="empty">—</td></tr>`;
+        indicator.textContent = 'No imports yet';
+        return;
+      }
+
+      const handle = currentPosts[0].account_handle;
+      setK('followers','—'); setK('followers_sub', handle ? `@${handle}` : 'LinkedIn');
+      setK('posts_total', fmtN(currentPosts.length));
+      setK('total_likes','—');
+      setK('last_post', daysSince(currentPosts[0].posted_at));
+      setK('last_post_sub', 'Imported from export');
+
+      // No view metrics on LinkedIn imports, so the Top-5-by-views row is N/A.
+      document.getElementById('top-row').innerHTML =
+        `<div class="empty" style="grid-column:1/-1;padding:1.4rem 1rem;">LinkedIn export has captions + dates, no view metrics.</div>`;
+      renderWatchTime('linkedin', currentPosts);
+      renderHashtags(currentPosts);
+
+      // Caption-first cards (no stat grid).
+      document.getElementById('post-grid').innerHTML = currentPosts.map(p => {
+        const cap = (p.caption || '(no caption)').replace(/\n/g, ' ');
+        const date = p.posted_at ? new Date(p.posted_at).toLocaleDateString('en-US',{month:'short',day:'2-digit',year:'numeric'}) : '—';
+        return `<div class="post" data-post-id="${escapeHtml(p.id)}" style="cursor:pointer">
+          <div class="body" style="padding:1rem 1.1rem;">
+            <div class="cap" style="max-height:7.5rem;">${escapeHtml(cap.slice(0, 280))}</div>
+            <div class="date">${escapeHtml(date)}${p.permalink ? ` · <a href="${escapeHtml(p.permalink)}" target="_blank" rel="noreferrer" style="color:var(--rust)">open ↗</a>` : ''}</div>
+          </div>
+        </div>`;
+      }).join('');
+      indicator.textContent = `Loaded · linkedin (${currentPosts.length})`;
+    }
+
     async function syncPlatform(platform) {
       indicator.textContent = `Syncing ${platform}`;
       refreshBtn.disabled = true;
       clearError();
+      if (platform === 'linkedin') {
+        try { await loadLinkedIn(); } catch (e) { renderError('linkedin', e?.message || String(e)); }
+        refreshBtn.disabled = false;
+        return;
+      }
       const { data: sessionData } = await sb.auth.getSession();
       const jwt = sessionData?.session?.access_token;
       if (!jwt){ toast('Session expired — sign in again', 'err'); indicator.textContent = 'Offline'; refreshBtn.disabled = false; return; }

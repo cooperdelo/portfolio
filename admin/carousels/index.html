@@ -110,6 +110,7 @@
   .rslide.split .rgrain { z-index:2; }
   .rslide.split .rsplit-divider { position:absolute; left:0; right:0; top:50%; height:3px; transform:translateY(-1.5px); background:rgba(244,239,230,0.55); z-index:3; }
   .rslide.split .rhalf .rblock { z-index:4; }
+  .rslide.split .split-mid { position:absolute; left:80px; right:80px; top:50%; transform:translateY(-50%); text-align:center; z-index:6; }
 </style>
 </head>
 <body>
@@ -199,6 +200,7 @@
     const FORMATS = ['statement','one-liner','two-part','stat','value-step','reflective','framework','save-carousel'];
     const FONTS   = ['serif','capcut','stat'];
     const PLACES  = ['top','center','lower','bottom'];
+    const SIZE_DEFAULT = { serif:60, capcut:58, stat:88 };
 
     // ---------- data ----------
     async function load() {
@@ -461,16 +463,19 @@ end $$;`;
       if (slide.split) {
         node.classList.add('split');
         const bl = slide.blocks || [];
-        const topB = bl.find(b => b.place === 'top') || bl[0];
-        const botB = bl.find(b => b.place === 'bottom') || bl.find(b => b !== topB) || bl[1];
-        const blockHTML = b => b ? `<div class="rblock place-center f-${esc(b.font||'capcut')}${b.accent?' accent':''}" style="${b.size?`font-size:${b.size}px;`:''}"${edAttr(bl.indexOf(b))}>${disp(b.text)}</div>` : '';
-        const half = (photo, b, pos) => {
+        const topBs = bl.filter(b => b.place === 'top');
+        const botBs = bl.filter(b => b.place === 'bottom');
+        const midBs = bl.filter(b => b.place !== 'top' && b.place !== 'bottom'); // center / lower -> on the dividing line
+        const blockHTML = (b, cls) => `<div class="rblock ${cls} f-${esc(b.font||'capcut')}${b.accent?' accent':''}" style="${b.size?`font-size:${b.size}px;`:''}"${edAttr(bl.indexOf(b))}>${disp(b.text)}</div>`;
+        const half = (photo, blocks, pos) => {
           const bgimg = photo ? `background-image:url('${lite(photo)}')` : `background-image:${fallbackBg}`;
-          return `<div class="rhalf ${pos}"><div class="rhbg" style="${bgimg}"></div><div class="rhscrim"></div>${blockHTML(b)}</div>`;
+          return `<div class="rhalf ${pos}"><div class="rhbg" style="${bgimg}"></div><div class="rhscrim"></div>${blocks.map(b=>blockHTML(b,'place-center')).join('')}</div>`;
         };
         const handle = showHandle ? `<div class="rhandle">${handleLabel}</div>` : '';
-        node.innerHTML = half(slide.photoTop, topB, 'top') + half(slide.photoBottom, botB, 'bottom')
-          + `<div class="rsplit-divider"></div><div class="rgrain"></div>` + handle;
+        const divider = midBs.length ? '' : '<div class="rsplit-divider"></div>';
+        const mid = midBs.map(b=>blockHTML(b,'split-mid')).join('');
+        node.innerHTML = half(slide.photoTop, topBs, 'top') + half(slide.photoBottom, botBs, 'bottom')
+          + divider + mid + `<div class="rgrain"></div>` + handle;
         return node;
       }
 
@@ -598,9 +603,12 @@ end $$;`;
             <button class="iconbtn" data-rmblock="${bi}" style="align-self:end">✕</button>
           </div>
           <div class="field"><textarea data-k="text" style="min-height:54px" placeholder="text · wrap a word in *stars* to color it (pick the color below)">${esc(b.text)}</textarea></div>
-          <div class="row2" style="grid-template-columns:1fr auto">
-            <div class="field"><label>Size override (px, optional)</label><input data-k="size" type="number" value="${b.size||''}"></div>
-            <label class="mini" style="display:flex;align-items:center;gap:0.3rem;align-self:end;padding-bottom:0.7rem"><input type="checkbox" data-k="accent" ${b.accent?'checked':''}>accent</label>
+          <div class="field"><label>Font size · <span data-sizeval>${b.size?b.size+'px':'auto'}</span></label>
+            <div style="display:flex;align-items:center;gap:0.55rem">
+              <input data-k="size" type="range" min="28" max="200" step="2" value="${b.size||SIZE_DEFAULT[b.font||'serif']||60}" style="flex:1">
+              <button class="iconbtn" data-resetsize="${bi}" title="back to automatic size">auto</button>
+              <label class="mini" style="display:flex;align-items:center;gap:0.3rem"><input type="checkbox" data-k="accent" ${b.accent?'checked':''}>accent</label>
+            </div>
           </div>
         </div>`).join('');
       return `<div class="slide-ed" data-si="${i}">
@@ -630,7 +638,7 @@ end $$;`;
           <label class="iconbtn">Upload<input type="file" accept="image/*" data-photobottom="${i}" style="display:none"></label>
           <input data-photobottomurl="${i}" placeholder="bottom photo URL" value="${slide.photoBottom && /^https?:/.test(slide.photoBottom)?esc(slide.photoBottom):''}" style="flex:1;min-width:0;font-family:'Geist Mono',monospace;font-size:0.6rem;background:rgba(20,17,15,0.65);border:1px solid var(--card-border);color:var(--ink);padding:0.4rem 0.55rem;border-radius:8px">
         </div>
-        <div class="mini" style="margin-top:0.3rem;opacity:0.7">split: text block placed "top" shows on the top photo, "bottom" on the bottom photo.</div>
+        <div class="mini" style="margin-top:0.3rem;opacity:0.7">split: set a text block's Place to "top" or "bottom" to sit on each photo, or "center" to put it on the line between them. Add more with + Text.</div>
         ` : `
         <div class="photo-row">
           <div class="thumb" style="${slide.photo?`background-image:url('${esc(slide.photo)}')`:''}"></div>
@@ -764,7 +772,9 @@ end $$;`;
           if (k==='size') v = t.value ? Number(t.value) : undefined;
           else if (k==='accent') v = t.checked;
           else v = t.value;
-          draft.slides[si].blocks[bi][k] = v; paintPreview();
+          draft.slides[si].blocks[bi][k] = v;
+          if (k==='size'){ const rv=blockEl.querySelector('[data-sizeval]'); if(rv) rv.textContent = v?v+'px':'auto'; }
+          if (k==='font' || k==='place' || k==='accent') paintPreview(); else paintPreviewSoon();
         }
       }
     }
@@ -775,6 +785,7 @@ end $$;`;
       if (t.dataset.addblock != null){ draft.slides[si].blocks.push({text:'',font:'capcut',place:'top'}); paintSlidesCol(); paintPreview(); return; }
       if (t.dataset.rmslide != null){ if (draft.slides.length>1){ draft.slides.splice(si,1); if(previewIdx>=draft.slides.length)previewIdx=0; paintSlidesCol(); paintPreview(); } return; }
       if (t.dataset.rmblock != null){ const bi=Number(t.dataset.rmblock); if(draft.slides[si].blocks.length>1){draft.slides[si].blocks.splice(bi,1); paintSlidesCol(); paintPreview();} return; }
+      if (t.dataset.resetsize != null){ const bi=Number(t.dataset.resetsize); draft.slides[si].blocks[bi].size=undefined; paintSlidesCol(); paintPreview(); return; }
       if (t.dataset.rmphoto != null){ draft.slides[si].photo=null; paintSlidesCol(); paintPreview(); return; }
       if (t.dataset.pick != null){ openPicker(url=>{ draft.slides[si].photo=url; paintSlidesCol(); paintPreview(); }); return; }
       if (t.dataset.picktop != null){ openPicker(url=>{ draft.slides[si].photoTop=url; paintSlidesCol(); paintPreview(); }); return; }
