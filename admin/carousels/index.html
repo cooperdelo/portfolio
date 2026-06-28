@@ -234,8 +234,13 @@
   .rslide.lay-cover .ed-tag{ margin-bottom:38px; }
   /* SOFT cover title (DEFAULT) — thin Inter, sentence case, no metal. Font-family is set inline from the block font picker so it can be changed per-post. */
   .rslide.lay-cover .ed-head{ font-family:"Inter",sans-serif; font-weight:300; font-size:92px; line-height:1.06; letter-spacing:-0.01em; text-transform:none; text-shadow:0 2px 16px rgba(0,0,0,.55); }
-  .rslide.lay-cover:not(.metalcover) .ed-head{ color:#f4f4f6!important; -webkit-text-fill-color:#f4f4f6!important; background:none!important; filter:none!important; animation:none!important; }
+  .rslide.lay-cover:not(.metalcover) .ed-head{ color:#f4f4f6!important; -webkit-text-fill-color:#f4f4f6!important; background:none!important; animation:softRise 1.15s cubic-bezier(.2,.7,.2,1) both, softFloat 7s ease-in-out 1.15s infinite; }
+  .rslide.lay-cover:not(.metalcover) .ed-sub{ animation:softRise 1.15s cubic-bezier(.2,.7,.2,1) .22s both; }
   .rslide.lay-cover .ed-head em{ font-style:normal; font-weight:600; }
+  @keyframes softRise{0%{opacity:0;transform:translateY(24px);filter:blur(7px)}62%{opacity:1;filter:blur(0)}100%{opacity:1;transform:translateY(0);filter:blur(0)}}
+  @keyframes softFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+  /* static JPG capture: freeze the soft cover (no motion in stills) */
+  .rslide.capturing.lay-cover .ed-head, .rslide.capturing.lay-cover .ed-sub{ animation:none!important; opacity:1!important; transform:none!important; filter:none!important; }
   /* BOLD METAL cover (OPTION: slide.coverStyle='metal') — big Anton silver, keeps the .metal gradient fill */
   .rslide.lay-cover.metalcover .ed-head{ font-weight:400; font-size:158px; line-height:0.88; letter-spacing:0.005em; text-transform:uppercase; text-shadow:none; }
   .rslide.lay-cover .ed-sub{ text-align:center; margin-top:30px; max-width:82%; color:#eceef3!important; font-family:"Satoshi","Inter",sans-serif!important; text-transform:uppercase; letter-spacing:0.16em; font-size:26px; text-shadow:0 1px 2px rgba(0,0,0,.8), 0 3px 16px rgba(0,0,0,.6); }
@@ -884,6 +889,18 @@ end $$;`;
       const blob = await canvasToBlob(canvas);
       downloadBlob(blob, `${slugify(post.title)}-${String(i+1).padStart(2,'0')}.png`);
     }
+    // iOS/Android can't batch-download blob links — render all slides to File[] for the native share sheet
+    async function renderAllFiles(post){
+      const slides = post.slides || [];
+      const files = [];
+      for (let i=0;i<slides.length;i++){
+        const canvas = await renderSlideToCanvas(slides[i], post.theme || 'mono', i === 0, postH(post));
+        const blob = await canvasToBlob(canvas);
+        files.push(new File([blob], `${slugify(post.title)}-${String(i+1).padStart(2,'0')}.png`, { type:'image/png' }));
+      }
+      return files;
+    }
+    const canShareFiles = () => !!(navigator.canShare && navigator.share && navigator.canShare({ files:[new File([new Blob(['x'],{type:'image/png'})],'x.png',{type:'image/png'})] }));
 
     // ---------- editor ----------
     const scrimEl = document.getElementById('scrim');
@@ -1172,7 +1189,29 @@ end $$;`;
       });
       document.getElementById('add-slide').addEventListener('click', () => { draft.slides.push(blankSlide()); paintSlidesCol(); paintPreview(); });
       document.getElementById('dl-one').addEventListener('click', async () => { readFormIntoDraft(); await downloadOne(draft, previewIdx); });
-      document.getElementById('dl-all').addEventListener('click', async () => { readFormIntoDraft(); await downloadAll(draft); });
+      let pendingShare = null;
+      document.getElementById('dl-all').addEventListener('click', async (e) => {
+        const btn = e.currentTarget;
+        // second tap: fire the iOS/Android share sheet inside the user gesture (required by Safari)
+        if (pendingShare) {
+          const files = pendingShare; pendingShare = null; btn.textContent = 'Download all slides';
+          try { await navigator.share({ files, title: draft.title || 'carousel slides' }); toast('Sent to share sheet — Save to Photos'); }
+          catch (err) { if (err && err.name !== 'AbortError') toast('Share canceled', 'err'); }
+          return;
+        }
+        readFormIntoDraft();
+        if (canShareFiles()) {
+          toast('Rendering…');
+          const files = await renderAllFiles(draft);
+          if (navigator.canShare({ files })) {
+            pendingShare = files;
+            btn.textContent = `💾 Save ${files.length} to Photos`;
+            toast('Tap “Save” to send them to your camera roll');
+            return;
+          }
+        }
+        await downloadAll(draft); // desktop: per-file download
+      });
       document.getElementById('copy-cap').addEventListener('click', () => {
         readFormIntoDraft();
         const tags = draft.hashtags.map(t=>'#'+t).join(' ');
