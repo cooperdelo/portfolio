@@ -1531,12 +1531,36 @@ end $$;`;
         navigator.clipboard.writeText((draft.caption||'') + (tags?'\n\n'+tags:'')).then(()=>toast('Caption copied'));
       });
       document.getElementById('auto-photos').addEventListener('click', autoPhotos);
-      document.getElementById('render-factory')?.addEventListener('click', async ()=>{
+      document.getElementById('render-factory')?.addEventListener('click', async (e)=>{
         if(!draft.id){ toast('Save the post first, then Render','err'); return; }
+        const btn = e.currentTarget; if(btn.dataset.busy==='1') return;
         const vid = document.getElementById('render-video-cb')?.checked;
+        const want = vid ? 'rendered_video_urls' : 'rendered_urls';
+        const before = (draft[want]||[]).length;
         const res = await sb.from('carousel_posts').update({ render_requested:true, render_video:!!vid }).eq('id', draft.id);
         if(res.error){ toast(res.error.message,'err'); return; }
-        toast('Queued for the render machine'+(vid?' (JPG + MP4)':' (JPG)'));
+        toast('Queued — rendering '+(vid?'JPG + MP4':'JPG')+' in the background (usually ~1–3 min)…');
+        if(!btn.dataset.label) btn.dataset.label = btn.textContent;
+        btn.dataset.busy='1'; btn.style.opacity='.7'; btn.textContent='⏳ Rendering…';
+        const started = Date.now();
+        const poll = setInterval(async ()=>{
+          const { data, error } = await sb.from('carousel_posts').select('render_requested,rendered_urls,rendered_video_urls').eq('id', draft.id).single();
+          if(error) return;
+          const urls = (data && data[want]) || [];
+          const done = data && data.render_requested===false && urls.length>0;
+          if(done){
+            clearInterval(poll);
+            draft.rendered_urls = data.rendered_urls||[];
+            draft.rendered_video_urls = data.rendered_video_urls||[];
+            btn.dataset.busy=''; btn.style.opacity='1'; btn.textContent='✅ Rendered';
+            toast('✅ Render complete — “Download” now gives the full-quality '+(vid?'video':'image')+'.');
+            setTimeout(()=>{ btn.textContent=btn.dataset.label; }, 8000);
+          } else if(Date.now()-started > 8*60*1000){
+            clearInterval(poll);
+            btn.dataset.busy=''; btn.style.opacity='1'; btn.textContent=btn.dataset.label;
+            toast('Still working — give it another minute, then try Download.','err');
+          }
+        }, 8000);
       });
       document.getElementById('save-post').addEventListener('click', savePost);
       document.getElementById('del-post')?.addEventListener('click', deletePost);
