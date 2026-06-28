@@ -1476,6 +1476,10 @@ end $$;`;
         if (pendingOne){ const f=pendingOne; pendingOne=null; btn.textContent='Download slide'; try{ await navigator.share({ files:[f], title: draft.title||'slide' }); toast('Sent to share sheet'); }catch(err){ if(err&&err.name!=='AbortError') toast('Share canceled','err'); } return; }
         readFormIntoDraft();
         const vid = document.getElementById('render-video-cb')?.checked;
+        const fx = (vid ? draft.rendered_video_urls : draft.rendered_urls) || [];
+        if (fx[previewIdx]) { try { toast('Downloading the full-quality render…'); const r=await fetch(fx[previewIdx]); const blob=await r.blob(); const name=`${slugify(draft.title)}-${String(previewIdx+1).padStart(2,'0')}.${vid?'mp4':'jpg'}`;
+            if (useShare()){ const f=new File([blob],name,{type:blob.type}); if(navigator.canShare && navigator.canShare({files:[f]})){ pendingOne=f; btn.textContent='💾 Save'; toast('Tap “Save”'); return; } }
+            downloadBlob(blob, name); toast('Saved — full-quality Factory render'); return; } catch(err){ toast('Could not fetch render; using quick export','err'); } }
         if (vid){ toast('Recording video…'); try{ const { blob, ext } = await recordSlideVideo(draft, previewIdx, 5); const name=`${slugify(draft.title)}-${String(previewIdx+1).padStart(2,'0')}.${ext}`;
             if (useShare()){ const f=new File([blob],name,{type:blob.type}); if(navigator.canShare && navigator.canShare({files:[f]})){ pendingOne=f; btn.textContent='💾 Save video'; toast('Tap “Save video” to keep it'); return; } }
             downloadBlob(blob, name); toast('Video saved (.'+ext+')'); }
@@ -1496,6 +1500,12 @@ end $$;`;
         }
         readFormIntoDraft();
         const vidAll = document.getElementById('render-video-cb')?.checked;
+        const fxAll = (vidAll ? draft.rendered_video_urls : draft.rendered_urls) || [];
+        if (fxAll.length && fxAll.length === (draft.slides||[]).length && fxAll.every(Boolean)) {
+          toast('Downloading the full-quality renders…'); const ext = vidAll?'mp4':'jpg';
+          if (useShare()){ const files=[]; for(let i=0;i<fxAll.length;i++){ try{ const r=await fetch(fxAll[i]); const b=await r.blob(); files.push(new File([b],`${slugify(draft.title)}-${String(i+1).padStart(2,'0')}.${ext}`,{type:b.type})); }catch(e){} } if(files.length && navigator.canShare({files})){ pendingShare=files; btn.textContent=`💾 Save ${files.length}`; toast('Tap “Save”'); return; } }
+          else { for(let i=0;i<fxAll.length;i++){ try{ const r=await fetch(fxAll[i]); const b=await r.blob(); downloadBlob(b,`${slugify(draft.title)}-${String(i+1).padStart(2,'0')}.${ext}`); await new Promise(rr=>setTimeout(rr,500)); }catch(e){} } toast('Saved — full-quality renders'); return; }
+        }
         if (vidAll){
           const n = (draft.slides||[]).length; toast('Recording '+n+' video'+(n===1?'':'s')+'…'); const files=[];
           for (let i=0;i<n;i++){ try{ const { blob, ext } = await recordSlideVideo(draft, i, 5); const name=`${slugify(draft.title)}-${String(i+1).padStart(2,'0')}.${ext}`;
