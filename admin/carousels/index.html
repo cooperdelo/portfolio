@@ -247,11 +247,12 @@
 
   /* spread: interior — photo top, frosted near-white text panel with metal-dark header */
   .rslide.lay-spread{ background:linear-gradient(180deg,#6d6d74,#202024); }
-  .rslide.lay-spread .sp-photo{ position:absolute; left:0; right:0; top:0; height:56%; z-index:0; background-size:cover; background-position:center; background-color:#2a2a30; }
-  .rslide.lay-spread .sp-glow{ position:absolute; left:0; right:0; top:0; height:56%; z-index:1; background:radial-gradient(ellipse at 50% 16%,rgba(252,86,3,.16),transparent 58%); }
-  .rslide.lay-spread .sp-panel{ position:absolute; left:38px; right:38px; bottom:42px; z-index:2; padding:38px 36px 42px; border-radius:20px; background:rgba(244,244,248,.86); backdrop-filter:blur(18px) saturate(120%); -webkit-backdrop-filter:blur(18px) saturate(120%); border:1px solid rgba(255,255,255,.6); box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 18px 44px rgba(0,0,0,.42); }
-  .rslide.lay-spread .sp-head{ font-family:"Anton","Archivo Black",sans-serif; font-size:110px; line-height:0.86; text-transform:uppercase; letter-spacing:0.005em; margin-bottom:16px; background:linear-gradient(177deg,#3a3a40,#0c0c0e 45%,#5a5a62 70%,#14141a); -webkit-background-clip:text; background-clip:text; color:transparent; -webkit-text-fill-color:transparent; }
-  .rslide.lay-spread .sp-body{ font-size:24px; line-height:1.5; text-transform:uppercase; letter-spacing:0.03em; color:#1a1a1f; }
+  .rslide.lay-spread .sp-photo{ position:absolute; left:0; right:0; top:0; height:33%; z-index:0; background-size:cover; background-position:center; background-color:#2a2a30; }
+  .rslide.lay-spread .sp-glow{ position:absolute; left:0; right:0; top:0; height:33%; z-index:1; background:radial-gradient(ellipse at 50% 16%,rgba(252,86,3,.18),transparent 60%); }
+  .rslide.lay-spread .sp-panel{ position:absolute; left:34px; right:34px; top:27%; bottom:34px; z-index:2; padding:48px 44px; border-radius:22px; display:flex; flex-direction:column; background:rgba(244,244,248,.9); backdrop-filter:blur(18px) saturate(120%); -webkit-backdrop-filter:blur(18px) saturate(120%); border:1px solid rgba(255,255,255,.6); box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 18px 44px rgba(0,0,0,.42); }
+  .rslide.lay-spread .sp-head{ font-family:"Anton","Archivo Black",sans-serif; font-size:98px; line-height:0.86; text-transform:uppercase; letter-spacing:0.005em; margin-bottom:26px; background:linear-gradient(177deg,#3a3a40,#0c0c0e 45%,#5a5a62 70%,#14141a); -webkit-background-clip:text; background-clip:text; color:transparent; -webkit-text-fill-color:transparent; }
+  .rslide.lay-spread .sp-body{ font-size:27px; line-height:1.62; text-transform:uppercase; letter-spacing:0.03em; color:#1a1a1f; }
+  .rslide.lay-spread .sp-body b{ font-weight:800; }
   .rslide.lay-spread .sp-body b{ font-weight:800; }
 
   /* edcta: closing call-to-action */
@@ -1009,7 +1010,7 @@ end $$;`;
     const PLUG_SEEDS = {
       cover:    { kicker:'PLUGVERSE EDITION 001', blocks:['RUBBER *BAND*','Chapel Hill · Indie Rock'] },
       edcover:  { kicker:'PLUGVERSE EDITION 001', cutout:null, blocks:['RUBBER *BAND*','Chapel Hill · Indie Rock','Accepting fall bookings','*Aug–Dec* dates open now','Book direct on *plugverse*'] },
-      spread:   { blocks:['THE SOUND','*Rubber Band* moves between indie, alt, and garage depending on the room — they read the crowd and change the set.'] },
+      spread:   { blocks:['THE SOUND','*Rubber Band* started the way the best ones do - too loud, in a room too small. five friends, forty-five songs, one rule: never play the same night twice.\n\nthey refuse to pick a lane. rock, country, alt - whatever the room is asking for becomes the set. organizers book them because they read a crowd like a setlist and bend the night until it breaks open.\n\ndorm-room floors to 200-cap stages in a single semester. the rule never changed - *show up ready*, leave nothing in the case.'] },
       edcta:    { kicker:'PLUGVERSE EDITION 001 · RUBBER BAND', blocks:['BOOK RUBBER BAND','Fall dates are filling fast','PLUGVERSE.APP'] },
       behind:   { kicker:'PLUGVERSE EDITION 001', cutout:null, blocks:['RUBBER BAND','book on plugverse'] },
       around:   { kicker:'PLUGVERSE EDITION 001', cutout:null, blocks:['RUBBER BAND','from dorm-room jams to 200-cap venues'] },
@@ -1175,7 +1176,7 @@ end $$;`;
       if (kind === 'rb-fall')
         return { title:'PLUGVERSE EDITION — Rubber Band · Fall bookings', theme:'plugverse', ratio:'4:5', pillar:'figuring-it-out', format:'statement', caption:'we are accepting fall bookings. book us direct on plugverse — no fees, signed + paid in one link.', hashtags:['plugverse','chapelhill','livemusic','rubberband'], status:'queued', source:'manual', slides:[
           { photo:null, layout:'edcover', coverStyle:'metal', theme:'plugverse', ratio:'4:5', kicker:'PLUGVERSE EDITION 001', cutout:null, blocks:[{ text:'RUBBER *BAND*', font:'anton' }, { text:'Chapel Hill · Rock · Country · Alt' }, { text:'Accepting fall bookings' }, { text:'*Aug–Dec* dates open now' }, { text:'Book direct — *no fees*' }] },
-          { photo:null, layout:'spread', theme:'plugverse', ratio:'4:5', blocks:[{ text:'THE SOUND', font:'anton' }, { text:'*Rubber Band* moves between rock, country, and alt depending on the room. We read the crowd and change the set — every gig, ready.' }] },
+          { photo:null, layout:'spread', theme:'plugverse', ratio:'4:5', blocks:[{ text:'THE SOUND', font:'anton' }, { text:'*Rubber Band* started the way the best ones do - too loud, in a room too small. five friends, forty-five songs, one rule: never play the same night twice.\n\nthey refuse to pick a lane. rock, country, alt - whatever the room is asking for becomes the set. organizers book them because they read a crowd like a setlist and bend the night until it breaks open.\n\ndorm-room floors to 200-cap stages in a single semester. the rule never changed - *show up ready*, leave nothing in the case.' }] },
           { photo:null, layout:'edcta', theme:'plugverse', ratio:'4:5', kicker:'PLUGVERSE EDITION 001 · RUBBER BAND', blocks:[{ text:'BOOK US THIS FALL', font:'anton' }, { text:'Fall dates are filling fast' }, { text:'PLUGVERSE.APP' }] },
         ] };
       // ---- non-layout formats from the existing system ----
