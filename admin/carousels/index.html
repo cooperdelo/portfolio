@@ -1022,6 +1022,8 @@ end $$;`;
       return files;
     }
     const canShareFiles = () => !!(navigator.canShare && navigator.share && navigator.canShare({ files:[new File([new Blob(['x'],{type:'image/png'})],'x.png',{type:'image/png'})] }));
+    const isMobileDevice = () => /iphone|ipad|ipod|android/i.test(navigator.userAgent) || (navigator.maxTouchPoints > 1 && /Mac|Mobile/i.test(navigator.userAgent));
+    const useShare = () => canShareFiles() && isMobileDevice();
 
     // ---------- editor ----------
     const scrimEl = document.getElementById('scrim');
@@ -1469,11 +1471,11 @@ end $$;`;
         readFormIntoDraft();
         const vid = document.getElementById('render-video-cb')?.checked;
         if (vid){ toast('Recording video…'); try{ const { blob, ext } = await recordSlideVideo(draft, previewIdx, 5); const name=`${slugify(draft.title)}-${String(previewIdx+1).padStart(2,'0')}.${ext}`;
-            if (canShareFiles()){ const f=new File([blob],name,{type:blob.type}); if(navigator.canShare && navigator.canShare({files:[f]})){ pendingOne=f; btn.textContent='💾 Save video'; toast('Tap “Save video” to keep it'); return; } }
+            if (useShare()){ const f=new File([blob],name,{type:blob.type}); if(navigator.canShare && navigator.canShare({files:[f]})){ pendingOne=f; btn.textContent='💾 Save video'; toast('Tap “Save video” to keep it'); return; } }
             downloadBlob(blob, name); toast('Video saved (.'+ext+')'); }
           catch(err){ toast('Video failed: '+err.message,'err'); }
           return; }
-        if (canShareFiles()){ toast('Rendering…'); const c=await renderSlideToCanvas(draft.slides[previewIdx], draft.theme||'mono', previewIdx===0, postH(draft)); const blob=await canvasToBlob(c); const f=new File([blob], `${slugify(draft.title)}-${String(previewIdx+1).padStart(2,'0')}.png`, {type:'image/png'}); if(navigator.canShare && navigator.canShare({files:[f]})){ pendingOne=f; btn.textContent='💾 Save to Photos'; toast('Tap “Save to Photos”'); return; } }
+        if (useShare()){ toast('Rendering…'); const c=await renderSlideToCanvas(draft.slides[previewIdx], draft.theme||'mono', previewIdx===0, postH(draft)); const blob=await canvasToBlob(c); const f=new File([blob], `${slugify(draft.title)}-${String(previewIdx+1).padStart(2,'0')}.png`, {type:'image/png'}); if(navigator.canShare && navigator.canShare({files:[f]})){ pendingOne=f; btn.textContent='💾 Save to Photos'; toast('Tap “Save to Photos”'); return; } }
         await downloadOne(draft, previewIdx);
       });
       let pendingShare = null;
@@ -1487,7 +1489,15 @@ end $$;`;
           return;
         }
         readFormIntoDraft();
-        if (canShareFiles()) {
+        const vidAll = document.getElementById('render-video-cb')?.checked;
+        if (vidAll){
+          const n = (draft.slides||[]).length; toast('Recording '+n+' video'+(n===1?'':'s')+'…'); const files=[];
+          for (let i=0;i<n;i++){ try{ const { blob, ext } = await recordSlideVideo(draft, i, 5); const name=`${slugify(draft.title)}-${String(i+1).padStart(2,'0')}.${ext}`;
+            if (useShare()){ files.push(new File([blob], name, {type:blob.type})); } else { downloadBlob(blob, name); await new Promise(r=>setTimeout(r,600)); } }catch(err){ toast('Video '+(i+1)+' failed: '+err.message,'err'); } }
+          if (useShare() && files.length && navigator.canShare({files})){ pendingShare=files; btn.textContent=`💾 Save ${files.length} videos`; toast('Tap “Save” to keep them'); }
+          else toast('Saved '+n+' video'+(n===1?'':'s')); return;
+        }
+        if (useShare()) {
           toast('Rendering…');
           const files = await renderAllFiles(draft);
           if (navigator.canShare({ files })) {
