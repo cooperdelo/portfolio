@@ -1009,7 +1009,7 @@ end $$;`;
 
     const PLUG_SEEDS = {
       cover:    { kicker:'PLUGVERSE EDITION 001', blocks:['RUBBER *BAND*','Chapel Hill · Indie Rock'] },
-      edcover:  { kicker:'PLUGVERSE EDITION 001', cutout:null, blocks:['RUBBER *BAND*','Chapel Hill · Indie Rock','Accepting fall bookings','*Aug–Dec* dates open now','Book direct on *plugverse*'] },
+      edcover:  { kicker:'PLUGVERSE EDITION 001', cutout:null, blocks:['RUBBER *BAND*','Chapel Hill · Indie Rock','Accepting fall bookings','*Aug–Dec* dates open now'] },
       spread:   { blocks:['THE SOUND','*Rubber Band* started the way the best ones do - too loud, in a room too small. five friends, forty-five songs, one rule: never play the same night twice.\n\nthey refuse to pick a lane. rock, country, alt - whatever the room is asking for becomes the set. organizers book them because they read a crowd like a setlist and bend the night until it breaks open.\n\ndorm-room floors to 200-cap stages in a single semester. the rule never changed - *show up ready*, leave nothing in the case.'] },
       edcta:    { kicker:'PLUGVERSE EDITION 001 · RUBBER BAND', blocks:['BOOK RUBBER BAND','Fall dates are filling fast','PLUGVERSE.APP'] },
       behind:   { kicker:'PLUGVERSE EDITION 001', cutout:null, blocks:['RUBBER BAND','book on plugverse'] },
@@ -1175,7 +1175,7 @@ end $$;`;
       // ---- editorial multi-slide starter: Rubber Band accepting fall bookings ----
       if (kind === 'rb-fall')
         return { title:'PLUGVERSE EDITION — Rubber Band · Fall bookings', theme:'plugverse', ratio:'4:5', pillar:'figuring-it-out', format:'statement', caption:'we are accepting fall bookings. book us direct on plugverse — no fees, signed + paid in one link.', hashtags:['plugverse','chapelhill','livemusic','rubberband'], status:'queued', source:'manual', slides:[
-          { photo:null, layout:'edcover', coverStyle:'metal', theme:'plugverse', ratio:'4:5', kicker:'PLUGVERSE EDITION 001', cutout:null, blocks:[{ text:'RUBBER *BAND*', font:'anton' }, { text:'Chapel Hill · Rock · Country · Alt' }, { text:'Accepting fall bookings' }, { text:'*Aug–Dec* dates open now' }, { text:'Book direct — *no fees*' }] },
+          { photo:null, layout:'edcover', coverStyle:'metal', theme:'plugverse', ratio:'4:5', kicker:'PLUGVERSE EDITION 001', cutout:null, blocks:[{ text:'RUBBER *BAND*', font:'anton' }, { text:'Chapel Hill · Rock · Country · Alt' }, { text:'Accepting fall bookings' }, { text:'*Aug–Dec* dates open now' }] },
           { photo:null, layout:'spread', theme:'plugverse', ratio:'4:5', blocks:[{ text:'THE SOUND', font:'anton' }, { text:'*Rubber Band* started the way the best ones do - too loud, in a room too small. five friends, forty-five songs, one rule: never play the same night twice.\n\nthey refuse to pick a lane. rock, country, alt - whatever the room is asking for becomes the set. organizers book them because they read a crowd like a setlist and bend the night until it breaks open.\n\ndorm-room floors to 200-cap stages in a single semester. the rule never changed - *show up ready*, leave nothing in the case.' }] },
           { photo:null, layout:'edcta', theme:'plugverse', ratio:'4:5', kicker:'PLUGVERSE EDITION 001 · RUBBER BAND', blocks:[{ text:'BOOK US THIS FALL', font:'anton' }, { text:'Fall dates are filling fast' }, { text:'PLUGVERSE.APP' }] },
         ] };
@@ -1263,7 +1263,7 @@ end $$;`;
           <div class="field"><textarea data-k="text" style="min-height:54px" placeholder="text · wrap a word in *stars* to color it (pick the color below)">${esc(b.text)}</textarea></div>
           <div class="field"><label>Font size · <span data-sizeval>${b.size?b.size+'px':'auto'}</span></label>
             <div style="display:flex;align-items:center;gap:0.55rem">
-              <input data-k="size" type="range" min="28" max="200" step="2" value="${b.size||SIZE_DEFAULT[b.font||'serif']||60}" style="flex:1">
+              <input data-k="size" type="range" min="28" max="320" step="2" value="${b.size||SIZE_DEFAULT[b.font||'serif']||60}" style="flex:1">
               <button class="iconbtn" data-resetsize="${bi}" title="back to automatic size">auto</button>
               <label class="mini" style="display:flex;align-items:center;gap:0.3rem"><input type="checkbox" data-k="accent" ${b.accent?'checked':''}>accent</label>
             </div>
