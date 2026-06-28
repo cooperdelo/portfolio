@@ -247,23 +247,23 @@
   .rslide.lay-cover .ed-coverscrim{ position:absolute; inset:0; z-index:1; background:radial-gradient(ellipse at 50% 42%, rgba(0,0,0,0.30), rgba(0,0,0,0.66) 100%); }
 
   /* device-frame (UI explainer): real screenshot on dark glass + ember glow, metal headline */
-  .rslide.framed { background:radial-gradient(ellipse at 72% 8%,rgba(252,86,3,.20),transparent 55%),radial-gradient(ellipse at 22% 92%,rgba(196,58,2,.16),transparent 60%),linear-gradient(160deg,#1b1b1f,#070708); }
-  .rslide.framed .rframe-glow { position:absolute; inset:0; background:radial-gradient(78% 50% at 82% 6%, rgba(252,86,3,0.16), transparent 60%); z-index:0; }
-  .rslide.framed .rframe-kicker { position:absolute; top:88px; left:96px; right:96px; z-index:3; font-family:"Inter",sans-serif; font-weight:700; font-size:24px; letter-spacing:0.26em; text-transform:uppercase; color:rgba(236,236,241,0.66); }
-  .rslide.framed .rframe-rule { position:absolute; top:142px; left:96px; right:96px; height:1px; background:rgba(255,255,255,0.18); z-index:3; }
-  .rslide.framed .rframe-head { position:absolute; top:96px; left:96px; right:96px; z-index:3; font-family:"Anton","Archivo Black",Impact,sans-serif; font-weight:400; font-size:96px; line-height:0.92; letter-spacing:0.005em; text-transform:uppercase; }
-  .rslide.framed.kicked .rframe-head { top:172px; }
+  /* ---- device-frame UI explainer: RESPONSIVE flex layout (no hardcoded px → works at 4:5, 1:1, 9:16) ---- */
+  .rslide.framed { display:flex; flex-direction:column; padding:90px 92px 90px; background:radial-gradient(ellipse at 72% 8%,rgba(252,86,3,.20),transparent 55%),radial-gradient(ellipse at 22% 92%,rgba(196,58,2,.16),transparent 60%),linear-gradient(160deg,#1b1b1f,#070708); }
+  .rslide.framed .rframe-glow { position:absolute; inset:0; background:radial-gradient(78% 50% at 82% 6%, rgba(252,86,3,0.16), transparent 60%); z-index:0; pointer-events:none; }
+  .rslide.framed .rframe-kicker { position:relative; z-index:3; font-family:"Inter",sans-serif; font-weight:700; font-size:23px; letter-spacing:0.26em; text-transform:uppercase; color:rgba(236,236,241,0.64); }
+  .rslide.framed .rframe-rule { position:relative; z-index:3; height:1px; background:rgba(255,255,255,0.16); margin:18px 0 0; }
+  .rslide.framed .rframe-head { position:relative; z-index:3; margin:26px 0 0; font-family:"Anton","Archivo Black",Impact,sans-serif; font-weight:400; font-size:86px; line-height:0.92; letter-spacing:0.005em; text-transform:uppercase; }
   .rslide.framed .rframe-head em { font-style:normal; }
-  .rslide.framed .rframe-sub { position:absolute; left:96px; right:96px; top:312px; z-index:3; font-family:"Satoshi","Inter",sans-serif; font-weight:500; color:#cbccd2; font-size:26px; line-height:1.45; letter-spacing:0.05em; text-transform:uppercase; }
-  .rslide.framed.kicked .rframe-sub { top:404px; }
+  .rslide.framed .rframe-sub { position:relative; z-index:3; margin:18px 0 0; max-width:94%; font-family:"Satoshi","Inter",sans-serif; font-weight:500; color:#cbccd2; font-size:25px; line-height:1.45; letter-spacing:0.05em; text-transform:uppercase; }
+  .rslide.framed .rframe-stage { position:relative; z-index:2; flex:1 1 auto; min-height:0; display:flex; align-items:center; justify-content:center; margin-top:48px; }
   .rslide.framed .rgrain { opacity:0.12; }
-  .rslide.framed .rdevice { position:absolute; left:50%; transform:translateX(-50%); overflow:hidden; z-index:2; box-shadow:0 50px 130px rgba(0,0,0,0.65); }
-  .rslide.framed .rdevice.phone { width:470px; height:820px; top:470px; border-radius:58px; background:#0c0c0c; border:13px solid #1b1b1b; }
-  .rslide.framed .rdevice.window { width:888px; height:556px; top:520px; border-radius:18px; background:#0d0d0d; border:1px solid rgba(255,255,255,0.12); }
-  .rslide.framed .rwin-bar { position:absolute; top:0; left:0; right:0; height:40px; background:rgba(255,255,255,0.04); border-bottom:1px solid rgba(255,255,255,0.07); z-index:2; }
+  .rslide.framed .rdevice { position:relative; overflow:hidden; box-shadow:0 50px 130px rgba(0,0,0,0.65); background:#0c0c0c; } /* width/height set inline from slide height for true responsiveness + html2canvas safety */
+  .rslide.framed .rdevice.phone { border-radius:54px; border:13px solid #1b1b1b; }
+  .rslide.framed .rdevice.window { border-radius:18px; border:1px solid rgba(255,255,255,0.12); }
+  .rslide.framed .rwin-bar { position:absolute; top:0; left:0; right:0; height:38px; background:rgba(255,255,255,0.05); border-bottom:1px solid rgba(255,255,255,0.07); z-index:2; }
   .rslide.framed .rscreen { position:absolute; inset:0; background-size:cover; background-position:top center; background-repeat:no-repeat; background-color:#101010; }
-  .rslide.framed .rdevice.window .rscreen { top:40px; }
-  .rslide.framed .rcallout { position:absolute; z-index:5; font-family:"Space Mono",monospace; font-size:24px; letter-spacing:0.04em; text-transform:uppercase; color:#f2f2f5; background:rgba(255,255,255,0.07); backdrop-filter:blur(18px) saturate(135%); -webkit-backdrop-filter:blur(18px) saturate(135%); border:1px solid rgba(255,255,255,0.18); border-radius:999px; padding:13px 22px; box-shadow:inset 0 1px 0 rgba(255,255,255,0.18),0 10px 34px rgba(0,0,0,0.55); max-width:380px; }
+  .rslide.framed .rdevice.window .rscreen { top:38px; }
+  .rslide.framed .rcallout { position:absolute; z-index:5; font-family:"Space Mono",monospace; font-size:22px; letter-spacing:0.04em; text-transform:uppercase; color:#f2f2f5; background:rgba(255,255,255,0.07); backdrop-filter:blur(18px) saturate(135%); -webkit-backdrop-filter:blur(18px) saturate(135%); border:1px solid rgba(255,255,255,0.18); border-radius:999px; padding:12px 20px; box-shadow:inset 0 1px 0 rgba(255,255,255,0.18),0 10px 34px rgba(0,0,0,0.55); max-width:62%; }
   /* ---- glassmorphic Studio UI polish (visual only — nothing removed) ---- */
   .slide-ed{ background:rgba(255,255,255,0.045)!important; backdrop-filter:blur(16px) saturate(130%); -webkit-backdrop-filter:blur(16px) saturate(130%); border:1px solid rgba(255,255,255,0.10)!important; border-radius:16px!important; padding:1.05rem 1.15rem!important; box-shadow:0 8px 30px rgba(0,0,0,0.28); }
   .slide-ed .sh .n{ color:#f0eee9!important; }
@@ -448,7 +448,7 @@ end $$;`;
       ['stat','Stat hero'],['contents','Index / contents'],['diptych','Diptych spread'],
     ];
     function renderTemplates(){
-      document.getElementById('count').textContent = `${PLUGVERSE_TEMPLATES.length + PERSONAL_TEMPLATES.length} templates`;
+      document.getElementById('count').textContent = `${PLUGVERSE_TEMPLATES.length + PERSONAL_TEMPLATES.length + FEATURE_KEYS.length} templates`;
       grid.innerHTML = '';
       const section = (title, theme, sub, list) => {
         const h = document.createElement('div');
@@ -476,6 +476,29 @@ end $$;`;
       };
       section('PLUGVERSE TEMPLATES', 'plugverse', 'dark glass · ember · metal', PLUGVERSE_TEMPLATES);
       section('PERSONAL BRAND TEMPLATES', 'personal', 'bone · serif · mono', PERSONAL_TEMPLATES);
+      // ---- Plugverse feature explainers (multi-slide: cover -> 3 steps -> payoff, one device throughout) ----
+      const fh = document.createElement('div');
+      fh.style.cssText = 'grid-column:1/-1;margin:0.9rem 0 0.1rem;display:flex;align-items:baseline;gap:0.6rem';
+      fh.innerHTML = `<div class="meta" style="font-size:0.66rem;letter-spacing:0.22em;color:var(--ink)">PLUGVERSE FEATURE EXPLAINERS</div><div class="mini" style="opacity:0.6">every feature · cover → 3 steps → payoff · drop in your screenshots</div>`;
+      grid.appendChild(fh);
+      for (const key of FEATURE_KEYS){
+        const f = FEATURES[key];
+        const card = document.createElement('div');
+        card.className = 'card ccard'; card.style.cssText = 'cursor:pointer'; card.dataset.feature = key;
+        const box = document.createElement('div'); box.className = 'preview'; box.style.cssText = 'position:relative;aspect-ratio:4/5;overflow:hidden;background:#0a0908';
+        try {
+          const node = buildSlideNode(newFeatureExplainer(key).slides[0], 'plugverse', false, false, 1350);
+          node.classList.add('capturing');
+          node.style.cssText += ';width:1080px;height:1350px;margin:0;transform:none';
+          const wrap = document.createElement('div');
+          wrap.style.cssText = 'position:absolute;top:0;left:0;width:1080px;height:1350px;transform-origin:top left';
+          wrap.appendChild(node); box.appendChild(wrap);
+          requestAnimationFrame(() => { const sc = box.clientWidth / 1080; wrap.style.transform = `scale(${sc})`; });
+        } catch(e){ box.innerHTML = `<div class="ph">${f.n}</div>`; }
+        const body = document.createElement('div'); body.className = 'body';
+        body.innerHTML = `<div class="t">${f.n}</div><div class="meta">${f.dev==='phone'?'📱 phone':'🖥 web'} · ${f.aud.toLowerCase()} · use →</div>`;
+        card.appendChild(box); card.appendChild(body); grid.appendChild(card);
+      }
     }
 
     function render() {
@@ -793,26 +816,31 @@ end $$;`;
         return node;
       }
 
-      // ---- device frame (UI explainer): screenshot in a phone/window frame ----
+      // ---- device frame (UI explainer): RESPONSIVE phone/window frame, device sized from slide height ----
       if (slide.frame) {
         node.classList.add('framed');
-        if (slide.kicker) node.classList.add('kicked');
         const bl = slide.blocks || [];
         const head = bl[0], sub = bl[1];
         const fdisp = (t) => esc(t||'').replace(/\*(.+?)\*/g, '<em>$1</em>').replace(/\n/g,'<br>');
         const screen = slide.photo ? `background-image:url('${slide.photo}')` : '';
-        const dev = slide.frame === 'phone'
-          ? `<div class="rdevice phone"><div class="rscreen" style="${screen}"></div></div>`
-          : `<div class="rdevice window"><div class="rwin-bar"></div><div class="rscreen" style="${screen}"></div></div>`;
+        const isPhone = slide.frame === 'phone';
+        // device size derived from slide height -> responsive (4:5/1:1/9:16) + explicit px so html2canvas exports correctly
+        const phoneH = Math.round(h * 0.54), phoneW = Math.round(phoneH * 0.462);
+        const winW = 900, winH = Math.round(winW * 0.62);
+        const devSize = isPhone ? `width:${phoneW}px;height:${phoneH}px` : `width:${winW}px;height:${winH}px`;
+        const dev = isPhone
+          ? `<div class="rdevice phone" style="${devSize}"><div class="rscreen" style="${screen}"></div></div>`
+          : `<div class="rdevice window" style="${devSize}"><div class="rwin-bar"></div><div class="rscreen" style="${screen}"></div></div>`;
         const headHTML = head ? `<div class="rframe-head metal"${edAttr(0)} style="${head.size?`font-size:${head.size}px;`:''}">${fdisp(head.text)}</div>` : '';
         const subHTML  = sub  ? `<div class="rframe-sub"${edAttr(1)} style="${sub.size?`font-size:${sub.size}px;`:''}">${fdisp(sub.text)}</div>` : '';
+        const kickHTML = slide.kicker ? `<div class="rframe-kicker">${esc(slide.kicker)}</div><div class="rframe-rule"></div>` : '';
         let calloutHTML = '';
         if (slide.callout){ const p=slide.calloutPos||'br';
-          const pos = p==='tr'?'top:430px;right:110px':p==='tl'?'top:430px;left:110px':p==='bl'?'bottom:160px;left:110px':'bottom:160px;right:110px';
+          const pos = p==='tr'?'top:5%;right:4%':p==='tl'?'top:5%;left:4%':p==='bl'?'bottom:5%;left:4%':'bottom:5%;right:4%';
           calloutHTML = `<div class="rcallout" style="${pos}">${esc(slide.callout)}</div>`; }
         const handle = showHandle ? `<div class="rhandle">${handleLabel}</div>` : '';
-        const kickHTML = slide.kicker ? `<div class="rframe-kicker">${esc(slide.kicker)}</div><div class="rframe-rule"></div>` : '';
-        node.innerHTML = `<div class="rframe-glow"></div>` + kickHTML + dev + headHTML + subHTML + calloutHTML + `<div class="rgrain"></div>` + handle;
+        const stage = `<div class="rframe-stage">${dev}${calloutHTML}</div>`;
+        node.innerHTML = `<div class="rframe-glow"></div>` + kickHTML + headHTML + subHTML + stage + `<div class="rgrain"></div>` + handle;
         return node;
       }
 
@@ -950,6 +978,45 @@ end $$;`;
       diptych:  { blocks:['the version i posted','vs the 14 takes nobody saw'] },
       vertical: { blocks:['figuring it out','one post at a time'] },
     };
+    // ---- Plugverse FEATURE EXPLAINERS (real shipped features) ----
+    // each: n=name, dev=ONE device (phone|window) used across the whole carousel, aud=audience kicker,
+    // h=ember headline, s=subhead, steps=[[title, detail, callout], ...3], cta=[head, sub]
+    const FEATURES = {
+      profile:    { n:'Artist Profile', dev:'phone', aud:'FOR ARTISTS', h:'One profile. *Booked* forever.', s:'the home base every independent artist should have had', steps:[['Build it once','bio, genres, rates, and media — set it and forget it','set up once'],['Set your rate card','tell venues your price before they ask','your rates'],['Share one link','put it everywhere you already post','one link']], cta:['your music, one link','plugverse.app'] },
+      apply:      { n:'Apply to Gigs', dev:'phone', aud:'FOR ARTISTS', h:'Stop *chasing* gigs.', s:'browse open slots near you and apply in one tap', steps:[['Browse open slots','see who needs music near you, tonight or next month','near you'],['Apply in one tap','no cold DMs, no chasing venues','one tap'],['Get picked','they choose, you play','you’re in']], cta:['let them come to you','plugverse.app'] },
+      setlist:    { n:'Spotify Setlist Import', dev:'phone', aud:'FOR ARTISTS', h:'Your setlist, *imported* in seconds.', s:'pull it from Spotify, send it with the booking', steps:[['Connect Spotify','link your account once','connect'],['Confirm the import','your songs, pulled in automatically','imported'],['Attach to a gig','send it with the booking — no screenshots','attached']], cta:['no more camera-roll screenshots','plugverse.app'] },
+      getpaid:    { n:'Get Paid via Stripe', dev:'phone', aud:'FOR ARTISTS', h:'Get paid. *Automatically*.', s:'money lands in your bank after the show', steps:[['Link your bank once','connect your payout account','linked'],['Play the gig','do what you do','showtime'],['Get paid on time','funds clear automatically after the event','paid']], cta:['no more “did you venmo me?”','plugverse.app'] },
+      band:       { n:'Bands & Earnings Split', dev:'phone', aud:'FOR ARTISTS', h:'One gig. The *whole band* paid.', s:'set the split once, we handle who gets what', steps:[['Invite your bandmates','add the whole lineup','invite'],['Set the split','decide the cut once','the split'],['Everyone gets paid','direct to each member, automatically','all paid']], cta:['one gig, everyone paid','plugverse.app'] },
+      recap:      { n:'Year in Review', dev:'phone', aud:'FOR ARTISTS', h:'Your year *on stage*.', s:'every gig and crowd, wrapped into one page', steps:[['Play your gigs','we track them as you go','tracked'],['Recap auto-builds','gigs, earnings, crowds — assembled for you','auto-built'],['Share the link','one public page for your year','share it']], cta:['your year, one link','plugverse.app'] },
+      agent:      { n:'Agent Representation', dev:'phone', aud:'FOR ARTISTS', h:'Bring your *agent* on board.', s:'they book, you play, commissions settle themselves', steps:[['Accept the invite','add your agent to your account','linked'],['They book for you','your agent manages the calendar','they book'],['Commission auto-splits','their cut releases automatically','auto-split']], cta:['they book, you play','plugverse.app'] },
+      postgig:    { n:'Post a Gig', dev:'window', aud:'FOR VENUES', h:'Post it *like a job*.', s:'say what you need, the right artists apply', steps:[['Post the opening','genre, date, budget — done','post it'],['Applications roll in','qualified artists come to you','applicants'],['Pick the best fit','choose and book in one move','picked']], cta:['the right artists, to you','plugverse.app'] },
+      discover:   { n:'Discover Artists', dev:'window', aud:'FOR VENUES', h:'See who’s *available*. Before you ask.', s:'browse vetted local artists by genre, rate, and date', steps:[['Filter by genre + budget','narrow to exactly your night','filter'],['Compare profiles','reviews, rates, media side by side','compare'],['Invite or book','reach out with one tap','book']], cta:['no cold outreach','plugverse.app'] },
+      directbook: { n:'Direct Booking', dev:'window', aud:'FOR VENUES', h:'Book live music in *minutes*.', s:'found the artist? book them from their profile', steps:[['Open the profile','everything you need to decide','the profile'],['Pick date + terms','set the night and the rate','the terms'],['Send the booking','one move, locked in','booked']], cta:['no friend-of-a-friend','plugverse.app'] },
+      budget:     { n:'Budget Tracker', dev:'window', aud:'FOR VENUES', h:'Know what’s *left* to spend.', s:'every booking against your budget, in one place', steps:[['Set the budget','tell it your number','the budget'],['Book artists','spend updates as you go','booking'],['Watch it live','always know what’s left','live total']], cta:['every booking, one view','plugverse.app'] },
+      recurring:  { n:'Recurring & Bulk Gigs', dev:'window', aud:'FOR VENUES', h:'Set the slot. *Fill* the calendar.', s:'post a recurring night once — applications come in for every date', steps:[['Set the recurring slot','every Friday, handled','recurring'],['Define the run','how many weeks, which dates','the run'],['Artists apply','across every date, automatically','applicants']], cta:['post once, fill the month','plugverse.app'] },
+      checkin:    { n:'Door Check-In', dev:'phone', aud:'FOR VENUES', h:'Run the door *from your phone*.', s:'check guests in and sell walk-ups at the entrance', steps:[['Open the event','your guest list, ready','the door'],['Check guests in','scan and admit in seconds','checked in'],['Sell walk-ups','take payment at the door','walk-up']], cta:['the whole door, in your hand','plugverse.app'] },
+      embed:      { n:'Embeddable Schedule', dev:'window', aud:'FOR VENUES', h:'Your lineup, *on your site*.', s:'drop your live schedule onto your own website', steps:[['Copy the embed','one snippet','copy'],['Paste on your site','anywhere you want it','paste'],['It stays in sync','updates itself, always current','live sync']], cta:['your schedule, everywhere','plugverse.app'] },
+      contracts:  { n:'Auto Contracts', dev:'window', aud:'EVERY BOOKING', h:'The contract *writes itself*.', s:'agree on terms, sign, done', steps:[['Agree on terms','set the rate and the date','the terms'],['Contract auto-generates','a real agreement, instantly','generated'],['Both sides sign','protected, on the record','signed']], cta:['no google docs, no exposure','plugverse.app'] },
+      escrow:     { n:'Escrow Payments', dev:'window', aud:'EVERY BOOKING', h:'Money held safe *until showtime*.', s:'paid up front, released after the event', steps:[['Organizer pays up front','funds collected at booking','paid in'],['Held in escrow','safe for both sides','held safe'],['Released after the show','straight to the artist','released']], cta:['no awkward end-of-night','plugverse.app'] },
+      negotiate:  { n:'Negotiation', dev:'phone', aud:'EVERY BOOKING', h:'Settle the rate *in-app*.', s:'counter, agree, lock it in', steps:[['Send an offer','open with your number','your offer'],['Counter back and forth','until both sides agree','counter'],['Lock the deal','straight into the contract','locked']], cta:['settle it where it lives','plugverse.app'] },
+      messaging:  { n:'In-App Messaging', dev:'phone', aud:'EVERY BOOKING', h:'Every conversation, *one thread*.', s:'no lost DMs — talk where the booking lives', steps:[['Open the booking thread','one place per gig','the thread'],['Message directly','reactions, read receipts, all of it','message'],['Stays in one place','never dig through DMs again','in one place']], cta:['no lost DMs','plugverse.app'] },
+      reviews:    { n:'Reviews & Reputation', dev:'phone', aud:'EVERY BOOKING', h:'Great gigs become *great proof*.', s:'reviews both ways — your track record sells the next gig', steps:[['Finish the gig','play the show','done'],['Leave a review','both sides rate each other','reviewed'],['Reputation compounds','your record earns the next gig','proof']], cta:['your track record sells for you','plugverse.app'] },
+      cancel:     { n:'Cancellation & Disputes', dev:'window', aud:'EVERY BOOKING', h:'Cancellations, *handled fairly*.', s:'propose a replacement, share evidence, settle it cleanly', steps:[['Request the cancellation','start the process','requested'],['Propose a fix','a replacement or your evidence','propose'],['Resolution or arbitration','settled cleanly, either way','resolved']], cta:['fair, structured, on the record','plugverse.app'] },
+      calendar:   { n:'Calendar Sync', dev:'phone', aud:'EVERY BOOKING', h:'Never *miss* a booking.', s:'your gigs on your calendar, with reminders built in', steps:[['Connect your calendar','one-time link','connect'],['Bookings sync over','every gig, automatically','synced'],['Reminders fire','never get caught off guard','reminders']], cta:['your gigs, on your calendar','plugverse.app'] },
+    };
+    const FEATURE_KEYS = Object.keys(FEATURES);
+    function newFeatureExplainer(key){
+      const f = FEATURES[key]; if (!f) return newTemplate('ui-explainer','plugverse');
+      const dev = f.dev;
+      const cover = { photo:null, layout:'cover', coverStyle:'metal', theme:'plugverse', ratio:'4:5', kicker:'PLUGVERSE · '+f.aud, blocks:[{ text:f.h, font:'anton' }, { text:f.s }] };
+      const steps = f.steps.map((s, i) => ({ photo:null, frame:dev, theme:'plugverse', ratio:'4:5', handle:true,
+        kicker:'HOW IT WORKS · 0'+(i+1), callout:s[2], calloutPos: dev==='phone' ? 'br' : 'tr',
+        blocks:[{ text:s[0], font:'anton' }, { text:s[1] }] }));
+      const payoff = { photo:null, layout:'cover', coverStyle:'metal', theme:'plugverse', ratio:'4:5', kicker:'PLUGVERSE', blocks:[{ text:f.cta[0], font:'anton' }, { text:f.cta[1] }] };
+      return { title:'PLUGVERSE — '+f.n, theme:'plugverse', ratio:'4:5', pillar:'figuring-it-out', format:'value-step',
+        caption:'', hashtags:['plugverse'], status:'queued', source:'manual', slides:[cover, ...steps, payoff] };
+    }
+
     function newTemplate(kind, theme = 'plugverse'){
       const personal = (theme === 'personal' || theme === 'mono');
       const mkPost = (slides) => ({ title:(personal?'PERSONAL':'EDITION')+' — '+kind, theme, ratio:'4:5', pillar:'figuring-it-out', format:'statement', caption:'', hashtags: personal?[]:['plugverse'], status:'queued', source:'manual', slides });
@@ -1328,6 +1395,8 @@ end $$;`;
       render();
     });
     document.getElementById('grid').addEventListener('click', e => {
+      const ff = e.target.closest('[data-feature]');
+      if (ff){ if (!tableReady){ toast('Run the setup SQL first','err'); return; } openEditor(newFeatureExplainer(ff.dataset.feature)); return; }
       const tt = e.target.closest('[data-tpl]'); if (!tt) return;
       if (!tableReady){ toast('Run the setup SQL first','err'); return; }
       openEditor(newTemplate(tt.dataset.tpl, tt.dataset.tpltheme));
