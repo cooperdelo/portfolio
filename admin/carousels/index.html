@@ -1333,6 +1333,7 @@ end $$;`;
           <label class="mini" style="display:flex;align-items:center;gap:0.3rem">Y<input type="range" min="0" max="100" step="1" value="${slide.focusY==null?50:slide.focusY}" data-focusy="${i}" style="width:74px"></label>
           <label class="mini" style="display:flex;align-items:center;gap:0.3rem">zoom<input type="range" min="100" max="260" step="5" value="${slide.zoom||100}" data-zoom="${i}" style="width:74px"></label>
           <button class="iconbtn" data-cropreset="${i}">reset</button>
+          ${['edcover','behind','around'].includes(slide.layout)?`<button class="iconbtn" data-cutsubject="${i}" style="border-color:rgba(252,86,3,.55);color:#ffd9c7" title="remove background, pick which people to keep, layer over the type">&#9986; cut out subject</button>`:''}
         </div>`:''}
         `}
         ${slide.frame ? `
@@ -1511,12 +1512,65 @@ end $$;`;
         }
       }
     }
+    let _bpModelP = null;
+    function _loadBP(){
+      if (_bpModelP) return _bpModelP;
+      _bpModelP = (async () => {
+        const L = (src) => new Promise((res, rej) => { const s = document.createElement('script'); s.src = src; s.onload = res; s.onerror = () => rej(new Error('load')); document.head.appendChild(s); });
+        if (!window.tf) await L('https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.21.0/dist/tf.min.js');
+        if (!window.bodyPix) await L('https://cdn.jsdelivr.net/npm/@tensorflow-models/body-pix@2.2.0/dist/body-pix.min.js');
+        return await window.bodyPix.load({ architecture: 'ResNet50', outputStride: 16, quantBytes: 2 });
+      })();
+      return _bpModelP;
+    }
+    async function cutoutSubject(si){
+      const slide = draft.slides[si]; if (!slide || !slide.photo){ toast('Add a photo first','err'); return; }
+      toast('Loading cut-out model…');
+      let net; try { net = await _loadBP(); } catch(e){ toast('Could not load the model','err'); return; }
+      const img = new Image(); img.crossOrigin = 'anonymous'; img.src = slide.photo;
+      try { await img.decode(); } catch(e){ toast('Image failed to load','err'); return; }
+      toast('Detecting people…');
+      const people = await net.segmentMultiPerson(img, { internalResolution:'high', segmentationThreshold:0.6, maxDetections:14, scoreThreshold:0.2, nmsRadius:20 });
+      if (!people.length){ toast('No people detected','err'); return; }
+      const W = people[0].width, H = people[0].height;
+      const persons = people.map((p, idx) => { let minx=W,miny=H,maxx=0,maxy=0,a=0; for(let y=0;y<H;y++){ for(let x=0;x<W;x++){ if(p.data[y*W+x]){ a++; if(x<minx)minx=x; if(x>maxx)maxx=x; if(y<miny)miny=y; if(y>maxy)maxy=y; } } } return { idx, p, a, minx, miny, maxx, maxy }; }).filter(o => o.a > 250).sort((m,n)=> n.a - m.a);
+      if (!persons.length){ toast('No clear subjects','err'); return; }
+      // default = foreground people (mask reaches the lower part of the photo), else the biggest
+      const fg = persons.filter(o => o.maxy > H*0.55);
+      const selected = new Set((fg.length ? fg : persons).slice(0,2).map(o => o.idx));
+      const scrim = document.createElement('div'); scrim.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.8);display:flex;align-items:center;justify-content:center;padding:18px';
+      const box = document.createElement('div'); box.style.cssText = 'background:#141416;border:1px solid rgba(255,255,255,.14);border-radius:16px;padding:18px;max-width:min(92vw,640px);max-height:92vh;overflow:auto;color:#fff;font-family:Inter,system-ui,sans-serif';
+      box.innerHTML = '<div style="font-size:13px;margin-bottom:10px;line-height:1.4">Tap the people to <b>keep</b> (orange = kept, layered over the type). Tap again to drop. Crowd left grey is removed.</div>';
+      const stage = document.createElement('div'); stage.style.cssText = 'position:relative;display:inline-block;max-width:100%;line-height:0';
+      const pic = document.createElement('img'); pic.src = slide.photo; pic.style.cssText = 'display:block;max-width:100%;height:auto;border-radius:8px';
+      stage.appendChild(pic); box.appendChild(stage);
+      const draw = () => { stage.querySelectorAll('.psel').forEach(e=>e.remove()); const sc = pic.clientWidth / W;
+        persons.forEach(o => { const on = selected.has(o.idx); const d = document.createElement('div'); d.className='psel';
+          d.style.cssText = `position:absolute;left:${o.minx*sc}px;top:${o.miny*sc}px;width:${(o.maxx-o.minx)*sc}px;height:${(o.maxy-o.miny)*sc}px;border:2px solid ${on?'#FF6B35':'rgba(255,255,255,.45)'};background:${on?'rgba(255,107,53,.20)':'rgba(0,0,0,0)'};border-radius:6px;cursor:pointer;box-sizing:border-box`;
+          d.onclick = () => { selected.has(o.idx) ? selected.delete(o.idx) : selected.add(o.idx); draw(); };
+          stage.appendChild(d); });
+      };
+      if (pic.complete) draw(); else pic.onload = draw;
+      const btns = document.createElement('div'); btns.style.cssText='display:flex;gap:10px;margin-top:14px;justify-content:flex-end';
+      const mk = (label, primary) => { const b=document.createElement('button'); b.textContent=label; b.style.cssText='padding:9px 16px;border-radius:10px;font:600 12px Inter,sans-serif;cursor:pointer;letter-spacing:.04em;text-transform:uppercase;'+(primary?'border:1px solid rgba(196,58,2,.5);background:linear-gradient(180deg,#FF6B35,#FF5722);color:#fff':'border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.05);color:#fff'); return b; };
+      const cancel = mk('Cancel',false), apply = mk('Apply cut-out',true);
+      btns.appendChild(cancel); btns.appendChild(apply); box.appendChild(btns); scrim.appendChild(box); document.body.appendChild(scrim);
+      cancel.onclick = () => scrim.remove();
+      apply.onclick = () => { if(!selected.size){ toast('Pick at least one person','err'); return; }
+        const union = new Uint8Array(W*H); persons.forEach(o => { if(selected.has(o.idx)) for(let i=0;i<o.p.data.length;i++) if(o.p.data[i]) union[i]=1; });
+        const cv=document.createElement('canvas'); cv.width=W; cv.height=H; const ctx=cv.getContext('2d'); ctx.drawImage(img,0,0,W,H);
+        const id=ctx.getImageData(0,0,W,H); for(let i=0;i<union.length;i++) if(!union[i]) id.data[i*4+3]=0; ctx.putImageData(id,0,0);
+        let ow=W,oh=H,MX=1100; if(W>MX){ ow=MX; oh=Math.round(H*MX/W); } const out=document.createElement('canvas'); out.width=ow; out.height=oh; out.getContext('2d').drawImage(cv,0,0,ow,oh);
+        slide.cutout = out.toDataURL('image/png'); scrim.remove(); paintSlidesCol(); paintPreview(); toast('Cut-out applied — Save to keep it');
+      };
+    }
     async function onSlideClick(e){
       const t = e.target;
       const slideEl = t.closest('.slide-ed'); if (!slideEl) return;
       const si = Number(slideEl.dataset.si);
       if (t.dataset.addblock != null){ draft.slides[si].blocks.push({text:'',font:'capcut',place:'top'}); paintSlidesCol(); paintPreview(); return; }
       if (t.dataset.cropreset != null){ const s=draft.slides[si]; s.focusX=50; s.focusY=50; s.zoom=100; paintSlidesCol(); paintPreview(); return; }
+      if (t.dataset.cutsubject != null){ cutoutSubject(si); return; }
       if (t.dataset.addtext != null){ draft.slides[si].blocks.push({text:'new text',font: draft.slides[si].split?'capcut':'serif', place:t.dataset.addtext}); paintSlidesCol(); paintPreview(); return; }
       if (t.dataset.rmslide != null){ if (draft.slides.length>1){ draft.slides.splice(si,1); if(previewIdx>=draft.slides.length)previewIdx=0; paintSlidesCol(); paintPreview(); } return; }
       if (t.dataset.rmblock != null){ const bi=Number(t.dataset.rmblock); draft.slides[si].blocks.splice(bi,1); paintSlidesCol(); paintPreview(); return; }
