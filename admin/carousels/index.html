@@ -236,7 +236,9 @@
   .rslide.lay-edcover .ec-bg{ position:absolute; inset:0; background-size:cover; background-position:center; z-index:0; }
   .rslide.lay-edcover .ec-glow{ position:absolute; inset:0; z-index:1; background:radial-gradient(ellipse at 72% 30%,rgba(252,86,3,.26),transparent 52%),radial-gradient(ellipse at 24% 86%,rgba(196,58,2,.22),transparent 58%); }
   .rslide.lay-edcover .ec-scrim{ position:absolute; inset:0; z-index:1; background:linear-gradient(to top,rgba(0,0,0,.68),rgba(0,0,0,.10) 46%,rgba(0,0,0,.46)); }
-  .rslide.lay-edcover .ec-word{ position:absolute; left:46px; right:46px; top:210px; z-index:2; text-align:center; font-family:"Anton","Archivo Black",sans-serif; font-weight:400; font-size:196px; line-height:0.8; letter-spacing:0.005em; text-transform:uppercase; }
+  .rslide.lay-edcover .ec-word{ position:absolute; left:46px; right:46px; top:210px; z-index:2; text-align:center; font-family:"Anton","Archivo Black",sans-serif; font-weight:400; font-size:196px; line-height:0.8; letter-spacing:0.005em; text-transform:uppercase;
+    /* extruded 3D metal that floats above the photo: stacked dark edges + a real cast shadow */
+    filter: drop-shadow(2px 2px 0 rgba(8,8,11,.95)) drop-shadow(4px 5px 0 rgba(7,7,10,.8)) drop-shadow(6px 8px 0 rgba(5,5,8,.6)) drop-shadow(9px 12px 2px rgba(4,4,7,.5)) drop-shadow(0 22px 40px rgba(0,0,0,.7)) !important; }
   .rslide.lay-edcover .ec-cut{ position:absolute; inset:0; background-size:cover; background-position:center top; background-repeat:no-repeat; z-index:3; }
   .rslide.lay-edcover .ec-chrome{ position:absolute; inset:0; z-index:4; padding:52px 46px; display:flex; flex-direction:column; justify-content:space-between; }
   .rslide.lay-edcover .ec-deck{ font-family:"Inter",sans-serif; font-size:21px; font-weight:600; letter-spacing:0.22em; text-transform:uppercase; color:#cfcfd6; margin-top:14px; }
