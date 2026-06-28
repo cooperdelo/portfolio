@@ -1284,14 +1284,13 @@ end $$;`;
             <div class="stage-frame" id="stage-frame"></div>
             <div class="slide-nav" id="slide-nav"></div>
             <div class="dl-row">
-              <button class="btn small" id="dl-one">Download slide</button>
-              <button class="btn small primary" id="dl-all">Download all slides</button>
+              <button class="btn small" id="dl-one" title="Render this one slide at full quality and save it">⬇ This slide</button>
+              <button class="btn small primary" id="dl-all" title="Render the whole post at full quality and save it">⬇ Download (full quality)</button>
             </div>
             <div class="dl-row">
               <button class="btn small" id="auto-photos">Auto-photos</button>
               <button class="btn small" id="copy-cap">Copy caption</button>
-              <button class="btn small" id="render-factory" title="Queue for the local render machine (final metal JPGs; check the box for MP4s)">⚡ Render</button>
-              <label class="mini" style="display:flex;align-items:center;gap:0.3rem"><input type="checkbox" id="render-video-cb">+ video</label>
+              <label class="mini" style="display:flex;align-items:center;gap:0.3rem" title="Off = save images. On = save video (MP4) instead."><input type="checkbox" id="render-video-cb">video (MP4)</label>
               <button class="btn small" id="save-post">Save</button>
               ${p.id ? '<button class="btn small danger" id="del-post">Delete</button>' : ''}
             </div>
@@ -1471,59 +1470,61 @@ end $$;`;
       });
       document.getElementById('add-slide').addEventListener('click', () => { draft.slides.push(blankSlide()); paintSlidesCol(); paintPreview(); });
       let pendingOne = null;
+      // ---- ONE-BUTTON full-quality export. Download = save edits -> Factory renders the real
+      //      (silver 3D) version on your PC -> the finished file downloads. No low-quality path. ----
+      let pendingShareFiles = null, pendingShareBtn = null;
+      function waitForRender(id, want, n){
+        return new Promise((resolve, reject)=>{
+          const started = Date.now();
+          const tick = async ()=>{
+            const { data, error } = await sb.from('carousel_posts').select('render_requested,'+want).eq('id', id).single();
+            if(!error && data){ const urls = data[want]||[]; if(data.render_requested===false && urls.length>=n && urls.every(Boolean)) return resolve(urls); }
+            if(Date.now()-started > 6*60*1000) return reject(new Error('timed out — is your computer awake?'));
+            setTimeout(tick, 1500);
+          };
+          tick();
+        });
+      }
+      async function exportViaFactory(which, btn){
+        if(btn.dataset.busy==='1') return;
+        readFormIntoDraft();
+        const vid = !!document.getElementById('render-video-cb')?.checked;
+        const label = btn.dataset.label || (btn.dataset.label = btn.textContent);
+        btn.dataset.busy='1'; btn.style.opacity='.65';
+        try{
+          btn.textContent='Saving…';
+          const row = { title:draft.title, pillar:draft.pillar, format:draft.format, caption:draft.caption, hashtags:draft.hashtags, slides:draft.slides, status:draft.status, source:draft.source||'manual', render_requested:true, render_video:vid };
+          let id = draft.id;
+          if(id){ const r=await sb.from('carousel_posts').update(row).eq('id', id); if(r.error) throw new Error(r.error.message); }
+          else { const r=await sb.from('carousel_posts').insert(row).select('id').single(); if(r.error) throw new Error(r.error.message); id=r.data.id; draft.id=id; }
+          btn.textContent='Rendering…';
+          toast('Rendering the full-quality '+(vid?'video':'image')+' on your PC…');
+          const want = vid ? 'rendered_video_urls' : 'rendered_urls';
+          const n = (draft.slides||[]).length;
+          const urls = await waitForRender(id, want, n);
+          draft[want] = urls;
+          const ext = vid?'mp4':'jpg';
+          const pick = which==='all' ? urls.map((u,i)=>({u,i})) : [{u:urls[previewIdx], i:previewIdx}];
+          btn.textContent='Saving file'+(which==='all'?'s':'')+'…';
+          if(useShare()){
+            const files=[];
+            for(const {u,i} of pick){ const b=await (await fetch(u)).blob(); files.push(new File([b], `${slugify(draft.title)}-${String(i+1).padStart(2,'0')}.${ext}`, {type:b.type})); }
+            if(files.length && navigator.canShare && navigator.canShare({files})){ pendingShareFiles=files; pendingShareBtn=btn; btn.dataset.busy=''; btn.style.opacity='1'; btn.textContent='Tap to save'+(files.length>1?' '+files.length:''); toast('Tap again to add to your camera roll'); return; }
+          }
+          for(const {u,i} of pick){ const b=await (await fetch(u)).blob(); downloadBlob(b, `${slugify(draft.title)}-${String(i+1).padStart(2,'0')}.${ext}`); await new Promise(r=>setTimeout(r,400)); }
+          toast('Saved '+(which==='all'? n+' '+(vid?'videos':'images') : 'the '+(vid?'video':'image'))+' — full quality');
+        }catch(err){ toast('Export failed: '+err.message, 'err'); }
+        finally{ if(btn.dataset.busy==='1'){ btn.dataset.busy=''; btn.style.opacity='1'; btn.textContent=label; } }
+      }
       document.getElementById('dl-one').addEventListener('click', async (e) => {
         const btn = e.currentTarget;
-        if (pendingOne){ const f=pendingOne; pendingOne=null; btn.textContent='Download slide'; try{ await navigator.share({ files:[f], title: draft.title||'slide' }); toast('Sent to share sheet'); }catch(err){ if(err&&err.name!=='AbortError') toast('Share canceled','err'); } return; }
-        readFormIntoDraft();
-        const vid = document.getElementById('render-video-cb')?.checked;
-        const fx = (vid ? draft.rendered_video_urls : draft.rendered_urls) || [];
-        if (fx[previewIdx]) { try { toast('Downloading the full-quality render…'); const r=await fetch(fx[previewIdx]); const blob=await r.blob(); const name=`${slugify(draft.title)}-${String(previewIdx+1).padStart(2,'0')}.${vid?'mp4':'jpg'}`;
-            if (useShare()){ const f=new File([blob],name,{type:blob.type}); if(navigator.canShare && navigator.canShare({files:[f]})){ pendingOne=f; btn.textContent='💾 Save'; toast('Tap “Save”'); return; } }
-            downloadBlob(blob, name); toast('Saved — full-quality Factory render'); return; } catch(err){ toast('Could not fetch render; using quick export','err'); } }
-        if (vid){ toast('Recording video…'); try{ const { blob, ext } = await recordSlideVideo(draft, previewIdx, 5); const name=`${slugify(draft.title)}-${String(previewIdx+1).padStart(2,'0')}.${ext}`;
-            if (useShare()){ const f=new File([blob],name,{type:blob.type}); if(navigator.canShare && navigator.canShare({files:[f]})){ pendingOne=f; btn.textContent='💾 Save video'; toast('Tap “Save video” to keep it'); return; } }
-            downloadBlob(blob, name); toast('Video saved (.'+ext+')'); }
-          catch(err){ toast('Video failed: '+err.message,'err'); }
-          return; }
-        if (useShare()){ toast('Rendering…'); const c=await renderSlideToCanvas(draft.slides[previewIdx], draft.theme||'mono', previewIdx===0, postH(draft)); const blob=await canvasToBlob(c); const f=new File([blob], `${slugify(draft.title)}-${String(previewIdx+1).padStart(2,'0')}.png`, {type:'image/png'}); if(navigator.canShare && navigator.canShare({files:[f]})){ pendingOne=f; btn.textContent='💾 Save to Photos'; toast('Tap “Save to Photos”'); return; } }
-        await downloadOne(draft, previewIdx);
+        if(pendingShareFiles){ const files=pendingShareFiles; pendingShareFiles=null; const b=pendingShareBtn||btn; b.textContent=b.dataset.label||'Download'; try{ await navigator.share({ files, title: draft.title||'slide' }); toast('Sent to share sheet'); }catch(err){ if(err&&err.name!=='AbortError') toast('Share canceled','err'); } return; }
+        await exportViaFactory('one', btn);
       });
-      let pendingShare = null;
       document.getElementById('dl-all').addEventListener('click', async (e) => {
         const btn = e.currentTarget;
-        // second tap: fire the iOS/Android share sheet inside the user gesture (required by Safari)
-        if (pendingShare) {
-          const files = pendingShare; pendingShare = null; btn.textContent = 'Download all slides';
-          try { await navigator.share({ files, title: draft.title || 'carousel slides' }); toast('Sent to share sheet — Save to Photos'); }
-          catch (err) { if (err && err.name !== 'AbortError') toast('Share canceled', 'err'); }
-          return;
-        }
-        readFormIntoDraft();
-        const vidAll = document.getElementById('render-video-cb')?.checked;
-        const fxAll = (vidAll ? draft.rendered_video_urls : draft.rendered_urls) || [];
-        if (fxAll.length && fxAll.length === (draft.slides||[]).length && fxAll.every(Boolean)) {
-          toast('Downloading the full-quality renders…'); const ext = vidAll?'mp4':'jpg';
-          if (useShare()){ const files=[]; for(let i=0;i<fxAll.length;i++){ try{ const r=await fetch(fxAll[i]); const b=await r.blob(); files.push(new File([b],`${slugify(draft.title)}-${String(i+1).padStart(2,'0')}.${ext}`,{type:b.type})); }catch(e){} } if(files.length && navigator.canShare({files})){ pendingShare=files; btn.textContent=`💾 Save ${files.length}`; toast('Tap “Save”'); return; } }
-          else { for(let i=0;i<fxAll.length;i++){ try{ const r=await fetch(fxAll[i]); const b=await r.blob(); downloadBlob(b,`${slugify(draft.title)}-${String(i+1).padStart(2,'0')}.${ext}`); await new Promise(rr=>setTimeout(rr,500)); }catch(e){} } toast('Saved — full-quality renders'); return; }
-        }
-        if (vidAll){
-          const n = (draft.slides||[]).length; toast('Recording '+n+' video'+(n===1?'':'s')+'…'); const files=[];
-          for (let i=0;i<n;i++){ try{ const { blob, ext } = await recordSlideVideo(draft, i, 5); const name=`${slugify(draft.title)}-${String(i+1).padStart(2,'0')}.${ext}`;
-            if (useShare()){ files.push(new File([blob], name, {type:blob.type})); } else { downloadBlob(blob, name); await new Promise(r=>setTimeout(r,600)); } }catch(err){ toast('Video '+(i+1)+' failed: '+err.message,'err'); } }
-          if (useShare() && files.length && navigator.canShare({files})){ pendingShare=files; btn.textContent=`💾 Save ${files.length} videos`; toast('Tap “Save” to keep them'); }
-          else toast('Saved '+n+' video'+(n===1?'':'s')); return;
-        }
-        if (useShare()) {
-          toast('Rendering…');
-          const files = await renderAllFiles(draft);
-          if (navigator.canShare({ files })) {
-            pendingShare = files;
-            btn.textContent = `💾 Save ${files.length} to Photos`;
-            toast('Tap “Save” to send them to your camera roll');
-            return;
-          }
-        }
-        await downloadAll(draft); // desktop: per-file download
+        if(pendingShareFiles){ const files=pendingShareFiles; pendingShareFiles=null; const b=pendingShareBtn||btn; b.textContent=b.dataset.label||'Download all'; try{ await navigator.share({ files, title: draft.title||'carousel' }); toast('Sent to share sheet'); }catch(err){ if(err&&err.name!=='AbortError') toast('Share canceled','err'); } return; }
+        await exportViaFactory('all', btn);
       });
       document.getElementById('copy-cap').addEventListener('click', () => {
         readFormIntoDraft();
