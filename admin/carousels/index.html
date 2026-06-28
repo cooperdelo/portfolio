@@ -1540,17 +1540,22 @@ end $$;`;
       const selected = new Set((fg.length ? fg : persons).slice(0,2).map(o => o.idx));
       const scrim = document.createElement('div'); scrim.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.8);display:flex;align-items:center;justify-content:center;padding:18px';
       const box = document.createElement('div'); box.style.cssText = 'background:#141416;border:1px solid rgba(255,255,255,.14);border-radius:16px;padding:18px;max-width:min(92vw,640px);max-height:92vh;overflow:auto;color:#fff;font-family:Inter,system-ui,sans-serif';
-      box.innerHTML = '<div style="font-size:13px;margin-bottom:10px;line-height:1.4">Tap the people to <b>keep</b> (orange = kept, layered over the type). Tap again to drop. Crowd left grey is removed.</div>';
+      box.innerHTML = '<div style="font-size:13px;margin-bottom:4px;line-height:1.4">Tap a person to toggle <b>KEEP</b> (orange) vs drop. Only KEEP people get layered over the type.</div><div data-cnt style="font-size:12px;color:#FF8A65;margin-bottom:10px;font-weight:700"></div>';
       const stage = document.createElement('div'); stage.style.cssText = 'position:relative;display:inline-block;max-width:100%;line-height:0';
       const pic = document.createElement('img'); pic.src = slide.photo; pic.style.cssText = 'display:block;max-width:100%;height:auto;border-radius:8px';
       stage.appendChild(pic); box.appendChild(stage);
-      const draw = () => { stage.querySelectorAll('.psel').forEach(e=>e.remove()); const sc = pic.clientWidth / W;
+      const cnt = () => { const c = box.querySelector('[data-cnt]'); if (c) c.textContent = selected.size + ' person' + (selected.size===1?'':'s') + ' kept'; };
+      const draw = () => {
+        const rw = pic.getBoundingClientRect().width; if (!rw){ requestAnimationFrame(draw); return; }
+        stage.querySelectorAll('.psel').forEach(e=>e.remove()); const sc = rw / W;
         persons.forEach(o => { const on = selected.has(o.idx); const d = document.createElement('div'); d.className='psel';
-          d.style.cssText = `position:absolute;left:${o.minx*sc}px;top:${o.miny*sc}px;width:${(o.maxx-o.minx)*sc}px;height:${(o.maxy-o.miny)*sc}px;border:2px solid ${on?'#FF6B35':'rgba(255,255,255,.45)'};background:${on?'rgba(255,107,53,.20)':'rgba(0,0,0,0)'};border-radius:6px;cursor:pointer;box-sizing:border-box`;
-          d.onclick = () => { selected.has(o.idx) ? selected.delete(o.idx) : selected.add(o.idx); draw(); };
+          d.style.cssText = `position:absolute;left:${o.minx*sc}px;top:${o.miny*sc}px;width:${Math.max(22,(o.maxx-o.minx)*sc)}px;height:${Math.max(22,(o.maxy-o.miny)*sc)}px;border:3px solid ${on?'#FF6B35':'rgba(255,255,255,.6)'};background:${on?'rgba(255,107,53,.26)':'rgba(0,0,0,.32)'};border-radius:8px;cursor:pointer;box-sizing:border-box`;
+          const bdg = document.createElement('div'); bdg.textContent = on?'KEEP':'drop'; bdg.style.cssText = `position:absolute;top:3px;right:3px;padding:2px 7px;border-radius:999px;font:700 10px Inter,sans-serif;letter-spacing:.05em;${on?'background:#FF6B35;color:#0a0a0a':'background:rgba(0,0,0,.65);color:#fff'}`; d.appendChild(bdg);
+          d.addEventListener('click', (ev) => { ev.stopPropagation(); selected.has(o.idx) ? selected.delete(o.idx) : selected.add(o.idx); cnt(); draw(); });
           stage.appendChild(d); });
       };
-      if (pic.complete) draw(); else pic.onload = draw;
+      cnt(); requestAnimationFrame(() => requestAnimationFrame(draw));
+      window.addEventListener('resize', draw);
       const btns = document.createElement('div'); btns.style.cssText='display:flex;gap:10px;margin-top:14px;justify-content:flex-end';
       const mk = (label, primary) => { const b=document.createElement('button'); b.textContent=label; b.style.cssText='padding:9px 16px;border-radius:10px;font:600 12px Inter,sans-serif;cursor:pointer;letter-spacing:.04em;text-transform:uppercase;'+(primary?'border:1px solid rgba(196,58,2,.5);background:linear-gradient(180deg,#FF6B35,#FF5722);color:#fff':'border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.05);color:#fff'); return b; };
       const cancel = mk('Cancel',false), apply = mk('Apply cut-out',true);
