@@ -229,6 +229,38 @@
   .rslide.lay-behind .lb-front,.rslide.lay-around .lb-front{ position:absolute; left:90px; right:90px; bottom:96px; z-index:4; }
   .rslide.lay-around .la-word{ position:absolute; z-index:4; left:80px; top:120px; max-width:46%; font-family:"Anton","Archivo Black",sans-serif; font-size:150px; line-height:0.84; text-transform:uppercase; }
   .rslide.ed[data-theme="personal"].lay-around .la-word,.rslide.ed[data-theme="mono"].lay-around .la-word{ font-family:"Hanken Grotesk",sans-serif; font-weight:800; }
+
+  /* ===== PLUGVERSE EDITIONS editorial layouts ===== */
+  /* edcover: layered magazine cover — big metal word BEHIND the subject cutout (heads overlap the type) + editorial chrome */
+  .rslide.lay-edcover{ background:#08080a; }
+  .rslide.lay-edcover .ec-bg{ position:absolute; inset:0; background-size:cover; background-position:center; z-index:0; }
+  .rslide.lay-edcover .ec-glow{ position:absolute; inset:0; z-index:1; background:radial-gradient(ellipse at 72% 30%,rgba(252,86,3,.26),transparent 52%),radial-gradient(ellipse at 24% 86%,rgba(196,58,2,.22),transparent 58%); }
+  .rslide.lay-edcover .ec-scrim{ position:absolute; inset:0; z-index:1; background:linear-gradient(to top,rgba(0,0,0,.68),rgba(0,0,0,.10) 46%,rgba(0,0,0,.46)); }
+  .rslide.lay-edcover .ec-word{ position:absolute; left:46px; right:46px; top:210px; z-index:2; text-align:center; font-family:"Anton","Archivo Black",sans-serif; font-weight:400; font-size:196px; line-height:0.8; letter-spacing:0.005em; text-transform:uppercase; }
+  .rslide.lay-edcover .ec-cut{ position:absolute; inset:0; background-size:cover; background-position:center top; background-repeat:no-repeat; z-index:3; }
+  .rslide.lay-edcover .ec-chrome{ position:absolute; inset:0; z-index:4; padding:52px 46px; display:flex; flex-direction:column; justify-content:space-between; }
+  .rslide.lay-edcover .ec-deck{ font-family:"Inter",sans-serif; font-size:21px; font-weight:600; letter-spacing:0.22em; text-transform:uppercase; color:#cfcfd6; margin-top:14px; }
+  .rslide.lay-edcover .ec-headline{ font-family:"Archivo Black","Anton",sans-serif; font-size:68px; line-height:0.96; letter-spacing:-0.01em; text-transform:uppercase; margin-bottom:16px; }
+  .rslide.lay-edcover .ec-decks{ display:grid; grid-template-columns:1fr 1fr; gap:13px; }
+  .rslide.lay-edcover .ec-chip{ padding:15px 16px; border-radius:14px; font-size:18px; line-height:1.4; text-transform:uppercase; letter-spacing:0.04em; color:#d6d6dd; }
+  .rslide.lay-edcover .ec-chip b{ color:#fff; }
+
+  /* spread: interior — photo top, frosted near-white text panel with metal-dark header */
+  .rslide.lay-spread{ background:linear-gradient(180deg,#6d6d74,#202024); }
+  .rslide.lay-spread .sp-photo{ position:absolute; left:0; right:0; top:0; height:56%; z-index:0; background-size:cover; background-position:center; background-color:#2a2a30; }
+  .rslide.lay-spread .sp-glow{ position:absolute; left:0; right:0; top:0; height:56%; z-index:1; background:radial-gradient(ellipse at 50% 16%,rgba(252,86,3,.16),transparent 58%); }
+  .rslide.lay-spread .sp-panel{ position:absolute; left:38px; right:38px; bottom:42px; z-index:2; padding:38px 36px 42px; border-radius:20px; background:rgba(244,244,248,.86); backdrop-filter:blur(18px) saturate(120%); -webkit-backdrop-filter:blur(18px) saturate(120%); border:1px solid rgba(255,255,255,.6); box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 18px 44px rgba(0,0,0,.42); }
+  .rslide.lay-spread .sp-head{ font-family:"Anton","Archivo Black",sans-serif; font-size:110px; line-height:0.86; text-transform:uppercase; letter-spacing:0.005em; margin-bottom:16px; background:linear-gradient(177deg,#3a3a40,#0c0c0e 45%,#5a5a62 70%,#14141a); -webkit-background-clip:text; background-clip:text; color:transparent; -webkit-text-fill-color:transparent; }
+  .rslide.lay-spread .sp-body{ font-size:24px; line-height:1.5; text-transform:uppercase; letter-spacing:0.03em; color:#1a1a1f; }
+  .rslide.lay-spread .sp-body b{ font-weight:800; }
+
+  /* edcta: closing call-to-action */
+  .rslide.lay-edcta{ background:radial-gradient(ellipse at 32% 64%,rgba(252,86,3,.4),transparent 52%),radial-gradient(ellipse at 80% 20%,rgba(196,58,2,.22),transparent 55%),linear-gradient(180deg,#161619,#040405); }
+  .rslide.lay-edcta .ect-pad{ position:absolute; inset:0; z-index:2; padding:54px 48px; display:flex; flex-direction:column; justify-content:space-between; }
+  .rslide.lay-edcta .ect-head{ font-family:"Anton","Archivo Black",sans-serif; font-size:106px; line-height:0.9; text-transform:uppercase; letter-spacing:0.01em; margin-bottom:18px; }
+  .rslide.lay-edcta .ect-sub{ font-size:23px; text-transform:uppercase; letter-spacing:0.2em; color:#a9a9b1; margin-bottom:24px; }
+  .rslide.lay-edcta .ect-btn{ display:inline-flex; align-items:center; gap:10px; align-self:flex-start; padding:17px 26px; border-radius:14px; font-size:21px; font-weight:800; text-transform:uppercase; letter-spacing:0.16em; color:#f4f4f8; }
+
   .rslide.ed.lay-cover{ background:#0a0a0b !important; }
   .rslide.lay-cover .edpad{ justify-content:center; align-items:center; text-align:center; padding:80px; }
   .rslide.lay-cover .ed-tag{ margin-bottom:38px; }
@@ -435,6 +467,8 @@ end $$;`;
     function statusPill(s){ return `<span class="pill st-${esc(s)}">${esc(s)}</span>`; }
 
     const PLUGVERSE_TEMPLATES = [
+      ['rb-fall','★ Rubber Band — Fall bookings (3-slide editorial)'],
+      ['edcover','Editorial cover (layered)'],['spread','Editorial spread'],['edcta','Editorial CTA'],
       ['cover','Cover / masthead'],['behind','Text behind subject'],['around','Text around subject'],
       ['duotone','Duotone feature'],['ui-explainer','UI explainer'],['pullquote','Pull quote'],
       ['stat','Stat hero'],['contents','Index / contents'],['oldnew','Old way vs Plugverse'],
@@ -774,6 +808,17 @@ end $$;`;
         } else if (L === 'around') {
           const cut = slide.cutout ? `<div class="lb-cut" style="background-image:url('${slide.cutout}')"></div>` : '';
           inner = `<div class="lb-bg" style="${photoCSS}"></div><div class="lb-scrim"></div>${cut}<div class="la-word ${M}"${edAttr(0)} style="${sz(0)}">${md(T(0))}</div>${grain}<div class="lb-front">${tag}<div class="ed-sub"${edAttr(1)}>${md(T(1))}</div></div>`;
+        } else if (L === 'edcover') {
+          const cut = slide.cutout ? `<div class="ec-cut" style="background-image:url('${slide.cutout}')"></div>` : '';
+          const decks = B.slice(3).map(b => `<div class="ec-chip glass">${md(b.text || '')}</div>`).join('');
+          inner = `<div class="ec-bg" style="${photoCSS}"></div><div class="ec-glow"></div><div class="ec-scrim"></div>`
+            + `<div class="ec-word ${M}"${edAttr(0)} style="${sz(0)}">${md(T(0))}</div>${cut}${grain}`
+            + `<div class="ec-chrome"><div>${tag}<div class="ec-deck"${edAttr(1)}>${md(T(1))}</div></div>`
+            + `<div><div class="ec-headline ${M}"${edAttr(2)}>${md(T(2))}</div>${decks ? `<div class="ec-decks">${decks}</div>` : ''}</div></div>`;
+        } else if (L === 'spread') {
+          inner = `<div class="sp-photo" style="${photoCSS}"></div><div class="sp-glow"></div>${grain}<div class="sp-panel"><div class="sp-head"${edAttr(0)}>${md(T(0))}</div><div class="sp-body"${edAttr(1)}>${md(T(1))}</div></div>`;
+        } else if (L === 'edcta') {
+          inner = `${grain}<div class="ect-pad"><div>${tag}</div><div><div class="ect-head ${M}"${edAttr(0)}>${md(T(0))}</div><div class="ect-sub"${edAttr(1)}>${md(T(1))}</div><div class="ect-btn glass"${edAttr(2)}>${md(T(2) || 'PLUGVERSE.APP')} &rarr;</div></div></div>`;
         } else if (L === 'cover') {
           const scrim = slide.photo ? `<div class="ed-photo" style="${photoCSS}"></div><div class="ed-coverscrim"></div>` : '';
           const metalCover = slide.coverStyle === 'metal';
@@ -963,6 +1008,9 @@ end $$;`;
 
     const PLUG_SEEDS = {
       cover:    { kicker:'PLUGVERSE EDITION 001', blocks:['RUBBER *BAND*','Chapel Hill · Indie Rock'] },
+      edcover:  { kicker:'PLUGVERSE EDITION 001', cutout:null, blocks:['RUBBER *BAND*','Chapel Hill · Indie Rock','Accepting fall bookings','*Aug–Dec* dates open now','Book direct on *plugverse*'] },
+      spread:   { blocks:['THE SOUND','*Rubber Band* moves between indie, alt, and garage depending on the room — they read the crowd and change the set.'] },
+      edcta:    { kicker:'PLUGVERSE EDITION 001 · RUBBER BAND', blocks:['BOOK RUBBER BAND','Fall dates are filling fast','PLUGVERSE.APP'] },
       behind:   { kicker:'PLUGVERSE EDITION 001', cutout:null, blocks:['RUBBER BAND','book on plugverse'] },
       around:   { kicker:'PLUGVERSE EDITION 001', cutout:null, blocks:['RUBBER BAND','from dorm-room jams to 200-cap venues'] },
       duotone:  { kicker:'THE SCENE', blocks:['every *night* needs a band','and every band needs a booking that actually works'] },
@@ -1123,6 +1171,13 @@ end $$;`;
     function newTemplate(kind, theme = 'plugverse'){
       const personal = (theme === 'personal' || theme === 'mono');
       const mkPost = (slides) => ({ title:(personal?'PERSONAL':'EDITION')+' — '+kind, theme, ratio:'4:5', pillar:'figuring-it-out', format:'statement', caption:'', hashtags: personal?[]:['plugverse'], status:'queued', source:'manual', slides });
+      // ---- editorial multi-slide starter: Rubber Band accepting fall bookings ----
+      if (kind === 'rb-fall')
+        return { title:'PLUGVERSE EDITION — Rubber Band · Fall bookings', theme:'plugverse', ratio:'4:5', pillar:'figuring-it-out', format:'statement', caption:'we are accepting fall bookings. book us direct on plugverse — no fees, signed + paid in one link.', hashtags:['plugverse','chapelhill','livemusic','rubberband'], status:'queued', source:'manual', slides:[
+          { photo:null, layout:'edcover', coverStyle:'metal', theme:'plugverse', ratio:'4:5', kicker:'PLUGVERSE EDITION 001', cutout:null, blocks:[{ text:'RUBBER *BAND*', font:'anton' }, { text:'Chapel Hill · Rock · Country · Alt' }, { text:'Accepting fall bookings' }, { text:'*Aug–Dec* dates open now' }, { text:'Book direct — *no fees*' }] },
+          { photo:null, layout:'spread', theme:'plugverse', ratio:'4:5', blocks:[{ text:'THE SOUND', font:'anton' }, { text:'*Rubber Band* moves between rock, country, and alt depending on the room. We read the crowd and change the set — every gig, ready.' }] },
+          { photo:null, layout:'edcta', theme:'plugverse', ratio:'4:5', kicker:'PLUGVERSE EDITION 001 · RUBBER BAND', blocks:[{ text:'BOOK US THIS FALL', font:'anton' }, { text:'Fall dates are filling fast' }, { text:'PLUGVERSE.APP' }] },
+        ] };
       // ---- non-layout formats from the existing system ----
       if (kind === 'single-cover')
         return mkPost([{ photo:null, overlay:0.35, theme, ratio:'4:5', blocks:[{ text: personal?'post the ugly version':'PLUGVERSE EDITION 001', font: personal?'serif':'stat', place:'center' }] }]);
