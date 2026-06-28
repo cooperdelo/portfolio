@@ -257,6 +257,8 @@
 
   /* edcta: closing call-to-action */
   .rslide.lay-edcta{ background:radial-gradient(ellipse at 32% 64%,rgba(252,86,3,.4),transparent 52%),radial-gradient(ellipse at 80% 20%,rgba(196,58,2,.22),transparent 55%),linear-gradient(180deg,#161619,#040405); }
+  .rslide.lay-edcta .ect-bg{ position:absolute; inset:0; z-index:0; background-size:cover; background-position:center; }
+  .rslide.lay-edcta .ect-scrim{ position:absolute; inset:0; z-index:1; background:radial-gradient(ellipse at 32% 64%,rgba(252,86,3,.34),transparent 54%),linear-gradient(to top,rgba(0,0,0,.74),rgba(0,0,0,.32) 55%,rgba(0,0,0,.6)); }
   .rslide.lay-edcta .ect-pad{ position:absolute; inset:0; z-index:2; padding:54px 48px; display:flex; flex-direction:column; justify-content:space-between; }
   .rslide.lay-edcta .ect-head{ font-family:"Anton","Archivo Black",sans-serif; font-size:106px; line-height:0.9; text-transform:uppercase; letter-spacing:0.01em; margin-bottom:18px; }
   .rslide.lay-edcta .ect-sub{ font-size:23px; text-transform:uppercase; letter-spacing:0.2em; color:#a9a9b1; margin-bottom:24px; }
@@ -778,7 +780,7 @@ end $$;`;
         const md = (t) => esc(t || '').replace(/\*(.+?)\*/g, '<em>$1</em>').replace(/\n/g, '<br>');
         const sz = (i) => (B[i] && B[i].size) ? `font-size:${B[i].size}px;` : '';
         const tag = slide.kicker ? `<div class="ed-tag">${esc(slide.kicker)}</div>` : '';
-        const photoCSS = slide.photo ? `background-image:url('${slide.photo}')` : '';
+        const photoCSS = slide.photo ? `background-image:url('${slide.photo}');background-position:${(slide.focusX==null?50:slide.focusX)}% ${(slide.focusY==null?50:slide.focusY)}%;background-size:${(slide.zoom&&slide.zoom>100)?slide.zoom+'%':'cover'}` : '';
         const grain = '<div class="rgrain"></div>';
         const L = slide.layout;
         node.classList.add('ed', 'lay-' + L);
@@ -819,7 +821,8 @@ end $$;`;
         } else if (L === 'spread') {
           inner = `<div class="sp-photo" style="${photoCSS}"></div><div class="sp-glow"></div>${grain}<div class="sp-panel"><div class="sp-head"${edAttr(0)}>${md(T(0))}</div><div class="sp-body"${edAttr(1)}>${md(T(1))}</div></div>`;
         } else if (L === 'edcta') {
-          inner = `${grain}<div class="ect-pad"><div>${tag}</div><div><div class="ect-head ${M}"${edAttr(0)}>${md(T(0))}</div><div class="ect-sub"${edAttr(1)}>${md(T(1))}</div><div class="ect-btn glass"${edAttr(2)}>${md(T(2) || 'PLUGVERSE.APP')} &rarr;</div></div></div>`;
+          const bg = slide.photo ? `<div class="ect-bg" style="${photoCSS}"></div><div class="ect-scrim"></div>` : '';
+          inner = `${bg}${grain}<div class="ect-pad"><div>${tag}</div><div><div class="ect-head ${M}"${edAttr(0)}>${md(T(0))}</div><div class="ect-sub"${edAttr(1)}>${md(T(1))}</div><div class="ect-btn glass"${edAttr(2)}>${md(T(2) || 'PLUGVERSE.APP')} &rarr;</div></div></div>`;
         } else if (L === 'cover') {
           const scrim = slide.photo ? `<div class="ed-photo" style="${photoCSS}"></div><div class="ed-coverscrim"></div>` : '';
           const metalCover = slide.coverStyle === 'metal';
@@ -1281,8 +1284,8 @@ end $$;`;
           <label class="mini" style="display:flex;align-items:center;gap:0.3rem"><input type="checkbox" data-split="${i}" ${slide.split?'checked':''}>split (two photos)</label>
           <label class="mini" style="display:flex;align-items:center;gap:0.3rem"><input type="checkbox" data-handle="${i}" ${slide.handle?'checked':''}>handle</label>
           <label class="mini" style="display:flex;align-items:center;gap:0.3rem" title="UI-explainer: wrap a screenshot in a device frame">frame<select data-frame="${i}"><option value="" ${!slide.frame?'selected':''}>none</option><option value="phone" ${slide.frame==='phone'?'selected':''}>phone</option><option value="window" ${slide.frame==='window'?'selected':''}>window</option></select></label>
-          <label class="mini" style="display:flex;align-items:center;gap:0.3rem" title="EDITIONS template layout">layout<select data-layout="${i}"><option value="">none</option>${['cover','behind','around','duotone','pullquote','stat','contents','oldnew','receipt','ticket','vertical','diptych'].map(L=>`<option value="${L}" ${slide.layout===L?'selected':''}>${L}</option>`).join('')}</select></label>
-          ${(slide.layout==='behind'||slide.layout==='around')?`<label class="mini" style="display:flex;align-items:center;gap:0.3rem" title="transparent subject PNG (from the render machine cutout step)">cutout<input data-cutout="${i}" value="${esc(slide.cutout||'')}" placeholder="cutout PNG url" style="width:150px;font-size:0.6rem;background:rgba(20,17,15,0.65);border:1px solid var(--card-border);color:var(--ink);padding:0.35rem 0.5rem;border-radius:7px"></label>`:''}
+          <label class="mini" style="display:flex;align-items:center;gap:0.3rem" title="EDITIONS template layout">layout<select data-layout="${i}"><option value="">none</option>${['edcover','spread','edcta','cover','behind','around','duotone','pullquote','stat','contents','oldnew','receipt','ticket','vertical','diptych'].map(L=>`<option value="${L}" ${slide.layout===L?'selected':''}>${L}</option>`).join('')}</select></label>
+          ${(slide.layout==='behind'||slide.layout==='around'||slide.layout==='edcover')?`<label class="mini" style="display:flex;align-items:center;gap:0.3rem" title="transparent subject PNG (from the render machine cutout step)">cutout<input data-cutout="${i}" value="${esc(slide.cutout||'')}" placeholder="cutout PNG url" style="width:150px;font-size:0.6rem;background:rgba(20,17,15,0.65);border:1px solid var(--card-border);color:var(--ink);padding:0.35rem 0.5rem;border-radius:7px"></label>`:''}
           <label class="mini" style="display:flex;align-items:center;gap:0.3rem" title="color for words wrapped in *stars*">*word* color<input type="color" value="${slide.emColor||'#E8B24A'}" data-emcolor="${i}" style="width:26px;height:20px;padding:0;border:none;background:none;cursor:pointer"></label>
           ${slide.split?'':`<label class="mini" style="display:flex;align-items:center;gap:0.3rem">overlay<input type="range" min="0" max="0.7" step="0.05" value="${slide.overlay||0}" data-overlay="${i}" style="width:80px"></label>`}
         </div>
@@ -1315,6 +1318,13 @@ end $$;`;
         <div class="photo-row" style="margin-top:0.35rem">
           <input data-photourl="${i}" placeholder="or paste your own photo URL (overrides the AI pick)" value="${slide.photo && /^https?:/.test(slide.photo) ? esc(slide.photo) : ''}" style="flex:1;min-width:0;font-family:'Geist Mono',monospace;font-size:0.62rem;background:rgba(20,17,15,0.65);border:1px solid var(--card-border);color:var(--ink);padding:0.45rem 0.6rem;border-radius:8px">
         </div>
+        ${slide.photo?`<div class="photo-row" style="margin-top:0.4rem;flex-wrap:wrap;gap:0.55rem;align-items:center">
+          <span class="mini" title="drag to choose which part of the photo stays in frame">crop</span>
+          <label class="mini" style="display:flex;align-items:center;gap:0.3rem">X<input type="range" min="0" max="100" step="1" value="${slide.focusX==null?50:slide.focusX}" data-focusx="${i}" style="width:74px"></label>
+          <label class="mini" style="display:flex;align-items:center;gap:0.3rem">Y<input type="range" min="0" max="100" step="1" value="${slide.focusY==null?50:slide.focusY}" data-focusy="${i}" style="width:74px"></label>
+          <label class="mini" style="display:flex;align-items:center;gap:0.3rem">zoom<input type="range" min="100" max="260" step="5" value="${slide.zoom||100}" data-zoom="${i}" style="width:74px"></label>
+          <button class="iconbtn" data-cropreset="${i}">reset</button>
+        </div>`:''}
         `}
         ${slide.frame ? `
         <div class="photo-row" style="margin-top:0.35rem"><span class="mini" style="width:3.2rem">kicker</span>
@@ -1468,6 +1478,9 @@ end $$;`;
       if (t.dataset.split != null) { slide.split = t.checked; paintSlidesCol(); paintPreview(); return; }
       if (t.dataset.layout != null) { slide.layout = t.value || undefined; paintSlidesCol(); paintPreview(); return; }
       if (t.dataset.cutout != null) { slide.cutout = t.value.trim() || null; paintPreviewSoon(); return; }
+      if (t.dataset.focusx != null) { slide.focusX = Number(t.value); paintPreviewSoon(); return; }
+      if (t.dataset.focusy != null) { slide.focusY = Number(t.value); paintPreviewSoon(); return; }
+      if (t.dataset.zoom != null) { slide.zoom = Number(t.value); paintPreviewSoon(); return; }
       if (t.dataset.frame != null) { slide.frame = t.value || undefined; paintSlidesCol(); paintPreview(); return; }
       if (t.dataset.kicker != null) { const had = !!slide.kicker; slide.kicker = t.value.trim() || undefined; (had === !!slide.kicker) ? paintPreviewSoon() : paintPreview(); return; }
       if (t.dataset.callout != null) { slide.callout = t.value.trim() || undefined; paintPreviewSoon(); return; }
@@ -1494,6 +1507,7 @@ end $$;`;
       const slideEl = t.closest('.slide-ed'); if (!slideEl) return;
       const si = Number(slideEl.dataset.si);
       if (t.dataset.addblock != null){ draft.slides[si].blocks.push({text:'',font:'capcut',place:'top'}); paintSlidesCol(); paintPreview(); return; }
+      if (t.dataset.cropreset != null){ const s=draft.slides[si]; s.focusX=50; s.focusY=50; s.zoom=100; paintSlidesCol(); paintPreview(); return; }
       if (t.dataset.addtext != null){ draft.slides[si].blocks.push({text:'new text',font: draft.slides[si].split?'capcut':'serif', place:t.dataset.addtext}); paintSlidesCol(); paintPreview(); return; }
       if (t.dataset.rmslide != null){ if (draft.slides.length>1){ draft.slides.splice(si,1); if(previewIdx>=draft.slides.length)previewIdx=0; paintSlidesCol(); paintPreview(); } return; }
       if (t.dataset.rmblock != null){ const bi=Number(t.dataset.rmblock); draft.slides[si].blocks.splice(bi,1); paintSlidesCol(); paintPreview(); return; }
