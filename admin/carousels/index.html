@@ -359,6 +359,11 @@
         <button data-f="posted">Posted</button>
         <button data-f="templates" style="border-color:rgba(252,86,3,0.4)">✦ Templates</button>
       </div>
+      <div class="seg" id="scope-filter" style="margin-left:0.5rem">
+        <button class="active" data-s="personal-brand">Personal</button>
+        <button data-s="plugverse">Plugverse</button>
+        <button data-s="all">All</button>
+      </div>
       <div class="spacer"></div>
       <span class="mini" id="count">—</span>
     </div>
@@ -418,6 +423,7 @@
     const renderStage = document.getElementById('render-stage');
     let posts = [];
     let filter = 'all';
+    let scopeFilter = 'personal-brand';
     let tableReady = true;
 
     const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -560,7 +566,7 @@ end $$;`;
 
     function render() {
       if (filter === 'templates') { renderTemplates(); return; }
-      const list = posts.filter(p => filter === 'all' || p.status === filter);
+      const list = posts.filter(p => (filter === 'all' || p.status === filter) && (scopeFilter === 'all' || (p.scope || 'personal-brand') === scopeFilter));
       document.getElementById('count').textContent = `${list.length} carousel${list.length===1?'':'s'}`;
       if (!list.length) { grid.innerHTML = `<div class="empty" style="grid-column:1/-1;">No carousels ${filter==='all'?'yet':'in '+filter}. Hit “New carousel” or “Import JSON”.</div>`; return; }
       grid.innerHTML = list.map(p => {
@@ -781,7 +787,7 @@ end $$;`;
       node.dataset.theme = theme;
       node.style.height = h + 'px';
       if (isCover) node.classList.add('cover');
-      const emColor = slide.emColor || '#E8B24A';
+      const emColor = slide.emColor || '#F9E4A9';
       const edAttr = (bi) => editable ? ` contenteditable="true" data-bi="${bi}" spellcheck="false"` : '';
       const disp = (t) => esc(t||'').replace(/\*(.+?)\*/g, `<span style="color:${emColor}">$1</span>`).replace(/\n/g,'<br>');
       const lite = (u) => u;
@@ -1757,6 +1763,12 @@ end $$;`;
       const b = e.target.closest('button[data-f]'); if (!b) return;
       filter = b.dataset.f;
       document.querySelectorAll('#status-filter button').forEach(x=>x.classList.toggle('active', x===b));
+      render();
+    });
+    document.getElementById('scope-filter')?.addEventListener('click', e => {
+      const b = e.target.closest('button[data-s]'); if (!b) return;
+      scopeFilter = b.dataset.s;
+      document.querySelectorAll('#scope-filter button').forEach(x=>x.classList.toggle('active', x===b));
       render();
     });
     document.getElementById('grid').addEventListener('click', e => {
