@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="robots" content="noindex, nofollow" />
+<title>B-roll · CD Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Geist+Mono:wght@400;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/admin/_shell/admin-shell.css" />
+<style>
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 0 14px 120px; }
+  .bhead { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin:14px 0 10px; }
+  .bhead h1 { font:600 1.3rem/1 "Geist",sans-serif; color:var(--ink); margin:0; }
+  .bcount { font:600 .62rem "Geist Mono",monospace; letter-spacing:.18em; text-transform:uppercase; color:var(--muted); }
+  .seg2 { display:flex; gap:.3rem; }
+  .seg2 button { font:600 .6rem "Geist Mono",monospace; letter-spacing:.16em; text-transform:uppercase; padding:.5rem .8rem; border-radius:999px; background:var(--card-bg); border:1px solid var(--card-border); color:var(--ink-2); }
+  .seg2 button.active { background:rgba(255,77,46,.12); border-color:rgba(255,77,46,.5); color:var(--ink); }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(108px,1fr)); gap:8px; }
+  .tile { position:relative; aspect-ratio:1; border-radius:12px; overflow:hidden; background:#14110f; border:1px solid var(--card-border); }
+  .tile img { width:100%; height:100%; object-fit:cover; display:block; }
+  .tile .tag { position:absolute; left:6px; bottom:6px; font:600 .5rem "Geist Mono",monospace; letter-spacing:.12em; text-transform:uppercase; color:#fff; background:rgba(0,0,0,.5); padding:2px 6px; border-radius:6px; }
+  .tile .x { position:absolute; top:6px; right:6px; width:30px; height:30px; border-radius:50%; border:none; background:rgba(10,9,8,.72); color:#fff; font-size:17px; line-height:30px; text-align:center; cursor:pointer; }
+  .tile.busy { opacity:.4; }
+  .addbar { position:fixed; left:0; right:0; bottom:0; padding:14px 14px calc(14px + env(safe-area-inset-bottom)); background:linear-gradient(180deg,transparent,rgba(10,9,8,.9) 30%); display:flex; justify-content:center; z-index:50; }
+  .addbtn { width:100%; max-width:520px; padding:16px; border-radius:16px; border:none; background:#ff4d2e; color:#fff; font:700 1rem "Geist",sans-serif; cursor:pointer; box-shadow:0 10px 30px rgba(255,77,46,.35); }
+  .addbtn:disabled { opacity:.6; }
+  .hint { color:var(--muted); font:.72rem "Geist Mono",monospace; margin:.4rem 0 1rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="bhead">
+    <h1>B-roll</h1>
+    <span class="bcount" id="count">loading…</span>
+    <div class="spacer" style="flex:1"></div>
+    <div class="seg2" id="filter">
+      <button class="active" data-f="all">All</button>
+      <button data-f="mine">My uploads</button>
+    </div>
+  </div>
+  <div class="hint">tap + to add from your camera roll · tap ✕ to remove a photo from the pool</div>
+  <div class="grid" id="grid"></div>
+</div>
+<div class="addbar"><button class="addbtn" id="add">+ Add from camera roll</button></div>
+<input type="file" id="file" accept="image/*" multiple style="display:none" />
+
+<script type="module">
+import { sb, requireFullAdminOrRedirect } from '/admin/_shell/supabase.js';
+import { mountShell, toast } from '/admin/_shell/admin-shell.js';
+if (!(await requireFullAdminOrRedirect())) throw new Error('access denied');
+await mountShell({ title: 'B-roll' });
+
+const grid = document.getElementById('grid');
+const countEl = document.getElementById('count');
+let items = [], filter = 'all';
+
+function scaleToBlob(file, maxW = 1600) {
+  return new Promise((resolve, reject) => {
+    const img = new Image(); const url = URL.createObjectURL(file);
+    img.onload = () => { const s = Math.min(1, maxW / img.width); const w = Math.round(img.width * s), h = Math.round(img.height * s);
+      const c = document.createElement('canvas'); c.width = w; c.height = h; c.getContext('2d').drawImage(img, 0, 0, w, h);
+      URL.revokeObjectURL(url); c.toBlob(b => resolve(b), 'image/jpeg', 0.85); };
+    img.onerror = reject; img.src = url;
+  });
+}
+
+async function load() {
+  countEl.textContent = 'loading…';
+  let assets = [], ups = [];
+  try { const { data } = await sb.from('broll_assets').select('id,media_url,usable_as_broll').order('created_at', { ascending: false }); assets = (data || []).filter(a => a.media_url && a.usable_as_broll !== false).map(a => ({ id: a.id, url: a.media_url, table: 'broll_assets' })); } catch (e) {}
+  try { const { data } = await sb.from('broll_uploads').select('id,media_url').order('created_at', { ascending: false }); ups = (data || []).filter(u => u.media_url).map(u => ({ id: u.id, url: u.media_url, table: 'broll_uploads' })); } catch (e) {}
+  items = ups.concat(assets);
+  render();
+}
+function render() {
+  const list = filter === 'mine' ? items.filter(i => i.table === 'broll_uploads') : items;
+  countEl.textContent = `${list.length} photos`;
+  grid.innerHTML = '';
+  for (const it of list) {
+    const t = document.createElement('div'); t.className = 'tile';
+    t.innerHTML = `<img loading="lazy" src="${it.url}" /><button class="x" data-id="${it.id}" data-table="${it.table}">✕</button>${it.table === 'broll_uploads' ? '<span class="tag">mine</span>' : ''}`;
+    grid.appendChild(t);
+  }
+}
+
+grid.addEventListener('click', async (e) => {
+  const x = e.target.closest('.x'); if (!x) return;
+  if (!confirm('Remove this photo from the pool?')) return;
+  const id = x.dataset.id, table = x.dataset.table, tile = x.closest('.tile');
+  tile.classList.add('busy');
+  try {
+    let res;
+    if (table === 'broll_uploads') res = await sb.from('broll_uploads').delete().eq('id', id);
+    else res = await sb.from('broll_assets').update({ usable_as_broll: false }).eq('id', id);
+    if (res.error) throw res.error;
+    items = items.filter(i => !(i.id === id && i.table === table)); render();
+    toast('Removed');
+  } catch (err) { tile.classList.remove('busy'); toast('Could not remove: ' + (err.message || 'permission'), 'err'); }
+});
+
+document.getElementById('add').addEventListener('click', () => document.getElementById('file').click());
+document.getElementById('file').addEventListener('change', async (e) => {
+  const files = [...(e.target.files || [])]; e.target.value = '';
+  if (!files.length) return;
+  const btn = document.getElementById('add'); btn.disabled = true; let ok = 0;
+  for (const f of files) {
+    try {
+      const blob = await scaleToBlob(f);
+      const path = `up-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.jpg`;
+      const up = await sb.storage.from('broll-up').upload(path, blob, { contentType: 'image/jpeg', upsert: false });
+      if (up.error) throw up.error;
+      const { data: pub } = sb.storage.from('broll-up').getPublicUrl(path);
+      const desc = (f.name || 'upload').replace(/\.[a-z0-9]+$/i, '').slice(0, 60);
+      const ins = await sb.from('broll_uploads').insert({ media_url: pub.publicUrl, description: desc });
+      if (ins.error) throw ins.error;
+      ok++; btn.textContent = `Uploading… ${ok}/${files.length}`;
+    } catch (err) { toast('Upload failed: ' + (err.message || ''), 'err'); }
+  }
+  btn.disabled = false; btn.textContent = '+ Add from camera roll';
+  if (ok) toast(`Added ${ok} photo${ok === 1 ? '' : 's'}`);
+  await load();
+});
+
+document.getElementById('filter').addEventListener('click', e => {
+  const b = e.target.closest('button[data-f]'); if (!b) return;
+  filter = b.dataset.f;
+  document.querySelectorAll('#filter button').forEach(x => x.classList.toggle('active', x === b));
+  render();
+});
+
+await load();
+</script>
+</body>
+</html>

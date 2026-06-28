@@ -642,16 +642,16 @@ end $$;`;
     let _broll = null, _brollVideos = [];
     async function loadBroll(){
       if (_broll) return _broll;
-      // Primary: the bundled roll shipped with the Studio (no DB dependency).
+      // Primary: the LIVE catalog table (so b-roll added/removed from the phone manager reflects here).
+      try {
+        const { data } = await sb.from('broll_assets').select('id,category,description,mood,pillars,orientation,media_url,usable_as_broll').order('created_at',{ascending:false});
+        if (data && data.length) _broll = data.filter(a => a.media_url && a.usable_as_broll !== false);
+      } catch(e){}
+      // Fallback: the bundled roll shipped with the Studio (no DB dependency). Always grab videos from it.
       try {
         const r = await fetch('/admin/carousels/_broll.json', { cache:'no-cache' });
-        if (r.ok){ const j = await r.json(); _broll = (j.photos||[]).filter(p=>p.media_url); _brollVideos = j.videos||[]; }
+        if (r.ok){ const j = await r.json(); if (!_broll || !_broll.length) _broll = (j.photos||[]).filter(p=>p.media_url); _brollVideos = j.videos||[]; }
       } catch(e){}
-      // Fallback: the DB catalog, if it's populated.
-      if (!_broll || !_broll.length){
-        try { const { data } = await sb.from('broll_assets').select('id,category,description,mood,pillars,orientation,media_url,usable_as_broll,media_host');
-          _broll = (data||[]).filter(a => a.media_url && a.media_host==='supabase' && a.usable_as_broll !== false); } catch(e){ _broll = _broll||[]; }
-      }
       // Merge in photos Cooper uploaded from his phone (newest first), if that table exists.
       try {
         const { data:up } = await sb.from('broll_uploads').select('media_url,description').order('created_at',{ascending:false});
