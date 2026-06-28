@@ -988,6 +988,28 @@ end $$;`;
       const blob = await canvasToBlob(canvas);
       downloadBlob(blob, `${slugify(post.title)}-${String(i+1).padStart(2,'0')}.png`);
     }
+    // in-browser video: renders the slide, then a cinematic push-in (Ken Burns) + fade-in, recorded to webm
+    async function recordSlideVideo(post, i, seconds){
+      if (typeof MediaRecorder === 'undefined') throw new Error('video recording not supported in this browser');
+      seconds = seconds || 5;
+      const base = await renderSlideToCanvas(post.slides[i], post.theme || 'mono', i === 0, postH(post));
+      const W = base.width, H = base.height;
+      const out = document.createElement('canvas'); out.width = W; out.height = H; const ctx = out.getContext('2d');
+      if (!out.captureStream) throw new Error('canvas capture not supported');
+      const stream = out.captureStream(30);
+      let mime = ['video/mp4;codecs=h264','video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm'].find(m => { try { return MediaRecorder.isTypeSupported(m); } catch(e){ return false; } }) || '';
+      const rec = new MediaRecorder(stream, mime ? { mimeType:mime, videoBitsPerSecond: 14000000 } : undefined);
+      const chunks = []; rec.ondataavailable = e => { if (e.data && e.data.size) chunks.push(e.data); };
+      const stopped = new Promise(res => { rec.onstop = res; });
+      rec.start();
+      const t0 = performance.now(), dur = seconds*1000;
+      await new Promise(resolve => { const frame = (now) => { const t = Math.min(1,(now-t0)/dur); const zoom = 1.0 + 0.10*t; const dw=W*zoom, dh=H*zoom; const fade = Math.min(1, t/0.12);
+        ctx.fillStyle='#000'; ctx.fillRect(0,0,W,H); ctx.globalAlpha=fade; ctx.drawImage(base,(W-dw)/2,(H-dh)/2,dw,dh); ctx.globalAlpha=1;
+        if (t<1) requestAnimationFrame(frame); else resolve(); }; requestAnimationFrame(frame); });
+      rec.stop(); await stopped;
+      const ext = (mime.indexOf('mp4')>=0) ? 'mp4' : 'webm';
+      return { blob: new Blob(chunks, { type: mime || 'video/webm' }), ext };
+    }
     // iOS/Android can't batch-download blob links — render all slides to File[] for the native share sheet
     async function renderAllFiles(post){
       const slides = post.slides || [];
@@ -1335,9 +1357,9 @@ end $$;`;
         </div>
         ${slide.photo?`<div class="photo-row" style="margin-top:0.4rem;flex-wrap:wrap;gap:0.55rem;align-items:center">
           <span class="mini" title="drag to choose which part of the photo stays in frame">crop</span>
-          <label class="mini" style="display:flex;align-items:center;gap:0.3rem">X<input type="range" min="0" max="100" step="1" value="${slide.focusX==null?50:slide.focusX}" data-focusx="${i}" style="width:74px"></label>
-          <label class="mini" style="display:flex;align-items:center;gap:0.3rem">Y<input type="range" min="0" max="100" step="1" value="${slide.focusY==null?50:slide.focusY}" data-focusy="${i}" style="width:74px"></label>
-          <label class="mini" style="display:flex;align-items:center;gap:0.3rem">zoom<input type="range" min="100" max="260" step="5" value="${slide.zoom||100}" data-zoom="${i}" style="width:74px"></label>
+          <label class="mini" style="display:flex;align-items:center;gap:0.3rem">X<input type="range" min="0" max="100" step="1" value="${slide.focusX==null?50:slide.focusX}" data-focusx="${i}" style="width:64px"><input type="number" min="0" max="100" value="${slide.focusX==null?50:slide.focusX}" data-focusx="${i}" style="width:44px;background:rgba(20,17,15,0.65);border:1px solid var(--card-border);color:var(--ink);border-radius:6px;padding:2px 4px;font-size:0.62rem"></label>
+          <label class="mini" style="display:flex;align-items:center;gap:0.3rem">Y<input type="range" min="0" max="100" step="1" value="${slide.focusY==null?50:slide.focusY}" data-focusy="${i}" style="width:64px"><input type="number" min="0" max="100" value="${slide.focusY==null?50:slide.focusY}" data-focusy="${i}" style="width:44px;background:rgba(20,17,15,0.65);border:1px solid var(--card-border);color:var(--ink);border-radius:6px;padding:2px 4px;font-size:0.62rem"></label>
+          <label class="mini" style="display:flex;align-items:center;gap:0.3rem">zoom<input type="range" min="100" max="260" step="5" value="${slide.zoom||100}" data-zoom="${i}" style="width:64px"><input type="number" min="100" max="400" value="${slide.zoom||100}" data-zoom="${i}" style="width:48px;background:rgba(20,17,15,0.65);border:1px solid var(--card-border);color:var(--ink);border-radius:6px;padding:2px 4px;font-size:0.62rem"></label>
           <button class="iconbtn" data-cropreset="${i}">reset</button>
           ${['edcover','behind','around'].includes(slide.layout)?`<button class="iconbtn" data-cutsubject="${i}" style="border-color:rgba(252,86,3,.55);color:#ffd9c7" title="remove background, pick which people to keep, layer over the type">&#9986; cut out subject</button>`:''}
         </div>`:''}
@@ -1440,7 +1462,20 @@ end $$;`;
         if (slide && slide.blocks[bi]) slide.blocks[bi].text = el.innerText.replace(/ /g,' ');
       });
       document.getElementById('add-slide').addEventListener('click', () => { draft.slides.push(blankSlide()); paintSlidesCol(); paintPreview(); });
-      document.getElementById('dl-one').addEventListener('click', async () => { readFormIntoDraft(); await downloadOne(draft, previewIdx); });
+      let pendingOne = null;
+      document.getElementById('dl-one').addEventListener('click', async (e) => {
+        const btn = e.currentTarget;
+        if (pendingOne){ const f=pendingOne; pendingOne=null; btn.textContent='Download slide'; try{ await navigator.share({ files:[f], title: draft.title||'slide' }); toast('Sent to share sheet'); }catch(err){ if(err&&err.name!=='AbortError') toast('Share canceled','err'); } return; }
+        readFormIntoDraft();
+        const vid = document.getElementById('render-video-cb')?.checked;
+        if (vid){ toast('Recording video…'); try{ const { blob, ext } = await recordSlideVideo(draft, previewIdx, 5); const name=`${slugify(draft.title)}-${String(previewIdx+1).padStart(2,'0')}.${ext}`;
+            if (canShareFiles()){ const f=new File([blob],name,{type:blob.type}); if(navigator.canShare && navigator.canShare({files:[f]})){ pendingOne=f; btn.textContent='💾 Save video'; toast('Tap “Save video” to keep it'); return; } }
+            downloadBlob(blob, name); toast('Video saved (.'+ext+')'); }
+          catch(err){ toast('Video failed: '+err.message,'err'); }
+          return; }
+        if (canShareFiles()){ toast('Rendering…'); const c=await renderSlideToCanvas(draft.slides[previewIdx], draft.theme||'mono', previewIdx===0, postH(draft)); const blob=await canvasToBlob(c); const f=new File([blob], `${slugify(draft.title)}-${String(previewIdx+1).padStart(2,'0')}.png`, {type:'image/png'}); if(navigator.canShare && navigator.canShare({files:[f]})){ pendingOne=f; btn.textContent='💾 Save to Photos'; toast('Tap “Save to Photos”'); return; } }
+        await downloadOne(draft, previewIdx);
+      });
       let pendingShare = null;
       document.getElementById('dl-all').addEventListener('click', async (e) => {
         const btn = e.currentTarget;
