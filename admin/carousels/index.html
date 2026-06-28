@@ -1540,36 +1540,45 @@ end $$;`;
       const selected = new Set((fg.length ? fg : persons).slice(0,2).map(o => o.idx));
       const scrim = document.createElement('div'); scrim.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.8);display:flex;align-items:center;justify-content:center;padding:18px';
       const box = document.createElement('div'); box.style.cssText = 'background:#141416;border:1px solid rgba(255,255,255,.14);border-radius:16px;padding:18px;max-width:min(92vw,640px);max-height:92vh;overflow:auto;color:#fff;font-family:Inter,system-ui,sans-serif';
-      box.innerHTML = '<div style="font-size:13px;margin-bottom:4px;line-height:1.4">Tap a person to keep (shown in <b>full colour</b>) vs drop (dimmed). The exact body shape is what gets cut out — not a box.</div><div data-cnt style="font-size:12px;color:#FF8A65;margin-bottom:10px;font-weight:700"></div>';
-      const stage = document.createElement('div'); stage.style.cssText = 'position:relative;display:inline-block;max-width:100%;line-height:0;cursor:pointer';
+      const manualAdd = new Uint8Array(W*H), manualRemove = new Uint8Array(W*H);
+      let mode = 'tap', brush = Math.max(14, Math.round(W*0.03)), painting = false;
+      box.innerHTML = '<div style="font-size:13px;margin-bottom:8px;line-height:1.4">Tap a person to keep (full colour) vs drop (dimmed). If the AI misses, switch to a brush and rough-paint what is / is not you — that defines the cut.</div>';
+      const bar = document.createElement('div'); bar.style.cssText='display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px';
+      const modeBtn=(id,label)=>{ const b=document.createElement('button'); b.textContent=label; b.dataset.m=id; b.style.cssText='padding:7px 12px;border-radius:9px;font:600 11px Inter,sans-serif;text-transform:uppercase;letter-spacing:.04em;cursor:pointer;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.05);color:#fff'; b.onclick=()=>{ mode=id; bar.querySelectorAll('button[data-m]').forEach(x=>{ const on=x.dataset.m===mode; x.style.background=on?'#FF6B35':'rgba(255,255,255,.05)'; x.style.color=on?'#0a0a0a':'#fff'; }); stage.style.cursor = mode==='tap'?'pointer':'crosshair'; }; return b; };
+      const bTap=modeBtn('tap','Tap people'), bAdd=modeBtn('add','+ keep brush'), bRem=modeBtn('rem','− erase brush');
+      bar.appendChild(bTap); bar.appendChild(bAdd); bar.appendChild(bRem);
+      const bl=document.createElement('label'); bl.style.cssText='font:600 11px Inter,sans-serif;color:#cfcfd6;display:flex;align-items:center;gap:6px'; bl.textContent='brush'; const bz=document.createElement('input'); bz.type='range'; bz.min='6'; bz.max='110'; bz.value=String(brush); bz.style.width='78px'; bz.oninput=()=>brush=Number(bz.value); bl.appendChild(bz); bar.appendChild(bl);
+      const zlab=document.createElement('label'); zlab.style.cssText='font:600 11px Inter,sans-serif;color:#cfcfd6;display:flex;align-items:center;gap:6px'; zlab.textContent='zoom'; const zz=document.createElement('input'); zz.type='range'; zz.min='1'; zz.max='4'; zz.step='0.25'; zz.value='1'; zz.style.width='78px'; zz.oninput=()=>setZoom(Number(zz.value)); zlab.appendChild(zz); bar.appendChild(zlab);
+      const clr=document.createElement('button'); clr.textContent='clear brush'; clr.style.cssText='padding:7px 12px;border-radius:9px;font:600 11px Inter,sans-serif;cursor:pointer;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.05);color:#fff'; clr.onclick=()=>{ manualAdd.fill(0); manualRemove.fill(0); draw(); }; bar.appendChild(clr);
+      const cntEl=document.createElement('span'); cntEl.style.cssText='font:700 11px Inter,sans-serif;color:#FF8A65;margin-left:2px'; bar.appendChild(cntEl);
+      box.appendChild(bar);
+      const stage = document.createElement('div'); stage.style.cssText = 'position:relative;display:inline-block;max-width:100%;line-height:0;cursor:pointer;touch-action:none';
       const pic = document.createElement('img'); pic.src = slide.photo; pic.style.cssText = 'display:block;max-width:100%;height:auto;border-radius:8px';
       const ov = document.createElement('canvas'); ov.width = W; ov.height = H; ov.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;border-radius:8px;pointer-events:none';
       stage.appendChild(pic); stage.appendChild(ov); box.appendChild(stage);
       const octx = ov.getContext('2d');
-      const cnt = () => { const c = box.querySelector('[data-cnt]'); if (c) c.textContent = selected.size + ' person' + (selected.size===1?'':'s') + ' kept'; };
-      const draw = () => {
-        const kept = new Uint8Array(W*H); persons.forEach(o => { if (selected.has(o.idx)) for (let i=0;i<o.p.data.length;i++) if (o.p.data[i]) kept[i]=1; });
-        const idata = octx.createImageData(W, H); const d = idata.data;
-        for (let i=0;i<W*H;i++){ const j=i*4; if (kept[i]){ d[j]=255; d[j+1]=107; d[j+2]=53; d[j+3]=38; } else { d[j]=0; d[j+1]=0; d[j+2]=0; d[j+3]=155; } }
-        octx.putImageData(idata, 0, 0); cnt();
-      };
-      stage.addEventListener('click', (ev) => {
-        const r = pic.getBoundingClientRect(); if (!r.width) return;
-        const x = Math.floor((ev.clientX - r.left)/r.width*W), y = Math.floor((ev.clientY - r.top)/r.height*H);
-        if (x<0||y<0||x>=W||y>=H) return; const i = y*W + x;
-        let hit = null; persons.forEach(o => { if (o.p.data[i] && (!hit || o.a < hit.a)) hit = o; });
-        if (hit){ selected.has(hit.idx) ? selected.delete(hit.idx) : selected.add(hit.idx); draw(); }
-      });
-      requestAnimationFrame(draw); window.addEventListener('resize', draw);
+      let baseW = 0; const setZoom = (z) => { if(!baseW) baseW = pic.getBoundingClientRect().width || pic.clientWidth; if(!baseW) return; pic.style.maxWidth='none'; pic.style.width = Math.round(baseW*z)+'px'; };
+      const computeKept = () => { const k=new Uint8Array(W*H); persons.forEach(o=>{ if(selected.has(o.idx)) for(let i=0;i<o.p.data.length;i++) if(o.p.data[i]) k[i]=1; }); for(let i=0;i<W*H;i++){ if(manualAdd[i]) k[i]=1; if(manualRemove[i]) k[i]=0; } return k; };
+      let _raf=false; const draw=()=>{ const kept=computeKept(); const idata=octx.createImageData(W,H); const d=idata.data; let any=false;
+        for(let i=0;i<W*H;i++){ const j=i*4; if(kept[i]){ d[j]=255;d[j+1]=107;d[j+2]=53;d[j+3]=38; any=true; } else { d[j]=0;d[j+1]=0;d[j+2]=0;d[j+3]=155; } }
+        octx.putImageData(idata,0,0); cntEl.textContent = any?'subject kept':'nothing kept yet'; };
+      const drawSoon=()=>{ if(_raf)return; _raf=true; requestAnimationFrame(()=>{ _raf=false; draw(); }); };
+      const xy=(ev)=>{ const r=pic.getBoundingClientRect(); return [ (ev.clientX-r.left)/r.width*W, (ev.clientY-r.top)/r.height*H ]; };
+      const stamp=(cx,cy)=>{ const r2=brush*brush; const x0=Math.max(0,Math.floor(cx-brush)),x1=Math.min(W-1,Math.ceil(cx+brush)),y0=Math.max(0,Math.floor(cy-brush)),y1=Math.min(H-1,Math.ceil(cy+brush)); for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++){ const dx=x-cx,dy=y-cy; if(dx*dx+dy*dy<=r2){ const i=y*W+x; if(mode==='add'){manualAdd[i]=1;manualRemove[i]=0;} else {manualRemove[i]=1;manualAdd[i]=0;} } } };
+      stage.addEventListener('pointerdown',(ev)=>{ const [x,y]=xy(ev); if(x<0||y<0||x>=W||y>=H)return;
+        if(mode==='tap'){ const i=Math.floor(y)*W+Math.floor(x); let hit=null; persons.forEach(o=>{ if(o.p.data[i]&&(!hit||o.a<hit.a)) hit=o; }); if(hit){ selected.has(hit.idx)?selected.delete(hit.idx):selected.add(hit.idx); draw(); } return; }
+        painting=true; try{ stage.setPointerCapture(ev.pointerId); }catch(e){} stamp(x,y); draw(); });
+      stage.addEventListener('pointermove',(ev)=>{ if(!painting||mode==='tap')return; const [x,y]=xy(ev); stamp(x,y); drawSoon(); });
+      stage.addEventListener('pointerup',()=>{ painting=false; draw(); });
+      bTap.click(); requestAnimationFrame(draw); window.addEventListener('resize', draw);
       const btns = document.createElement('div'); btns.style.cssText='display:flex;gap:10px;margin-top:14px;justify-content:flex-end';
       const mk = (label, primary) => { const b=document.createElement('button'); b.textContent=label; b.style.cssText='padding:9px 16px;border-radius:10px;font:600 12px Inter,sans-serif;cursor:pointer;letter-spacing:.04em;text-transform:uppercase;'+(primary?'border:1px solid rgba(196,58,2,.5);background:linear-gradient(180deg,#FF6B35,#FF5722);color:#fff':'border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.05);color:#fff'); return b; };
       const cancel = mk('Cancel',false), apply = mk('Apply cut-out',true);
       btns.appendChild(cancel); btns.appendChild(apply); box.appendChild(btns); scrim.appendChild(box); document.body.appendChild(scrim);
       cancel.onclick = () => scrim.remove();
-      apply.onclick = () => { if(!selected.size){ toast('Pick at least one person','err'); return; }
-        const union = new Uint8Array(W*H); persons.forEach(o => { if(selected.has(o.idx)) for(let i=0;i<o.p.data.length;i++) if(o.p.data[i]) union[i]=1; });
+      apply.onclick = () => { const kept=computeKept(); let any=false; for(let i=0;i<W*H;i++) if(kept[i]){any=true;break;} if(!any){ toast('Keep at least one subject','err'); return; }
         const cv=document.createElement('canvas'); cv.width=W; cv.height=H; const ctx=cv.getContext('2d'); ctx.drawImage(img,0,0,W,H);
-        const id=ctx.getImageData(0,0,W,H); for(let i=0;i<union.length;i++) if(!union[i]) id.data[i*4+3]=0; ctx.putImageData(id,0,0);
+        const id=ctx.getImageData(0,0,W,H); for(let i=0;i<W*H;i++) if(!kept[i]) id.data[i*4+3]=0; ctx.putImageData(id,0,0);
         let ow=W,oh=H,MX=1100; if(W>MX){ ow=MX; oh=Math.round(H*MX/W); } const out=document.createElement('canvas'); out.width=ow; out.height=oh; out.getContext('2d').drawImage(cv,0,0,ow,oh);
         slide.cutout = out.toDataURL('image/png'); scrim.remove(); paintSlidesCol(); paintPreview(); toast('Cut-out applied — Save to keep it');
       };
