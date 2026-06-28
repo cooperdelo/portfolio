@@ -956,10 +956,11 @@ end $$;`;
       window.__captureReady = false;
       const node = buildSlideNode(slide, theme, false, false, h);
       node.style.margin = '0';
-      if (mode === 'static') node.classList.add('capturing'); // flat-silver metal for crisp still
+      if (mode === 'static') node.classList.add('capturing'); // flat-silver fallback for html2canvas ONLY (can't do gradient text)
       root.appendChild(node);
       try { await document.fonts.ready; } catch(e){}
-      await new Promise(r => setTimeout(r, mode === 'static' ? 140 : 60));
+      // 'still' = Playwright high-fidelity JPG: keep real metal gradient + shadows, just wait for the entrance to settle
+      await new Promise(r => setTimeout(r, mode === 'static' ? 140 : (mode === 'still' ? 1700 : 60)));
       window.__captureReady = true;
       return { w:1080, h };
     };
