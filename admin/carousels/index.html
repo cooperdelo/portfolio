@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo+Black&family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Playfair+Display:ital,wght@0,400..800;1,400..700&family=Plus+Jakarta+Sans:wght@400..800&family=Hanken+Grotesk:wght@500;700;800&family=Space+Mono:wght@400;700&family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Geist+Mono:wght@300..700&family=Geist:wght@300..700&display=swap" rel="stylesheet" />
-<link href="https://fonts.googleapis.com/css2?family=Bowlby+One&family=Archivo:wght@400;500;600;700;800;900&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Bowlby+One&family=Archivo:wght@400;500;600;700;800;900&family=Inter:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet" />
 <link href="https://api.fontshare.com/v2/css?f[]=tanker@400&f[]=satoshi@900,700,500,400&f[]=general-sans@500,600,700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/admin/_shell/admin-shell.css" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -138,6 +138,7 @@
   .rblock.f-general{ font-family:"General Sans","Inter",sans-serif; font-weight:600; }
   .rblock.f-hanken{ font-family:"Hanken Grotesk",sans-serif; font-weight:800; letter-spacing:-0.02em; }
   .rblock.f-fraunces{ font-family:"Fraunces",serif; font-weight:600; }
+  .rblock.f-inter{ font-family:"Inter",sans-serif; font-weight:300; letter-spacing:-0.01em; }
 
   /* ---- EDITIONS layouts (data-driven template library) ---- */
   .rslide.ed{ background:radial-gradient(ellipse at 74% 8%,rgba(252,86,3,.20),transparent 55%),radial-gradient(ellipse at 20% 92%,rgba(196,58,2,.15),transparent 60%),linear-gradient(160deg,#1b1b1f,#070708); }
@@ -231,7 +232,12 @@
   .rslide.ed.lay-cover{ background:#0a0a0b !important; }
   .rslide.lay-cover .edpad{ justify-content:center; align-items:center; text-align:center; padding:80px; }
   .rslide.lay-cover .ed-tag{ margin-bottom:38px; }
-  .rslide.lay-cover .ed-head{ font-family:"Anton","Archivo Black",Impact,sans-serif!important; font-weight:400!important; font-size:158px; line-height:0.88!important; letter-spacing:0.005em; text-transform:uppercase; }
+  /* SOFT cover title (DEFAULT) — thin Inter, sentence case, no metal. Font-family is set inline from the block font picker so it can be changed per-post. */
+  .rslide.lay-cover .ed-head{ font-family:"Inter",sans-serif; font-weight:300; font-size:92px; line-height:1.06; letter-spacing:-0.01em; text-transform:none; text-shadow:0 2px 16px rgba(0,0,0,.55); }
+  .rslide.lay-cover:not(.metalcover) .ed-head{ color:#f4f4f6!important; -webkit-text-fill-color:#f4f4f6!important; background:none!important; filter:none!important; animation:none!important; }
+  .rslide.lay-cover .ed-head em{ font-style:normal; font-weight:600; }
+  /* BOLD METAL cover (OPTION: slide.coverStyle='metal') — big Anton silver, keeps the .metal gradient fill */
+  .rslide.lay-cover.metalcover .ed-head{ font-weight:400; font-size:158px; line-height:0.88; letter-spacing:0.005em; text-transform:uppercase; text-shadow:none; }
   .rslide.lay-cover .ed-sub{ text-align:center; margin-top:30px; max-width:82%; color:#eceef3!important; font-family:"Satoshi","Inter",sans-serif!important; text-transform:uppercase; letter-spacing:0.16em; font-size:26px; text-shadow:0 1px 2px rgba(0,0,0,.8), 0 3px 16px rgba(0,0,0,.6); }
   .rslide.lay-cover .ed-coverscrim{ position:absolute; inset:0; z-index:1; background:radial-gradient(ellipse at 50% 42%, rgba(0,0,0,0.30), rgba(0,0,0,0.66) 100%); }
 
@@ -357,9 +363,9 @@
     const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
     const PILLARS = ['juggling','discipline','behind','perceived','figuring-it-out'];
     const FORMATS = ['statement','one-liner','two-part','stat','value-step','reflective','framework','save-carousel'];
-    const FONTS   = ['serif','capcut','stat','anton','archivo','satoshi','general','hanken','fraunces'];
+    const FONTS   = ['inter','serif','capcut','stat','anton','archivo','satoshi','general','hanken','fraunces'];
     const PLACES  = ['top','center','lower','bottom'];
-    const SIZE_DEFAULT = { serif:60, capcut:58, stat:88, anton:96, archivo:80, satoshi:34, general:34, hanken:84, fraunces:56 };
+    const SIZE_DEFAULT = { inter:92, serif:60, capcut:58, stat:88, anton:96, archivo:80, satoshi:34, general:34, hanken:84, fraunces:56 };
 
     // ---------- data ----------
     async function load() {
@@ -742,7 +748,15 @@ end $$;`;
           inner = `<div class="lb-bg" style="${photoCSS}"></div><div class="lb-scrim"></div>${cut}<div class="la-word ${M}"${edAttr(0)} style="${sz(0)}">${md(T(0))}</div>${grain}<div class="lb-front">${tag}<div class="ed-sub"${edAttr(1)}>${md(T(1))}</div></div>`;
         } else if (L === 'cover') {
           const scrim = slide.photo ? `<div class="ed-photo" style="${photoCSS}"></div><div class="ed-coverscrim"></div>` : '';
-          inner = `${scrim}${grain}<div class="edpad">${tag}<div class="ed-head ${M}"${edAttr(0)} style="${sz(0)}">${md(T(0))}</div><div class="ed-sub"${edAttr(1)}>${md(T(1))}</div></div>`;
+          const metalCover = slide.coverStyle === 'metal';
+          if (metalCover) node.classList.add('metalcover');
+          const COVER_FAM = { anton:'"Anton","Archivo Black",sans-serif', archivo:'"Archivo Black",sans-serif', stat:'"Archivo Black",sans-serif', hanken:'"Hanken Grotesk",sans-serif', capcut:'"Hanken Grotesk",sans-serif', fraunces:'"Fraunces",serif', serif:'"Fraunces",serif', satoshi:'"Satoshi","Inter",sans-serif', general:'"General Sans","Inter",sans-serif', inter:'"Inter",sans-serif' };
+          const cf = (B[0] && B[0].font) || (metalCover ? 'anton' : 'inter');
+          const cfam = COVER_FAM[cf] || '"Inter",sans-serif';
+          const cfw = metalCover ? 400 : (cf === 'inter' ? 300 : (cf === 'fraunces' || cf === 'serif') ? 400 : (cf === 'satoshi' || cf === 'general') ? 600 : 700);
+          const headCls = metalCover ? ('ed-head ' + M) : 'ed-head';
+          const headStyle = `font-family:${cfam};font-weight:${cfw};${sz(0)}`;
+          inner = `${scrim}${grain}<div class="edpad">${tag}<div class="${headCls}"${edAttr(0)} style="${headStyle}">${md(T(0))}</div><div class="ed-sub"${edAttr(1)}>${md(T(1))}</div></div>`;
         } else {
           inner = `${(slide.photo?`<div class="ed-photo" style="${photoCSS}"></div><div class="ed-vign"></div>`:'')}${grain}<div class="edpad" style="justify-content:flex-end">${tag}<div class="ed-head ${M}"${edAttr(0)} style="${sz(0)}">${md(T(0))}</div><div class="ed-sub" style="margin-top:18px"${edAttr(1)}>${md(T(1))}</div></div>`;
         }
