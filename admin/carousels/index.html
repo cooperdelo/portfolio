@@ -272,6 +272,12 @@
   .rslide.lay-edcta .ect-head{ font-family:"Anton","Archivo Black",sans-serif; font-size:106px; line-height:0.9; text-transform:uppercase; letter-spacing:0.01em; margin-bottom:18px; }
   .rslide.lay-edcta .ect-sub{ font-size:23px; text-transform:uppercase; letter-spacing:0.2em; color:#a9a9b1; margin-bottom:24px; }
   .rslide.lay-edcta .ect-btn{ display:inline-flex; align-items:center; gap:10px; align-self:flex-start; padding:17px 26px; border-radius:14px; font-size:21px; font-weight:800; text-transform:uppercase; letter-spacing:0.16em; color:#f4f4f8; }
+  /* CTA slide motion (video only; frozen in static JPG) */
+  .rslide.lay-edcta .ect-bg{ transform-origin:50% 45%; animation:spZoom 11s ease-out both; }
+  .rslide.lay-edcta .ect-head{ animation:metal-sheen 6s ease-in-out infinite, spRise 1.05s cubic-bezier(.2,.7,.2,1) .2s both; }
+  .rslide.lay-edcta .ect-sub{ animation:spRise 1.05s cubic-bezier(.2,.7,.2,1) .42s both; }
+  .rslide.lay-edcta .ect-btn{ animation:spFade 1s ease-out .68s both; }
+  .rslide.capturing.lay-edcta .ect-bg,.rslide.capturing.lay-edcta .ect-head,.rslide.capturing.lay-edcta .ect-sub,.rslide.capturing.lay-edcta .ect-btn{ animation:none!important; transform:none!important; opacity:1!important; }
 
   .rslide.ed.lay-cover{ background:#0a0a0b !important; }
   .rslide.lay-cover .edpad{ justify-content:center; align-items:center; text-align:center; padding:80px; }
@@ -1541,6 +1547,7 @@ end $$;`;
       const scrim = document.createElement('div'); scrim.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.8);display:flex;align-items:center;justify-content:center;padding:18px';
       const box = document.createElement('div'); box.style.cssText = 'background:#141416;border:1px solid rgba(255,255,255,.14);border-radius:16px;padding:18px;max-width:min(92vw,640px);max-height:92vh;overflow:auto;color:#fff;font-family:Inter,system-ui,sans-serif';
       const manualAdd = new Uint8Array(W*H), manualRemove = new Uint8Array(W*H);
+      const undoStack = [];
       let mode = 'tap', brush = Math.max(14, Math.round(W*0.03)), painting = false;
       // if a cutout already exists, start from it (so reopening continues your edits, not the raw auto-detect)
       if (slide.cutout){ try { const cimg = new Image(); cimg.crossOrigin='anonymous'; cimg.src = slide.cutout; await cimg.decode(); const cc=document.createElement('canvas'); cc.width=W; cc.height=H; cc.getContext('2d').drawImage(cimg,0,0,W,H); const cd=cc.getContext('2d').getImageData(0,0,W,H).data; let n=0; for(let i=0;i<W*H;i++){ if(cd[i*4+3]>12){ manualAdd[i]=1; n++; } } if(n>50) selected.clear(); } catch(e){} }
@@ -1551,7 +1558,8 @@ end $$;`;
       bar.appendChild(bTap); bar.appendChild(bAdd); bar.appendChild(bRem);
       const bl=document.createElement('label'); bl.style.cssText='font:600 11px Inter,sans-serif;color:#cfcfd6;display:flex;align-items:center;gap:6px'; bl.textContent='brush'; const bz=document.createElement('input'); bz.type='range'; bz.min='6'; bz.max='110'; bz.value=String(brush); bz.style.width='78px'; bz.oninput=()=>brush=Number(bz.value); bl.appendChild(bz); bar.appendChild(bl);
       const zlab=document.createElement('label'); zlab.style.cssText='font:600 11px Inter,sans-serif;color:#cfcfd6;display:flex;align-items:center;gap:6px'; zlab.textContent='zoom'; const zz=document.createElement('input'); zz.type='range'; zz.min='1'; zz.max='4'; zz.step='0.25'; zz.value='1'; zz.style.width='78px'; zz.oninput=()=>setZoom(Number(zz.value)); zlab.appendChild(zz); bar.appendChild(zlab);
-      const clr=document.createElement('button'); clr.textContent='clear brush'; clr.style.cssText='padding:7px 12px;border-radius:9px;font:600 11px Inter,sans-serif;cursor:pointer;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.05);color:#fff'; clr.onclick=()=>{ manualAdd.fill(0); manualRemove.fill(0); draw(); }; bar.appendChild(clr);
+      const undoBtn=document.createElement('button'); undoBtn.textContent='undo'; undoBtn.style.cssText='padding:7px 12px;border-radius:9px;font:600 11px Inter,sans-serif;cursor:pointer;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.05);color:#fff'; undoBtn.onclick=()=>{ const s=undoStack.pop(); if(s){ manualAdd.set(s.a); manualRemove.set(s.r); draw(); } else toast('Nothing to undo'); }; bar.appendChild(undoBtn);
+      const clr=document.createElement('button'); clr.textContent='clear brush'; clr.style.cssText='padding:7px 12px;border-radius:9px;font:600 11px Inter,sans-serif;cursor:pointer;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.05);color:#fff'; clr.onclick=()=>{ undoStack.push({a:manualAdd.slice(),r:manualRemove.slice()}); manualAdd.fill(0); manualRemove.fill(0); draw(); }; bar.appendChild(clr);
       const cntEl=document.createElement('span'); cntEl.style.cssText='font:700 11px Inter,sans-serif;color:#FF8A65;margin-left:2px'; bar.appendChild(cntEl);
       box.appendChild(bar);
       const stage = document.createElement('div'); stage.style.cssText = 'position:relative;display:inline-block;max-width:100%;line-height:0;cursor:pointer;touch-action:none;user-select:none;-webkit-user-select:none';
@@ -1569,6 +1577,7 @@ end $$;`;
       const stamp=(cx,cy)=>{ const r2=brush*brush; const x0=Math.max(0,Math.floor(cx-brush)),x1=Math.min(W-1,Math.ceil(cx+brush)),y0=Math.max(0,Math.floor(cy-brush)),y1=Math.min(H-1,Math.ceil(cy+brush)); for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++){ const dx=x-cx,dy=y-cy; if(dx*dx+dy*dy<=r2){ const i=y*W+x; if(mode==='add'){manualAdd[i]=1;manualRemove[i]=0;} else {manualRemove[i]=1;manualAdd[i]=0;} } } };
       stage.addEventListener('pointerdown',(ev)=>{ ev.preventDefault(); const [x,y]=xy(ev); if(x<0||y<0||x>=W||y>=H)return;
         if(mode==='tap'){ const i=Math.floor(y)*W+Math.floor(x); let hit=null; persons.forEach(o=>{ if(o.p.data[i]&&(!hit||o.a<hit.a)) hit=o; }); if(hit){ selected.has(hit.idx)?selected.delete(hit.idx):selected.add(hit.idx); draw(); } return; }
+        undoStack.push({a:manualAdd.slice(),r:manualRemove.slice()}); if(undoStack.length>25) undoStack.shift();
         painting=true; try{ stage.setPointerCapture(ev.pointerId); }catch(e){} stamp(x,y); draw(); });
       stage.addEventListener('pointermove',(ev)=>{ if(!painting||mode==='tap')return; const [x,y]=xy(ev); stamp(x,y); drawSoon(); });
       stage.addEventListener('pointerup',()=>{ painting=false; draw(); });
