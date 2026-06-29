@@ -67,7 +67,7 @@ function scaleToBlob(file, maxW = 1600) {
 async function load() {
   countEl.textContent = 'loading…';
   let assets = [], ups = [];
-  try { const { data } = await sb.from('broll_assets').select('id,media_url,usable_as_broll').order('created_at', { ascending: false }); assets = (data || []).filter(a => a.media_url && a.usable_as_broll !== false).map(a => ({ id: a.id, url: a.media_url, table: 'broll_assets' })); } catch (e) {}
+  try { const { data } = await sb.from('broll_assets').select('id,media_url,thumb_url,usable_as_broll').order('created_at', { ascending: false }); assets = (data || []).filter(a => a.media_url && a.usable_as_broll !== false).map(a => ({ id: a.id, url: a.media_url, thumb: a.thumb_url, table: 'broll_assets' })); } catch (e) {}
   try { const { data } = await sb.from('broll_uploads').select('id,media_url').order('created_at', { ascending: false }); ups = (data || []).filter(u => u.media_url).map(u => ({ id: u.id, url: u.media_url, table: 'broll_uploads' })); } catch (e) {}
   items = ups.concat(assets);
   render();
@@ -78,7 +78,7 @@ function render() {
   grid.innerHTML = '';
   for (const it of list) {
     const t = document.createElement('div'); t.className = 'tile';
-    t.innerHTML = `<img loading="lazy" src="${it.url}" /><button class="x" data-id="${it.id}" data-table="${it.table}">✕</button>${it.table === 'broll_uploads' ? '<span class="tag">mine</span>' : ''}`;
+    t.innerHTML = `<img loading="lazy" decoding="async" src="${it.thumb || it.url}" /><button class="x" data-id="${it.id}" data-table="${it.table}">✕</button>${it.table === 'broll_uploads' ? '<span class="tag">mine</span>' : ''}`;
     grid.appendChild(t);
   }
 }

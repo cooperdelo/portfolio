@@ -927,8 +927,9 @@ end $$;`;
       }
 
       const img = slide.photo || slide.bg;
+      const _fx = slide.focusX != null ? slide.focusX : 50, _fy = slide.focusY != null ? slide.focusY : 50, _z = slide.zoom || 100;
       const bg = img
-        ? `<div class="rbg" style="background-image:url('${lite(img)}')"></div>`
+        ? `<div class="rbg" style="background-image:url('${lite(img)}');background-position:${_fx}% ${_fy}%;background-size:${_z > 100 ? _z + '%' : 'cover'}"></div>`
         : `<div class="rbg" style="background-image:${THEME_BG[theme]||THEME_BG.mono}"></div>`;
       const hasTop = (slide.blocks||[]).some(b => b.place==='top');
       const hasLow = (slide.blocks||[]).some(b => b.place==='lower' || b.place==='bottom');
