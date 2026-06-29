@@ -66,19 +66,18 @@ function scaleToBlob(file, maxW = 1600) {
 
 async function load() {
   countEl.textContent = 'loading…';
-  let assets = [], ups = [];
-  try { const { data } = await sb.from('broll_assets').select('id,media_url,thumb_url,usable_as_broll').order('created_at', { ascending: false }); assets = (data || []).filter(a => a.media_url && a.usable_as_broll !== false).map(a => ({ id: a.id, url: a.media_url, thumb: a.thumb_url, table: 'broll_assets' })); } catch (e) {}
-  try { const { data } = await sb.from('broll_uploads').select('id,media_url').order('created_at', { ascending: false }); ups = (data || []).filter(u => u.media_url).map(u => ({ id: u.id, url: u.media_url, table: 'broll_uploads' })); } catch (e) {}
-  items = ups.concat(assets);
+  let assets = [];
+  try { const { data } = await sb.from('broll_assets').select('id,media_url,thumb_url,usable_as_broll,source').order('created_at', { ascending: false }); assets = (data || []).filter(a => a.media_url && a.usable_as_broll !== false).map(a => ({ id: a.id, url: a.media_url, thumb: a.thumb_url, source: a.source })); } catch (e) {}
+  items = assets;
   render();
 }
 function render() {
-  const list = filter === 'mine' ? items.filter(i => i.table === 'broll_uploads') : items;
+  const list = filter === 'mine' ? items.filter(i => i.source === 'iphone') : items;
   countEl.textContent = `${list.length} photos`;
   grid.innerHTML = '';
   for (const it of list) {
     const t = document.createElement('div'); t.className = 'tile';
-    t.innerHTML = `<img loading="lazy" decoding="async" src="${it.thumb || it.url}" /><button class="x" data-id="${it.id}" data-table="${it.table}">✕</button>${it.table === 'broll_uploads' ? '<span class="tag">mine</span>' : ''}`;
+    t.innerHTML = `<img loading="lazy" decoding="async" src="${it.thumb || it.url}" /><button class="x" data-id="${it.id}">✕</button>${it.source === 'iphone' ? '<span class="tag">mine</span>' : ''}`;
     grid.appendChild(t);
   }
 }
@@ -86,14 +85,12 @@ function render() {
 grid.addEventListener('click', async (e) => {
   const x = e.target.closest('.x'); if (!x) return;
   if (!confirm('Remove this photo from the pool?')) return;
-  const id = x.dataset.id, table = x.dataset.table, tile = x.closest('.tile');
+  const id = x.dataset.id, tile = x.closest('.tile');
   tile.classList.add('busy');
   try {
-    let res;
-    if (table === 'broll_uploads') res = await sb.from('broll_uploads').delete().eq('id', id);
-    else res = await sb.from('broll_assets').update({ usable_as_broll: false }).eq('id', id);
+    const res = await sb.from('broll_assets').update({ usable_as_broll: false }).eq('id', id);
     if (res.error) throw res.error;
-    items = items.filter(i => !(i.id === id && i.table === table)); render();
+    items = items.filter(i => i.id !== id); render();
     toast('Removed');
   } catch (err) { tile.classList.remove('busy'); toast('Could not remove: ' + (err.message || 'permission'), 'err'); }
 });
@@ -107,11 +104,11 @@ document.getElementById('file').addEventListener('change', async (e) => {
     try {
       const blob = await scaleToBlob(f);
       const path = `up-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.jpg`;
-      const up = await sb.storage.from('broll-up').upload(path, blob, { contentType: 'image/jpeg', upsert: false });
+      const up = await sb.storage.from('broll').upload(path, blob, { contentType: 'image/jpeg', upsert: false });
       if (up.error) throw up.error;
-      const { data: pub } = sb.storage.from('broll-up').getPublicUrl(path);
+      const { data: pub } = sb.storage.from('broll').getPublicUrl(path);
       const desc = (f.name || 'upload').replace(/\.[a-z0-9]+$/i, '').slice(0, 60);
-      const ins = await sb.from('broll_uploads').insert({ media_url: pub.publicUrl, description: desc });
+      const ins = await sb.from('broll_assets').insert({ media_url: pub.publicUrl, description: desc, source: 'iphone', type: 'photo', media_host: 'supabase', usable_as_broll: true });
       if (ins.error) throw ins.error;
       ok++; btn.textContent = `Uploading… ${ok}/${files.length}`;
     } catch (err) { toast('Upload failed: ' + (err.message || ''), 'err'); }
