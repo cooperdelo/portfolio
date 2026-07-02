@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="alternate icon" type="image/png" href="/favicon-32.png" sizes="32x32" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
+<link rel="manifest" href="/site.webmanifest" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Resume / Cooper Delo</title>
+<meta name="description" content="Cooper Delo — Product builder and founder. AI-native marketplace development and business strategy. Full resume." />
+<meta property="og:type" content="website" />
+<meta property="og:title" content="Resume / Cooper Delo" />
+<meta property="og:description" content="Product builder and founder. AI-native marketplace development and business strategy." />
+<meta property="og:image" content="https://cooperdelo.com/photos/og-cover.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="1200" />
+<meta property="og:url" content="https://cooperdelo.com/resume" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Resume / Cooper Delo" />
+<meta name="twitter:description" content="Product builder and founder." />
+<meta name="twitter:image" content="https://cooperdelo.com/photos/og-cover.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,300..900,30..100,0..1;1,9..144,300..900,30..100,0..1&family=Geist+Mono:wght@400;500&family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="shell.css" />
+
+<style>
+  /* ============================================================
+     Resume page — vintage, engraved, glassmorphic
+     Dark grained surface; glass plates float over it in 3D.
+     ============================================================ */
+
+  /* Deeper, darker surface for this page + vintage grain */
+  body.resume-page {
+    background:
+      radial-gradient(ellipse at 20% 0%, rgba(255,77,46,0.10) 0%, rgba(255,77,46,0) 55%),
+      radial-gradient(ellipse at 90% 85%, rgba(107,63,160,0.10) 0%, rgba(107,63,160,0) 55%),
+      linear-gradient(180deg, #060504 0%, #0A0908 45%, #0d0b09 100%);
+  }
+  /* Heavier engraved grain layer, sits above the base but under content */
+  .resume-grain {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    opacity: 0.10; mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='3' seed='11'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  }
+
+  .resume-wrap {
+    max-width: 1040px; margin: 0 auto; padding: 0 1.6rem;
+    position: relative; z-index: 1;
+  }
+
+  /* ── Masthead: engraved / pressed name ── */
+  .resume-head {
+    padding: 11rem 0 3rem; text-align: center; position: relative;
+  }
+  .resume-head .eyebrow { display: block; margin-bottom: 1.6rem; }
+
+  .engraved-name {
+    font-family: "Fraunces", Georgia, serif;
+    font-weight: 400;
+    font-variation-settings: "opsz" 144, "SOFT" 40, "WONK" 0;
+    font-size: clamp(2.9rem, 9vw, 7rem);
+    line-height: 0.92; letter-spacing: -0.01em;
+    text-transform: uppercase;
+    color: #17140f;
+    /* Multi-layer text-shadow = engraved / pressed-into-surface feel */
+    text-shadow:
+      0 1px 0 rgba(255,255,255,0.10),
+      0 -1px 0 rgba(0,0,0,0.9),
+      0 -2px 1px rgba(0,0,0,0.7),
+      0 2px 2px rgba(255,255,255,0.06),
+      0 3px 6px rgba(0,0,0,0.5);
+    background: linear-gradient(180deg, #efe7d8 0%, #c9c0af 48%, #8f887a 100%);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 3px 10px rgba(0,0,0,0.6));
+  }
+  .engraved-name .dot { color: var(--rust); -webkit-text-fill-color: var(--rust); }
+
+  .resume-subtitle {
+    margin-top: 1.5rem;
+    font-family: "Fraunces", Georgia, serif; font-style: italic; font-weight: 300;
+    font-variation-settings: "opsz" 144, "WONK" 1, "SOFT" 100;
+    font-size: clamp(1.05rem, 2.2vw, 1.6rem);
+    color: var(--ink-2); line-height: 1.35;
+  }
+  .resume-contact {
+    margin-top: 1.7rem;
+    display: flex; flex-wrap: wrap; gap: 0.5rem 1.4rem; justify-content: center;
+    font-family: "Geist Mono", monospace; text-transform: uppercase;
+    letter-spacing: 0.14em; font-size: 0.72rem; color: var(--muted);
+  }
+  .resume-contact a { color: var(--ink-2); transition: color 0.3s; }
+  .resume-contact a:hover { color: var(--rust); }
+
+  .resume-actions { margin-top: 2.4rem; display: flex; justify-content: center; }
+  .download-btn {
+    position: relative; overflow: hidden;
+    font-family: "Geist Mono", monospace; text-transform: uppercase;
+    font-size: 0.74rem; letter-spacing: 0.22em; color: var(--bg);
+    padding: 1rem 1.8rem; border-radius: 999px; background: var(--rust);
+    border: 1px solid rgba(255,77,46,0.6);
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.25) inset,
+      0 -1px 0 rgba(0,0,0,0.3) inset,
+      0 24px 80px -28px rgba(255,77,46,0.7);
+    transition: transform 0.4s cubic-bezier(0.22,1,0.36,1), box-shadow 0.4s;
+  }
+  .download-btn:hover {
+    transform: translateY(-2px) scale(1.03);
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.3) inset,
+      0 -1px 0 rgba(0,0,0,0.3) inset,
+      0 32px 80px -22px rgba(255,77,46,0.9);
+  }
+  .download-btn::before {
+    content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+    background: linear-gradient(180deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 60%);
+  }
+
+  /* ── Glass plates for each section (float in 3D) ── */
+  .resume-plate {
+    position: relative;
+    margin: 1.6rem 0;
+    padding: 2.2rem 2.2rem 2.4rem;
+    border-radius: 20px;
+    background: rgba(244,239,230,0.045);
+    backdrop-filter: blur(26px) saturate(150%);
+    -webkit-backdrop-filter: blur(26px) saturate(150%);
+    border: 1px solid rgba(244,239,230,0.12);
+    box-shadow:
+      0 1px 0 rgba(244,239,230,0.12) inset,
+      0 -1px 0 rgba(0,0,0,0.5) inset,
+      0 30px 90px -32px rgba(0,0,0,0.75),
+      0 60px 120px -50px rgba(255,77,46,0.12);
+    transform: perspective(1400px) rotateX(1.2deg);
+    transform-style: preserve-3d;
+    transition: transform 0.7s cubic-bezier(0.22,1,0.36,1), border-color 0.5s, box-shadow 0.5s;
+    will-change: transform;
+  }
+  .resume-plate:hover {
+    transform: perspective(1400px) rotateX(0deg) translateY(-4px);
+    border-color: rgba(255,77,46,0.32);
+    box-shadow:
+      0 1px 0 rgba(244,239,230,0.16) inset,
+      0 -1px 0 rgba(0,0,0,0.5) inset,
+      0 40px 110px -32px rgba(0,0,0,0.85),
+      0 80px 150px -50px rgba(255,77,46,0.35);
+  }
+  /* engraved top sheen on each plate */
+  .resume-plate::before {
+    content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+    background: linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0) 40%);
+  }
+  /* faint grain inside the glass */
+  .resume-plate::after {
+    content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+    opacity: 0.06; mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' seed='4'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  }
+  .resume-plate > * { position: relative; z-index: 1; }
+
+  .plate-title {
+    font-family: "Anton", Impact, sans-serif; text-transform: uppercase;
+    font-size: clamp(1.5rem, 3.4vw, 2.4rem); line-height: 0.95; letter-spacing: -0.01em;
+    color: var(--ink);
+    /* subtle engrave */
+    text-shadow: 0 1px 0 rgba(0,0,0,0.6), 0 -1px 0 rgba(255,255,255,0.05);
+    margin-bottom: 1.6rem;
+    display: flex; align-items: baseline; gap: 1rem;
+  }
+  .plate-title .idx {
+    font-family: "Fraunces", Georgia, serif; font-style: italic; font-weight: 300;
+    font-size: 1rem; color: var(--rust); -webkit-text-fill-color: initial;
+    text-shadow: none;
+  }
+
+  /* ── Entries ── */
+  .entry { padding: 1.2rem 0; border-top: 1px solid rgba(244,239,230,0.10); }
+  .entry:first-of-type { border-top: 0; padding-top: 0; }
+  .entry-head {
+    display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline;
+    gap: 0.3rem 1.2rem;
+  }
+  .entry-org {
+    font-family: "Fraunces", Georgia, serif; font-weight: 400;
+    font-size: clamp(1.1rem, 2.2vw, 1.4rem); color: var(--ink); line-height: 1.2;
+  }
+  .entry-when {
+    font-family: "Geist Mono", monospace; text-transform: uppercase;
+    letter-spacing: 0.16em; font-size: 0.68rem; color: var(--muted); white-space: nowrap;
+  }
+  .entry-role {
+    margin-top: 0.25rem;
+    font-family: "Geist Mono", monospace; text-transform: uppercase;
+    letter-spacing: 0.16em; font-size: 0.74rem; color: var(--rust);
+  }
+  .entry-sub {
+    margin-top: 0.1rem;
+    font-family: "Geist Mono", monospace; text-transform: uppercase;
+    letter-spacing: 0.12em; font-size: 0.68rem; color: var(--ink-2);
+  }
+  .entry ul { list-style: none; margin: 0.7rem 0 0; padding: 0; }
+  .entry ul li {
+    position: relative; padding-left: 1.2rem; margin-bottom: 0.4rem;
+    font-size: 0.98rem; line-height: 1.55; color: var(--ink-2); max-width: 62ch;
+  }
+  .entry ul li::before {
+    content: ""; position: absolute; left: 0; top: 0.62em;
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--rust); box-shadow: 0 0 8px rgba(255,77,46,0.7);
+  }
+
+  /* Education block (compact) */
+  .edu-line { font-family: "Fraunces", Georgia, serif; font-size: 1.15rem; color: var(--ink); }
+  .edu-meta { margin-top: 0.35rem; color: var(--ink-2); font-size: 0.98rem; line-height: 1.55; }
+  .edu-gpa {
+    margin-top: 0.6rem; font-family: "Geist Mono", monospace; text-transform: uppercase;
+    letter-spacing: 0.14em; font-size: 0.72rem; color: var(--rust);
+  }
+
+  /* Additional info — tag chips */
+  .info-group { margin-bottom: 1.2rem; }
+  .info-group:last-child { margin-bottom: 0; }
+  .info-label {
+    font-family: "Geist Mono", monospace; text-transform: uppercase;
+    letter-spacing: 0.2em; font-size: 0.68rem; color: var(--muted);
+    display: block; margin-bottom: 0.6rem;
+  }
+  .chip-row { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .chip {
+    font-family: "Geist Mono", monospace; font-size: 0.72rem; letter-spacing: 0.04em;
+    color: var(--ink-2); padding: 0.4rem 0.75rem; border-radius: 999px;
+    background: rgba(244,239,230,0.05);
+    border: 1px solid rgba(244,239,230,0.12);
+    box-shadow: 0 1px 0 rgba(244,239,230,0.08) inset;
+    transition: border-color 0.3s, color 0.3s;
+  }
+  .chip:hover { border-color: rgba(255,77,46,0.4); color: var(--ink); }
+  .info-text { color: var(--ink-2); font-size: 0.95rem; line-height: 1.6; }
+
+  @media (max-width: 640px) {
+    .resume-plate { padding: 1.6rem 1.3rem 1.8rem; }
+    .resume-head { padding: 9rem 0 2rem; }
+  }
+</style>
+</head>
+
+<body class="grain resume-page">
+
+<div class="resume-grain"></div>
+
+<div class="loader" id="loader">
+  <div class="label">Curriculum vitae</div>
+  <div class="name">Resume.</div>
+  <div class="progress"></div>
+</div>
+<div class="transition-veil out" id="veil"><span class="label"></span></div>
+<canvas class="scene-canvas" id="scene-canvas"></canvas>
+<div class="cursor" id="cursor"></div>
+
+<nav class="top" id="topnav">
+  <a href="index.html" class="nav-logo" data-cursor="HOME" data-transition="HOME">Cooper Delo</a>
+  <div class="nav-pill">
+    <div class="nav-links" id="navLinks">
+      <span class="nav-indicator" id="navIndicator"></span>
+      <a href="index.html" class="nav-link" data-cursor="VIEW" data-transition="HOME">Home</a>
+      <a href="plugverse.html" class="nav-link" data-cursor="VIEW" data-transition="PLUGVERSE">Plugverse</a>
+      <a href="rubber-band.html" class="nav-link" data-cursor="VIEW" data-transition="MUSIC">Music</a>
+      <a href="athletic.html" class="nav-link" data-cursor="VIEW" data-transition="ATHLETIC">Athletic</a>
+      <a href="lens.html" class="nav-link" data-cursor="VIEW" data-transition="LENS">Lens</a>
+      <a href="now.html" class="nav-link" data-cursor="VIEW" data-transition="NOW">Now</a>
+    </div>
+  </div>
+  <button class="nav-cta" data-cursor="OPEN" data-contact>Get in touch</button>
+</nav>
+<div class="nav-progress-track"><div class="nav-progress" id="navProgress"></div></div>
+
+<main>
+
+<div class="resume-wrap">
+
+  <header class="resume-head">
+    <span class="eyebrow reveal in">Curriculum vitae / 2026</span>
+    <h1 class="engraved-name reveal in">Cooper E. Delo<span class="dot">.</span></h1>
+    <p class="resume-subtitle reveal">Product Builder and Founder. AI-Native Marketplace Development. Business Strategy.</p>
+    <div class="resume-contact reveal">
+      <a href="mailto:cdelo@unc.edu" data-cursor="MAIL">cdelo@unc.edu</a>
+      <a href="tel:+17045602202" data-cursor="CALL">(704) 560-2202</a>
+      <a href="https://linkedin.com/in/cooperdelo" target="_blank" rel="noreferrer" data-no-transition data-cursor="OPEN" onclick="window.open(this.href,'_blank');return false;">linkedin.com/in/cooperdelo</a>
+    </div>
+    <div class="resume-actions reveal">
+      <a href="/Cooper_Delo_Resume_2026.pdf" download class="download-btn" data-cursor="SAVE" data-no-transition>Download PDF</a>
+    </div>
+  </header>
+
+  <!-- EDUCATION -->
+  <section class="resume-plate reveal" data-tilt>
+    <h2 class="plate-title"><span class="idx">01</span> Education</h2>
+    <div class="entry">
+      <div class="entry-head">
+        <span class="edu-line">University of North Carolina at Chapel Hill</span>
+        <span class="entry-when">May 2028</span>
+      </div>
+      <div class="edu-meta">Kenan-Flagler Business School. Chapel Hill, NC.</div>
+      <div class="edu-meta">Bachelor of Science in Business Administration. Bachelor of Arts in Computer Science (Second Major).</div>
+      <div class="edu-gpa">GPA 3.867 · Dean's List, Fall 2024 and Spring 2025</div>
+    </div>
+  </section>
+
+  <!-- EXPERIENCE -->
+  <section class="resume-plate reveal" data-tilt>
+    <h2 class="plate-title"><span class="idx">02</span> Experience</h2>
+
+    <!-- NOTE: Truist bullets are PLACEHOLDER. Cooper's internship runs May 27 - Aug 7, 2026.
+         No specific project details exist in the vault yet (internship still in progress as of build).
+         Replace these two bullets with the actual project once known. -->
+    <div class="entry">
+      <div class="entry-head">
+        <span class="entry-org">Truist Financial</span>
+        <span class="entry-when">Summer 2026 · Charlotte, NC</span>
+      </div>
+      <div class="entry-role">Technology and Innovation Intern, Leadership Development Program (LDP)</div>
+      <ul>
+        <li>Selected for Truist's 2026 T&amp;I LDP; building enterprise technology solutions within the bank</li>
+        <li>Shipping product improvements in collaboration with senior engineers and PMs</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-head">
+        <span class="entry-org">Plugverse</span>
+        <span class="entry-when">November 2025 – Present · Chapel Hill, NC</span>
+      </div>
+      <div class="entry-role">Founder and CEO</div>
+      <ul>
+        <li>Founded Plugverse LLC; sole developer of full-stack artist-venue booking marketplace</li>
+        <li>Built on Next.js, React, Supabase, and Stripe Connect; 8 user roles, 48-suite QA pipeline</li>
+        <li>Won $20K Luby Pitch Competition and $1,850 1789 grant; managing 4-person intern team</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-head">
+        <span class="entry-org">UNC Kenan-Flagler Business School</span>
+        <span class="entry-when">July 2025 – December 2025 · Chapel Hill, NC</span>
+      </div>
+      <div class="entry-role">AI Research and Product Assistant</div>
+      <ul>
+        <li>Built AI resume generator deployed to all incoming Kenan-Flagler students; demoed to Associate Dean</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-head">
+        <span class="entry-org">CleverCX</span>
+        <span class="entry-when">May 2025 – August 2025 · Charlotte, NC</span>
+      </div>
+      <div class="entry-role">Product Management Intern, Early-Stage Fintech Startup</div>
+      <ul>
+        <li>Reported 300+ Jira issues improving QA coverage across 4 user roles</li>
+        <li>Tracked 500+ support cases via Excel dashboard; collaborated with 10+ engineers and PMs</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-head">
+        <span class="entry-org">Global Career Accelerator</span>
+        <span class="entry-when">May 2025 – July 2025 · Chapel Hill, NC</span>
+      </div>
+      <div class="entry-role">Data Analyst Trainee</div>
+      <ul>
+        <li>Analyzed 600K+ row Intel dataset in Python and SQL; completed 20+ analytics assignments</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- PROJECTS / LEADERSHIP -->
+  <section class="resume-plate reveal" data-tilt>
+    <h2 class="plate-title"><span class="idx">03</span> Projects / Leadership</h2>
+
+    <div class="entry">
+      <div class="entry-head">
+        <span class="entry-org">Carolina Data Challenge 2025</span>
+        <span class="entry-when">September 2025 · Chapel Hill, NC</span>
+      </div>
+      <div class="entry-role">Data Analyst</div>
+      <ul>
+        <li>Modeled risk for the $500B space economy; presented investment matrix to industry judges</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-head">
+        <span class="entry-org">Rubber Band</span>
+        <span class="entry-when">July 2025 – Present · Chapel Hill, NC</span>
+      </div>
+      <div class="entry-role">Lead Guitarist and Business Manager</div>
+      <ul>
+        <li>Perform lead guitar and vocals for UNC's top event cover band</li>
+        <li>Manage all contracts, venue negotiations, and pricing; $50K+ in cumulative bookings</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ADDITIONAL INFORMATION -->
+  <section class="resume-plate reveal" data-tilt>
+    <h2 class="plate-title"><span class="idx">04</span> Additional Information</h2>
+
+    <div class="info-group">
+      <span class="info-label">Technical Skills</span>
+      <div class="chip-row">
+        <span class="chip">JavaScript / TypeScript</span>
+        <span class="chip">React</span>
+        <span class="chip">Next.js</span>
+        <span class="chip">Node.js</span>
+        <span class="chip">Python</span>
+        <span class="chip">SQL</span>
+        <span class="chip">Supabase</span>
+        <span class="chip">PostgreSQL</span>
+        <span class="chip">Stripe API</span>
+        <span class="chip">Vercel</span>
+        <span class="chip">GitHub</span>
+        <span class="chip">Claude AI / API</span>
+        <span class="chip">PostHog</span>
+        <span class="chip">Java</span>
+        <span class="chip">Azure</span>
+        <span class="chip">Jira</span>
+        <span class="chip">Miro</span>
+      </div>
+    </div>
+
+    <div class="info-group">
+      <span class="info-label">Student Organizations</span>
+      <div class="chip-row">
+        <span class="chip">1789 Venture Lab</span>
+        <span class="chip">Finance Society</span>
+        <span class="chip">Busi-Tech Club</span>
+        <span class="chip">Consulting Club</span>
+        <span class="chip">UNC Habitat for Humanity</span>
+      </div>
+    </div>
+
+    <div class="info-group">
+      <span class="info-label">Interests</span>
+      <div class="chip-row">
+        <span class="chip">Cybersecurity</span>
+        <span class="chip">Artificial Intelligence</span>
+        <span class="chip">Golf</span>
+        <span class="chip">Music Production</span>
+        <span class="chip">Guitar</span>
+      </div>
+    </div>
+
+    <div class="info-group">
+      <span class="info-label">Certifications</span>
+      <p class="info-text">SQL and Python Specialist (UNC GCA). Powering Medicine (NC State).</p>
+    </div>
+  </section>
+
+</div><!-- /.resume-wrap -->
+
+</main>
+
+<footer class="site">
+  <div style="max-width: 1600px; margin: 0 auto; display: grid; gap: 2.5rem; position: relative;">
+    <div class="footer-continue">
+      <span class="eyebrow">The rest of the site</span>
+      <div class="pills">
+        <a href="plugverse.html" data-cursor="NEXT" data-transition="PLUGVERSE" class="stat-card glass" style="padding: 1rem 1.4rem; font-family: 'Geist Mono', monospace; text-transform: uppercase; letter-spacing: 0.22em; font-size: 0.78rem;">Plugverse</a>
+        <a href="rubber-band.html" data-cursor="NEXT" data-transition="MUSIC" class="stat-card glass" style="padding: 1rem 1.4rem; font-family: 'Geist Mono', monospace; text-transform: uppercase; letter-spacing: 0.22em; font-size: 0.78rem;">Music</a>
+        <a href="index.html" data-cursor="HOME" data-transition="HOME" class="stat-card glass" style="padding: 1rem 1.4rem; font-family: 'Geist Mono', monospace; text-transform: uppercase; letter-spacing: 0.22em; font-size: 0.78rem;">Home</a>
+      </div>
+    </div>
+    <div>
+      <span class="eyebrow">Get in touch</span>
+      <button class="under" data-contact data-cursor="OPEN" style="display: block; margin-top: 1rem; text-align: left; font-family: 'Anton', Impact, sans-serif; font-size: clamp(2.6rem, 7vw, 6rem); line-height: 0.95; text-transform: uppercase; color: var(--ink);">cooperdelo6@gmail.com</button>
+    </div>
+    <div class="massive">cooperdelo</div>
+    <div style="display: flex; justify-content: space-between; font-family: 'Geist Mono', monospace; text-transform: uppercase; letter-spacing: 0.22em; font-size: 0.72rem; opacity: 0.7;">
+      <span>Chapel Hill, NC</span><span>2026</span>
+    </div>
+  </div>
+</footer>
+
+<div class="modal-backdrop" id="modal">
+  <div class="modal">
+    <h3>Get in touch.</h3>
+    <p style="font-family: 'Geist Mono', monospace; text-transform: uppercase; letter-spacing: 0.22em; font-size: 0.7rem; color: var(--muted); margin-bottom: 1.4rem;">Email is the fastest way</p>
+    <div class="email-row">
+      <span>cooperdelo6@gmail.com</span>
+      <button class="copy-btn" data-cursor="COPY" id="copyBtn">Copy</button>
+    </div>
+    <div class="options">
+      <a href="https://mail.google.com/mail/?view=cm&fs=1&to=cooperdelo6@gmail.com" target="_blank" rel="noreferrer" data-no-transition data-cursor="OPEN" onclick="window.open(this.href, '_blank'); return false;">Gmail</a>
+      <a href="https://www.linkedin.com/in/cooperdelo/" target="_blank" rel="noreferrer" data-no-transition data-cursor="OPEN" onclick="window.open(this.href, '_blank'); return false;">LinkedIn</a>
+      <a href="https://instagram.com/cooperdelo" target="_blank" rel="noreferrer" data-no-transition data-cursor="OPEN" onclick="window.open(this.href, '_blank'); return false;">Instagram</a>
+    </div>
+    <div style="display: flex; justify-content: flex-end; align-items: center; padding-top: 0.6rem;">
+      <button class="close under" data-cursor="CLOSE" id="closeModal">Close</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast">Copied to clipboard</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" defer></script>
+<script src="shell.js" defer></script>
+</body>
+</html>
