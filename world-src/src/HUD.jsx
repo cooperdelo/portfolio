@@ -40,6 +40,9 @@ export default function HUD() {
       {phase === 'idle' && <div className="hint">drag to look · scroll to move · hover a record · click to drop the needle</div>}
       {phase === 'inroom' && <div className="hint">drag to look around · click a photo to enlarge · walk up to any artifact</div>}
 
+      {/* needle-drop transition overlay */}
+      <Transition />
+
       {/* lightbox */}
       <div className={'lightbox' + (lightbox ? ' show' : '')} onClick={(e) => e.target.className.includes('lightbox') && closeLightbox()}>
         <button className="lx" data-c onClick={closeLightbox}>Close [esc]</button>
@@ -70,6 +73,21 @@ function Crate() {
           <span className="dot" style={{ background: s.accent }} />{s.key}
         </button>
       ))}
+    </div>
+  );
+}
+
+function Transition() {
+  const phase = useStore((s) => s.phase);
+  const section = useStore((s) => s.section);
+  const active = phase === 'dropping' || phase === 'returning';
+  const accent = section ? section.accent : '#FF4D2E';
+  return (
+    <div className={'drop' + (active ? ' on' : '')} style={{ '--a': accent }}>
+      <div className="drop-vinyl" style={{ borderColor: accent }}>
+        <div className="drop-hole" style={{ background: accent }} />
+      </div>
+      {section && <div className="drop-label" style={{ color: accent }}>{phase === 'returning' ? 'back to the studio' : `▶ ${section.key.toLowerCase()}`}</div>}
     </div>
   );
 }

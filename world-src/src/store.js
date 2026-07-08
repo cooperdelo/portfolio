@@ -1,34 +1,35 @@
 import { create } from 'zustand';
 
-// Global experience state: which room we're in, the transition phase, and the
-// active lightbox / inspected artifact. Rooms are entered by "dropping" a record.
+// Global experience state. `phase` drives the transition; `shown` is which
+// scene is actually mounted (flips at the midpoint of the needle-drop so the
+// swap happens under the overlay).
 export const useStore = create((set, get) => ({
-  // 'hub' or a section key (HOME/PLUGVERSE/MUSIC/ATHLETIC/LENS/NOW)
+  phase: 'idle',        // 'idle' | 'dropping' | 'inroom' | 'returning'
+  shown: 'hub',         // 'hub' | section key
   room: 'hub',
-  // 'idle' | 'dropping' | 'inroom' | 'returning'
-  phase: 'idle',
-  section: null,          // the SECTIONS entry we dove into
-  hovered: null,          // key of hovered record (hub) or artifact id
-  lightbox: null,         // { src, caption } or null
+  section: null,        // SECTIONS entry being visited
+  hovered: null,
+  lightbox: null,       // { src, caption } | null
   soundOn: false,
-  ready: false,           // assets warmed / loader done
+  ready: false,
 
   setReady: (v) => set({ ready: v }),
   setHovered: (h) => set({ hovered: h }),
   toggleSound: () => set((s) => ({ soundOn: !s.soundOn })),
 
-  dive: (section) => {
-    if (get().phase !== 'idle') return;
-    set({ phase: 'dropping', section });
-    // the transition component flips to 'inroom' when the needle lands
-  },
-  arriveInRoom: () => set((s) => ({ phase: 'inroom', room: s.section.key })),
-  returnToHub: () => {
-    if (get().phase !== 'inroom') return;
-    set({ phase: 'returning', lightbox: null });
-  },
-  arriveInHub: () => set({ phase: 'idle', room: 'hub', section: null }),
+  dive: (section) => { if (get().phase === 'idle') set({ phase: 'dropping', section }); },
+  swapToRoom: () => set((s) => ({ shown: s.section ? s.section.key : 'hub' })),
+  finishDrop: () => set((s) => ({ phase: 'inroom', room: s.section ? s.section.key : 'hub' })),
+
+  returnToHub: () => { if (get().phase === 'inroom') set({ phase: 'returning', lightbox: null }); },
+  swapToHub: () => set({ shown: 'hub' }),
+  finishReturn: () => set({ phase: 'idle', room: 'hub', section: null }),
+
+  // jump straight from one room to another (via the crate)
+  jumpTo: (section) => { const p = get().phase; if (p === 'idle') set({ phase: 'dropping', section }); },
 
   openLightbox: (src, caption) => set({ lightbox: { src, caption } }),
   closeLightbox: () => set({ lightbox: null })
 }));
+
+if (typeof window !== 'undefined') window.__store = useStore;

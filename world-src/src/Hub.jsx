@@ -4,6 +4,23 @@ import * as THREE from 'three';
 import { Model } from './Model.jsx';
 import { Frame } from './bits.jsx';
 import Records from './Records.jsx';
+import { useStore } from './store.js';
+import { sectionByKey } from './data.js';
+
+// Wraps props so clicking the instruments jumps straight into the Music room.
+function ClickTo({ sectionKey, children }) {
+  const dive = useStore((s) => s.dive);
+  const phase = useStore((s) => s.phase);
+  return (
+    <group
+      onPointerOver={(e) => { e.stopPropagation(); if (phase === 'idle') document.body.classList.add('hot'); }}
+      onPointerOut={() => document.body.classList.remove('hot')}
+      onClick={(e) => { e.stopPropagation(); if (phase === 'idle') dive(sectionByKey(sectionKey)); }}
+    >
+      {children}
+    </group>
+  );
+}
 
 // Warm wood-ish wall/floor material helpers
 const wall = <meshStandardMaterial color="#3a2a1c" roughness={0.9} metalness={0.02} envMapIntensity={0.4} />;
@@ -63,16 +80,19 @@ export default function Hub() {
         <Model src="mic" fit={1.7} position={[1.2, 0, -3.2]} rotation={[0, -0.3, 0]} cast />
 
         {/* ---- the guitars on stands (left) — clickable to Music ---- */}
-        <group position={[-6.2, 0, -3]}>
-          <Model src="bass" fit={1.7} position={[0, 0, 0]} rotation={[0, 0.5, 0.06]} />
-          <Model src="electric" fit={1.5} position={[1.1, 0, 0.5]} rotation={[0, 0.9, -0.05]} />
-          <Model src="acoustic" fit={1.6} position={[-1.0, 0, 0.4]} rotation={[0, 0.2, 0.05]} />
-        </group>
-        {/* amps */}
-        <Model src="amp" fit={1.1} position={[-8.2, 0, -1.2]} rotation={[0, 0.6, 0]} />
+        <ClickTo sectionKey="MUSIC">
+          <group position={[-6.2, 0, -3]}>
+            <Model src="bass" fit={1.7} position={[0, 0, 0]} rotation={[0, 0.5, 0.06]} />
+            <Model src="electric" fit={1.5} position={[1.1, 0, 0.5]} rotation={[0, 0.9, -0.05]} />
+            <Model src="acoustic" fit={1.6} position={[-1.0, 0, 0.4]} rotation={[0, 0.2, 0.05]} />
+          </group>
+          <Model src="amp" fit={1.1} position={[-8.2, 0, -1.2]} rotation={[0, 0.6, 0]} />
+        </ClickTo>
 
-        {/* ---- drums (right corner) ---- */}
-        <Model src="drums" fit={2.4} position={[6.4, 0, -3.6]} rotation={[0, -0.7, 0]} />
+        {/* ---- drums (right corner) — clickable to Music ---- */}
+        <ClickTo sectionKey="MUSIC">
+          <Model src="drums" fit={2.4} position={[6.4, 0, -3.6]} rotation={[0, -0.7, 0]} />
+        </ClickTo>
 
         {/* ---- ambience ---- */}
         <Model src="lamp" fit={2.6} position={[-9.2, 0, 2.2]} rotation={[0, 0, 0]} envIntensity={1.2} />
