@@ -1,0 +1,87 @@
+import React, { Suspense } from 'react';
+import { ContactShadows } from '@react-three/drei';
+import { Model } from './Model.jsx';
+import { Frame, VideoScreen, Panel, Label, InfoTile, Embed } from './bits.jsx';
+
+const ACCENT = '#E7C9A0';
+
+// A travel station: big cover + placard + a couple gallery tiles, on a wall.
+function TripStation({ trip, x, z, side }) {
+  const rot = side < 0 ? Math.PI / 2 : -Math.PI / 2; // face inward
+  const g = trip.gallery.slice(0, 3);
+  return (
+    <group position={[x, 0, z]} rotation={[0, rot, 0]}>
+      <Frame src={trip.cover} position={[0, 4.2, 0]} width={2.6} accent={ACCENT} caption={`${trip.name} · ${trip.place}`} />
+      <Panel position={[0, 5.9, 0]} width={230} accent={ACCENT}>
+        <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 20, textTransform: 'uppercase' }}>{trip.name}</div>
+        <div style={{ fontFamily: 'Geist Mono, monospace', fontSize: 8.5, letterSpacing: '.1em', textTransform: 'uppercase', color: ACCENT, margin: '2px 0 5px' }}>{trip.meta}</div>
+        <div style={{ fontSize: 10.5, lineHeight: 1.45, opacity: 0.85 }}>{trip.blurb}</div>
+      </Panel>
+      {g.map((p, i) => (
+        <Frame key={p} src={p} position={[(i - (g.length - 1) / 2) * 1.55, 2.2, 0]} width={1.35} accent={ACCENT} />
+      ))}
+    </group>
+  );
+}
+
+export default function LensRoom({ section: s }) {
+  const left = s.trips.slice(0, 3);
+  const right = s.trips.slice(3, 6);
+  return (
+    <group>
+      {/* shell — darkroom */}
+      <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]}><planeGeometry args={[60, 60]} /><meshStandardMaterial color="#120d0a" roughness={0.96} /></mesh>
+      <mesh receiveShadow position={[0, 6, -14]}><boxGeometry args={[34, 16, 0.4]} /><meshStandardMaterial color="#1c150f" roughness={0.94} /></mesh>
+      <mesh receiveShadow position={[-13, 6, -3]} rotation={[0, Math.PI / 2, 0]}><boxGeometry args={[26, 16, 0.4]} /><meshStandardMaterial color="#181109" roughness={0.95} /></mesh>
+      <mesh receiveShadow position={[13, 6, -3]} rotation={[0, Math.PI / 2, 0]}><boxGeometry args={[26, 16, 0.4]} /><meshStandardMaterial color="#181109" roughness={0.95} /></mesh>
+
+      {/* warm lighting + red safelight accents */}
+      <ambientLight intensity={0.7} color="#4a3626" />
+      <pointLight position={[0, 5, -4]} intensity={3.0} distance={22} color="#ffdca0" castShadow shadow-mapSize={[1024, 1024]} />
+      <pointLight position={[-9, 4, -3]} intensity={2.4} distance={16} color={ACCENT} />
+      <pointLight position={[9, 4, -3]} intensity={2.4} distance={16} color={ACCENT} />
+      <pointLight position={[0, 3, 4]} intensity={1.4} distance={16} color="#ff5a3a" />
+
+      {/* title */}
+      <Label position={[0, 8.6, -13.6]} size={1.7} color={ACCENT} font max={26}>LENS</Label>
+      <Label position={[0, 7.2, -13.6]} size={0.26} color="#F4EFE6" mono opacity={0.7} max={26}>THROUGH THE FRAME</Label>
+      <Panel position={[0, 5.4, -13.4]} width={360} accent={ACCENT}>
+        <div style={{ fontFamily: 'Fraunces, serif', fontStyle: 'italic', fontSize: 14, textAlign: 'center', opacity: 0.9, lineHeight: 1.4 }}>{s.manifesto}</div>
+      </Panel>
+
+      {/* travel stations pulled inward along the side walls */}
+      <Suspense fallback={null}>
+        {left.map((t, i) => <TripStation key={t.name} trip={t} x={-9} z={1 - i * 4.4} side={-1} />)}
+        {right.map((t, i) => <TripStation key={t.name} trip={t} x={9} z={1 - i * 4.4} side={1} />)}
+
+        {/* the kit — 4 camera gear on a back shelf */}
+        <mesh position={[-6, 2.2, -13.6]} receiveShadow><boxGeometry args={[7, 0.16, 0.7]} /><meshStandardMaterial color="#2a1c12" roughness={0.7} /></mesh>
+        <Model src="camera" fit={1.1} position={[-8.4, 2.3, -13.3]} rotation={[0, 0.4, 0]} />
+        {s.kit.map((k, i) => (
+          <InfoTile key={k.name} src={k.img} position={[-7.3 + i * 1.6, 3.4, -13.5]} width={1.4} accent={ACCENT} cardSide={i < 2 ? 1 : -1}
+            card={<>
+              <div style={{ fontFamily: 'Geist Mono, monospace', fontSize: 8.5, letterSpacing: '.16em', textTransform: 'uppercase', color: ACCENT }}>{k.badge}</div>
+              <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 16, textTransform: 'uppercase', margin: '3px 0 6px' }}>{k.name}</div>
+              {k.specs.map(([a, b], j) => <div key={j} style={{ display: 'flex', justifyContent: 'space-between', fontFamily: 'Geist Mono, monospace', fontSize: 8.5, textTransform: 'uppercase', opacity: 0.7, padding: '2px 0' }}><span>{a}</span><span>{b}</span></div>)}
+            </>} />
+        ))}
+        <Label position={[-6, 4.4, -13.5]} size={0.3} color={ACCENT} font>THE KIT</Label>
+
+        {/* the reel — 4 vertical phone screens */}
+        <Label position={[6.5, 5, -13.5]} size={0.3} color={ACCENT} font>THE REEL</Label>
+        {s.reels.map((r, i) => (
+          <VideoScreen key={r.v} src={r.v} position={[4 + i * 1.9, 3, -13.5]} width={1.5} aspect={9 / 16} accent={ACCENT} />
+        ))}
+
+        {/* in rotation — Apple embed centerpiece + replay cards facing the camera */}
+        <Label position={[0, 5.4, -5]} size={0.34} color={ACCENT} font>IN ROTATION</Label>
+        <Embed position={[0, 2.9, -5]} url={s.embeds[0].url} kind="apple" label={s.embeds[0].label} accent={ACCENT} w={300} h={330} />
+        {s.replay.map(([p, m], i) => (
+          <Frame key={p} src={p} position={[i === 0 ? -3.6 : i === 1 ? 3.6 : 0, i === 2 ? 4.6 : 2.5, -5]} width={1.5} accent={ACCENT} caption={m} />
+        ))}
+      </Suspense>
+
+      <ContactShadows position={[0, 0.02, -4]} scale={44} resolution={1024} blur={2.6} opacity={0.45} far={13} />
+    </group>
+  );
+}
