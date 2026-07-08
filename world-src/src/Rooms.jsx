@@ -82,9 +82,12 @@ export function GenericRoom({ section: s }) {
 import MusicRoom from './MusicRoom.jsx';
 import PlugverseRoom from './PlugverseRoom.jsx';
 import LensRoom from './LensRoom.jsx';
+import AthleticRoom from './AthleticRoom.jsx';
+import NowRoom from './NowRoom.jsx';
+import HomeRoom from './HomeRoom.jsx';
 
 // Registry — specific room components get added here as they're built.
-const REGISTRY = { MUSIC: MusicRoom, PLUGVERSE: PlugverseRoom, LENS: LensRoom };
+const REGISTRY = { MUSIC: MusicRoom, PLUGVERSE: PlugverseRoom, LENS: LensRoom, ATHLETIC: AthleticRoom, NOW: NowRoom, HOME: HomeRoom };
 export function registerRoom(key, comp) { REGISTRY[key] = comp; }
 export function ActiveRoom() {
   const section = useStore((s) => s.section);
