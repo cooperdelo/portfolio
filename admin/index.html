@@ -9,91 +9,216 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Geist+Mono:wght@300..700&family=Geist:wght@300..700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/admin/_shell/admin-shell.css" />
+<style>
+  /* ---- Hero ---- */
+  .hero { position: relative; border-radius: 22px; overflow: hidden; margin-bottom: 2.4rem;
+    min-height: 340px; display: grid; grid-template-columns: 1.1fr 1fr; align-items: center;
+    border: 1px solid var(--card-border);
+    background:
+      radial-gradient(120% 140% at 85% 20%, rgba(255,77,46,0.14), transparent 55%),
+      radial-gradient(90% 120% at 10% 90%, rgba(201,190,230,0.10), transparent 60%),
+      linear-gradient(180deg, rgba(20,17,15,0.55), rgba(10,9,8,0.85)); }
+  #scene { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; }
+  .hero-copy { position: relative; z-index: 2; padding: 2.6rem 2.8rem; }
+  .hero-copy .eyebrow { font-family: "Geist Mono", monospace; text-transform: uppercase;
+    letter-spacing: 0.28em; font-size: 0.64rem; color: var(--muted); margin-bottom: 0.9rem; }
+  .hero-copy h1 { font-family: "Anton", Impact, sans-serif; text-transform: uppercase;
+    font-size: clamp(2.4rem, 5vw, 3.8rem); line-height: 0.92; letter-spacing: -0.01em; }
+  .hero-copy h1 .accent { color: var(--rust); }
+  .hero-copy .greeting { font-family: "Geist Mono", monospace; font-size: 0.72rem;
+    letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-2); margin-top: 1rem; }
+  .hero-copy .greeting b { color: var(--rust); }
+  .hero-actions { display: flex; gap: 0.6rem; flex-wrap: wrap; margin-top: 1.6rem; }
+  @media (max-width: 820px) { .hero { grid-template-columns: 1fr; min-height: 460px; }
+    #scene { opacity: 0.55; } .hero-copy { padding: 2rem 1.5rem; } }
+
+  /* ---- Domain sections ---- */
+  .domain { margin-bottom: 2.2rem; }
+  .domain-head { display: flex; align-items: baseline; gap: 0.9rem; margin: 0 0 1rem; }
+  .domain-head .dh-title { font-family: "Anton", sans-serif; text-transform: uppercase;
+    font-size: 1.15rem; letter-spacing: 0.02em; }
+  .domain-head .dh-rule { flex: 1; height: 1px; background: var(--line); }
+  .domain-head .dh-tag { font-family: "Geist Mono", monospace; font-size: 0.58rem;
+    letter-spacing: 0.24em; text-transform: uppercase; color: var(--muted); }
+  .tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(215px, 1fr)); gap: 0.85rem; }
+
+  .tile { position: relative; display: flex; flex-direction: column; gap: 0.15rem;
+    padding: 1.15rem 1.2rem 1.2rem; border-radius: 16px;
+    background: linear-gradient(180deg, rgba(244,239,230,0.045), rgba(244,239,230,0.015));
+    border: 1px solid var(--card-border); overflow: hidden;
+    transition: transform .28s cubic-bezier(.22,1,.36,1), border-color .28s, background .28s; }
+  .tile::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+    background: var(--accent, var(--rust)); opacity: 0; transition: opacity .28s; }
+  .tile:hover { transform: translateY(-3px); border-color: var(--card-border-hover);
+    background: linear-gradient(180deg, rgba(244,239,230,0.07), rgba(244,239,230,0.02)); }
+  .tile:hover::before { opacity: 1; }
+  .tile .ic { font-size: 1.15rem; line-height: 1; margin-bottom: 0.55rem; }
+  .tile .t-label { font-family: "Geist", sans-serif; font-weight: 600; font-size: 0.98rem;
+    letter-spacing: -0.01em; }
+  .tile .t-sub { font-family: "Geist Mono", monospace; font-size: 0.6rem; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--muted); margin-top: 0.15rem; }
+  .tile .t-stat { margin-left: auto; }
+  .tile-row { display: flex; align-items: flex-start; }
+  /* domain accent colors */
+  .d-money  { --accent: var(--pastel-cyan); }
+  .d-health { --accent: var(--sage); }
+  .d-acad   { --accent: var(--pastel-pink); }
+  .d-build  { --accent: var(--rust); }
+  .d-brand  { --accent: var(--pastel-lavender); }
+  .dh-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 12px var(--accent); }
+</style>
 </head>
 <body>
   <main>
-    <div class="page-head">
-      <div>
-        <div class="eyebrow">Admin Console</div>
-        <h1>WELCOME <span class="accent">back</span></h1>
+    <!-- ===== 3D HERO ===== -->
+    <section class="hero">
+      <canvas id="scene"></canvas>
+      <div class="hero-copy">
+        <div class="eyebrow">Personal Operating System</div>
+        <h1>COOPER<br><span class="accent">DELO</span></h1>
+        <div class="greeting" id="greeting">— five domains in orbit —</div>
+        <div class="hero-actions">
+          <a class="btn primary" href="/admin/health/log.html">Daily log</a>
+          <a class="btn ghost" href="/admin/academics/">Academics</a>
+          <a class="btn ghost" href="/admin/finance/">Finance</a>
+        </div>
       </div>
-      <div class="actions">
-        <span class="live-dot">Realtime · ON</span>
-      </div>
-    </div>
+    </section>
 
-    <div class="kpi-grid" id="entry-grid">
-      <a class="card" href="/admin/finance/">
-        <div class="label">Finance</div>
-        <div class="value">DASH</div>
-        <div class="delta flat">KPIs · charts · runway</div>
-      </a>
-      <a class="card" href="/admin/finance/transactions.html">
-        <div class="label">Transactions</div>
-        <div class="value">LIST</div>
-        <div class="delta flat">Filter · edit · audit</div>
-      </a>
-      <a class="card" href="/admin/finance/entry.html">
-        <div class="label">Quick add</div>
-        <div class="value">+ NEW</div>
-        <div class="delta flat">Log income or expense</div>
-      </a>
-      <a class="card" href="/admin/finance/investments.html" data-role="full">
-        <div class="label">Investments</div>
-        <div class="value">PORT</div>
-        <div class="delta flat">Roth · brokerage · trend</div>
-      </a>
-      <a class="card" href="/admin/merch/" data-role="full">
-        <div class="label">Merch</div>
-        <div class="value">SKU</div>
-        <div class="delta flat">Inventory · debts · log</div>
-      </a>
-      <a class="card" href="/admin/finance/funding.html">
-        <div class="label">Funding</div>
-        <div class="value">SRC</div>
-        <div class="delta flat">All sources · burn down</div>
-      </a>
-      <a class="card" href="/admin/plugverse/">
-        <div class="label">Plugverse</div>
-        <div class="value">KPI</div>
-        <div class="delta flat">MRR · users · payouts</div>
-      </a>
-      <a class="card" href="/admin/social/" data-role="full">
-        <div class="label">Social</div>
-        <div class="value">IG · TT</div>
-        <div class="delta flat">My posts · engagement</div>
-      </a>
-      <a class="card" href="/admin/carousels/" data-role="full">
-        <div class="label">Carousels</div>
-        <div class="value">MAKE</div>
-        <div class="delta flat">Build · store · download all</div>
-      </a>
-      <a class="card" href="/admin/playbook/">
-        <div class="label">Playbook</div>
-        <div class="value">VAULT</div>
-        <div class="delta flat">Voice · hooks · identity</div>
-      </a>
-      <a class="card" href="/admin/contacts/">
-        <div class="label">Contacts</div>
-        <div class="value">PIPE</div>
-        <div class="delta flat">Network · outreach · stages</div>
-      </a>
-      <a class="card" href="/admin/finance/export.html" data-role="full">
-        <div class="label">Export</div>
-        <div class="value">XLSX</div>
-        <div class="delta flat">For parents · for taxes</div>
-      </a>
-      <a class="card" href="/admin/finance/tax.html" data-role="full">
-        <div class="label">Tax prep</div>
-        <div class="value">DEDUC</div>
-        <div class="delta flat">By year · by category</div>
-      </a>
-    </div>
+    <!-- ===== MONEY ===== -->
+    <section class="domain d-money">
+      <div class="domain-head"><span class="dh-dot"></span><span class="dh-title">Money</span><span class="dh-rule"></span><span class="dh-tag">finance · tax · runway</span></div>
+      <div class="tiles">
+        <a class="tile" href="/admin/finance/"><div class="ic">📊</div><div class="t-label">Finance Dashboard</div><div class="t-sub">KPIs · charts · runway</div></a>
+        <a class="tile" href="/admin/finance/transactions.html"><div class="ic">🧾</div><div class="t-label">Transactions</div><div class="t-sub">Filter · edit · audit</div></a>
+        <a class="tile" href="/admin/finance/entry.html"><div class="ic">➕</div><div class="t-label">Quick Add</div><div class="t-sub">Log income or expense</div></a>
+        <a class="tile" href="/admin/finance/funding.html"><div class="ic">🌱</div><div class="t-label">Funding Sources</div><div class="t-sub">All sources · burn down</div></a>
+        <a class="tile" href="/admin/finance/investments.html" data-role="full"><div class="ic">📈</div><div class="t-label">Investments</div><div class="t-sub">Roth · brokerage · trend</div></a>
+        <a class="tile" href="/admin/finance/tax.html" data-role="full"><div class="ic">🏛️</div><div class="t-label">Tax Prep</div><div class="t-sub">By year · by category</div></a>
+        <a class="tile" href="/admin/finance/export.html" data-role="full"><div class="ic">📤</div><div class="t-label">Export XLSX</div><div class="t-sub">For parents · for taxes</div></a>
+      </div>
+    </section>
+
+    <!-- ===== HEALTH ===== -->
+    <section class="domain d-health">
+      <div class="domain-head"><span class="dh-dot"></span><span class="dh-title">Health</span><span class="dh-rule"></span><span class="dh-tag">crohn's tracker</span></div>
+      <div class="tiles">
+        <a class="tile" href="/admin/health/log.html" data-role="full"><div class="ic">🩺</div><div class="t-label">Daily Log</div><div class="t-sub">Bristol · mood · meds</div></a>
+        <a class="tile" href="/admin/health/food.html" data-role="full"><div class="ic">🍽️</div><div class="t-label">Food Log</div><div class="t-sub">Photo · caption · macros</div></a>
+        <a class="tile" href="/admin/health/dashboard.html" data-role="full"><div class="ic">🔬</div><div class="t-label">Insights</div><div class="t-sub">Triggers · sleep · flares</div></a>
+      </div>
+    </section>
+
+    <!-- ===== ACADEMICS ===== -->
+    <section class="domain d-acad">
+      <div class="domain-head"><span class="dh-dot"></span><span class="dh-title">Academics</span><span class="dh-rule"></span><span class="dh-tag">unc · grad spring 2028</span></div>
+      <div class="tiles">
+        <a class="tile" href="/admin/academics/" data-role="full"><div class="ic">🎓</div><div class="t-label">Degree Progress</div><div class="t-sub">Credits · plan · study abroad</div></a>
+      </div>
+    </section>
+
+    <!-- ===== BUILD ===== -->
+    <section class="domain d-build">
+      <div class="domain-head"><span class="dh-dot"></span><span class="dh-title">Build</span><span class="dh-rule"></span><span class="dh-tag">plugverse</span></div>
+      <div class="tiles">
+        <a class="tile" href="/admin/plugverse/"><div class="ic">🎸</div><div class="t-label">Plugverse KPIs</div><div class="t-sub">MRR · users · payouts</div></a>
+      </div>
+    </section>
+
+    <!-- ===== BRAND ===== -->
+    <section class="domain d-brand">
+      <div class="domain-head"><span class="dh-dot"></span><span class="dh-title">Brand</span><span class="dh-rule"></span><span class="dh-tag">content · network · merch</span></div>
+      <div class="tiles">
+        <a class="tile" href="/admin/social/" data-role="full"><div class="ic">📱</div><div class="t-label">Social Analytics</div><div class="t-sub">IG · TikTok · engagement</div></a>
+        <a class="tile" href="/admin/carousels/" data-role="full"><div class="ic">🎨</div><div class="t-label">Carousel Studio</div><div class="t-sub">Build · store · download</div></a>
+        <a class="tile" href="/admin/playbook/"><div class="ic">📓</div><div class="t-label">Playbook</div><div class="t-sub">Voice · hooks · identity</div></a>
+        <a class="tile" href="/admin/contacts/"><div class="ic">🤝</div><div class="t-label">Contacts</div><div class="t-sub">Network · outreach · stages</div></a>
+        <a class="tile" href="/admin/merch/" data-role="full"><div class="ic">👕</div><div class="t-label">Merch Tracker</div><div class="t-sub">Inventory · debts · log</div></a>
+      </div>
+    </section>
   </main>
 
   <script type="module">
     import { mountShell } from '/admin/_shell/admin-shell.js';
-    mountShell({ title: 'Admin' });
+    await mountShell({ title: 'Admin' });
+
+    // greeting by time of day
+    const h = new Date().getHours();
+    const part = h < 5 ? 'burning the midnight oil' : h < 12 ? 'good morning' : h < 17 ? 'good afternoon' : h < 22 ? 'good evening' : 'late night';
+    document.getElementById('greeting').innerHTML = `<b>${part}</b> · ${new Date().toLocaleDateString('en-US',{weekday:'long', month:'long', day:'numeric'})}`;
+
+    // ===== 3D identity scene: 5 domains orbiting a core =====
+    try {
+      const THREE = await import('https://esm.sh/three@0.160.0');
+      const canvas = document.getElementById('scene');
+      const wrap = canvas.parentElement;
+      const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+      renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+      const scene = new THREE.Scene();
+      const cam = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+      cam.position.set(0, 0, 8);
+
+      const root = new THREE.Group(); scene.add(root);
+
+      // core
+      const core = new THREE.Mesh(
+        new THREE.IcosahedronGeometry(1.15, 1),
+        new THREE.MeshStandardMaterial({ color: 0xF2EDE4, emissive: 0xFF4D2E, emissiveIntensity: 0.25, metalness: 0.3, roughness: 0.35, flatShading: true }));
+      root.add(core);
+      const wire = new THREE.LineSegments(
+        new THREE.EdgesGeometry(new THREE.IcosahedronGeometry(1.32, 1)),
+        new THREE.LineBasicMaterial({ color: 0xF4EFE6, transparent: true, opacity: 0.18 }));
+      root.add(wire);
+
+      // five domains
+      const domains = [
+        { c: 0xFF4D2E, r: 2.6, tilt: 0.2,  speed: 0.55 }, // build/plugverse
+        { c: 0xC9BEE6, r: 3.2, tilt: 1.1,  speed: 0.42 }, // brand/music
+        { c: 0x7A8A6E, r: 2.9, tilt: -0.7, speed: 0.48 }, // health
+        { c: 0xB2E3E1, r: 3.5, tilt: 0.9,  speed: 0.36 }, // money
+        { c: 0xF2C1D1, r: 2.4, tilt: -1.3, speed: 0.6  }, // academics
+      ];
+      const nodes = domains.map((d, i) => {
+        const g = new THREE.Group(); g.rotation.x = d.tilt; g.rotation.z = d.tilt * 0.6;
+        const ring = new THREE.Mesh(new THREE.TorusGeometry(d.r, 0.008, 8, 120),
+          new THREE.MeshBasicMaterial({ color: d.c, transparent: true, opacity: 0.22 }));
+        ring.rotation.x = Math.PI / 2; g.add(ring);
+        const node = new THREE.Mesh(new THREE.SphereGeometry(0.12, 16, 16),
+          new THREE.MeshStandardMaterial({ color: d.c, emissive: d.c, emissiveIntensity: 0.9 }));
+        g.add(node); root.add(g);
+        return { g, node, ...d, phase: i * 1.3 };
+      });
+
+      // particle halo
+      const pc = 340, pg = new THREE.BufferGeometry(), pp = new Float32Array(pc * 3);
+      for (let i = 0; i < pc; i++) { const rr = 4 + Math.random() * 3, a = Math.random() * Math.PI * 2, b = Math.acos(2*Math.random()-1);
+        pp[i*3] = rr*Math.sin(b)*Math.cos(a); pp[i*3+1] = rr*Math.sin(b)*Math.sin(a); pp[i*3+2] = rr*Math.cos(b); }
+      pg.setAttribute('position', new THREE.BufferAttribute(pp, 3));
+      scene.add(new THREE.Points(pg, new THREE.PointsMaterial({ color: 0xDDD4C5, size: 0.02, transparent: true, opacity: 0.5 })));
+
+      scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+      const pl = new THREE.PointLight(0xFF4D2E, 40, 40); pl.position.set(5, 4, 6); scene.add(pl);
+
+      let mx = 0, my = 0;
+      wrap.addEventListener('pointermove', e => { const r = wrap.getBoundingClientRect();
+        mx = ((e.clientX - r.left)/r.width - 0.5) * 2; my = ((e.clientY - r.top)/r.height - 0.5) * 2; });
+
+      function resize() { const w = wrap.clientWidth, hh = wrap.clientHeight;
+        renderer.setSize(w, hh, false); cam.aspect = w/hh; cam.updateProjectionMatrix(); }
+      resize(); new ResizeObserver(resize).observe(wrap);
+
+      const clock = new THREE.Clock();
+      (function loop() {
+        const t = clock.getElapsedTime();
+        root.rotation.y = t * 0.12; root.rotation.x = Math.sin(t*0.2)*0.1;
+        core.rotation.y = t*0.4; core.rotation.x = t*0.25; wire.rotation.copy(core.rotation);
+        nodes.forEach(n => { const a = t*n.speed + n.phase; n.node.position.set(Math.cos(a)*n.r, 0, Math.sin(a)*n.r);
+          n.node.scale.setScalar(1 + Math.sin(t*2+n.phase)*0.25); });
+        cam.position.x += (mx*1.2 - cam.position.x)*0.05; cam.position.y += (-my*0.8 - cam.position.y)*0.05;
+        cam.lookAt(0,0,0);
+        renderer.render(scene, cam); requestAnimationFrame(loop);
+      })();
+    } catch (e) { console.warn('3D scene skipped:', e); }
   </script>
 </body>
 </html>

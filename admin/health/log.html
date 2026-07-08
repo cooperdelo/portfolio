@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="robots" content="noindex, nofollow, noarchive" />
+<title>Daily Log · CD Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Geist+Mono:wght@300..700&family=Geist:wght@300..700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/admin/_shell/admin-shell.css" />
+<style>
+  .tapgrid { display:flex; flex-wrap:wrap; gap:.5rem; }
+  .tap { flex:1 1 auto; min-width:44px; padding:.75rem .5rem; border:1px solid var(--line,#2a2a2a);
+         border-radius:12px; background:transparent; color:inherit; font:inherit; font-weight:600;
+         cursor:pointer; text-align:center; transition:.12s; user-select:none; }
+  .tap:hover { border-color:#666; }
+  .tap.on { background:var(--accent,#c8ff4d); color:#111; border-color:var(--accent,#c8ff4d); }
+  .tap.warn.on { background:#ff6b4d; border-color:#ff6b4d; color:#111; }
+  .biggrid { display:grid; grid-template-columns:repeat(7,1fr); gap:.4rem; }
+  .biggrid .tap { padding:.9rem .2rem; font-size:1.1rem; }
+  .bristol-help { font-size:.72rem; opacity:.6; margin-top:.3rem; }
+  .sublabel { font-size:.85rem; opacity:.7; margin:.1rem 0 .5rem; }
+  .stack { display:flex; flex-direction:column; gap:1.4rem; }
+  .row { display:flex; gap:.6rem; align-items:center; flex-wrap:wrap; }
+  .card h2 { font-size:1.05rem; margin:.2rem 0 .8rem; }
+  @media(max-width:640px){ .biggrid .tap{ font-size:1rem; } }
+</style>
+</head>
+<body>
+  <main>
+    <div class="page-head">
+      <div>
+        <div class="eyebrow">Crohn's tracker · <span id="today-str"></span></div>
+        <h1>DAILY <span class="accent">log</span></h1>
+      </div>
+      <div class="actions">
+        <a class="btn ghost" href="/admin/health/food.html">Log food &rarr;</a>
+        <a class="btn ghost" href="/admin/health/dashboard.html">Insights</a>
+      </div>
+    </div>
+
+    <div class="stack">
+
+      <!-- A. BATHROOM TRIP (Bristol) -->
+      <div class="card" style="max-width:720px;">
+        <h2>&#128701; Bathroom trip <span class="sublabel" style="display:inline;">(log each one &mdash; 5s)</span></h2>
+        <div class="sublabel">Bristol type &mdash; tap one</div>
+        <div class="biggrid" id="bristol">
+          <button class="tap" data-v="1">1</button>
+          <button class="tap" data-v="2">2</button>
+          <button class="tap" data-v="3">3</button>
+          <button class="tap" data-v="4">4</button>
+          <button class="tap" data-v="5">5</button>
+          <button class="tap" data-v="6">6</button>
+          <button class="tap" data-v="7">7</button>
+        </div>
+        <div class="bristol-help">1&ndash;2 hard/constipated &middot; 3&ndash;4 normal &middot; 5 soft &middot; 6&ndash;7 loose/diarrhea</div>
+        <div class="row" style="margin-top:1rem;">
+          <button class="tap warn" id="b-blood" style="flex:0 0 auto;">Blood</button>
+          <button class="tap warn" id="b-mucus" style="flex:0 0 auto;">Mucus</button>
+          <button class="tap warn" id="b-urgency" style="flex:0 0 auto;">Urgency</button>
+        </div>
+        <div class="field" style="margin-top:1rem;">
+          <label>Pain (0 none &ndash; 10 worst): <b id="b-pain-val">0</b></label>
+          <input type="range" id="b-pain" min="0" max="10" step="1" value="0" />
+        </div>
+        <button class="btn primary" id="save-bristol" style="margin-top:.6rem;">Log trip</button>
+      </div>
+
+      <!-- B. TODAY CHECK-IN -->
+      <div class="card" style="max-width:720px;">
+        <h2>&#128202; Today check-in <span class="sublabel" style="display:inline;">(once a day)</span></h2>
+
+        <div class="sublabel">Mood</div>
+        <div class="tapgrid" id="mood">
+          <button class="tap" data-v="1">1</button><button class="tap" data-v="2">2</button>
+          <button class="tap" data-v="3">3</button><button class="tap" data-v="4">4</button>
+          <button class="tap" data-v="5">5</button>
+        </div>
+
+        <div class="sublabel" style="margin-top:1rem;">Stress</div>
+        <div class="tapgrid" id="stress">
+          <button class="tap" data-v="1">1</button><button class="tap" data-v="2">2</button>
+          <button class="tap" data-v="3">3</button><button class="tap" data-v="4">4</button>
+          <button class="tap" data-v="5">5</button>
+        </div>
+
+        <div class="sublabel" style="margin-top:1rem;">Energy</div>
+        <div class="tapgrid" id="energy">
+          <button class="tap" data-v="1">1</button><button class="tap" data-v="2">2</button>
+          <button class="tap" data-v="3">3</button><button class="tap" data-v="4">4</button>
+          <button class="tap" data-v="5">5</button>
+        </div>
+
+        <div class="field" style="margin-top:1rem;">
+          <label>Overall gut symptom severity (0 none &ndash; 10 flare): <b id="sev-val">0</b></label>
+          <input type="range" id="severity" min="0" max="10" step="1" value="0" />
+        </div>
+        <div class="row">
+          <button class="tap warn" id="flare" style="flex:0 0 auto;">&#128293; Flare day</button>
+        </div>
+        <div class="field" style="margin-top:1rem;">
+          <label>Note (optional)</label>
+          <input type="text" id="day-note" placeholder="Anything worth remembering about today" />
+        </div>
+      </div>
+
+      <!-- C. INTAKE -->
+      <div class="card" style="max-width:720px;">
+        <h2>&#128138; Intake today</h2>
+        <div class="row">
+          <button class="tap on" id="med-bud" style="flex:0 0 auto;">Budesonide &#10003;</button>
+          <button class="tap" id="med-trem" style="flex:0 0 auto;">Tremfya</button>
+          <button class="tap" id="sup-zinc" style="flex:0 0 auto;">Zinc</button>
+        </div>
+
+        <div class="sublabel" style="margin-top:1rem;">THC <span style="opacity:.6;">(flagged irritant)</span></div>
+        <div class="tapgrid" id="thc">
+          <button class="tap on" data-v="none">None</button>
+          <button class="tap" data-v="edible">Edible</button>
+          <button class="tap warn" data-v="smoked">Smoked</button>
+        </div>
+
+        <div class="field" style="margin-top:1rem;">
+          <label>Alcohol drinks today (flagged &mdash; ALDH2): <b id="alc-val">0</b></label>
+          <input type="range" id="alcohol" min="0" max="8" step="1" value="0" />
+        </div>
+      </div>
+
+      <div class="row" style="max-width:720px;">
+        <button class="btn primary" id="save-day" style="flex:1 1 auto;">Save today's check-in + intake</button>
+      </div>
+
+    </div>
+  </main>
+  <script type="module" src="/admin/health/_js/log.js"></script>
+</body>
+</html>

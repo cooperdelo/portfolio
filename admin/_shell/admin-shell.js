@@ -16,6 +16,14 @@ const NAV = [
     { href: '/admin/',                          label: 'Home' },
     { href: '/admin/finance/',                  label: 'Finance Dashboard' },
   ]},
+  { section: 'Health', items: [
+    { href: '/admin/health/log.html',           label: 'Daily Log', roles: ['full'] },
+    { href: '/admin/health/food.html',          label: 'Food Log', roles: ['full'] },
+    { href: '/admin/health/dashboard.html',     label: 'Health Insights', roles: ['full'] },
+  ]},
+  { section: 'Academics', items: [
+    { href: '/admin/academics/',                label: 'Degree Progress', roles: ['full'] },
+  ]},
   { section: 'Finance', items: [
     { href: '/admin/finance/transactions.html', label: 'Transactions' },
     { href: '/admin/finance/entry.html',        label: 'Quick Add' },

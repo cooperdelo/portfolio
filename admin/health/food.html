@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="robots" content="noindex, nofollow, noarchive" />
+<title>Food Log · CD Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Geist+Mono:wght@300..700&family=Geist:wght@300..700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/admin/_shell/admin-shell.css" />
+<style>
+  .stack{display:flex;flex-direction:column;gap:1.2rem;}
+  .drop{border:1.5px dashed #555;border-radius:16px;padding:1.4rem;text-align:center;cursor:pointer;}
+  .drop.hasimg{border-style:solid;border-color:var(--accent,#c8ff4d);}
+  #preview{max-width:100%;max-height:280px;border-radius:12px;margin-top:.8rem;display:none;}
+  .entry{display:flex;gap:.8rem;align-items:flex-start;padding:.7rem 0;border-top:1px solid #262626;}
+  .entry img{width:56px;height:56px;object-fit:cover;border-radius:9px;flex:0 0 auto;background:#222;}
+  .pill{font-size:.68rem;padding:.15rem .5rem;border-radius:999px;border:1px solid #444;opacity:.85;}
+  .pill.pending{color:#ffd24d;border-color:#ffd24d;}
+  .pill.analyzed{color:var(--accent,#c8ff4d);border-color:var(--accent,#c8ff4d);}
+  .pill.manual{color:#8ab4ff;border-color:#8ab4ff;}
+  .macros{font-size:.78rem;opacity:.75;margin-top:.15rem;}
+</style>
+</head>
+<body>
+  <main>
+    <div class="page-head">
+      <div>
+        <div class="eyebrow">Crohn's tracker · food</div>
+        <h1>FOOD <span class="accent">log</span></h1>
+      </div>
+      <div class="actions">
+        <a class="btn ghost" href="/admin/health/log.html">&larr; Daily log</a>
+        <a class="btn ghost" href="/admin/health/dashboard.html">Insights</a>
+      </div>
+    </div>
+
+    <div class="stack" style="max-width:720px;">
+      <div class="card">
+        <h2 style="font-size:1.05rem;margin:.1rem 0 .8rem;">Snap a photo + caption</h2>
+        <p class="sublabel" style="opacity:.7;font-size:.85rem;margin:0 0 .8rem;">
+          The photo + your caption get analyzed automatically (no app to fight). Caption = ground truth so nothing gets misread.
+        </p>
+
+        <label class="drop" id="drop" for="photo">
+          <div id="drop-text">📷 Tap to take / choose a photo</div>
+          <img id="preview" alt="preview" />
+        </label>
+        <input type="file" id="photo" accept="image/*" capture="environment" style="display:none;" />
+
+        <div class="field" style="margin-top:1rem;">
+          <label>Caption — what is it? (be specific)</label>
+          <input type="text" id="caption" placeholder="e.g. grilled chicken bowl, white rice, broccoli, no sauce" />
+        </div>
+        <div class="row" style="display:flex;gap:.6rem;flex-wrap:wrap;">
+          <button class="btn primary" id="save-photo">Save photo entry</button>
+          <button class="btn ghost" id="save-text">No photo — save caption only</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 style="font-size:1.05rem;margin:.1rem 0 .4rem;">Today</h2>
+        <div id="list"><p class="sublabel" style="opacity:.6;">Loading…</p></div>
+      </div>
+    </div>
+  </main>
+  <script type="module" src="/admin/health/_js/food.js"></script>
+</body>
+</html>
