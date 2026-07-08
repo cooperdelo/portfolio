@@ -521,3 +521,51 @@ table.data thead th { backdrop-filter: blur(10px); }
 .main > *:nth-child(4){ animation-delay:.15s } .main > *:nth-child(5){ animation-delay:.20s }
 @keyframes rise { from { opacity:0; transform: translateY(14px); } to { opacity:1; transform:none; } }
 @media (prefers-reduced-motion: reduce){ .main > *{ animation:none; } }
+
+/* =====================================================================
+   DESIGN SYSTEM v3 — deeper glassmorphism, cleaner surfaces
+   ===================================================================== */
+.rail {
+  background: linear-gradient(180deg, rgba(28,23,19,0.55), rgba(16,13,11,0.72));
+  backdrop-filter: blur(30px) saturate(160%); -webkit-backdrop-filter: blur(30px) saturate(160%);
+  border-right: 1px solid rgba(244,239,230,0.10);
+  box-shadow: 1px 0 0 rgba(244,239,230,0.05) inset;
+}
+.rail a.nav-item { border-radius: 10px; }
+.rail a.nav-item:hover { background: rgba(244,239,230,0.06); }
+.rail a.nav-item.active {
+  background: linear-gradient(90deg, rgba(255,77,46,0.14), rgba(255,77,46,0.02));
+  border-color: rgba(255,77,46,0.30);
+}
+
+/* Frosted cards everywhere get a crisper glass edge + top sheen */
+.card, .kpi .kpi, .chart-card, .tbl-wrap {
+  backdrop-filter: blur(26px) saturate(150%); -webkit-backdrop-filter: blur(26px) saturate(150%);
+}
+.card { border-radius: 20px; }
+.card::before {
+  content: ""; position: absolute; inset: 0 0 auto 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(244,239,230,0.35), transparent);
+  opacity: .5; pointer-events: none;
+}
+
+/* Buttons: frosted glass pills */
+.btn { background: rgba(244,239,230,0.05); backdrop-filter: blur(14px) saturate(160%); -webkit-backdrop-filter: blur(14px) saturate(160%); }
+.btn:hover { background: rgba(244,239,230,0.09); }
+
+/* Inputs: subtle glass */
+.field input, .field select, .field textarea, .filters select, .filters input {
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  border-radius: 12px;
+}
+
+/* Refined scrollbars */
+* { scrollbar-width: thin; scrollbar-color: rgba(244,239,230,0.18) transparent; }
+*::-webkit-scrollbar { width: 8px; height: 8px; }
+*::-webkit-scrollbar-thumb { background: rgba(244,239,230,0.16); border-radius: 8px; }
+*::-webkit-scrollbar-thumb:hover { background: rgba(255,77,46,0.4); }
+
+/* Soften the ambient aurora so the glass reads cleaner */
+body::after { filter: blur(28px) saturate(115%); opacity: .8; }
+
+::selection { background: var(--rust); color: #0A0908; }
