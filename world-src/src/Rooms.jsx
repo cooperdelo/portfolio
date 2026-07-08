@@ -79,8 +79,10 @@ export function GenericRoom({ section: s }) {
   );
 }
 
+import MusicRoom from './MusicRoom.jsx';
+
 // Registry — specific room components get added here as they're built.
-const REGISTRY = {};
+const REGISTRY = { MUSIC: MusicRoom };
 export function registerRoom(key, comp) { REGISTRY[key] = comp; }
 export function ActiveRoom() {
   const section = useStore((s) => s.section);
@@ -89,12 +91,13 @@ export function ActiveRoom() {
   const Comp = REGISTRY[section.key] || GenericRoom;
   return (
     <>
-      <Environment preset="night" environmentIntensity={0.35} />
-      <ambientLight intensity={0.7} color="#3a2c22" />
-      <hemisphereLight intensity={0.5} color={section.accent} groundColor="#180f0a" />
-      <spotLight position={[0, 9, 4]} angle={0.8} penumbra={0.9} intensity={45} distance={30} color="#ffd9a0" castShadow shadow-mapSize={[2048, 2048]} />
-      <pointLight position={[-6, 3, 2]} intensity={0.6} distance={20} color={section.accent} />
-      <pointLight position={[6, 2, 2]} intensity={0.5} distance={20} color="#ff945a" />
+      <Environment preset="night" environmentIntensity={0.4} />
+      <ambientLight intensity={1.0} color="#4a3626" />
+      <hemisphereLight intensity={0.7} color={section.accent} groundColor="#180f0a" />
+      <pointLight position={[0, 5, -2]} intensity={3.0} distance={20} color="#ffd9a0" castShadow shadow-mapSize={[1024, 1024]} />
+      <pointLight position={[-8, 4, -2]} intensity={2.0} distance={16} color={section.accent} />
+      <pointLight position={[8, 4, -2]} intensity={2.0} distance={16} color="#ffce9a" />
+      <pointLight position={[0, 4, -9]} intensity={1.6} distance={14} color="#ffb066" />
       <Comp section={section} />
     </>
   );

@@ -43,6 +43,42 @@ export function Frame({ src, position, rotation = [0, 0, 0], width = 1.6, accent
   );
 }
 
+// A framed photo that reveals an info card on hover (gear specs, concert notes).
+// Click still opens the lightbox of the photo.
+export function InfoTile({ src, position, rotation = [0, 0, 0], width = 1.4, accent = '#F4EFE6', card, cardSide = 1, caption }) {
+  const g = useRef();
+  const rim = useRef();
+  const [hover, setHover] = useState(false);
+  const openLightbox = useStore((s) => s.openLightbox);
+  const h = width * 0.72;
+  useFrame((_, dt) => {
+    const s = hover ? 1.08 : 1;
+    easing.damp3(g.current.scale, [s, s, s], 0.15, dt);
+    easing.damp(rim.current.material, 'opacity', hover ? 0.55 : 0, 0.15, dt);
+  });
+  return (
+    <group ref={g} position={position} rotation={rotation}
+      onPointerOver={(e) => { e.stopPropagation(); setHover(true); document.body.classList.add('hot'); }}
+      onPointerOut={() => { setHover(false); document.body.classList.remove('hot'); }}
+      onClick={(e) => { e.stopPropagation(); openLightbox(P + src, caption || prettyCaption(src)); }}>
+      <mesh ref={rim} position={[0, 0, -0.03]}><planeGeometry args={[width + 0.4, h + 0.4]} /><meshBasicMaterial color={accent} transparent opacity={0} blending={THREE.AdditiveBlending} depthWrite={false} /></mesh>
+      <mesh castShadow><boxGeometry args={[width + 0.09, h + 0.09, 0.05]} /><meshStandardMaterial color="#0e0b09" roughness={0.5} metalness={0.2} /></mesh>
+      <Image url={P + src} transparent position={[0, 0, 0.031]} scale={[width, h]} toneMapped={false} />
+      {hover && card && (
+        <Html position={[cardSide * (width / 2 + 0.15), 0.05, 0.12]} transform occlude distanceFactor={2.4} style={{ pointerEvents: 'none' }}>
+          <div style={{
+            width: 200, padding: '12px 14px', borderRadius: 11,
+            background: 'linear-gradient(180deg, rgba(14,10,8,.92), rgba(14,10,8,.97))',
+            backdropFilter: 'blur(16px)', border: '1px solid rgba(244,239,230,.16)', color: '#F4EFE6',
+            fontFamily: 'Geist, sans-serif', borderTop: `2px solid ${accent}`, boxShadow: '0 22px 55px -28px #000',
+            transform: cardSide < 0 ? 'translateX(-100%)' : 'none'
+          }}>{card}</div>
+        </Html>
+      )}
+    </group>
+  );
+}
+
 // A looping video plane (reels / product UI). Muted, autoplay.
 export function VideoScreen({ src, position, rotation = [0, 0, 0], width = 2.4, aspect = 16 / 9, frame = true, accent = '#F4EFE6' }) {
   return (
