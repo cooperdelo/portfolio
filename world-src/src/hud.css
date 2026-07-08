@@ -1,0 +1,61 @@
+:root { --rust:#FF4D2E; --ink:#F4EFE6; --muted:#8a8176; --bg:#0b0806; }
+* { box-sizing:border-box; }
+html, body, #root { height:100%; margin:0; }
+body { overflow:hidden; background:var(--bg); color:var(--ink); font-family:'Geist',system-ui,sans-serif; cursor:none; }
+@media (pointer:coarse){ body{cursor:auto;} #cursor{display:none;} }
+canvas { touch-action:none; }
+
+/* custom cursor */
+#cursor { position:fixed; top:0; left:0; z-index:40; pointer-events:none; mix-blend-mode:difference; }
+#cursor .dot { width:7px; height:7px; border-radius:50%; background:var(--ink); transform:translate(-50%,-50%); }
+#cursor .ring { position:absolute; width:34px; height:34px; border:1px solid rgba(244,239,230,.6); border-radius:50%; transform:translate(-50%,-50%) scale(1); transition:transform .3s cubic-bezier(.22,1,.36,1),border-color .3s; }
+#cursor .clabel { position:absolute; left:26px; top:0; transform:translateY(-50%); font-family:'Geist Mono',monospace; font-size:9px; letter-spacing:.22em; text-transform:uppercase; white-space:nowrap; opacity:0; transition:opacity .2s; }
+body.hot #cursor .ring { transform:translate(-50%,-50%) scale(1.7); border-color:var(--rust); }
+body.hot #cursor .clabel { opacity:1; }
+
+/* top chrome */
+.top { position:fixed; top:0; left:0; right:0; display:flex; justify-content:space-between; padding:20px 28px; z-index:14; pointer-events:none; }
+.brand { font-family:'Anton',sans-serif; font-size:17px; letter-spacing:.02em; text-transform:uppercase; text-shadow:0 2px 12px #000; }
+.brand .d { color:var(--rust); }
+.np { font-family:'Geist Mono',monospace; font-size:10px; letter-spacing:.28em; text-transform:uppercase; opacity:.7; margin-top:3px; }
+
+.back { position:fixed; top:20px; right:28px; z-index:15; font-family:'Geist Mono',monospace; font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:var(--ink); background:rgba(244,239,230,.05); border:1px solid rgba(244,239,230,.18); border-radius:999px; padding:.6rem 1rem; cursor:none; backdrop-filter:blur(10px); transition:.2s; }
+.back:hover { color:var(--rust); border-color:rgba(255,77,46,.5); }
+
+.tools { position:fixed; bottom:20px; right:24px; z-index:14; display:flex; gap:10px; }
+.tbtn { font-family:'Geist Mono',monospace; font-size:9.5px; letter-spacing:.18em; text-transform:uppercase; color:var(--muted); background:rgba(244,239,230,.05); border:1px solid rgba(244,239,230,.14); border-radius:999px; padding:.5rem .85rem; cursor:none; transition:.2s; backdrop-filter:blur(10px); }
+.tbtn:hover { color:var(--ink); border-color:rgba(244,239,230,.4); }
+.tbtn.on { color:var(--rust); border-color:rgba(255,77,46,.5); }
+
+.hint { position:fixed; bottom:64px; left:50%; transform:translateX(-50%); z-index:12; font-family:'Geist Mono',monospace; font-size:11px; letter-spacing:.24em; text-transform:uppercase; opacity:.6; pointer-events:none; text-shadow:0 2px 8px #000; text-align:center; }
+
+/* record crate */
+.crate { position:fixed; bottom:18px; left:50%; transform:translateX(-50%); z-index:13; display:flex; gap:7px; padding:7px; border-radius:999px; background:rgba(12,9,7,.5); border:1px solid rgba(244,239,230,.1); backdrop-filter:blur(14px); }
+.crate-rec { display:flex; align-items:center; gap:6px; font-family:'Geist Mono',monospace; font-size:9px; letter-spacing:.16em; text-transform:uppercase; color:var(--muted); background:transparent; border:1px solid transparent; border-radius:999px; padding:.45rem .7rem; cursor:none; transition:.2s; }
+.crate-rec .dot { width:7px; height:7px; border-radius:50%; opacity:.8; }
+.crate-rec:hover { color:var(--ink); background:rgba(244,239,230,.06); }
+.crate-rec.on { color:var(--ink); border-color:var(--a); }
+
+/* lightbox */
+.lightbox { position:fixed; inset:0; z-index:30; display:flex; align-items:center; justify-content:center; padding:5vh 5vw; background:rgba(6,5,4,0); backdrop-filter:blur(0); opacity:0; pointer-events:none; transition:opacity .5s, backdrop-filter .5s; }
+.lightbox.show { opacity:1; pointer-events:auto; background:rgba(6,5,4,.74); backdrop-filter:blur(6px); }
+.lightbox img { max-width:100%; max-height:82vh; border-radius:8px; box-shadow:0 40px 120px -20px #000, 0 0 0 1px rgba(244,239,230,.1); transform:scale(.92); transition:transform .6s cubic-bezier(.22,1,.36,1); }
+.lightbox.show img { transform:scale(1); }
+.lightbox .lcap { position:absolute; bottom:6vh; left:50%; transform:translateX(-50%); font-family:'Geist Mono',monospace; font-size:11px; letter-spacing:.22em; text-transform:uppercase; opacity:.7; }
+.lightbox .lx { position:absolute; top:5vh; right:5vw; font-family:'Geist Mono',monospace; font-size:11px; letter-spacing:.2em; text-transform:uppercase; opacity:.7; cursor:none; background:none; border:none; color:var(--ink); }
+
+/* loader */
+.loader { position:fixed; inset:0; z-index:50; background:#0b0806; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:20px; transition:opacity 1s; }
+.loader.hide { opacity:0; pointer-events:none; }
+.loader .lname { font-family:'Anton',sans-serif; font-size:clamp(2.6rem,8vw,5rem); line-height:.86; text-transform:uppercase; text-align:center; }
+.loader .lname .d { color:var(--rust); }
+.loader .lbar { width:200px; height:2px; background:rgba(244,239,230,.14); overflow:hidden; position:relative; }
+.loader .lbar i { display:block; height:100%; width:40%; background:var(--rust); animation:load 1.1s ease-in-out infinite; }
+@keyframes load { 0%{transform:translateX(-100%);} 100%{transform:translateX(350%);} }
+.loader .lsub { font-family:'Geist Mono',monospace; font-size:10px; letter-spacing:.28em; text-transform:uppercase; color:var(--muted); }
+
+@media (max-width:680px){
+  .top{ flex-direction:column; gap:8px; padding:16px; }
+  .hint{ font-size:8.5px; width:88%; }
+  .crate{ flex-wrap:wrap; justify-content:center; max-width:94vw; }
+}
