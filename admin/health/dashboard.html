@@ -13,6 +13,7 @@
   .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:.8rem;margin-bottom:1.2rem;}
   .kpi{border:1px solid #262626;border-radius:14px;padding:.9rem 1rem;}
   .kpi .n{font-size:1.7rem;font-weight:700;font-family:'Geist Mono',monospace;}
+  .kpi .n.good{color:#7bd88f;} .kpi .n.warn{color:#ffd24d;} .kpi .n.bad{color:#ff6b4d;}
   .kpi .l{font-size:.75rem;opacity:.65;margin-top:.2rem;}
   table{width:100%;border-collapse:collapse;font-size:.82rem;}
   th,td{padding:.45rem .5rem;text-align:left;border-bottom:1px solid #222;white-space:nowrap;}
@@ -49,7 +50,7 @@
         <table>
           <thead><tr>
             <th>Date</th><th>Sleep</th><th>Stress<br>(Garmin)</th><th>Mood</th>
-            <th>Symptom</th><th>BMs</th><th>Worst<br>Bristol</th><th>Blood</th><th>Irritants</th>
+            <th>Symptom</th><th>BMs</th><th>HBI<br>proxy</th><th>Blood</th><th>Irritants</th>
           </tr></thead>
           <tbody id="rows"><tr><td colspan="9" class="muted">Loading…</td></tr></tbody>
         </table>
