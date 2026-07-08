@@ -159,7 +159,7 @@
     var m=new THREE.MeshStandardMaterial({roughness:.6,metalness:.05});loadCover(sec,m);
     var sleeve=new THREE.Mesh(new THREE.BoxGeometry(H,H,.05),m);sleeve.castShadow=true;sleeve.receiveShadow=true;
     var edge=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(H,H,.05)),new THREE.LineBasicMaterial({color:sec.accent,transparent:true,opacity:0}));
-    var peek=new THREE.Mesh(new THREE.CircleGeometry(.58,40),new THREE.MeshStandardMaterial({map:discTex(sec.accent),roughness:.5,metalness:.15}));peek.position.set(.34,.08,.028);
+    var peek=new THREE.Mesh(new THREE.CircleGeometry(.5,40),new THREE.MeshStandardMaterial({map:discTex(sec.accent),roughness:.5,metalness:.15}));peek.position.set(0,.42,-.06);
     g.add(peek,sleeve,edge);g.position.set(cx,top+H/2*Math.cos(lean)-.02,-.55);g.rotation.set(lean,0,0);
     g.userData={sec:sec,edge:edge,peek:peek,home:g.position.clone()};wall.add(g);vinyls.push(g);}
 
