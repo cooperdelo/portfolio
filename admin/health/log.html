@@ -35,8 +35,7 @@
         <h1>DAILY <span class="accent">log</span></h1>
       </div>
       <div class="actions">
-        <a class="btn ghost" href="/admin/health/food.html">Log food &rarr;</a>
-        <a class="btn ghost" href="/admin/health/dashboard.html">Insights</a>
+        <a class="btn ghost" href="/admin/health/dashboard.html">Insights &rarr;</a>
       </div>
     </div>
 
@@ -125,6 +124,24 @@
         <div class="field" style="margin-top:1rem;">
           <label>Alcohol drinks today (flagged &mdash; ALDH2): <b id="alc-val">0</b></label>
           <input type="range" id="alcohol" min="0" max="8" step="1" value="0" />
+        </div>
+      </div>
+
+      <!-- D. MEAL (merged food log) -->
+      <div class="card" style="max-width:720px;">
+        <h2>&#127869; Log a meal <span class="sublabel" style="display:inline;">(photo + caption &rarr; auto-analyzed)</span></h2>
+        <label id="drop" for="mealphoto" style="display:block;border:1.5px dashed #555;border-radius:14px;padding:1.1rem;text-align:center;cursor:pointer;">
+          <span id="drop-text">&#128247; Tap to add a meal photo</span>
+        </label>
+        <img id="mealprev" alt="" style="max-width:100%;max-height:220px;border-radius:12px;margin-top:.6rem;display:none;" />
+        <input type="file" id="mealphoto" accept="image/*" capture="environment" style="display:none;" />
+        <div class="field" style="margin-top:.8rem;">
+          <label>What is it? (be specific &mdash; this is the ground truth)</label>
+          <input type="text" id="mealcap" placeholder="e.g. grilled chicken bowl, white rice, broccoli, no sauce" />
+        </div>
+        <div class="row">
+          <button class="tap" id="save-meal" style="flex:0 0 auto;">Add meal</button>
+          <span id="meal-count" class="sublabel" style="display:inline;"></span>
         </div>
       </div>
 

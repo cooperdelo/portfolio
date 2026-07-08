@@ -18,7 +18,6 @@ const NAV = [
   ]},
   { section: 'Health', items: [
     { href: '/admin/health/log.html',           label: 'Daily Log', roles: ['full'] },
-    { href: '/admin/health/food.html',          label: 'Food Log', roles: ['full'] },
     { href: '/admin/health/dashboard.html',     label: 'Health Insights', roles: ['full'] },
   ]},
   { section: 'Academics', items: [

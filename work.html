@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Work · Cooper Delo</title>
+<meta name="description" content="An interactive 3D gallery — music, startup, sport, and the road. Drag to explore." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Geist+Mono:wght@300..700&family=Geist:wght@300..700&display=swap" rel="stylesheet" />
+<style>
+  :root { --ink:#F4EFE6; --bg:#07070C; --rust:#FF4D2E; --muted:#8A8598; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html,body { height:100%; overflow:hidden; background:var(--bg); color:var(--ink);
+    font-family:"Geist",-apple-system,sans-serif; -webkit-font-smoothing:antialiased; }
+  #gl { position:fixed; inset:0; display:block; cursor:grab; }
+  #gl.drag { cursor:grabbing; }
+  .hud { position:fixed; inset:0; pointer-events:none; z-index:5; }
+  .top { position:absolute; top:0; left:0; right:0; display:flex; justify-content:space-between;
+    align-items:flex-start; padding:1.6rem 2rem; }
+  .brand { font-family:"Anton",sans-serif; text-transform:uppercase; font-size:1.2rem; letter-spacing:.02em; }
+  .brand .dot { color:var(--rust); }
+  .nav { pointer-events:auto; display:flex; gap:1.2rem; font-family:"Geist Mono",monospace;
+    font-size:.66rem; letter-spacing:.22em; text-transform:uppercase; }
+  .nav a { color:var(--muted); text-decoration:none; transition:color .2s; }
+  .nav a:hover { color:var(--ink); }
+  .title { position:absolute; left:2rem; bottom:2rem; max-width:60ch; }
+  .title h1 { font-family:"Anton",sans-serif; text-transform:uppercase; font-size:clamp(2rem,6vw,4.4rem);
+    line-height:.92; letter-spacing:-.01em; }
+  .title h1 .accent { color:var(--rust); }
+  .title p { font-family:"Geist Mono",monospace; font-size:.7rem; letter-spacing:.22em;
+    text-transform:uppercase; color:var(--muted); margin-top:.9rem; }
+  .filters { position:absolute; right:2rem; bottom:2rem; pointer-events:auto; display:flex;
+    flex-direction:column; gap:.5rem; align-items:flex-end; }
+  .chip { font-family:"Geist Mono",monospace; font-size:.62rem; letter-spacing:.2em; text-transform:uppercase;
+    color:var(--muted); cursor:pointer; transition:color .2s; }
+  .chip:hover, .chip.on { color:var(--ink); }
+  .chip.on::before { content:"● "; color:var(--rust); }
+  .caption { position:absolute; left:50%; bottom:2rem; transform:translateX(-50%);
+    font-family:"Geist Mono",monospace; font-size:.7rem; letter-spacing:.18em; text-transform:uppercase;
+    color:var(--ink); opacity:0; transition:opacity .3s; text-align:center; }
+  .hint { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+    font-family:"Geist Mono",monospace; font-size:.66rem; letter-spacing:.24em; text-transform:uppercase;
+    color:var(--muted); opacity:.8; animation:fade 3.5s ease 2.5s forwards; }
+  @keyframes fade { to { opacity:0; } }
+  /* lightbox */
+  #box { position:fixed; inset:0; z-index:20; background:rgba(5,5,10,.9); backdrop-filter:blur(10px);
+    display:none; align-items:center; justify-content:center; padding:4vw; pointer-events:auto; }
+  #box.show { display:flex; }
+  #box img { max-width:90vw; max-height:82vh; border-radius:6px; box-shadow:0 40px 120px -30px rgba(0,0,0,.9); }
+  #box .cap { position:absolute; bottom:2rem; font-family:"Geist Mono",monospace; font-size:.72rem;
+    letter-spacing:.2em; text-transform:uppercase; color:var(--muted); }
+  #box .x { position:absolute; top:1.6rem; right:2rem; font-family:"Geist Mono",monospace;
+    font-size:.7rem; letter-spacing:.2em; text-transform:uppercase; color:var(--ink); cursor:pointer; }
+  /* fallback grid */
+  #fallback { position:fixed; inset:0; overflow:auto; padding:5rem 2rem 2rem; display:none;
+    grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:1rem; z-index:3; }
+  #fallback.show { display:grid; }
+  #fallback img { width:100%; border-radius:6px; }
+</style>
+</head>
+<body>
+  <canvas id="gl"></canvas>
+  <div id="fallback"></div>
+
+  <div class="hud">
+    <div class="top">
+      <div class="brand">COOPER<span class="dot">.</span>DELO</div>
+      <div class="nav">
+        <a href="/">Home</a><a href="/plugverse.html">Plugverse</a><a href="/rubber-band.html">Band</a><a href="/now.html">Now</a>
+      </div>
+    </div>
+    <div class="title">
+      <h1>THE <span class="accent">WORK</span></h1>
+      <p>Music · Startup · Sport · The Road — drag to explore</p>
+    </div>
+    <div class="filters" id="filters"></div>
+    <div class="caption" id="caption"></div>
+    <div class="hint">◐ drag to spin · click to open</div>
+  </div>
+
+  <div id="box"><span class="x" id="boxx">✕ close</span><img id="boximg" alt=""/><div class="cap" id="boxcap"></div></div>
+
+  <script type="module">
+    // ---- curated works across pillars (real photos) ----
+    const WORKS = [
+      { f:'gig_rubber_big_stage_1.jpg', t:'Rubber Band · main stage', c:'music' },
+      { f:'gig_rubber_bass_bw.jpg', t:'On bass', c:'music' },
+      { f:'cooper_bass_outdoor_solo.jpg', t:'Solo · outdoor', c:'music' },
+      { f:'concert_rubber_band_live.jpg', t:'Live', c:'music' },
+      { f:'solo_cooper_bass.jpeg', t:'Cooper Delo · artist', c:'music' },
+      { f:'cooper_with_guitar_outdoor.jpg', t:'Writing', c:'music' },
+      { f:'flicker_of_time_ep_cover.jpg', t:'Flicker of Time — EP', c:'music' },
+      { f:'Plugverse_picture.jpeg', t:'Plugverse', c:'startup' },
+      { f:'plugverse_profile.jpg', t:'Plugverse · product', c:'startup' },
+      { f:'plugverse_merch.jpg', t:'Plugverse · merch', c:'startup' },
+      { f:'luby_pic_with_check.jpg', t:'1789 Venture Lab', c:'startup' },
+      { f:'cooper_suit_campus.jpg', t:'Kenan-Flagler', c:'startup' },
+      { f:'snowboard_athletics.jpg', t:'Snowboard', c:'sport' },
+      { f:'golf_swing_finish.jpg', t:'Golf · finish', c:'sport' },
+      { f:'golf_portrait.jpg', t:'On the course', c:'sport' },
+      { f:'cooper_tux_with_canon.jpg', t:'Lens', c:'sport' },
+      { f:'thailand_trip_wat_arun.jpg', t:'Bangkok · Wat Arun', c:'road' },
+      { f:'ireland_trip_1.jpg', t:'Ireland', c:'road' },
+      { f:'london_trip_1.jpg', t:'London', c:'road' },
+      { f:'cooper_park_portrait.jpg', t:'Chapel Hill', c:'road' },
+    ];
+    const CATS = { music:0xFF4D2E, startup:0xC9BEE6, sport:0xB2E3E1, road:0xF2C1D1 };
+
+    try {
+      const THREE = await import('https://esm.sh/three@0.160.0');
+      const canvas = document.getElementById('gl');
+      const renderer = new THREE.WebGLRenderer({ canvas, antialias:true });
+      renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+      const scene = new THREE.Scene();
+      scene.fog = new THREE.FogExp2(0x07070C, 0.045);
+      const cam = new THREE.PerspectiveCamera(60, 1, 0.1, 100);
+      cam.position.set(0,0,0.1);
+
+      // grid room
+      const grid = new THREE.GridHelper(60, 60, 0x2b2b45, 0x18182b);
+      grid.position.y = -6; scene.add(grid);
+      const grid2 = grid.clone(); grid2.position.y = 8; scene.add(grid2);
+
+      const group = new THREE.Group(); scene.add(group);
+      const loader = new THREE.TextureLoader();
+      const R = 9, rows = [2.6, 0, -2.6];
+      const planes = [];
+      const per = Math.ceil(WORKS.length / rows.length);
+
+      WORKS.forEach((w, i) => {
+        const row = Math.floor(i / per), col = i % per;
+        const a = (col / per) * Math.PI * 2 + row * 0.32;
+        const y = rows[row] + (Math.random()-0.5)*0.5;
+        const tex = loader.load('/photos/' + w.f, t => { t.colorSpace = THREE.SRGBColorSpace; });
+        const geo = new THREE.PlaneGeometry(2.4, 3.1);
+        const mat = new THREE.MeshBasicMaterial({ map: tex, transparent:true });
+        const m = new THREE.Mesh(geo, mat);
+        m.position.set(Math.sin(a)*R, y, Math.cos(a)*R);
+        m.lookAt(0, y*0.3, 0);
+        m.userData = { ...w, baseScale:1 };
+        // subtle colored frame
+        const edge = new THREE.LineSegments(new THREE.EdgesGeometry(geo),
+          new THREE.LineBasicMaterial({ color: CATS[w.c], transparent:true, opacity:0.5 }));
+        m.add(edge);
+        group.add(m); planes.push(m);
+      });
+
+      // ---- interaction ----
+      let drag=false, px=0, vel=0, targetRotY=0, curRotY=0;
+      canvas.addEventListener('pointerdown', e=>{ drag=true; px=e.clientX; canvas.classList.add('drag'); });
+      addEventListener('pointerup', ()=>{ drag=false; canvas.classList.remove('drag'); });
+      addEventListener('pointermove', e=>{
+        const nx=(e.clientX/innerWidth)*2-1, ny=-(e.clientY/innerHeight)*2+1; mouse.set(nx,ny);
+        if(drag){ const dx=e.clientX-px; px=e.clientX; vel=dx*0.005; targetRotY+=vel; }
+      });
+      // wheel to spin too
+      addEventListener('wheel', e=>{ targetRotY += e.deltaY*0.0015; }, {passive:true});
+
+      const ray = new THREE.Raycaster(), mouse = new THREE.Vector2();
+      let hovered = null;
+      const caption = document.getElementById('caption');
+
+      // lightbox
+      const box=document.getElementById('box'), boximg=document.getElementById('boximg'), boxcap=document.getElementById('boxcap');
+      canvas.addEventListener('click', ()=>{ if(Math.abs(vel)>0.01) return; if(hovered){
+        boximg.src='/photos/'+hovered.userData.f; boxcap.textContent=hovered.userData.t+' · '+hovered.userData.c; box.classList.add('show'); }});
+      document.getElementById('boxx').onclick=()=>box.classList.remove('show');
+      box.addEventListener('click',e=>{ if(e.target===box) box.classList.remove('show'); });
+
+      // filters
+      const fEl=document.getElementById('filters'); let active=null;
+      ['all','music','startup','sport','road'].forEach(cat=>{
+        const c=document.createElement('div'); c.className='chip'+(cat==='all'?' on':''); c.textContent=cat;
+        c.onclick=()=>{ active=(cat==='all')?null:cat; fEl.querySelectorAll('.chip').forEach(x=>x.classList.remove('on')); c.classList.add('on'); };
+        fEl.appendChild(c);
+      });
+
+      function resize(){ renderer.setSize(innerWidth,innerHeight); cam.aspect=innerWidth/innerHeight; cam.updateProjectionMatrix(); }
+      resize(); addEventListener('resize', resize);
+
+      (function loop(){
+        requestAnimationFrame(loop);
+        if(!drag){ targetRotY += 0.0009; vel*=0.94; }
+        curRotY += (targetRotY-curRotY)*0.08; group.rotation.y = curRotY;
+        // hover
+        ray.setFromCamera(mouse, cam);
+        const hits = ray.intersectObjects(planes);
+        const top = hits.length ? hits[0].object : null;
+        if(top!==hovered){ hovered=top;
+          caption.style.opacity = hovered?1:0; if(hovered) caption.textContent=hovered.userData.t; }
+        planes.forEach(m=>{
+          const dim = active && m.userData.c!==active;
+          m.material.opacity += ((dim?0.12:1)-m.material.opacity)*0.1;
+          const want = (m===hovered?1.18:1); m.scale.x += (want-m.scale.x)*0.12; m.scale.y=m.scale.x;
+        });
+        renderer.render(scene, cam);
+      })();
+    } catch(err){
+      console.warn('3D gallery fallback:', err);
+      const fb=document.getElementById('fallback'); fb.classList.add('show');
+      WORKS.forEach(w=>{ const i=document.createElement('img'); i.src='/photos/'+w.f; i.alt=w.t; fb.appendChild(i); });
+    }
+  </script>
+</body>
+</html>

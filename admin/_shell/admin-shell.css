@@ -428,3 +428,96 @@ h2.section-h .accent {
   font-variation-settings: normal;
   font-weight: 600;
 }
+
+/* =====================================================================
+   DESIGN SYSTEM v2 — global glow-up (applies to every /admin/* page)
+   Appended so it overrides the base without touching class names.
+   ===================================================================== */
+
+/* Living ambient background — slow drifting aurora behind everything */
+body::after {
+  content: ""; position: fixed; inset: -20%; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(38vw 38vw at 18% 12%, rgba(255,77,46,0.16), transparent 60%),
+    radial-gradient(34vw 34vw at 82% 20%, rgba(201,190,230,0.13), transparent 62%),
+    radial-gradient(40vw 40vw at 70% 88%, rgba(178,227,225,0.10), transparent 62%),
+    radial-gradient(30vw 30vw at 25% 82%, rgba(200,16,46,0.10), transparent 60%);
+  filter: blur(20px) saturate(120%);
+  animation: aurora 26s ease-in-out infinite alternate;
+}
+@keyframes aurora {
+  0%   { transform: translate3d(0,0,0) scale(1); }
+  50%  { transform: translate3d(2%, -1.5%, 0) scale(1.08); }
+  100% { transform: translate3d(-1.5%, 2%, 0) scale(1.04); }
+}
+@media (prefers-reduced-motion: reduce) { body::after { animation: none; } }
+
+/* Cards: kill the "blob" flatness — real depth, structure, hover life */
+.card {
+  background:
+    linear-gradient(180deg, rgba(244,239,230,0.06), rgba(244,239,230,0.015)),
+    rgba(20,17,15,0.30);
+  border-color: rgba(244,239,230,0.14);
+  box-shadow:
+    0 1px 0 rgba(244,239,230,0.10) inset,
+    0 -1px 0 rgba(0,0,0,0.55) inset,
+    0 30px 90px -40px rgba(0,0,0,0.85);
+  transition: transform .4s cubic-bezier(.22,1,.36,1), border-color .4s, box-shadow .4s;
+}
+.card::after {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  background: radial-gradient(120% 80% at 50% -10%, rgba(255,77,46,0.10), transparent 55%);
+  opacity: 0; transition: opacity .4s;
+}
+.card:hover {
+  transform: translateY(-4px);
+  border-color: var(--card-border-hover);
+  box-shadow: 0 1px 0 rgba(244,239,230,0.12) inset, 0 40px 110px -34px rgba(255,77,46,0.28);
+}
+.card:hover::after { opacity: 1; }
+
+/* Entry-grid / KPI tiles on every dashboard get an accent edge + lift */
+.kpi-grid .card { position: relative; overflow: hidden; }
+.kpi-grid a.card::before {
+  content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+  background: var(--rust, #FF4D2E); opacity: 0; transition: opacity .3s; border-radius: 3px;
+}
+.kpi-grid a.card:hover::before { opacity: 1; }
+.kpi-grid a.card:hover .value { color: var(--rust, #FF4D2E); transition: color .3s; }
+
+/* Headline gets a subtle gradient — feels designed, not default */
+.page-head h1 {
+  background: linear-gradient(92deg, var(--ink) 30%, #EAD9C8 65%, var(--ink) 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.page-head h1 .accent {
+  -webkit-text-fill-color: var(--rust, #FF4D2E);
+}
+
+/* Section headers: add a leading accent tick */
+h2.section-h { display: flex; align-items: center; gap: .7rem; }
+h2.section-h::before {
+  content: ""; width: 22px; height: 2px; border-radius: 2px;
+  background: linear-gradient(90deg, var(--rust), transparent);
+}
+
+/* Buttons: crisper, springier */
+.btn { backdrop-filter: blur(8px); }
+.btn.primary { box-shadow: 0 1px 0 rgba(255,255,255,0.3) inset, 0 18px 50px -18px rgba(255,77,46,0.8); }
+
+/* Tables feel more premium */
+table.data tbody tr { transition: background .2s; }
+table.data tbody tr:hover { background: rgba(255,77,46,0.05); }
+table.data thead th { backdrop-filter: blur(10px); }
+
+/* Rail: sharper active state + brand glow */
+.rail .brand .dot { animation: brandpulse 2.4s ease-in-out infinite; }
+@keyframes brandpulse { 0%,100%{ box-shadow:0 0 12px rgba(255,77,46,0.7);} 50%{ box-shadow:0 0 22px rgba(255,77,46,1);} }
+.rail a.nav-item.active { box-shadow: 0 0 30px -10px rgba(255,77,46,0.6) inset; }
+
+/* Gentle entrance for main content */
+.main > * { animation: rise .6s cubic-bezier(.22,1,.36,1) both; }
+.main > *:nth-child(2){ animation-delay:.05s } .main > *:nth-child(3){ animation-delay:.10s }
+.main > *:nth-child(4){ animation-delay:.15s } .main > *:nth-child(5){ animation-delay:.20s }
+@keyframes rise { from { opacity:0; transform: translateY(14px); } to { opacity:1; transform:none; } }
+@media (prefers-reduced-motion: reduce){ .main > *{ animation:none; } }

@@ -113,3 +113,47 @@ document.getElementById('save-day').addEventListener('click', async () => {
   if (e1 || e2) { console.error(e1 || e2); toast((e1 || e2).message || 'Save failed', 'err', 4000); return; }
   toast('Saved ✓ nice work');
 });
+
+// ---------- Meal (merged food log) ----------
+const BUCKET = 'health-food-photos';
+const mealInput = document.getElementById('mealphoto');
+const mealPrev = document.getElementById('mealprev');
+const mealCap = document.getElementById('mealcap');
+const mealCountEl = document.getElementById('meal-count');
+let mealFile = null;
+
+mealInput.addEventListener('change', () => {
+  mealFile = mealInput.files?.[0] || null;
+  if (mealFile) {
+    mealPrev.src = URL.createObjectURL(mealFile);
+    mealPrev.style.display = 'block';
+    document.getElementById('drop-text').textContent = mealFile.name;
+  }
+});
+
+async function refreshMealCount() {
+  const { count } = await sb.from('health_food_log')
+    .select('*', { count: 'exact', head: true }).eq('day', today);
+  if (count != null) mealCountEl.textContent = count ? `${count} logged today` : '';
+}
+refreshMealCount();
+
+document.getElementById('save-meal').addEventListener('click', async () => {
+  const caption = mealCap.value.trim();
+  if (!caption) { toast('Add a caption', 'err'); return; }
+  const btn = document.getElementById('save-meal'); btn.disabled = true;
+  let photo_path = null;
+  if (mealFile) {
+    const ext = (mealFile.name.split('.').pop() || 'jpg').toLowerCase();
+    photo_path = `${today}/${Date.now()}.${ext}`;
+    const up = await sb.storage.from(BUCKET).upload(photo_path, mealFile, { contentType: mealFile.type || 'image/jpeg' });
+    if (up.error) { console.error(up.error); toast('Upload failed: ' + up.error.message, 'err', 4000); btn.disabled = false; return; }
+  }
+  const { error } = await sb.from('health_food_log').insert({ photo_path, caption, status: mealFile ? 'pending' : 'manual' });
+  btn.disabled = false;
+  if (error) { console.error(error); toast(error.message || 'Save failed', 'err', 4000); return; }
+  toast('Meal logged ✓');
+  mealFile = null; mealInput.value = ''; mealCap.value = ''; mealPrev.style.display = 'none';
+  document.getElementById('drop-text').textContent = '📷 Tap to add a meal photo';
+  refreshMealCount();
+});
