@@ -37,6 +37,14 @@
     </div>
 
     <div class="stack" style="max-width:720px;">
+      <div class="card" style="display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;">
+        <label class="sublabel" style="margin:0;">Logging for</label>
+        <button class="btn ghost" id="d-prev" style="padding:.4rem .7rem;">&#8249;</button>
+        <input type="date" id="d-input" style="background:transparent;border:1px solid var(--line,#2a2a2a);color:inherit;font:inherit;border-radius:10px;padding:.5rem .7rem;" />
+        <button class="btn ghost" id="d-next" style="padding:.4rem .7rem;">&#8250;</button>
+        <button class="btn ghost" id="d-today" style="padding:.4rem .8rem;">Today</button>
+        <span class="sublabel" style="margin:0;opacity:.55;">Pick any past day to log its meals.</span>
+      </div>
       <div class="card">
         <h2 style="font-size:1.05rem;margin:.1rem 0 .8rem;">Snap a photo + caption</h2>
         <p class="sublabel" style="opacity:.7;font-size:.85rem;margin:0 0 .8rem;">
@@ -60,7 +68,7 @@
       </div>
 
       <div class="card">
-        <h2 style="font-size:1.05rem;margin:.1rem 0 .4rem;">Today</h2>
+        <h2 style="font-size:1.05rem;margin:.1rem 0 .4rem;" id="list-day">Today</h2>
         <div id="list"><p class="sublabel" style="opacity:.6;">Loading…</p></div>
       </div>
     </div>

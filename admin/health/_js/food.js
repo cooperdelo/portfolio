@@ -10,7 +10,24 @@ import { mountShell, toast } from '/admin/_shell/admin-shell.js';
 await mountShell({ title: 'Food Log · Health' });
 
 const BUCKET = 'health-food-photos';
-const today = new Date().toISOString().slice(0, 10);
+
+// ---- selected day (defaults to today; can log/view any past day) ----
+const todayStr = () => new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD local (ET)
+let day = todayStr();
+// occurred_at at noon ET for past days (round-trips the generated `day` column)
+const tsFor = () => (day === todayStr() ? new Date().toISOString() : new Date(`${day}T12:00:00`).toISOString());
+const dInput = document.getElementById('d-input');
+function syncDate() {
+  dInput.value = day; dInput.max = todayStr();
+  document.getElementById('d-next').disabled = day >= todayStr();
+  document.getElementById('list-day').textContent = day === todayStr() ? 'Today'
+    : new Date(`${day}T12:00:00`).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+}
+function shiftDay(n) { const d = new Date(`${day}T12:00:00`); d.setDate(d.getDate() + n); day = d.toLocaleDateString('en-CA'); syncDate(); loadToday(); }
+document.getElementById('d-prev').addEventListener('click', () => shiftDay(-1));
+document.getElementById('d-next').addEventListener('click', () => { if (day < todayStr()) shiftDay(1); });
+document.getElementById('d-today').addEventListener('click', () => { day = todayStr(); syncDate(); loadToday(); });
+dInput.addEventListener('change', () => { if (dInput.value) { day = dInput.value; syncDate(); loadToday(); } });
 
 const fileInput = document.getElementById('photo');
 const preview   = document.getElementById('preview');
@@ -40,7 +57,7 @@ async function saveEntry({ withPhoto }) {
   let photo_path = null;
   if (withPhoto && picked) {
     const ext = (picked.name.split('.').pop() || 'jpg').toLowerCase();
-    photo_path = `${today}/${Date.now()}.${ext}`;
+    photo_path = `${day}/${Date.now()}.${ext}`;
     const up = await sb.storage.from(BUCKET).upload(photo_path, picked, {
       cacheControl: '3600', upsert: false, contentType: picked.type || 'image/jpeg',
     });
@@ -49,7 +66,7 @@ async function saveEntry({ withPhoto }) {
   }
 
   const { error } = await sb.from('health_food_log').insert({
-    photo_path, caption,
+    photo_path, caption, occurred_at: tsFor(),
     status: withPhoto ? 'pending' : 'manual',
   });
   btnP.disabled = btnT.disabled = false;
@@ -76,7 +93,7 @@ async function signedUrl(path) {
 async function loadToday() {
   const list = document.getElementById('list');
   const { data, error } = await sb.from('health_food_log')
-    .select('*').eq('day', today).order('occurred_at', { ascending: false });
+    .select('*').eq('day', day).order('occurred_at', { ascending: false });
   if (error) { list.innerHTML = `<p class="sublabel">Couldn't load (${error.message})</p>`; return; }
   if (!data?.length) { list.innerHTML = `<p class="sublabel" style="opacity:.6;">Nothing logged yet today.</p>`; return; }
 
@@ -99,4 +116,5 @@ async function loadToday() {
   list.innerHTML = rows.join('');
 }
 
+syncDate();
 loadToday();
