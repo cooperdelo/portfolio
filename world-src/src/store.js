@@ -12,12 +12,14 @@ export const useStore = create((set, get) => ({
   lightbox: null,       // { src, caption } | null
   soundOn: false,
   ready: false,
+  roomView: 'front',    // 'left' | 'front' | 'right' — which wall the camera faces
 
   setReady: (v) => set({ ready: v }),
   setHovered: (h) => set({ hovered: h }),
   toggleSound: () => set((s) => ({ soundOn: !s.soundOn })),
+  setRoomView: (v) => set({ roomView: v }),
 
-  dive: (section) => { if (get().phase === 'idle') set({ phase: 'dropping', section }); },
+  dive: (section) => { if (get().phase === 'idle') set({ phase: 'dropping', section, roomView: 'front' }); },
   voidScene: () => set({ shown: 'void' }),   // brief empty frame under the overlay so scenes never coexist in GPU memory
   swapToRoom: () => set((s) => ({ shown: s.section ? s.section.key : 'hub' })),
   finishDrop: () => set((s) => ({ phase: 'inroom', room: s.section ? s.section.key : 'hub' })),

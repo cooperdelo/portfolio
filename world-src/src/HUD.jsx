@@ -27,6 +27,9 @@ export default function HUD() {
         <button className="back" data-c onClick={returnToHub}>← back to the studio</button>
       )}
 
+      {/* POV wall navigation */}
+      {phase === 'inroom' && active && <PovNav sectionKey={active.key} accent={active.accent} />}
+
       {/* tools */}
       <div className="tools">
         <button className={'tbtn' + (soundOn ? ' on' : '')} data-c onClick={toggleSound}>Sound {soundOn ? '●' : '○'}</button>
@@ -85,6 +88,32 @@ function Lightbox({ lightbox, close }) {
   );
 }
 
+// Per-room wall labels for the [left · front · right] POV switch.
+const WALLS = {
+  MUSIC: ['The Rig', 'Stage', 'Shows'],
+  PLUGVERSE: ['The Story', 'Center', 'The Wins'],
+  ATHLETIC: ['Iron', 'Center', 'Golf'],
+  LENS: ['Left', 'The Wall', 'Right'],
+  NOW: ['Left', 'The Desk', 'The Board']
+};
+function PovNav({ sectionKey, accent }) {
+  const roomView = useStore((s) => s.roomView);
+  const setRoomView = useStore((s) => s.setRoomView);
+  const [L, C, R] = WALLS[sectionKey] || ['Left', 'Center', 'Right'];
+  const btn = (view, label, arrowL, arrowR) => (
+    <button className={'pov-btn' + (roomView === view ? ' on' : '')} style={{ '--a': accent }} data-c onClick={() => setRoomView(view)}>
+      {arrowL && <span className="pov-arw">◀</span>}{label}{arrowR && <span className="pov-arw">▶</span>}
+    </button>
+  );
+  return (
+    <div className="povnav">
+      {btn('left', L, true, false)}
+      {btn('front', C, false, false)}
+      {btn('right', R, false, true)}
+    </div>
+  );
+}
+
 function Crate() {
   const { room, phase, dive, returnToHub } = useStore();
   if (phase === 'dropping' || phase === 'returning') return null;
@@ -116,9 +145,6 @@ function Transition() {
   const accent = section ? section.accent : '#FF4D2E';
   return (
     <div className={'drop' + (active ? ' on' : '')} style={{ '--a': accent }}>
-      <div className="drop-vinyl" style={{ borderColor: accent }}>
-        <div className="drop-hole" style={{ background: accent }} />
-      </div>
       {section && <div className="drop-label" style={{ color: accent }}>{phase === 'returning' ? 'back to the studio' : `▶ ${section.key.toLowerCase()}`}</div>}
     </div>
   );

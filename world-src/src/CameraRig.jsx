@@ -7,14 +7,20 @@ import { useStore } from './store.js';
 // Camera anchors per scene. { p: position, l: lookAt }
 const ANCHORS = {
   hub: { p: [0, 2.7, 7.6], l: [0, 1.9, -3.8] },
-  drop: { p: [-0.4, 1.7, -1.4], l: [-1.0, 1.2, -4.0] },   // pushed toward the turntable
-  room: { p: [0, 1.75, 7.2], l: [0, 1.6, -3.2] }
+  drop: { p: [-0.6, 1.6, -1.2], l: [-1.0, 1.25, -4.0] }    // pushed toward the turntable
+};
+// Room POV: click to face the stage (front) or turn to the side walls.
+const ROOM_VIEWS = {
+  front: { p: [0, 2.1, 7.0], l: [0, 2.6, -7] },
+  left: { p: [3.4, 3.0, 1.5], l: [-11, 3.4, -3] },
+  right: { p: [-3.4, 3.0, 1.5], l: [11, 3.4, -3] }
 };
 
 export default function CameraRig() {
   const { camera, gl } = useThree();
   const phase = useStore((s) => s.phase);
   const shown = useStore((s) => s.shown);
+  const roomView = useStore((s) => s.roomView);
   const drag = useRef({ on: false, lx: 0, ly: 0, yaw: 0, pitch: 0, tyaw: 0, tpitch: 0, dolly: 0 });
   const tmpP = useRef(new THREE.Vector3());
   const look = useRef(new THREE.Vector3(0, 1.8, -3));
@@ -35,15 +41,15 @@ export default function CameraRig() {
     return () => { el.removeEventListener('pointerdown', down); removeEventListener('pointerup', up); removeEventListener('pointermove', move); removeEventListener('wheel', wheel); };
   }, [gl]);
 
-  // reset drag offsets when entering/leaving rooms
-  useEffect(() => { drag.current.tyaw = 0; drag.current.tpitch = 0; drag.current.dolly = 0; }, [shown]);
+  // reset drag offsets when entering/leaving rooms or switching wall view
+  useEffect(() => { drag.current.tyaw = 0; drag.current.tpitch = 0; drag.current.dolly = 0; }, [shown, roomView]);
 
   useFrame((_, dt) => {
     const d = drag.current;
     d.yaw = THREE.MathUtils.damp(d.yaw, d.tyaw, 4, dt);
     d.pitch = THREE.MathUtils.damp(d.pitch, d.tpitch, 4, dt);
 
-    let a = shown === 'hub' ? ANCHORS.hub : ANCHORS.room;
+    let a = shown === 'hub' ? ANCHORS.hub : (ROOM_VIEWS[roomView] || ROOM_VIEWS.front);
     if (phase === 'dropping') a = ANCHORS.drop;
 
     // apply orbit offsets

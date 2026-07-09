@@ -1,12 +1,42 @@
-import React, { Suspense } from 'react';
-import { ContactShadows } from '@react-three/drei';
+import React, { Suspense, useRef } from 'react';
+import { ContactShadows, useTexture } from '@react-three/drei';
+import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { Model } from './Model.jsx';
 import Records from './Records.jsx';
 import { useStore } from './store.js';
-import { sectionByKey } from './data.js';
+import { sectionByKey, SECTIONS, thumb } from './data.js';
 import { POSTERS } from './posters.js';
 import { useStudioTextures, AlbumPoster, PhotoPoster, CityWindow, ShelfUnit, Plaque } from './studio.jsx';
+
+// The record physically ejects from the shelf, arcs to the turntable and spins
+// flat onto the platter during the needle-drop (the blur overlay then takes over).
+function FlyingRecord({ section }) {
+  const ref = useRef(); const inner = useRef(); const t = useRef(0);
+  const tex = useTexture(thumb(section.cover));
+  const idx = Math.max(0, SECTIONS.findIndex((s) => s.key === section.key));
+  useFrame((_, dt) => {
+    if (!ref.current) return;
+    t.current += dt;
+    const k = Math.min(t.current / 0.5, 1);
+    const e = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
+    const sx = (idx - (SECTIONS.length - 1) / 2) * 1.5, sy = 2.85, sz = -6.2;
+    const ex = -1.0, ey = 1.42, ez = -4.0;
+    ref.current.position.set(sx + (ex - sx) * e, sy + (ey - sy) * e + Math.sin(k * Math.PI) * 1.0, sz + (ez - sz) * e);
+    ref.current.rotation.x = (Math.PI / 2) * (1 - e);   // upright in the shelf → flat on the platter
+    if (inner.current) inner.current.rotation.y += dt * (10 + 20 * k);
+  });
+  return (
+    <group ref={ref}>
+      <group ref={inner}>
+        <mesh><cylinderGeometry args={[0.74, 0.74, 0.02, 48]} /><meshStandardMaterial color="#0a0a0c" roughness={0.35} metalness={0.5} /></mesh>
+        <mesh position={[0, 0.012, 0]} rotation={[-Math.PI / 2, 0, 0]}><circleGeometry args={[0.44, 48]} /><meshBasicMaterial map={tex} toneMapped={false} /></mesh>
+        <mesh position={[0, 0.013, 0]} rotation={[-Math.PI / 2, 0, 0]}><ringGeometry args={[0.05, 0.06, 32]} /><meshBasicMaterial color="#000" /></mesh>
+      </group>
+      <pointLight position={[0, 0.6, 0]} intensity={1.2} distance={4} color={section.accent} />
+    </group>
+  );
+}
 
 // Clicking the instruments jumps straight into the Music room.
 function ClickTo({ sectionKey, children }) {
@@ -44,8 +74,11 @@ const rightAlbums = ALBUMS.slice(25, 39); // right wall (around the shelf)
 
 export default function Hub() {
   const tex = useStudioTextures();
+  const phase = useStore((s) => s.phase);
+  const section = useStore((s) => s.section);
   return (
     <group>
+      {phase === 'dropping' && section && <Suspense fallback={null}><FlyingRecord section={section} /></Suspense>}
       {/* ---- room shell ---- */}
       <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]}>
         <planeGeometry args={[44, 44]} />
