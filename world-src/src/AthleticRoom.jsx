@@ -71,7 +71,7 @@ export default function AthleticRoom({ section: s }) {
             </>} />
         ))}
         {/* swing reel */}
-        <VideoScreen src="golf_swing_iron.mov" position={[4.4, 2.4, -3]} rotation={[0, 0.5, 0]} width={2.2} accent={ACCENT} />
+        <Frame src="golf_swing_finish.jpg" position={[4.4, 2.4, -3]} rotation={[0, 0.5, 0]} width={2.2} accent={ACCENT} caption="On the course" />
       </Suspense>
       <StatPanel stats={s.golf.stats} position={[4.4, 3, -5]} rotation={[0, -0.55, 0]} title="The hobby" />
 

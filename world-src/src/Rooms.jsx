@@ -1,8 +1,15 @@
 import React, { useEffect, Suspense } from 'react';
-import { ContactShadows, Environment } from '@react-three/drei';
+import { ContactShadows, Environment, useTexture } from '@react-three/drei';
 import * as THREE from 'three';
 import { useStore } from './store.js';
 import { Frame, VideoScreen, Panel, Label, ContactStation } from './bits.jsx';
+import { POSTERS } from './posters.js';
+
+// Hub-only textures (the 40 album posters) — freed from GPU when we enter a room
+// so the hub and a room never keep their textures resident at the same time.
+const BASE = import.meta.env.BASE_URL;
+const HUB_TEXTURES = POSTERS.map((p) => (p.own ? '/photos/' + p.img.replace('__own:', '') : BASE + 'posters/' + p.img));
+function freeHubTextures() { try { useTexture.clear(HUB_TEXTURES); } catch {} try { THREE.Cache.clear(); } catch {} }
 
 // Collect a flat list of photo filenames for a section (handles nested shapes).
 export function collectPhotos(s) {
@@ -84,10 +91,9 @@ import PlugverseRoom from './PlugverseRoom.jsx';
 import LensRoom from './LensRoom.jsx';
 import AthleticRoom from './AthleticRoom.jsx';
 import NowRoom from './NowRoom.jsx';
-import HomeRoom from './HomeRoom.jsx';
 
-// Registry — specific room components get added here as they're built.
-const REGISTRY = { MUSIC: MusicRoom, PLUGVERSE: PlugverseRoom, LENS: LensRoom, ATHLETIC: AthleticRoom, NOW: NowRoom, HOME: HomeRoom };
+// Registry — HOME is intentionally absent (the hub is home).
+const REGISTRY = { MUSIC: MusicRoom, PLUGVERSE: PlugverseRoom, LENS: LensRoom, ATHLETIC: AthleticRoom, NOW: NowRoom };
 export function registerRoom(key, comp) { REGISTRY[key] = comp; }
 export function ActiveRoom() {
   const section = useStore((s) => s.section);
@@ -96,10 +102,11 @@ export function ActiveRoom() {
   const Comp = REGISTRY[section.key] || GenericRoom;
   return (
     <>
-      <Environment preset="night" environmentIntensity={0.4} />
-      <ambientLight intensity={1.0} color="#4a3626" />
-      <hemisphereLight intensity={0.7} color={section.accent} groundColor="#180f0a" />
-      <pointLight position={[0, 5, -2]} intensity={3.0} distance={20} color="#ffd9a0" castShadow shadow-mapSize={[1024, 1024]} />
+      {/* no HDRI Environment here — it doubled GPU memory on top of the hub's
+          cached textures and lost the WebGL context. Lit with real lights. */}
+      <ambientLight intensity={1.5} color="#5a4636" />
+      <hemisphereLight intensity={1.1} color={section.accent} groundColor="#241811" />
+      <pointLight position={[0, 5, -2]} intensity={3.4} distance={22} color="#ffd9a0" castShadow shadow-mapSize={[1024, 1024]} />
       <pointLight position={[-8, 4, -2]} intensity={2.0} distance={16} color={section.accent} />
       <pointLight position={[8, 4, -2]} intensity={2.0} distance={16} color="#ffce9a" />
       <pointLight position={[0, 4, -9]} intensity={1.6} distance={14} color="#ffb066" />
@@ -114,14 +121,18 @@ export function Timers() {
   const { swapToRoom, finishDrop, swapToHub, finishReturn } = useStore.getState();
   useEffect(() => {
     if (phase === 'dropping') {
-      const t1 = setTimeout(() => useStore.getState().swapToRoom(), 700);
-      const t2 = setTimeout(() => useStore.getState().finishDrop(), 1350);
-      return () => { clearTimeout(t1); clearTimeout(t2); };
+      // unmount the hub → free its poster textures → THEN mount the room, so the
+      // two scenes never hold textures in GPU at the same time (context-loss fix).
+      const t0 = setTimeout(() => { useStore.getState().voidScene(); freeHubTextures(); }, 420);
+      const t1 = setTimeout(() => useStore.getState().swapToRoom(), 900);
+      const t2 = setTimeout(() => useStore.getState().finishDrop(), 1450);
+      return () => { clearTimeout(t0); clearTimeout(t1); clearTimeout(t2); };
     }
     if (phase === 'returning') {
-      const t1 = setTimeout(() => useStore.getState().swapToHub(), 650);
-      const t2 = setTimeout(() => useStore.getState().finishReturn(), 1300);
-      return () => { clearTimeout(t1); clearTimeout(t2); };
+      const t0 = setTimeout(() => useStore.getState().voidScene(), 380);
+      const t1 = setTimeout(() => useStore.getState().swapToHub(), 820);
+      const t2 = setTimeout(() => useStore.getState().finishReturn(), 1320);
+      return () => { clearTimeout(t0); clearTimeout(t1); clearTimeout(t2); };
     }
   }, [phase]);
   return null;

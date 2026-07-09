@@ -4,7 +4,7 @@ import { Image, Html, Text } from '@react-three/drei';
 import { easing } from 'maath';
 import * as THREE from 'three';
 import { useStore } from './store.js';
-import { SECTIONS, P } from './data.js';
+import { SECTIONS, P, thumb } from './data.js';
 
 const SIZE = 1.15;
 
@@ -25,7 +25,6 @@ function Record({ section, position }) {
     const sc = hover ? 1.06 : 1;
     easing.damp3(g.current.scale, [sc, sc, sc], 0.18, dt);
     easing.damp(glow.current.material, 'opacity', hover ? 0.4 : 0, 0.2, dt);
-    if (hover) disc.current.rotation.z += dt * 1.2;
   });
 
   return (
@@ -55,7 +54,7 @@ function Record({ section, position }) {
         <boxGeometry args={[SIZE, SIZE, 0.07]} />
         <meshStandardMaterial color="#15100c" roughness={0.6} metalness={0.05} envMapIntensity={0.5} />
       </mesh>
-      <Image url={P + section.cover} position={[0, 0, 0.037]} scale={[SIZE * 0.985, SIZE * 0.985]} toneMapped={false} />
+      <Image url={thumb(section.cover)} position={[0, 0, 0.037]} scale={[SIZE * 0.985, SIZE * 0.985]} toneMapped={false} />
 
       {/* spine label */}
       <Text position={[0, -SIZE * 0.62, 0.05]} fontSize={0.11} color={section.accent} anchorX="center" anchorY="middle" letterSpacing={0.14} outlineWidth={0.004} outlineColor="#000">
@@ -82,6 +81,27 @@ function Record({ section, position }) {
   );
 }
 
+// Animated invitation above the shelf so it's obvious the records are clickable.
+function Cta({ y, z }) {
+  const g = useRef();
+  const arrow = useRef();
+  useFrame((state) => {
+    const t = state.clock.elapsedTime;
+    if (g.current) g.current.children.forEach((c) => { if (c.material) c.material.opacity = 0.75 + Math.sin(t * 2) * 0.25; });
+    if (arrow.current) arrow.current.position.y = -0.62 + Math.sin(t * 3) * 0.06;
+  });
+  return (
+    <group ref={g} position={[0, y, z]}>
+      <Text fontSize={0.42} color="#F4EFE6" anchorX="center" anchorY="middle" letterSpacing={0.02} outlineWidth={0.006} outlineColor="#000" material-transparent material-opacity={1}>
+        PICK A RECORD
+      </Text>
+      <Text ref={arrow} position={[0, -0.62, 0]} fontSize={0.15} color="#FF4D2E" anchorX="center" anchorY="middle" letterSpacing={0.18} outlineWidth={0.004} outlineColor="#000" material-transparent material-opacity={1}>
+        ↓ CLICK ONE TO STEP INSIDE ↓
+      </Text>
+    </group>
+  );
+}
+
 // The face-out record display on a wooden ledge along the back wall.
 export default function Records({ y = 2.7, z = -6.55 }) {
   const positions = useMemo(() => {
@@ -90,6 +110,8 @@ export default function Records({ y = 2.7, z = -6.55 }) {
   }, [y, z]);
   return (
     <group>
+      {/* invitation to click */}
+      <Cta y={y + 1.35} z={z + 0.1} />
       {/* wooden ledge */}
       <mesh position={[0, y - SIZE * 0.6, z - 0.15]} receiveShadow castShadow>
         <boxGeometry args={[SECTIONS.length * 1.5 + 0.6, 0.16, 0.6]} />

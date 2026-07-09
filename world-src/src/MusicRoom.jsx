@@ -123,9 +123,9 @@ export default function MusicRoom({ section: s }) {
 
       {/* ---- front-of-house: setlist embed + reels + blurb ---- */}
       <Suspense fallback={null}>
-        <Embed position={[0, 2.7, -2.5]} url={s.embeds[0].url} label={s.embeds[0].label} accent={ACCENT} w={300} h={360} />
-        <VideoScreen src="rubber_band_live_4.mov" position={[-4.6, 2.2, -1.6]} rotation={[0, 0.5, 0]} width={2.6} accent={ACCENT} />
-        <VideoScreen src="cat_cradle_performance.mov" position={[4.6, 2.2, -1.6]} rotation={[0, -0.5, 0]} width={2.6} accent={ACCENT} />
+        <Embed position={[0, 3.0, -2.8]} url={s.embeds[0].url} label={s.embeds[0].label} accent={ACCENT} w={330} h={500} df={2.7} />
+        <Frame src="rubber_band_full_pic.jpeg" position={[-5.0, 2.3, -1.6]} rotation={[0, 0.5, 0]} width={3.0} accent={ACCENT} caption="Rubber Band — live" />
+        <Frame src="cooper_laughing_with_bass.jpg" position={[5.0, 2.3, -1.6]} rotation={[0, -0.5, 0]} width={3.0} accent={ACCENT} caption="Cat's Cradle" />
       </Suspense>
       <Panel position={[-8.4, 2.6, -3]} rotation={[0, 0.7, 0]} width={230} accent={ACCENT}>
         <div style={{ fontFamily: 'Fraunces, serif', fontStyle: 'italic', fontSize: 14, opacity: 0.9, lineHeight: 1.4 }}>{s.blurb}</div>

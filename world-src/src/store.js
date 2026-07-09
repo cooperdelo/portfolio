@@ -18,6 +18,7 @@ export const useStore = create((set, get) => ({
   toggleSound: () => set((s) => ({ soundOn: !s.soundOn })),
 
   dive: (section) => { if (get().phase === 'idle') set({ phase: 'dropping', section }); },
+  voidScene: () => set({ shown: 'void' }),   // brief empty frame under the overlay so scenes never coexist in GPU memory
   swapToRoom: () => set((s) => ({ shown: s.section ? s.section.key : 'hub' })),
   finishDrop: () => set((s) => ({ phase: 'inroom', room: s.section ? s.section.key : 'hub' })),
 
@@ -28,7 +29,9 @@ export const useStore = create((set, get) => ({
   // jump straight from one room to another (via the crate)
   jumpTo: (section) => { const p = get().phase; if (p === 'idle') set({ phase: 'dropping', section }); },
 
-  openLightbox: (src, caption) => set({ lightbox: { src, caption } }),
+  // Accepts either (src, caption) for photos or a rich object
+  // { src, title, meta:[[k,v]], blurb, kind:'album'|'photo', accent } for posters.
+  openLightbox: (a, b) => set({ lightbox: (a && typeof a === 'object') ? a : { src: a, caption: b } }),
   closeLightbox: () => set({ lightbox: null })
 }));
 

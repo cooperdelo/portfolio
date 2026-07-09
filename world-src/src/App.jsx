@@ -16,7 +16,7 @@ export default function App() {
     <>
       <Canvas
         shadows
-        dpr={[1, 2]}
+        dpr={[1, 1.5]}
         gl={{ antialias: false, powerPreference: 'high-performance', toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.35 }}
         camera={{ position: [0, 2.6, 7.5], fov: 52, near: 0.1, far: 200 }}
       >

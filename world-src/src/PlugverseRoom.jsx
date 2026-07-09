@@ -32,8 +32,8 @@ export default function PlugverseRoom({ section: s }) {
       <Suspense fallback={null}>
         <Model src="mixingdesk" fit={3.6} position={[0, 0, -9.4]} />
         <Model src="chair" fit={1.2} position={[0, 0, -7.6]} rotation={[0, Math.PI, 0]} />
-        <VideoScreen src="plugverse_ui.mp4" position={[-1.6, 2.4, -9.6]} rotation={[0, 0.25, 0]} width={2.6} accent={ACCENT} />
-        <VideoScreen src="hero_plugverse_product.mov" position={[1.8, 2.4, -9.6]} rotation={[0, -0.25, 0]} width={2.4} accent={ACCENT} />
+        <VideoScreen src="plugverse_ui.mp4" poster="Plugverse_picture.jpeg" label="Plugverse — booking flow" position={[-1.6, 2.4, -9.6]} rotation={[0, 0.25, 0]} width={2.6} accent={ACCENT} />
+        <VideoScreen src="hero_plugverse_product.mov" poster="plugverse_profile.jpg" label="Artist profile" position={[1.8, 2.4, -9.6]} rotation={[0, -0.25, 0]} width={2.4} accent={ACCENT} />
       </Suspense>
 
       {/* founder-story timeline along the left wall */}

@@ -43,13 +43,45 @@ export default function HUD() {
       {/* needle-drop transition overlay */}
       <Transition />
 
-      {/* lightbox */}
-      <div className={'lightbox' + (lightbox ? ' show' : '')} onClick={(e) => e.target.className.includes('lightbox') && closeLightbox()}>
-        <button className="lx" data-c onClick={closeLightbox}>Close [esc]</button>
-        {lightbox && <img src={lightbox.src} alt="" />}
-        {lightbox && <div className="lcap">{lightbox.caption}</div>}
-      </div>
+      {/* lightbox — artifact on the left, info panel on the right */}
+      <Lightbox lightbox={lightbox} close={closeLightbox} />
     </>
+  );
+}
+
+const prettyName = (s) => (s || '').replace(/^.*\//, '').replace('replay/', '').replace(/\.(jpg|jpeg|png|JPG)$/i, '').replace(/[_-]/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+
+function Lightbox({ lightbox, close }) {
+  useEffect(() => {
+    const onKey = (e) => { if (e.key === 'Escape') close(); };
+    addEventListener('keydown', onKey);
+    return () => removeEventListener('keydown', onKey);
+  }, [close]);
+  const lb = lightbox || {};
+  const title = lb.title || prettyName(lb.caption || lb.src);
+  const accent = lb.accent || '#FF4D2E';
+  const meta = lb.meta || [];
+  return (
+    <div className={'lightbox' + (lightbox ? ' show' : '')} onClick={(e) => e.target.classList.contains('lightbox') && close()}>
+      <div className="lb-art">{lightbox && <img src={lb.src} alt="" />}</div>
+      <div className="lb-info">
+        <button className="lx" data-c onClick={close}>Close [ESC]</button>
+        {lightbox && (
+          <>
+            {lb.eyebrow && <div className="lb-eyebrow" style={{ color: accent }}>{lb.eyebrow}</div>}
+            <h2 className="lb-title">{title}</h2>
+            {meta.length > 0 && (
+              <div className="lb-meta">
+                {meta.map(([k, v], i) => (
+                  <div key={i} className="lb-row"><span>{k}</span><span>{v}</span></div>
+                ))}
+              </div>
+            )}
+            {lb.blurb && <p className="lb-blurb">{lb.blurb}</p>}
+          </>
+        )}
+      </div>
+    </div>
   );
 }
 

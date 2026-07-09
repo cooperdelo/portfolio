@@ -4,7 +4,7 @@ import { Image, Text, Html, useVideoTexture, RoundedBox } from '@react-three/dre
 import { easing } from 'maath';
 import * as THREE from 'three';
 import { useStore } from './store.js';
-import { P, V } from './data.js';
+import { P, V, thumb } from './data.js';
 
 const MONO = 'https://fonts.gstatic.com/s/geistmono/v1/or3yQ6H-1_WfwkMZI_qYFrkdwUS9.woff'; // fallback handled by drei
 const prettyCaption = (name) => name.replace('replay/', '').replace(/\.(jpg|jpeg|png|JPG)$/i, '').replace(/_/g, ' ');
@@ -38,7 +38,7 @@ export function Frame({ src, position, rotation = [0, 0, 0], width = 1.6, accent
         <boxGeometry args={[width + 0.1, h + 0.1, 0.05]} />
         <meshStandardMaterial color="#0e0b09" roughness={0.5} metalness={0.2} />
       </mesh>
-      <Image url={P + src} transparent position={[0, 0, 0.031]} scale={[width, h]} toneMapped={false} />
+      <Image url={thumb(src)} transparent position={[0, 0, 0.031]} scale={[width, h]} toneMapped={false} />
     </group>
   );
 }
@@ -63,7 +63,7 @@ export function InfoTile({ src, position, rotation = [0, 0, 0], width = 1.4, acc
       onClick={(e) => { e.stopPropagation(); openLightbox(P + src, caption || prettyCaption(src)); }}>
       <mesh ref={rim} position={[0, 0, -0.03]}><planeGeometry args={[width + 0.4, h + 0.4]} /><meshBasicMaterial color={accent} transparent opacity={0} blending={THREE.AdditiveBlending} depthWrite={false} /></mesh>
       <mesh castShadow><boxGeometry args={[width + 0.09, h + 0.09, 0.05]} /><meshStandardMaterial color="#0e0b09" roughness={0.5} metalness={0.2} /></mesh>
-      <Image url={P + src} transparent position={[0, 0, 0.031]} scale={[width, h]} toneMapped={false} />
+      <Image url={thumb(src)} transparent position={[0, 0, 0.031]} scale={[width, h]} toneMapped={false} />
       {hover && card && (
         <Html position={[cardSide * (width / 2 + 0.15), 0.05, 0.12]} transform occlude distanceFactor={2.4} style={{ pointerEvents: 'none' }}>
           <div style={{
@@ -80,27 +80,37 @@ export function InfoTile({ src, position, rotation = [0, 0, 0], width = 1.4, acc
 }
 
 // A looping video plane (reels / product UI). Muted, autoplay.
-export function VideoScreen({ src, position, rotation = [0, 0, 0], width = 2.4, aspect = 16 / 9, frame = true, accent = '#F4EFE6' }) {
+// A "clip" panel: renders the poster image via the same drei <Image> that Frame
+// uses (the earlier custom-material path crashed the WebGL context). A triangle
+// marks it as a clip; clicking opens the full image in the lightbox.
+export function VideoScreen({ src, poster, position, rotation = [0, 0, 0], width = 2.4, aspect = 16 / 9, frame = true, accent = '#F4EFE6', label }) {
+  const open = useStore((s) => s.openLightbox);
+  const [hover, setHover] = useState(false);
+  const g = useRef();
+  const h = width / aspect;
+  const isImg = (n) => n && /\.(jpe?g|png|JPG)$/i.test(n);
+  const img = poster && isImg(poster) ? poster : (isImg(src) ? src : null);
+  useFrame((_, dt) => { if (g.current) { const s = hover ? 1.03 : 1; easing.damp3(g.current.scale, [s, s, s], 0.16, dt); } });
   return (
-    <group position={position} rotation={rotation}>
+    <group ref={g} position={position} rotation={rotation}
+      onPointerOver={(e) => { if (img) { e.stopPropagation(); setHover(true); document.body.classList.add('hot'); } }}
+      onPointerOut={() => { setHover(false); document.body.classList.remove('hot'); }}
+      onClick={(e) => { if (img) { e.stopPropagation(); open(P + img, (label || img).replace(/\.(jpg|jpeg|png|JPG)$/i, '').replace(/[_-]/g, ' ')); } }}>
       {frame && (
         <mesh position={[0, 0, -0.03]}>
-          <boxGeometry args={[width + 0.14, width / aspect + 0.14, 0.06]} />
+          <boxGeometry args={[width + 0.14, h + 0.14, 0.06]} />
           <meshStandardMaterial color="#0a0a0c" roughness={0.4} metalness={0.5} />
         </mesh>
       )}
-      <VideoInner src={src} width={width} aspect={aspect} />
-      <pointLight position={[0, 0, 0.6]} intensity={0.4} distance={3} color={accent} />
+      {img
+        ? <Image url={thumb(img)} position={[0, 0, 0.02]} scale={[width, h]} toneMapped={false} />
+        : <mesh position={[0, 0, 0.02]}><planeGeometry args={[width, h]} /><meshBasicMaterial color="#0e0b09" toneMapped={false} /></mesh>}
+      <mesh position={[0, 0, 0.04]} rotation={[0, 0, -Math.PI / 2]}>
+        <circleGeometry args={[Math.min(width, h) * 0.11, 3]} />
+        <meshBasicMaterial color="#ffffff" transparent opacity={0.85} />
+      </mesh>
+      <pointLight position={[0, 0, 0.6]} intensity={0.3} distance={3} color={accent} />
     </group>
-  );
-}
-function VideoInner({ src, width, aspect }) {
-  const tex = useVideoTexture(V + src, { muted: true, loop: true, start: true, crossOrigin: 'anonymous', playsInline: true });
-  return (
-    <mesh>
-      <planeGeometry args={[width, width / aspect]} />
-      <meshBasicMaterial map={tex} toneMapped={false} />
-    </mesh>
   );
 }
 
@@ -144,18 +154,17 @@ export function Label({ children, position, rotation, size = 0.16, color = '#F4E
   );
 }
 
-// A live third-party embed (Spotify / Apple Music) rendered on an in-world screen.
-export function Embed({ position, rotation = [0, 0, 0], url, kind = 'spotify', label, accent = '#F4EFE6', w = 320, h = 380 }) {
+// A live third-party embed (Spotify / Apple Music) on an in-world screen. The
+// styled wrapper IS the panel (no mismatched 3D box behind it). df scales size.
+export function Embed({ position, rotation = [0, 0, 0], url, kind = 'spotify', label, accent = '#F4EFE6', w = 340, h = 460, df = 2.3 }) {
   return (
     <group position={position} rotation={rotation}>
-      <mesh position={[0, 0, -0.04]}>
-        <boxGeometry args={[w / 130 + 0.2, h / 130 + 0.5, 0.08]} />
-        <meshStandardMaterial color="#0a0a0c" roughness={0.4} metalness={0.4} />
-      </mesh>
-      <Label position={[0, h / 260 + 0.13, 0.06]} size={0.11} color={accent} mono>{(label || '').toUpperCase()}</Label>
-      <Html position={[0, 0, 0.02]} transform occlude distanceFactor={1.7}>
-        <iframe title={label} src={url} width={w} height={h} style={{ border: 0, borderRadius: 12, background: '#111' }}
-          allow="autoplay *; encrypted-media *; clipboard-write" loading="lazy" />
+      <Html transform occlude distanceFactor={df} style={{ pointerEvents: 'auto' }}>
+        <div style={{ width: w + 20, background: 'linear-gradient(180deg,#100b08,#0b0806)', border: `1px solid ${accent}66`, borderRadius: 18, padding: '12px 10px 10px', boxShadow: `0 40px 90px -20px #000, 0 0 60px -20px ${accent}` }}>
+          <div style={{ fontFamily: 'Geist Mono, monospace', fontSize: 12, letterSpacing: '.24em', textTransform: 'uppercase', color: accent, textAlign: 'center', marginBottom: 8 }}>{label}</div>
+          <iframe title={label} src={url} width={w} height={h} style={{ border: 0, borderRadius: 12, background: '#111', display: 'block' }}
+            allow="autoplay *; encrypted-media *; clipboard-write" loading="lazy" />
+        </div>
       </Html>
     </group>
   );

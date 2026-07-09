@@ -70,7 +70,7 @@ export default function LensRoom({ section: s }) {
         {/* the reel — 4 vertical phone screens */}
         <Label position={[6.5, 5, -13.5]} size={0.3} color={ACCENT} font>THE REEL</Label>
         {s.reels.map((r, i) => (
-          <VideoScreen key={r.v} src={r.v} position={[4 + i * 1.9, 3, -13.5]} width={1.5} aspect={9 / 16} accent={ACCENT} />
+          <VideoScreen key={r.v} src={r.v} poster={r.poster} label={r.label} position={[4 + i * 1.9, 3, -13.5]} width={1.5} aspect={9 / 16} accent={ACCENT} />
         ))}
 
         {/* in rotation — Apple embed centerpiece + replay cards facing the camera */}

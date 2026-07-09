@@ -6,6 +6,10 @@
 
 export const P = '/photos/';
 export const V = '/videos/';
+// 800px thumbnails used for in-world textures (keeps GPU memory sane; originals
+// are only loaded by the DOM lightbox). See public/thumbs.
+export const T = import.meta.env.BASE_URL + 'thumbs/';
+export const thumb = (name) => T + name.replace(/\.(jpe?g|png|JPG)$/i, '.jpg');
 
 // Brand accents per section/room.
 export const ACCENTS = {
@@ -22,22 +26,24 @@ export const CONTACT = {
   location: 'Chapel Hill, NC'
 };
 
-// The 6 records on the shelf. `cover` is the sleeve art; `blurb` is the
+// HOME is NOT a record/room — the studio hub IS home. Its identity content is
+// surfaced directly in the hub (manifesto sign, facts, portraits, contact).
+export const HOME = {
+  key: 'HOME', accent: ACCENTS.HOME, eyebrow: 'cooper delo',
+  blurb: 'Sophomore at UNC Kenan-Flagler, solo founder of Plugverse, bassist, photographer, lifter. Build it, ship it, run it back.',
+  manifesto: ['Build. Ship.', 'Learn what hit.', 'Run it back.'],
+  facts: [
+    ['Age', '20 · Chapel Hill'], ['School', 'UNC Kenan-Flagler'], ['Majors', 'Business + CS'],
+    ['GPA', '3.867'], ['Building', 'Plugverse'], ['Abroad', 'Singapore · Spring 2027']
+  ],
+  roles: ['Builder.', 'Founder.', 'Musician.', 'Student.', 'Writer.'],
+  portraits: ['cooper_park_portrait.jpg', 'cooper_suit_campus.jpg', 'cooper_tux_with_canon.jpg',
+    'cooper_with_guitar_outdoor.jpg', 'cooper_laughing_with_bass.jpg', 'hs_grad.jpg', 'front-page-hero.jpg']
+};
+
+// The 5 records on the shelf. `cover` is the sleeve art; `blurb` is the
 // hover/description card; `room` picks which built environment you drop into.
 export const SECTIONS = [
-  {
-    key: 'HOME', room: 'foyer', accent: ACCENTS.HOME, eyebrow: 'cooper delo',
-    cover: 'cooper_park_portrait.jpg',
-    blurb: 'Sophomore at UNC Kenan-Flagler, solo founder of Plugverse, bassist, photographer, lifter. Build it, ship it, run it back.',
-    manifesto: ['Build. Ship.', 'Learn what hit.', 'Run it back.'],
-    facts: [
-      ['Age', '20 · Chapel Hill'], ['School', 'UNC Kenan-Flagler'], ['Majors', 'Business + CS'],
-      ['GPA', '3.867'], ['Building', 'Plugverse'], ['Abroad', 'Singapore · Spring 2027']
-    ],
-    roles: ['Builder.', 'Founder.', 'Musician.', 'Student.', 'Writer.'],
-    portraits: ['cooper_park_portrait.jpg', 'cooper_suit_campus.jpg', 'cooper_tux_with_canon.jpg',
-      'cooper_with_guitar_outdoor.jpg', 'cooper_laughing_with_bass.jpg', 'hs_grad.jpg', 'front-page-hero.jpg']
-  },
   {
     key: 'PLUGVERSE', room: 'office', accent: ACCENTS.PLUGVERSE, eyebrow: 'the startup',
     cover: 'Plugverse_picture.jpeg',
