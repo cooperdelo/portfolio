@@ -1,0 +1,12 @@
+{
+  "name": "cd-scripts",
+  "private": true,
+  "type": "module",
+  "description": "Standalone maintenance scripts (run locally / from the vault, NOT deployed by Vercel).",
+  "scripts": {
+    "garmin": "node garmin-sync.mjs"
+  },
+  "dependencies": {
+    "garmin-connect": "^1.6.0"
+  }
+}

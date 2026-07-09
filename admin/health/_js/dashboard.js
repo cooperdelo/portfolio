@@ -24,15 +24,6 @@ const kpis = document.getElementById('kpis');
 const tbody = document.getElementById('rows');
 const signal = document.getElementById('signal');
 
-if (tl.error) { tbody.innerHTML = `<tr><td colspan="9" class="muted">Load error: ${tl.error.message}. (Schema applied?)</td></tr>`; }
-else if (!rows.length) {
-  kpis.innerHTML = card('—', 'Start logging'); 
-  signal.textContent = 'No data yet — log a few days on the Daily Log page and insights appear here automatically.';
-  tbody.innerHTML = `<tr><td colspan="9" class="muted">No data yet.</td></tr>`;
-} else {
-  render();
-}
-
 // ---- liquid stools per day (Bristol 6–7) ----
 const liquidByDay = {};
 for (const b of (br.data || [])) { if (b.bristol >= 6) liquidByDay[b.day] = (liquidByDay[b.day] || 0) + 1; }
@@ -112,4 +103,14 @@ function render() {
       <td>${r.irritant_count ? '⚠ ' + r.irritant_count : ''}</td>
     </tr>`;
   }).join('');
+}
+
+// ---- gate: render only after all declarations above are initialized ----
+if (tl.error) { tbody.innerHTML = `<tr><td colspan="9" class="muted">Load error: ${tl.error.message}. (Schema applied?)</td></tr>`; }
+else if (!rows.length) {
+  kpis.innerHTML = card('—', 'Start logging');
+  signal.textContent = 'No data yet — log a few days on the Daily Log page and insights appear here automatically.';
+  tbody.innerHTML = `<tr><td colspan="9" class="muted">No data yet.</td></tr>`;
+} else {
+  render();
 }
