@@ -45,6 +45,19 @@
   .tile .t-sub{font-family:"Geist Mono",monospace;font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-top:.3rem;}
   .d-money{--accent:var(--pastel-cyan);}.d-health{--accent:var(--sage);}.d-acad{--accent:var(--pastel-pink);}.d-build{--accent:var(--rust);}.d-brand{--accent:var(--pastel-lavender);}
   .domain-head .tk-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 12px var(--accent);}
+
+  /* Quick actions — one tap to the things logged daily */
+  .qa-row{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;margin:-.8rem 0 2.4rem;}
+  .qa-row .qa-eyebrow{font-family:"Geist Mono",monospace;font-size:.58rem;letter-spacing:.24em;text-transform:uppercase;color:var(--muted);margin-right:.4rem;}
+  .qa{display:inline-flex;align-items:center;gap:.5rem;padding:.6rem .95rem;border-radius:999px;
+    font-family:"Geist Mono",monospace;font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-2);
+    border:1px solid rgba(244,239,230,.14);background:rgba(244,239,230,.03);
+    backdrop-filter:blur(12px);transition:transform .25s cubic-bezier(.22,1,.36,1),border-color .25s,color .25s,background .25s;}
+  .qa .qa-plus{color:var(--rust);font-weight:700;font-size:.9rem;line-height:1;}
+  .qa:hover{transform:translateY(-2px);border-color:rgba(255,77,46,.45);color:var(--ink);background:rgba(255,77,46,.06);}
+  .qa.qa-search{margin-left:auto;color:var(--muted);}
+  .qa.qa-search kbd{font-family:"Geist Mono",monospace;font-size:.58rem;padding:.08rem .35rem;border-radius:4px;border:1px solid rgba(244,239,230,.16);color:var(--ink-2);background:rgba(0,0,0,.25);}
+  @media(max-width:640px){.qa.qa-search{margin-left:0;}}
 </style>
 </head>
 <body>
@@ -56,6 +69,16 @@
         <h1>COOPER<br><span class="accent">DELO</span></h1>
         <div class="greeting" id="greeting">— five domains in orbit —</div>
       </div>
+    </section>
+
+    <section class="qa-row">
+      <span class="qa-eyebrow">Quick log</span>
+      <a class="qa" href="/admin/health/log.html" data-role="full"><span class="qa-plus">+</span>Meal</a>
+      <a class="qa" href="/admin/health/log.html" data-role="full"><span class="qa-plus">+</span>Bathroom trip</a>
+      <a class="qa" href="/admin/finance/entry.html"><span class="qa-plus">+</span>Expense</a>
+      <a class="qa" href="/admin/contacts/"><span class="qa-plus">+</span>Contact</a>
+      <a class="qa" href="/admin/playbook/"><span class="qa-plus">+</span>Playbook idea</a>
+      <button class="qa qa-search" data-openpalette><span class="qa-plus">⌕</span>Search <kbd>⌘K</kbd></button>
     </section>
 
     <section class="domain d-money">

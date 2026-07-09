@@ -244,7 +244,7 @@ export async function mountShell({ title } = {}) {
 
   // 6) Command palette + recent-page tracking
   mountPalette(role);
-  wrap.querySelector('[data-openpalette]')?.addEventListener('click', () => window.__openPalette && window.__openPalette());
+  wrap.querySelectorAll('[data-openpalette]').forEach(b => b.addEventListener('click', () => window.__openPalette && window.__openPalette()));
   pushRecent(normalizePath(location.pathname));
 
   return { session, email, role };
