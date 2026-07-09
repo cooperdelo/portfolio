@@ -8,6 +8,11 @@ import { useStore } from './store.js';
 import HUD from './HUD.jsx';
 import Stage from './Stage.jsx';
 
+// Mobile perf profile: lower DPR ceiling, no real-time shadow maps (contact
+// shadows still ground everything), and a minimal post stack. Desktop keeps
+// the full cinematic pipeline.
+const COARSE = typeof matchMedia !== 'undefined' && matchMedia('(pointer:coarse)').matches;
+
 export default function App() {
   const setReady = useStore((s) => s.setReady);
   useEffect(() => { const t = setTimeout(() => setReady(true), 1400); return () => clearTimeout(t); }, [setReady]);
@@ -15,8 +20,8 @@ export default function App() {
   return (
     <>
       <Canvas
-        shadows
-        dpr={[1, 1.5]}
+        shadows={!COARSE}
+        dpr={[1, COARSE ? 1.25 : 1.5]}
         gl={{ antialias: false, powerPreference: 'high-performance', toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.35 }}
         camera={{ position: [0, 2.6, 7.5], fov: 52, near: 0.1, far: 200 }}
       >
@@ -25,13 +30,19 @@ export default function App() {
         <Suspense fallback={null}>
           <Stage />
         </Suspense>
-        <EffectComposer disableNormalPass multisampling={0}>
-          <Bloom mipmapBlur intensity={0.7} luminanceThreshold={0.72} luminanceSmoothing={0.85} />
-          <ChromaticAberration blendFunction={BlendFunction.NORMAL} offset={[0.0009, 0.0009]} radialModulation modulationOffset={0.3} />
-          <Noise premultiply blendFunction={BlendFunction.OVERLAY} opacity={0.32} />
-          <Vignette eskil={false} offset={0.28} darkness={0.72} />
-          <SMAA />
-        </EffectComposer>
+        {COARSE ? (
+          <EffectComposer disableNormalPass multisampling={0}>
+            <Vignette eskil={false} offset={0.28} darkness={0.7} />
+          </EffectComposer>
+        ) : (
+          <EffectComposer disableNormalPass multisampling={0}>
+            <Bloom mipmapBlur intensity={0.7} luminanceThreshold={0.72} luminanceSmoothing={0.85} />
+            <ChromaticAberration blendFunction={BlendFunction.NORMAL} offset={[0.0009, 0.0009]} radialModulation modulationOffset={0.3} />
+            <Noise premultiply blendFunction={BlendFunction.OVERLAY} opacity={0.32} />
+            <Vignette eskil={false} offset={0.28} darkness={0.72} />
+            <SMAA />
+          </EffectComposer>
+        )}
         <AdaptiveDpr pixelated />
       </Canvas>
       <HUD />

@@ -61,12 +61,13 @@ body.hot #cursor .clabel { opacity:1; }
 .lb-blurb { margin-top:22px; font-size:15px; line-height:1.6; opacity:.86; max-width:46ch; }
 @media (max-width:760px){ .lightbox { grid-template-columns:1fr; grid-template-rows:1fr auto; gap:3vh; } .lb-art img { max-height:44vh; transform:none; } .lightbox.show .lb-art img { transform:none; } }
 
-/* needle-drop transition — a camera-blur wash that ramps in as the record lands
-   on the platter, masking the scene swap, then clears into the room. */
-.drop { position:fixed; inset:0; z-index:35; display:flex; align-items:flex-end; justify-content:center; padding-bottom:16vh; background:radial-gradient(circle at 50% 52%, color-mix(in srgb, var(--a) 32%, #0b0806) 0%, #0b0806 68%); opacity:0; pointer-events:none; backdrop-filter:blur(0px); transition:opacity .55s ease, backdrop-filter .45s ease; }
-.drop.on { opacity:1; backdrop-filter:blur(18px); }
-.drop-label { font-family:'Anton',sans-serif; font-size:clamp(1.4rem,4vw,2.4rem); text-transform:uppercase; letter-spacing:.06em; text-shadow:0 2px 24px #000; opacity:0; transform:translateY(10px); transition:opacity .5s .1s, transform .5s .1s; }
-.drop.on .drop-label { opacity:1; transform:none; }
+/* needle-drop transition — TRANSPARENT while the record flies to the turntable
+   (the 3D dive stays visible), snapping opaque ONLY for the brief scene swap
+   ('void' frame), then clearing into the room. */
+.drop { position:fixed; inset:0; z-index:35; display:flex; align-items:flex-end; justify-content:center; padding-bottom:16vh; background:radial-gradient(circle at 50% 52%, color-mix(in srgb, var(--a) 30%, #0b0806) 0%, #0b0806 70%); opacity:0; pointer-events:none; transition:opacity .5s ease; }
+.drop.cover { opacity:1; transition:opacity .24s ease; }
+.drop-label { font-family:'Anton',sans-serif; font-size:clamp(1.4rem,4vw,2.4rem); text-transform:uppercase; letter-spacing:.06em; text-shadow:0 2px 24px #000; animation:droplabel .45s ease both; }
+@keyframes droplabel { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
 
 /* loader */
 .loader { position:fixed; inset:0; z-index:50; background:#0b0806; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:20px; transition:opacity 1s; }
@@ -78,8 +79,25 @@ body.hot #cursor .clabel { opacity:1; }
 @keyframes load { 0%{transform:translateX(-100%);} 100%{transform:translateX(350%);} }
 .loader .lsub { font-family:'Geist Mono',monospace; font-size:10px; letter-spacing:.28em; text-transform:uppercase; color:var(--muted); }
 
+/* 3D-tilt photo preview in the lightbox */
+.lb-art { perspective:1400px; }
+.lightbox.show .lb-art img { transition:transform .18s ease-out; will-change:transform; }
+
 @media (max-width:680px){
-  .top{ flex-direction:column; gap:8px; padding:16px; }
-  .hint{ font-size:8.5px; width:88%; }
-  .crate{ flex-wrap:wrap; justify-content:center; max-width:94vw; }
+  .top{ padding:12px 14px; }
+  .brand{ font-size:14px; }
+  .np{ font-size:8.5px; }
+  .hint{ display:none; }
+  .back{ top:12px; right:12px; padding:.5rem .8rem; font-size:9px; }
+  .povnav{ top:56px; padding:4px; gap:4px; }
+  .pov-btn{ font-size:8.5px; padding:.42rem .6rem; letter-spacing:.1em; }
+  .crate{ bottom:10px; flex-wrap:wrap; justify-content:center; max-width:96vw; padding:5px; gap:4px; }
+  .crate-rec{ font-size:8px; padding:.38rem .5rem; letter-spacing:.1em; }
+  .tools{ bottom:auto; top:12px; right:auto; left:50%; transform:translateX(-50%); display:none; }
+  .lightbox{ grid-template-columns:1fr; grid-template-rows:auto 1fr; gap:2vh; padding:8vh 5vw 4vh; overflow-y:auto; }
+  .lb-art img{ max-height:38vh; }
+  .lb-title{ font-size:1.5rem; margin-bottom:12px; }
+  .lb-row{ padding:6px 0; font-size:12.5px; }
+  .lb-blurb{ font-size:13px; margin-top:14px; }
+  .drop-label{ font-size:1.3rem; }
 }

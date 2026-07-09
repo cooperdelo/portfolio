@@ -2,6 +2,7 @@ import React, { Suspense } from 'react';
 import { ContactShadows } from '@react-three/drei';
 import { Model } from './Model.jsx';
 import { Frame, VideoScreen, Panel, Label, InfoTile, Embed } from './bits.jsx';
+import { RoomShell } from './studio.jsx';
 
 const ACCENT = '#E7C9A0';
 
@@ -29,14 +30,10 @@ export default function LensRoom({ section: s }) {
   const right = s.trips.slice(3, 6);
   return (
     <group>
-      {/* shell — darkroom */}
-      <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]}><planeGeometry args={[60, 60]} /><meshStandardMaterial color="#120d0a" roughness={0.96} /></mesh>
-      <mesh receiveShadow position={[0, 6, -14]}><boxGeometry args={[34, 16, 0.4]} /><meshStandardMaterial color="#1c150f" roughness={0.94} /></mesh>
-      <mesh receiveShadow position={[-13, 6, -3]} rotation={[0, Math.PI / 2, 0]}><boxGeometry args={[26, 16, 0.4]} /><meshStandardMaterial color="#181109" roughness={0.95} /></mesh>
-      <mesh receiveShadow position={[13, 6, -3]} rotation={[0, Math.PI / 2, 0]}><boxGeometry args={[26, 16, 0.4]} /><meshStandardMaterial color="#181109" roughness={0.95} /></mesh>
+      {/* real studio shell (darkroom edition — warm brick, red safelights) */}
+      <RoomShell halfW={13} backZ={-14} height={13} frontZ={9} accent={ACCENT} />
 
       {/* warm lighting + red safelight accents */}
-      <ambientLight intensity={0.7} color="#4a3626" />
       <pointLight position={[0, 5, -4]} intensity={3.0} distance={22} color="#ffdca0" castShadow shadow-mapSize={[1024, 1024]} />
       <pointLight position={[-9, 4, -3]} intensity={2.4} distance={16} color={ACCENT} />
       <pointLight position={[9, 4, -3]} intensity={2.4} distance={16} color={ACCENT} />
@@ -73,11 +70,11 @@ export default function LensRoom({ section: s }) {
           <VideoScreen key={r.v} src={r.v} poster={r.poster} label={r.label} position={[4 + i * 1.9, 3, -13.5]} width={1.5} aspect={9 / 16} accent={ACCENT} />
         ))}
 
-        {/* in rotation — Apple embed centerpiece + replay cards facing the camera */}
-        <Label position={[0, 5.4, -5]} size={0.34} color={ACCENT} font>IN ROTATION</Label>
-        <Embed position={[0, 2.9, -5]} url={s.embeds[0].url} kind="apple" label={s.embeds[0].label} accent={ACCENT} w={300} h={330} />
+        {/* in rotation — on the right wall past the trips (nothing floats mid-room) */}
+        <Label position={[12.55, 6.2, 6.2]} rotation={[0, -Math.PI / 2, 0]} size={0.34} color={ACCENT} font>IN ROTATION</Label>
+        <Embed position={[12.55, 3.2, 6.2]} rotation={[0, -Math.PI / 2, 0]} url={s.embeds[0].url} kind="apple" label={s.embeds[0].label} accent={ACCENT} w={300} h={330} />
         {s.replay.map(([p, m], i) => (
-          <Frame key={p} src={p} position={[i === 0 ? -3.6 : i === 1 ? 3.6 : 0, i === 2 ? 4.6 : 2.5, -5]} width={1.5} accent={ACCENT} caption={m} />
+          <Frame key={p} src={p} position={[12.55, 5.4 - i * 1.65, 8.4]} rotation={[0, -Math.PI / 2, 0]} width={1.4} accent={ACCENT} caption={m} />
         ))}
       </Suspense>
 

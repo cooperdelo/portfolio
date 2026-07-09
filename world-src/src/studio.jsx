@@ -1,6 +1,6 @@
 import React, { useMemo, useRef, useState } from 'react';
 import { useFrame, useLoader } from '@react-three/fiber';
-import { Image, Text } from '@react-three/drei';
+import { Image, Text, useTexture } from '@react-three/drei';
 import { easing } from 'maath';
 import * as THREE from 'three';
 import { useStore } from './store.js';
@@ -8,6 +8,91 @@ import { P, thumb } from './data.js';
 import { POSTERS } from './posters.js';
 
 const BASE = import.meta.env.BASE_URL;
+
+// =============================================================================
+// PBR materials — photoscanned Poly Haven maps (CC0, 1k JPG in public/tex).
+// This is what takes surfaces from "flat game texture" to "real room":
+// diffuse + normal + roughness on every large surface.
+// Available sets: 'brick', 'floor' (wood deck), 'wood' (oak veneer),
+// 'plaster', 'fabric' (normal+rough only — tint via material color).
+// =============================================================================
+const HAS_DIFF = { brick: true, floor: true, wood: true, plaster: true, fabric: false };
+export function usePBR(name, repeat = [1, 1]) {
+  const urls = { normalMap: `${BASE}tex/${name}_nor.jpg`, roughnessMap: `${BASE}tex/${name}_rough.jpg` };
+  if (HAS_DIFF[name]) urls.map = `${BASE}tex/${name}_diff.jpg`;
+  const tex = useTexture(urls);
+  return useMemo(() => {
+    const out = {};
+    for (const [k, t] of Object.entries(tex)) {
+      const c = t.clone(); c.needsUpdate = true;
+      c.wrapS = c.wrapT = THREE.RepeatWrapping; c.repeat.set(repeat[0], repeat[1]); c.anisotropy = 8;
+      if (k === 'map') c.colorSpace = THREE.SRGBColorSpace;
+      out[k] = c;
+    }
+    return out;
+  }, [tex, repeat[0], repeat[1]]);
+}
+['brick', 'floor', 'wood', 'plaster', 'fabric'].forEach((n) => {
+  if (HAS_DIFF[n]) useTexture.preload(`${BASE}tex/${n}_diff.jpg`);
+  useTexture.preload(`${BASE}tex/${n}_nor.jpg`); useTexture.preload(`${BASE}tex/${n}_rough.jpg`);
+});
+
+// =============================================================================
+// RoomShell — the shared "real studio room" every section room sits inside:
+// wood floor, brick walls, ceiling, baseboards, warm LED strips. Rooms add
+// their own accent lighting + content; nothing here should ever read as void.
+// =============================================================================
+export function RoomShell({ halfW = 11, backZ = -13, height = 12, frontZ = 11, accent = '#FF4D2E' }) {
+  const depth = frontZ - backZ;
+  const midZ = (backZ + frontZ) / 2;
+  const floor = usePBR('floor', [9, 9]);
+  const brickBack = usePBR('brick', [Math.max(4, Math.round(halfW * 0.62)), Math.max(3, Math.round(height * 0.4))]);
+  const brickSide = usePBR('brick', [Math.max(4, Math.round(depth * 0.31)), Math.max(3, Math.round(height * 0.4))]);
+  const wood = usePBR('wood', [6, 0.4]);
+  const strip = (w, pos, rot = [0, 0, 0]) => (
+    <group position={pos} rotation={rot}>
+      <mesh><boxGeometry args={[w, 0.045, 0.045]} /><meshStandardMaterial color="#3a2a1a" emissive="#ff9b45" emissiveIntensity={1.8} /></mesh>
+    </group>
+  );
+  return (
+    <group>
+      {/* wood floor */}
+      <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, midZ]}>
+        <planeGeometry args={[halfW * 2 + 30, depth + 30]} />
+        <meshStandardMaterial {...floor} color="#6f6357" roughness={0.92} envMapIntensity={0.3} />
+      </mesh>
+      {/* back + side brick walls */}
+      <mesh receiveShadow position={[0, height / 2 - 1, backZ]}>
+        <boxGeometry args={[halfW * 2 + 2, height + 2, 0.4]} />
+        <meshStandardMaterial {...brickBack} color="#a08574" roughness={0.95} envMapIntensity={0.3} />
+      </mesh>
+      <mesh receiveShadow position={[-halfW, height / 2 - 1, midZ]} rotation={[0, Math.PI / 2, 0]}>
+        <boxGeometry args={[depth + 2, height + 2, 0.4]} />
+        <meshStandardMaterial {...brickSide} color="#967d6c" roughness={0.95} envMapIntensity={0.28} />
+      </mesh>
+      <mesh receiveShadow position={[halfW, height / 2 - 1, midZ]} rotation={[0, Math.PI / 2, 0]}>
+        <boxGeometry args={[depth + 2, height + 2, 0.4]} />
+        <meshStandardMaterial {...brickSide} color="#967d6c" roughness={0.95} envMapIntensity={0.28} />
+      </mesh>
+      {/* ceiling */}
+      <mesh position={[0, height - 1, midZ]} rotation={[Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[halfW * 2 + 4, depth + 6]} /><meshStandardMaterial color="#14100c" roughness={1} />
+      </mesh>
+      {/* wood baseboards */}
+      <mesh position={[0, 0.14, backZ + 0.28]}><boxGeometry args={[halfW * 2, 0.28, 0.08]} /><meshStandardMaterial {...wood} color="#5a4128" roughness={0.7} /></mesh>
+      <mesh position={[-halfW + 0.28, 0.14, midZ]} rotation={[0, Math.PI / 2, 0]}><boxGeometry args={[depth, 0.28, 0.08]} /><meshStandardMaterial {...wood} color="#5a4128" roughness={0.7} /></mesh>
+      <mesh position={[halfW - 0.28, 0.14, midZ]} rotation={[0, Math.PI / 2, 0]}><boxGeometry args={[depth, 0.28, 0.08]} /><meshStandardMaterial {...wood} color="#5a4128" roughness={0.7} /></mesh>
+      {/* warm LED strips: cove line along the top of each wall + accent under back wall */}
+      {strip(halfW * 2 - 1, [0, height - 1.6, backZ + 0.32])}
+      {strip(depth - 1, [-halfW + 0.32, height - 1.6, midZ], [0, Math.PI / 2, 0])}
+      {strip(depth - 1, [halfW - 0.32, height - 1.6, midZ], [0, Math.PI / 2, 0])}
+      {strip(halfW * 2 - 2, [0, 0.34, backZ + 0.34])}
+      {/* soft cove bounce so the strips read as real light */}
+      <pointLight position={[0, height - 2, backZ + 2]} intensity={1.1} distance={halfW * 1.6} color="#ffb877" />
+      <pointLight position={[0, 2.5, frontZ - 3]} intensity={0.9} distance={halfW * 1.8} color="#ffd9b0" />
+    </group>
+  );
+}
 const posterSrc = (p) => (p.own ? P + p.img.replace('__own:', '') : BASE + 'posters/' + p.img);
 
 // ---- procedural textures (self-contained, no external files) ----
@@ -90,19 +175,31 @@ export function PhotoPoster({ src, position, rotation, w = 1.6, ratio = 0.7, tit
 }
 
 // ---- a big window looking onto a night city (sells the 'real room' feel) ----
-export function CityWindow({ position, rotation = [0, 0, 0], w = 6, h = 5, view = 'thailand_trip_bangkok_skyline.jpg' }) {
+// The view plane sits IN FRONT of the wall face (the group mounts slightly
+// proud of the wall) — frame is four slats, never an opaque filler box.
+export function CityWindow({ position, rotation = [0, 0, 0], w = 5.4, h = 3.8, view = 'thailand_trip_bangkok_skyline.jpg' }) {
+  const slat = (sw, sh, x, y) => (
+    <mesh position={[x, y, 0.05]} castShadow key={`${x},${y}`}>
+      <boxGeometry args={[sw, sh, 0.16]} /><meshStandardMaterial color="#141110" roughness={0.6} />
+    </mesh>
+  );
   return (
     <group position={position} rotation={rotation}>
-      {/* the view, behind the glass, tinted to night + glowing */}
-      <Image url={thumb(view)} scale={[w, h]} position={[0, 0, -0.3]} toneMapped={false} />
-      <mesh position={[0, 0, -0.28]}><planeGeometry args={[w, h]} /><meshBasicMaterial color="#0a1430" transparent opacity={0.45} /></mesh>
-      {/* frame + mullions */}
-      <mesh position={[0, 0, 0]}><boxGeometry args={[w + 0.4, h + 0.4, 0.2]} /><meshStandardMaterial color="#12100e" roughness={0.7} /></mesh>
-      <mesh position={[0, 0, 0.02]}><boxGeometry args={[w, h, 0.24]} /><meshStandardMaterial color="#0b0806" /></mesh>
-      {[-w / 4, w / 4].map((mx) => (<mesh key={mx} position={[mx, 0, 0.06]}><boxGeometry args={[0.08, h, 0.06]} /><meshStandardMaterial color="#161310" /></mesh>))}
-      <mesh position={[0, 0, 0.06]}><boxGeometry args={[w, 0.08, 0.06]} /><meshStandardMaterial color="#161310" /></mesh>
+      {/* the night city, tinted cool, glowing through the glass */}
+      <Image url={thumb(view)} scale={[w, h]} position={[0, 0, -0.06]} toneMapped={false} />
+      <mesh position={[0, 0, -0.02]}><planeGeometry args={[w, h]} /><meshBasicMaterial color="#0a1430" transparent opacity={0.38} /></mesh>
+      {/* frame slats + mullions */}
+      {slat(w + 0.44, 0.22, 0, h / 2 + 0.11)}
+      {slat(w + 0.44, 0.22, 0, -h / 2 - 0.11)}
+      {slat(0.22, h + 0.44, -w / 2 - 0.11, 0)}
+      {slat(0.22, h + 0.44, w / 2 + 0.11, 0)}
+      <mesh position={[-w / 6, 0, 0.03]}><boxGeometry args={[0.07, h, 0.08]} /><meshStandardMaterial color="#161310" /></mesh>
+      <mesh position={[w / 6, 0, 0.03]}><boxGeometry args={[0.07, h, 0.08]} /><meshStandardMaterial color="#161310" /></mesh>
+      <mesh position={[0, 0, 0.03]}><boxGeometry args={[w, 0.07, 0.08]} /><meshStandardMaterial color="#161310" /></mesh>
+      {/* sill */}
+      <mesh position={[0, -h / 2 - 0.28, 0.16]} castShadow><boxGeometry args={[w + 0.6, 0.12, 0.34]} /><meshStandardMaterial color="#1a1512" roughness={0.6} /></mesh>
       {/* cool moonlight spilling in */}
-      <pointLight position={[0, 0, 2]} intensity={1.2} distance={12} color="#9ab4ff" />
+      <pointLight position={[0, 0, 1.6]} intensity={1.4} distance={11} color="#9ab4ff" />
     </group>
   );
 }

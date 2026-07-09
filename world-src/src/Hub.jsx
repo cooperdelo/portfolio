@@ -7,10 +7,10 @@ import Records from './Records.jsx';
 import { useStore } from './store.js';
 import { sectionByKey, SECTIONS, thumb } from './data.js';
 import { POSTERS } from './posters.js';
-import { useStudioTextures, AlbumPoster, PhotoPoster, CityWindow, ShelfUnit, Plaque } from './studio.jsx';
+import { usePBR, useStudioTextures, AlbumPoster, PhotoPoster, CityWindow, ShelfUnit, Plaque } from './studio.jsx';
 
 // The record physically ejects from the shelf, arcs to the turntable and spins
-// flat onto the platter during the needle-drop (the blur overlay then takes over).
+// flat onto the platter during the needle-drop (the overlay covers only the swap).
 function FlyingRecord({ section }) {
   const ref = useRef(); const inner = useRef(); const t = useRef(0);
   const tex = useTexture(thumb(section.cover));
@@ -23,7 +23,7 @@ function FlyingRecord({ section }) {
     const sx = (idx - (SECTIONS.length - 1) / 2) * 1.5, sy = 2.85, sz = -6.2;
     const ex = -1.0, ey = 1.42, ez = -4.0;
     ref.current.position.set(sx + (ex - sx) * e, sy + (ey - sy) * e + Math.sin(k * Math.PI) * 1.0, sz + (ez - sz) * e);
-    ref.current.rotation.x = (Math.PI / 2) * (1 - e);   // upright in the shelf → flat on the platter
+    ref.current.rotation.x = (Math.PI / 2) * (1 - e);
     if (inner.current) inner.current.rotation.y += dt * (10 + 20 * k);
   });
   return (
@@ -64,73 +64,90 @@ function Monitor({ position, rotation }) {
   );
 }
 
-// Distribute the 40 album posters across the three walls (avoiding the record
-// shelf, the window, and the shelf unit).
+// Hanging pendant lamp — warm bulb + cone shade, over the desk (basement vibe).
+function Pendant({ x, z }) {
+  return (
+    <group position={[x, 0, z]}>
+      <mesh position={[0, 9.15, 0]}><cylinderGeometry args={[0.015, 0.015, 3.7, 6]} /><meshStandardMaterial color="#1a1512" /></mesh>
+      <mesh position={[0, 7.25, 0]}><coneGeometry args={[0.42, 0.52, 24, 1, true]} /><meshStandardMaterial color="#15100c" roughness={0.55} metalness={0.35} side={THREE.DoubleSide} /></mesh>
+      <mesh position={[0, 7.1, 0]}><sphereGeometry args={[0.09, 12, 12]} /><meshStandardMaterial color="#ffd9a0" emissive="#ffb066" emissiveIntensity={2.8} /></mesh>
+      <pointLight position={[0, 6.85, 0]} intensity={1.5} distance={9} color="#ffb877" />
+    </group>
+  );
+}
+
+// Album poster wall layouts — explicit slots that stay CLEAR of the window
+// (left wall) and the shelf unit (right wall). No more covered vinyls.
+const POSTER_Z = -6.7; // back-wall poster plane (wall face at -6.8 → no z-fight)
 const OWN = POSTERS.filter((p) => p.own);
 const ALBUMS = POSTERS.filter((p) => !p.own);
-const backAlbums = ALBUMS.slice(0, 12);   // back wall, above the records
-const leftAlbums = ALBUMS.slice(12, 25);  // left wall (around the window)
-const rightAlbums = ALBUMS.slice(25, 39); // right wall (around the shelf)
+const backAlbums = ALBUMS.slice(0, 12);
+const leftAlbums = ALBUMS.slice(12, 25);   // 13
+const rightAlbums = ALBUMS.slice(25, 39);  // 14
+// left wall: window occupies z -4.2..1.3, y ≤ 5.1 → slots flank + top band
+const L_SLOTS = [
+  ...[6.3, 4.5, 2.7].flatMap((y) => [[-8.6, y], [-6.7, y]]),
+  ...[[-4.5, 6.3], [-2.6, 6.3], [-0.7, 6.3], [1.2, 6.3]],
+  ...[6.3, 4.5, 2.7].flatMap((y) => [[3.4, y], [5.3, y]]),
+].map(([z, y]) => [z, y]);
+// right wall: shelf occupies z -3.0..0.2 up to y ~5 → slots flank + top band
+const R_SLOTS = [
+  ...[6.3, 4.5, 2.7].flatMap((y) => [[-8.6, y], [-6.7, y], [-4.8, y]]),
+  ...[[-2.8, 6.3], [-0.9, 6.3], [1.0, 6.3]],
+  ...[6.3, 4.5].flatMap((y) => [[2.9, y], [4.8, y], [6.7, y]]),
+].map(([z, y]) => [z, y]);
 
 export default function Hub() {
   const tex = useStudioTextures();
+  const floor = usePBR('floor', [10, 10]);
+  const brickBack = usePBR('brick', [9, 5]);
+  const brickSide = usePBR('brick', [8, 5]);
+  const rugFab = usePBR('fabric', [3, 2.2]);
   const phase = useStore((s) => s.phase);
   const section = useStore((s) => s.section);
   return (
     <group>
       {phase === 'dropping' && section && <Suspense fallback={null}><FlyingRecord section={section} /></Suspense>}
-      {/* ---- room shell ---- */}
+
+      {/* ---- room shell: real wood floor + brick walls + ceiling ---- */}
       <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]}>
-        <planeGeometry args={[44, 44]} />
-        <meshStandardMaterial color="#160f0a" roughness={0.96} metalness={0.04} envMapIntensity={0.3} />
+        <planeGeometry args={[46, 46]} />
+        <meshStandardMaterial {...floor} color="#6f6357" roughness={0.92} envMapIntensity={0.3} />
       </mesh>
-      <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.01, -1]}>
-        <planeGeometry args={[13, 9]} />
-        <meshStandardMaterial map={tex.wood} color="#3a2616" roughness={0.85} />
-      </mesh>
-      {/* back wall — brick */}
       <mesh receiveShadow position={[0, 4.5, -7]}>
         <boxGeometry args={[24, 13, 0.4]} />
-        <meshStandardMaterial map={tex.brick} roughnessMap={tex.brick} color="#8a6a54" roughness={0.95} envMapIntensity={0.35} />
+        <meshStandardMaterial {...brickBack} color="#a08574" roughness={0.95} envMapIntensity={0.32} />
       </mesh>
-      {/* side walls — brick */}
       <mesh receiveShadow position={[-11, 4.5, -1]} rotation={[0, Math.PI / 2, 0]}>
-        <boxGeometry args={[20, 13, 0.4]} /><meshStandardMaterial map={tex.brick} color="#7c5f4b" roughness={0.95} envMapIntensity={0.3} />
+        <boxGeometry args={[20, 13, 0.4]} /><meshStandardMaterial {...brickSide} color="#967d6c" roughness={0.95} envMapIntensity={0.28} />
       </mesh>
       <mesh receiveShadow position={[11, 4.5, -1]} rotation={[0, Math.PI / 2, 0]}>
-        <boxGeometry args={[20, 13, 0.4]} /><meshStandardMaterial map={tex.brick} color="#7c5f4b" roughness={0.95} envMapIntensity={0.3} />
+        <boxGeometry args={[20, 13, 0.4]} /><meshStandardMaterial {...brickSide} color="#967d6c" roughness={0.95} envMapIntensity={0.28} />
       </mesh>
-      {/* ceiling */}
-      <mesh position={[0, 11, -1]} rotation={[Math.PI / 2, 0, 0]}><planeGeometry args={[24, 20]} /><meshStandardMaterial color="#0e0a07" roughness={1} /></mesh>
+      <mesh position={[0, 11, -1]} rotation={[Math.PI / 2, 0, 0]}><planeGeometry args={[24, 22]} /><meshStandardMaterial color="#120e0a" roughness={1} /></mesh>
+      {/* baseboards */}
+      <mesh position={[0, 0.14, -6.76]}><boxGeometry args={[24, 0.28, 0.08]} /><meshStandardMaterial map={tex.wood} color="#5a4128" roughness={0.7} /></mesh>
+      {/* cove LED strip along the back wall top */}
+      <mesh position={[0, 9.6, -6.72]}><boxGeometry args={[22, 0.045, 0.045]} /><meshStandardMaterial color="#3a2a1a" emissive="#ff9b45" emissiveIntensity={1.8} /></mesh>
+      <pointLight position={[0, 9.2, -5]} intensity={1.2} distance={16} color="#ffb877" />
 
       <Suspense fallback={null}>
         {/* ---- ALBUM POSTER WALLS ---- */}
-        {/* back wall: 6 cols x 2 rows above the records */}
         {backAlbums.map((p, i) => {
           const c = i % 6, r = Math.floor(i / 6);
-          return <AlbumPoster key={p.img} poster={p} position={[(c - 2.5) * 2.6, 6.9 - r * 1.7, -6.78]} rotation={[0, 0, 0]} w={1.3} />;
+          return <AlbumPoster key={p.img} poster={p} position={[(c - 2.5) * 2.6, 6.9 - r * 1.7, POSTER_Z]} rotation={[0, 0, 0]} w={1.3} />;
         })}
-        {/* Cooper's own EP — hero poster, centered in the top-row gap */}
-        {OWN[0] && <AlbumPoster poster={OWN[0]} position={[0, 5.35, -6.78]} rotation={[0, 0, 0]} w={1.45} />}
-
-        {/* left wall: posters around the window (skip the window's zone z -3.5..0.5) */}
         {leftAlbums.map((p, i) => {
-          const col = i % 5, row = Math.floor(i / 5);
-          const z = -6 + col * 2.3;
-          const y = 7.3 - row * 1.7;
-          if (row >= 2 && z > -3.6 && z < 0.8) return null; // leave room for window lower-center
-          return <AlbumPoster key={p.img} poster={p} position={[-10.7, y, z]} rotation={[0, Math.PI / 2, 0]} w={1.25} />;
+          const s = L_SLOTS[i]; if (!s) return null;
+          return <AlbumPoster key={p.img} poster={p} position={[-10.7, s[1], s[0]]} rotation={[0, Math.PI / 2, 0]} w={1.25} />;
         })}
-        <CityWindow position={[-10.68, 3.4, -1.5]} rotation={[0, Math.PI / 2, 0]} w={6.2} h={4.6} />
-
-        {/* right wall: posters around the shelf unit */}
         {rightAlbums.map((p, i) => {
-          const col = i % 5, row = Math.floor(i / 5);
-          const z = -6 + col * 2.3;
-          const y = 7.3 - row * 1.7;
-          if (row >= 1 && z > -3.6 && z < 1.0) return null; // leave room for the shelf
-          return <AlbumPoster key={p.img} poster={p} position={[10.7, y, z]} rotation={[0, -Math.PI / 2, 0]} w={1.25} />;
+          const s = R_SLOTS[i]; if (!s) return null;
+          return <AlbumPoster key={p.img} poster={p} position={[10.7, s[1], s[0]]} rotation={[0, -Math.PI / 2, 0]} w={1.25} />;
         })}
+
+        {/* window sits lower + smaller so it never covers a poster row */}
+        <CityWindow position={[-10.68, 2.9, -1.5]} rotation={[0, Math.PI / 2, 0]} w={5.4} h={3.8} />
 
         {/* ---- LED shelf unit with objects (right wall) ---- */}
         <group position={[10.5, 0.4, -1.4]} rotation={[0, -Math.PI / 2, 0]}>
@@ -143,13 +160,23 @@ export default function Hub() {
           <Model src="plant" fit={0.9} position={[-0.9, 0.1, 0.1]} />
         </group>
 
-        {/* ---- the desk + turntable + monitors ---- */}
+        {/* ---- the desk + turntable + monitors + NOW PLAYING (Cooper's EP) ---- */}
         <Model src="mixingdesk" fit={3.4} position={[0, 0, -4.2]} rotation={[0, 0, 0]} envIntensity={0.9} />
         <Model src="turntable" fit={1.15} position={[-1.0, 1.15, -4.0]} rotation={[0, 0.3, 0]} envIntensity={1.1} />
         <Monitor position={[2.3, 1.5, -4.2]} rotation={[0, -0.4, 0]} />
         <Monitor position={[-3.2, 1.5, -4.2]} rotation={[0, 0.4, 0]} />
         <Model src="chair" fit={1.15} position={[0, 0, -2.4]} rotation={[0, Math.PI, 0]} />
         <Model src="mic" fit={0.62} position={[1.35, 1.16, -3.7]} rotation={[0.5, -0.3, 0]} cast />
+        {/* EP on a desk stand — its own clear slot (was z-fighting inside the grid) */}
+        {OWN[0] && (
+          <group position={[1.75, 1.14, -3.95]} rotation={[-0.1, -0.38, 0]}>
+            <AlbumPoster poster={OWN[0]} position={[0, 0.5, 0]} w={0.92} />
+            <mesh position={[0, 0.16, -0.14]} rotation={[0.5, 0, 0]}><boxGeometry args={[0.5, 0.5, 0.04]} /><meshStandardMaterial color="#241a10" roughness={0.7} /></mesh>
+          </group>
+        )}
+        {/* pendant lamps hanging over the desk */}
+        <Pendant x={-1.7} z={-3.3} />
+        <Pendant x={1.7} z={-3.3} />
 
         {/* ---- guitars on stands (left) — clickable to Music ---- */}
         <ClickTo sectionKey="MUSIC">
@@ -166,9 +193,17 @@ export default function Hub() {
           <Model src="drums" fit={2.4} position={[6.4, 0, -3.6]} rotation={[0, -0.7, 0]} />
         </ClickTo>
 
+        {/* ---- lounge: sofa + coffee table + rug (the basement corner) ---- */}
+        <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]} position={[4.9, 0.012, 4.6]}>
+          <planeGeometry args={[7.2, 5]} />
+          <meshStandardMaterial {...rugFab} color="#2e1a16" roughness={0.98} />
+        </mesh>
+        <Model src="sofa" fit={3.1} position={[5.6, 0, 5.6]} rotation={[0, -2.35, 0]} />
+        <Model src="coffeetable" fit={1.4} position={[4.0, 0, 3.6]} rotation={[0, 0.3, 0]} />
+        <Model src="plant" fit={1.7} position={[8.8, 0, 3.0]} />
+
         {/* ---- ambience ---- */}
         <Model src="lamp" fit={2.6} position={[-9.2, 0, 3.4]} rotation={[0, 0, 0]} envIntensity={1.2} />
-        <Model src="plant" fit={1.7} position={[8.8, 0, 3.2]} />
         <pointLight position={[-9.2, 2.4, 3.4]} intensity={1.3} distance={9} color="#ffb066" />
       </Suspense>
 

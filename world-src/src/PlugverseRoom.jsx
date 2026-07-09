@@ -2,20 +2,17 @@ import React, { Suspense } from 'react';
 import { ContactShadows } from '@react-three/drei';
 import { Model } from './Model.jsx';
 import { Frame, VideoScreen, Panel, Label, InfoTile } from './bits.jsx';
+import { RoomShell } from './studio.jsx';
 
 const ACCENT = '#C9BEE6';
 
 export default function PlugverseRoom({ section: s }) {
   return (
     <group>
-      {/* shell */}
-      <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]}><planeGeometry args={[54, 54]} /><meshStandardMaterial color="#12100f" roughness={0.95} /></mesh>
-      <mesh receiveShadow position={[0, 6, -13]}><boxGeometry args={[30, 16, 0.4]} /><meshStandardMaterial color="#171622" roughness={0.9} /></mesh>
-      <mesh receiveShadow position={[-11, 6, -3]} rotation={[0, Math.PI / 2, 0]}><boxGeometry args={[22, 16, 0.4]} /><meshStandardMaterial color="#14131c" roughness={0.92} /></mesh>
-      <mesh receiveShadow position={[11, 6, -3]} rotation={[0, Math.PI / 2, 0]}><boxGeometry args={[22, 16, 0.4]} /><meshStandardMaterial color="#14131c" roughness={0.92} /></mesh>
+      {/* real studio shell */}
+      <RoomShell halfW={11} backZ={-13} height={13} frontZ={9} accent={ACCENT} />
 
       {/* lighting */}
-      <ambientLight intensity={0.7} color="#4a4658" />
       <pointLight position={[0, 5, -3]} intensity={3.2} distance={20} color="#cfc6e8" castShadow shadow-mapSize={[1024, 1024]} />
       <pointLight position={[-6, 4, -6]} intensity={2.4} distance={16} color={ACCENT} />
       <pointLight position={[6, 4, -2]} intensity={1.8} distance={16} color="#ffb066" />
@@ -32,14 +29,16 @@ export default function PlugverseRoom({ section: s }) {
       <Suspense fallback={null}>
         <Model src="mixingdesk" fit={3.6} position={[0, 0, -9.4]} />
         <Model src="chair" fit={1.2} position={[0, 0, -7.6]} rotation={[0, Math.PI, 0]} />
-        <VideoScreen src="plugverse_ui.mp4" poster="Plugverse_picture.jpeg" label="Plugverse — booking flow" position={[-1.6, 2.4, -9.6]} rotation={[0, 0.25, 0]} width={2.6} accent={ACCENT} />
-        <VideoScreen src="hero_plugverse_product.mov" poster="plugverse_profile.jpg" label="Artist profile" position={[1.8, 2.4, -9.6]} rotation={[0, -0.25, 0]} width={2.4} accent={ACCENT} />
+        <VideoScreen src="plugverse_ui.mp4" poster="Plugverse_picture.jpeg" label="Plugverse — booking flow" position={[-2.3, 3.0, -12.5]} width={2.6} accent={ACCENT} />
+        <VideoScreen src="hero_plugverse_product.mov" poster="plugverse_profile.jpg" label="Artist profile" position={[2.3, 3.0, -12.5]} width={2.4} accent={ACCENT} />
       </Suspense>
 
-      {/* founder-story timeline along the left wall */}
-      <Label position={[-10.6, 7, -3]} rotation={[0, Math.PI / 2, 0]} size={0.5} color={ACCENT} font max={20}>THE STORY</Label>
+      {/* founder-story timeline — horizontal strip along the left wall
+          (was a vertical stack whose last two panels sat below the floor) */}
+      <Label position={[-10.6, 6.6, -1.6]} rotation={[0, Math.PI / 2, 0]} size={0.5} color={ACCENT} font max={20}>THE STORY</Label>
+      <mesh position={[-10.7, 3.7, -1.6]} rotation={[0, Math.PI / 2, 0]}><boxGeometry args={[15.4, 0.03, 0.03]} /><meshStandardMaterial color="#3a3348" emissive={ACCENT} emissiveIntensity={0.9} /></mesh>
       {s.story.map((b, i) => (
-        <Panel key={i} position={[-10.5, 5 - i * 1.9, -1 + 0]} rotation={[0, Math.PI / 2, 0]} width={240} accent={ACCENT}>
+        <Panel key={i} position={[-10.55, i % 2 ? 2.5 : 4.9, -8 + i * 3.2]} rotation={[0, Math.PI / 2, 0]} width={230} accent={ACCENT}>
           <div style={{ fontFamily: 'Geist Mono, monospace', fontSize: 9, letterSpacing: '.16em', textTransform: 'uppercase', color: ACCENT }}>{`0${i + 1} · ${b.h}`}</div>
           <div style={{ fontSize: 11.5, lineHeight: 1.45, opacity: 0.88, marginTop: 5 }}>{b.t}</div>
         </Panel>
@@ -74,15 +73,15 @@ export default function PlugverseRoom({ section: s }) {
         </Panel>
       ))}
 
-      {/* stat plaques + closing quote (front) */}
-      <Panel position={[-4.6, 2.4, -1]} rotation={[0, 0.6, 0]} width={230} accent={ACCENT}>
+      {/* stat plaques + closing quote — mounted on the right wall */}
+      <Panel position={[10.55, 4.7, 1.6]} rotation={[0, -Math.PI / 2, 0]} width={230} accent={ACCENT}>
         {s.stats.map(([k, v], i) => (
           <div key={i} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, padding: '4px 0', borderTop: i ? '1px solid rgba(244,239,230,.08)' : 'none' }}>
             <span style={{ opacity: 0.5, fontFamily: 'Geist Mono, monospace', fontSize: 9.5, textTransform: 'uppercase' }}>{k}</span><span>{v}</span>
           </div>
         ))}
       </Panel>
-      <Panel position={[4.6, 2.4, -1]} rotation={[0, -0.6, 0]} width={230} accent={ACCENT}>
+      <Panel position={[10.55, 2.3, 1.6]} rotation={[0, -Math.PI / 2, 0]} width={230} accent={ACCENT}>
         <div style={{ fontFamily: 'Fraunces, serif', fontStyle: 'italic', fontSize: 14, lineHeight: 1.45, opacity: 0.9 }}>{s.closing}</div>
       </Panel>
 

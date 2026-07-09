@@ -26,7 +26,7 @@ export const useStore = create((set, get) => ({
 
   returnToHub: () => { if (get().phase === 'inroom') set({ phase: 'returning', lightbox: null }); },
   swapToHub: () => set({ shown: 'hub' }),
-  finishReturn: () => set({ phase: 'idle', room: 'hub', section: null }),
+  finishReturn: () => set({ phase: 'idle', room: 'hub', section: null, roomView: 'front' }),
 
   // jump straight from one room to another (via the crate)
   jumpTo: (section) => { const p = get().phase; if (p === 'idle') set({ phase: 'dropping', section }); },

@@ -104,9 +104,10 @@ export function ActiveRoom() {
     <>
       {/* no HDRI Environment here — it doubled GPU memory on top of the hub's
           cached textures and lost the WebGL context. Lit with real lights. */}
-      <ambientLight intensity={1.5} color="#5a4636" />
-      <hemisphereLight intensity={1.1} color={section.accent} groundColor="#241811" />
-      <pointLight position={[0, 5, -2]} intensity={3.4} distance={22} color="#ffd9a0" castShadow shadow-mapSize={[1024, 1024]} />
+      <ambientLight intensity={2.1} color="#6a5642" />
+      <hemisphereLight intensity={1.35} color={section.accent} groundColor="#2c1e14" />
+      <pointLight position={[0, 5, -2]} intensity={4.2} distance={24} color="#ffd9a0" castShadow shadow-mapSize={[1024, 1024]} />
+      <pointLight position={[0, 4, 5]} intensity={1.6} distance={18} color="#ffe2c0" />
       <pointLight position={[-8, 4, -2]} intensity={2.0} distance={16} color={section.accent} />
       <pointLight position={[8, 4, -2]} intensity={2.0} distance={16} color="#ffce9a" />
       <pointLight position={[0, 4, -9]} intensity={1.6} distance={14} color="#ffb066" />

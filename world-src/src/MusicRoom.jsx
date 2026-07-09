@@ -2,6 +2,7 @@ import React, { Suspense } from 'react';
 import { ContactShadows, Image } from '@react-three/drei';
 import { Model } from './Model.jsx';
 import { Frame, VideoScreen, Panel, Label, InfoTile, Embed } from './bits.jsx';
+import { RoomShell } from './studio.jsx';
 import { P } from './data.js';
 
 const ACCENT = '#FF4D2E';
@@ -23,11 +24,8 @@ function BandMic({ position, role, name, you }) {
 export default function MusicRoom({ section: s }) {
   return (
     <group>
-      {/* ---- shell ---- */}
-      <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]}><planeGeometry args={[54, 54]} /><meshStandardMaterial color="#160f0a" roughness={0.96} /></mesh>
-      <mesh receiveShadow position={[0, 6, -13]}><boxGeometry args={[30, 16, 0.4]} /><meshStandardMaterial color="#221109" roughness={0.94} /></mesh>
-      <mesh receiveShadow position={[-11, 6, -3]} rotation={[0, Math.PI / 2, 0]}><boxGeometry args={[22, 16, 0.4]} /><meshStandardMaterial color="#1d120c" roughness={0.95} /></mesh>
-      <mesh receiveShadow position={[11, 6, -3]} rotation={[0, Math.PI / 2, 0]}><boxGeometry args={[22, 16, 0.4]} /><meshStandardMaterial color="#1d120c" roughness={0.95} /></mesh>
+      {/* ---- real studio shell (wood floor, brick walls, LED cove) ---- */}
+      <RoomShell halfW={11} backZ={-13} height={13} frontZ={9} accent={ACCENT} />
 
       {/* ---- stage + room lighting (point lights aim reliably in R3F) ---- */}
       <pointLight position={[0, 4, -8.4]} intensity={5.5} distance={18} color="#ffd9a0" castShadow shadow-mapSize={[1024, 1024]} />
@@ -38,7 +36,6 @@ export default function MusicRoom({ section: s }) {
       {/* wall fills for rig + concert galleries */}
       <pointLight position={[-8, 4, -3]} intensity={2.2} distance={14} color="#ffce9a" />
       <pointLight position={[8, 4, -3]} intensity={2.2} distance={14} color="#ffce9a" />
-      <ambientLight intensity={0.6} color="#5a4230" />
 
       {/* ---- stage (back) ---- */}
       <mesh receiveShadow castShadow position={[0, 0.2, -9.5]}><boxGeometry args={[16, 0.4, 5]} /><meshStandardMaterial color="#0f0a07" roughness={0.8} /></mesh>
@@ -70,7 +67,7 @@ export default function MusicRoom({ section: s }) {
         </Suspense>
         <Label position={[0, 3.15, 0]} size={0.16} color={ACCENT} mono>FLICKER OF TIME · EP</Label>
       </group>
-      <Panel position={[8.4, 2.6, -3]} rotation={[0, -0.7, 0]} width={210} accent={ACCENT}>
+      <Panel position={[7.0, 3.9, -12.5]} width={210} accent={ACCENT}>
         <div style={{ fontFamily: 'Geist Mono, monospace', fontSize: 9, letterSpacing: '.18em', textTransform: 'uppercase', color: ACCENT }}>Cooper Delo · solo</div>
         {s.soloStats.map(([k, v], i) => (
           <div key={i} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, padding: '5px 0', borderTop: i ? '1px solid rgba(244,239,230,.08)' : 'none' }}>
@@ -121,13 +118,14 @@ export default function MusicRoom({ section: s }) {
         })}
       </Suspense>
 
-      {/* ---- front-of-house: setlist embed + reels + blurb ---- */}
+      {/* ---- front-of-house: setlist off-center + photos in the front corners
+           (peripheral — you see them when you turn, they never block the stage) ---- */}
       <Suspense fallback={null}>
-        <Embed position={[0, 3.0, -2.8]} url={s.embeds[0].url} label={s.embeds[0].label} accent={ACCENT} w={330} h={500} df={2.7} />
-        <Frame src="rubber_band_full_pic.jpeg" position={[-5.0, 2.3, -1.6]} rotation={[0, 0.5, 0]} width={3.0} accent={ACCENT} caption="Rubber Band — live" />
-        <Frame src="cooper_laughing_with_bass.jpg" position={[5.0, 2.3, -1.6]} rotation={[0, -0.5, 0]} width={3.0} accent={ACCENT} caption="Cat's Cradle" />
+        <Embed position={[5.2, 2.8, 1.2]} rotation={[0, -0.4, 0]} url={s.embeds[0].url} label={s.embeds[0].label} accent={ACCENT} w={310} h={460} df={2.5} />
+        <Frame src="rubber_band_full_pic.jpeg" position={[-8.7, 2.5, 0.8]} rotation={[0, 0.72, 0]} width={3.0} accent={ACCENT} caption="Rubber Band — live" />
+        <Frame src="cooper_laughing_with_bass.jpg" position={[8.7, 2.5, 3.6]} rotation={[0, -0.72, 0]} width={3.0} accent={ACCENT} caption="Cat's Cradle" />
       </Suspense>
-      <Panel position={[-8.4, 2.6, -3]} rotation={[0, 0.7, 0]} width={230} accent={ACCENT}>
+      <Panel position={[-7.0, 3.9, -12.5]} width={230} accent={ACCENT}>
         <div style={{ fontFamily: 'Fraunces, serif', fontStyle: 'italic', fontSize: 14, opacity: 0.9, lineHeight: 1.4 }}>{s.blurb}</div>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, marginTop: 9 }}>
           {s.bandStats.map(([k, v]) => (

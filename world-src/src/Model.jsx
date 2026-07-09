@@ -18,7 +18,9 @@ export const MODELS = {
   camera: base + 'models/camera.glb',
   golfclub: base + 'models/golfclub.glb',
   dumbbell: base + 'models/dumbbell.glb',
-  plant: base + 'models/plant.glb'
+  plant: base + 'models/plant.glb',
+  sofa: base + 'models/sofa.glb',
+  coffeetable: base + 'models/coffeetable.glb'
 };
 
 Object.values(MODELS).forEach((u) => useGLTF.preload(u));

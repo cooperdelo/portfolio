@@ -27,8 +27,9 @@ export default function HUD() {
         <button className="back" data-c onClick={returnToHub}>← back to the studio</button>
       )}
 
-      {/* POV wall navigation */}
+      {/* POV wall navigation — in rooms AND in the hub */}
       {phase === 'inroom' && active && <PovNav sectionKey={active.key} accent={active.accent} />}
+      {phase === 'idle' && <PovNav sectionKey="HUB" accent="#FF4D2E" />}
 
       {/* tools */}
       <div className="tools">
@@ -55,18 +56,27 @@ export default function HUD() {
 const prettyName = (s) => (s || '').replace(/^.*\//, '').replace('replay/', '').replace(/\.(jpg|jpeg|png|JPG)$/i, '').replace(/[_-]/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
 
 function Lightbox({ lightbox, close }) {
+  const artRef = useRef();
   useEffect(() => {
     const onKey = (e) => { if (e.key === 'Escape') close(); };
     addEventListener('keydown', onKey);
     return () => removeEventListener('keydown', onKey);
   }, [close]);
+  // 3D preview: the artifact tilts in perspective, tracking the cursor
+  const onArtMove = (e) => {
+    const img = artRef.current; if (!img) return;
+    const r = img.getBoundingClientRect();
+    const dx = (e.clientX - r.left) / r.width - 0.5, dy = (e.clientY - r.top) / r.height - 0.5;
+    img.style.transform = `rotateY(${11 + dx * 16}deg) rotateX(${2 - dy * 12}deg) scale(1.02)`;
+  };
+  const onArtLeave = () => { if (artRef.current) artRef.current.style.transform = ''; };
   const lb = lightbox || {};
   const title = lb.title || prettyName(lb.caption || lb.src);
   const accent = lb.accent || '#FF4D2E';
   const meta = lb.meta || [];
   return (
     <div className={'lightbox' + (lightbox ? ' show' : '')} onClick={(e) => e.target.classList.contains('lightbox') && close()}>
-      <div className="lb-art">{lightbox && <img src={lb.src} alt="" />}</div>
+      <div className="lb-art" onMouseMove={onArtMove} onMouseLeave={onArtLeave}>{lightbox && <img ref={artRef} src={lb.src} alt="" />}</div>
       <div className="lb-info">
         <button className="lx" data-c onClick={close}>Close [ESC]</button>
         {lightbox && (
@@ -90,6 +100,7 @@ function Lightbox({ lightbox, close }) {
 
 // Per-room wall labels for the [left · front · right] POV switch.
 const WALLS = {
+  HUB: ['Window Wall', 'The Records', 'Shelf Wall'],
   MUSIC: ['The Rig', 'Stage', 'Shows'],
   PLUGVERSE: ['The Story', 'Center', 'The Wins'],
   ATHLETIC: ['Iron', 'Center', 'Golf'],
@@ -140,12 +151,16 @@ function Crate() {
 
 function Transition() {
   const phase = useStore((s) => s.phase);
+  const shown = useStore((s) => s.shown);
   const section = useStore((s) => s.section);
   const active = phase === 'dropping' || phase === 'returning';
+  // The overlay is opaque ONLY during the actual scene swap ('void'), so the
+  // 3D record flying to the turntable + camera dive stay fully visible.
+  const covering = active && shown === 'void';
   const accent = section ? section.accent : '#FF4D2E';
   return (
-    <div className={'drop' + (active ? ' on' : '')} style={{ '--a': accent }}>
-      {section && <div className="drop-label" style={{ color: accent }}>{phase === 'returning' ? 'back to the studio' : `▶ ${section.key.toLowerCase()}`}</div>}
+    <div className={'drop' + (covering ? ' cover' : '') + (active ? ' active' : '')} style={{ '--a': accent }}>
+      {covering && section && <div className="drop-label" style={{ color: accent }}>{phase === 'returning' ? 'back to the studio' : `▶ ${section.key.toLowerCase()}`}</div>}
     </div>
   );
 }

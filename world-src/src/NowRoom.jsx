@@ -2,6 +2,7 @@ import React, { Suspense, useState, useEffect } from 'react';
 import { ContactShadows, Html } from '@react-three/drei';
 import { Model } from './Model.jsx';
 import { Frame, Panel, Label } from './bits.jsx';
+import { RoomShell } from './studio.jsx';
 
 const ACCENT = '#8FA382';
 
@@ -18,7 +19,7 @@ function Countdown({ label, target }) {
     </div>
   );
   return (
-    <Html position={[0, 3, -8]} transform occlude distanceFactor={2.6} style={{ pointerEvents: 'none' }}>
+    <Html position={[0, 2.9, -11.55]} transform occlude distanceFactor={2.6} style={{ pointerEvents: 'none' }}>
       <div style={{ width: 320, textAlign: 'center', color: '#F4EFE6', fontFamily: 'Geist, sans-serif' }}>
         <div style={{ fontFamily: 'Geist Mono, monospace', fontSize: 9, letterSpacing: '.2em', textTransform: 'uppercase', color: ACCENT, marginBottom: 10 }}>{label}</div>
         {t > 0
@@ -32,12 +33,8 @@ function Countdown({ label, target }) {
 export default function NowRoom({ section: s }) {
   return (
     <group>
-      <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]}><planeGeometry args={[50, 50]} /><meshStandardMaterial color="#111310" roughness={0.95} /></mesh>
-      <mesh receiveShadow position={[0, 6, -12]}><boxGeometry args={[28, 16, 0.4]} /><meshStandardMaterial color="#191d15" roughness={0.92} /></mesh>
-      <mesh receiveShadow position={[-10, 6, -3]} rotation={[0, Math.PI / 2, 0]}><boxGeometry args={[20, 16, 0.4]} /><meshStandardMaterial color="#161a12" roughness={0.94} /></mesh>
-      <mesh receiveShadow position={[10, 6, -3]} rotation={[0, Math.PI / 2, 0]}><boxGeometry args={[20, 16, 0.4]} /><meshStandardMaterial color="#161a12" roughness={0.94} /></mesh>
+      <RoomShell halfW={10} backZ={-12} height={13} frontZ={8} accent={ACCENT} />
 
-      <ambientLight intensity={0.8} color="#3e4636" />
       <pointLight position={[0, 5, -3]} intensity={3.0} distance={20} color="#e2ecd6" castShadow shadow-mapSize={[1024, 1024]} />
       <pointLight position={[-6, 4, -4]} intensity={2.2} distance={16} color={ACCENT} />
       <pointLight position={[6, 4, -2]} intensity={1.6} distance={16} color="#ffb066" />
