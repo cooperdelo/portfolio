@@ -122,11 +122,11 @@ export function Timers() {
   const { swapToRoom, finishDrop, swapToHub, finishReturn } = useStore.getState();
   useEffect(() => {
     if (phase === 'dropping') {
-      // unmount the hub → free its poster textures → THEN mount the room, so the
-      // two scenes never hold textures in GPU at the same time (context-loss fix).
-      const t0 = setTimeout(() => { useStore.getState().voidScene(); freeHubTextures(); }, 420);
-      const t1 = setTimeout(() => useStore.getState().swapToRoom(), 900);
-      const t2 = setTimeout(() => useStore.getState().finishDrop(), 1450);
+      // Let the record VISIBLY land on the turntable (flight ~0.7s) before the
+      // cover snaps in for the scene swap; then free hub textures + mount room.
+      const t0 = setTimeout(() => { useStore.getState().voidScene(); freeHubTextures(); }, 1050);
+      const t1 = setTimeout(() => useStore.getState().swapToRoom(), 1500);
+      const t2 = setTimeout(() => useStore.getState().finishDrop(), 2050);
       return () => { clearTimeout(t0); clearTimeout(t1); clearTimeout(t2); };
     }
     if (phase === 'returning') {

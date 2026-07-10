@@ -7,7 +7,7 @@ import Records from './Records.jsx';
 import { useStore } from './store.js';
 import { sectionByKey, SECTIONS, thumb } from './data.js';
 import { POSTERS } from './posters.js';
-import { usePBR, useStudioTextures, AlbumPoster, PhotoPoster, CityWindow, ShelfUnit, Plaque } from './studio.jsx';
+import { usePBR, useStudioTextures, AlbumPoster, PhotoPoster, CityWindow, ShelfUnit, Plaque, RecordShelf } from './studio.jsx';
 
 // The record physically ejects from the shelf, arcs to the turntable and spins
 // flat onto the platter during the needle-drop (the overlay covers only the swap).
@@ -18,10 +18,10 @@ function FlyingRecord({ section }) {
   useFrame((_, dt) => {
     if (!ref.current) return;
     t.current += dt;
-    const k = Math.min(t.current / 0.5, 1);
+    const k = Math.min(t.current / 0.72, 1);
     const e = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
     const sx = (idx - (SECTIONS.length - 1) / 2) * 1.5, sy = 2.85, sz = -6.2;
-    const ex = -1.0, ey = 1.42, ez = -4.0;
+    const ex = -1.0, ey = 1.5, ez = -3.95;
     ref.current.position.set(sx + (ex - sx) * e, sy + (ey - sy) * e + Math.sin(k * Math.PI) * 1.0, sz + (ez - sz) * e);
     ref.current.rotation.x = (Math.PI / 2) * (1 - e);
     if (inner.current) inner.current.rotation.y += dt * (10 + 20 * k);
@@ -70,8 +70,22 @@ function Pendant({ x, z }) {
     <group position={[x, 0, z]}>
       <mesh position={[0, 9.15, 0]}><cylinderGeometry args={[0.015, 0.015, 3.7, 6]} /><meshStandardMaterial color="#1a1512" /></mesh>
       <mesh position={[0, 7.25, 0]}><coneGeometry args={[0.42, 0.52, 24, 1, true]} /><meshStandardMaterial color="#15100c" roughness={0.55} metalness={0.35} side={THREE.DoubleSide} /></mesh>
-      <mesh position={[0, 7.1, 0]}><sphereGeometry args={[0.09, 12, 12]} /><meshStandardMaterial color="#ffd9a0" emissive="#ffb066" emissiveIntensity={2.8} /></mesh>
-      <pointLight position={[0, 6.85, 0]} intensity={1.5} distance={9} color="#ffb877" />
+      <mesh position={[0, 7.1, 0]}><sphereGeometry args={[0.09, 12, 12]} /><meshStandardMaterial color="#ffd9a0" emissive="#ffb066" emissiveIntensity={2.2} /></mesh>
+      <pointLight position={[0, 6.85, 0]} intensity={0.8} distance={8} color="#ffb877" />
+    </group>
+  );
+}
+
+// The black record spinning on the turntable platter (always readable as a
+// record player — and the FlyingRecord lands right here during the dive).
+function SpinningVinyl({ position }) {
+  const ref = useRef();
+  useFrame((_, dt) => { if (ref.current) ref.current.rotation.y += dt * 2.2; });
+  return (
+    <group ref={ref} position={position}>
+      <mesh castShadow><cylinderGeometry args={[0.52, 0.52, 0.016, 48]} /><meshStandardMaterial color="#0a0a0c" roughness={0.32} metalness={0.4} /></mesh>
+      <mesh position={[0, 0.01, 0]} rotation={[-Math.PI / 2, 0, 0]}><ringGeometry args={[0.16, 0.5, 48]} /><meshStandardMaterial color="#111116" roughness={0.25} metalness={0.5} /></mesh>
+      <mesh position={[0, 0.011, 0]} rotation={[-Math.PI / 2, 0, 0]}><circleGeometry args={[0.15, 32]} /><meshStandardMaterial color="#FF4D2E" roughness={0.5} /></mesh>
     </group>
   );
 }
@@ -84,18 +98,24 @@ const ALBUMS = POSTERS.filter((p) => !p.own);
 const backAlbums = ALBUMS.slice(0, 12);
 const leftAlbums = ALBUMS.slice(12, 25);   // 13
 const rightAlbums = ALBUMS.slice(25, 39);  // 14
-// left wall: window occupies z -4.2..1.3, y ≤ 5.1 → slots flank + top band
+// Side-wall slots. IMPORTANT: the back wall sits at z=-7, so side-wall slots
+// must stay z ≥ -6.0 or the posters end up behind/inside the back wall.
+// left wall: window occupies z -4.2..1.3 up to y ~5.1 → flank + top band
 const L_SLOTS = [
-  ...[6.3, 4.5, 2.7].flatMap((y) => [[-8.6, y], [-6.7, y]]),
-  ...[[-4.5, 6.3], [-2.6, 6.3], [-0.7, 6.3], [1.2, 6.3]],
-  ...[6.3, 4.5, 2.7].flatMap((y) => [[3.4, y], [5.3, y]]),
-].map(([z, y]) => [z, y]);
-// right wall: shelf occupies z -3.0..0.2 up to y ~5 → slots flank + top band
+  [-6.0, 6.3], [-6.0, 4.5], [-6.0, 2.7],
+  [-4.4, 6.3], [-2.5, 6.3], [-0.6, 6.3], [1.3, 6.3],
+  [3.3, 6.3], [3.3, 4.5], [3.3, 2.7],
+  [5.2, 6.3], [5.2, 4.5], [5.2, 2.7],
+];
+// right wall: shelf occupies z -3.0..0.2 up to y ~5 → flank + top band
 const R_SLOTS = [
-  ...[6.3, 4.5, 2.7].flatMap((y) => [[-8.6, y], [-6.7, y], [-4.8, y]]),
-  ...[[-2.8, 6.3], [-0.9, 6.3], [1.0, 6.3]],
-  ...[6.3, 4.5].flatMap((y) => [[2.9, y], [4.8, y], [6.7, y]]),
-].map(([z, y]) => [z, y]);
+  [-6.0, 6.3], [-6.0, 4.5], [-6.0, 2.7],
+  [-4.4, 6.3], [-4.4, 4.5],
+  [-2.6, 6.3], [-0.7, 6.3], [1.2, 6.3],
+  [3.1, 6.3], [3.1, 4.5],
+  [5.0, 6.3], [5.0, 4.5],
+  [6.9, 6.3], [6.9, 4.5],
+];
 
 export default function Hub() {
   const tex = useStudioTextures();
@@ -118,13 +138,17 @@ export default function Hub() {
         <boxGeometry args={[24, 13, 0.4]} />
         <meshStandardMaterial {...brickBack} color="#a08574" roughness={0.95} envMapIntensity={0.32} />
       </mesh>
-      <mesh receiveShadow position={[-11, 4.5, -1]} rotation={[0, Math.PI / 2, 0]}>
-        <boxGeometry args={[20, 13, 0.4]} /><meshStandardMaterial {...brickSide} color="#967d6c" roughness={0.95} envMapIntensity={0.28} />
+      <mesh receiveShadow position={[-11, 4.5, 0]} rotation={[0, Math.PI / 2, 0]}>
+        <boxGeometry args={[22.4, 13, 0.4]} /><meshStandardMaterial {...brickSide} color="#967d6c" roughness={0.95} envMapIntensity={0.28} />
       </mesh>
-      <mesh receiveShadow position={[11, 4.5, -1]} rotation={[0, Math.PI / 2, 0]}>
-        <boxGeometry args={[20, 13, 0.4]} /><meshStandardMaterial {...brickSide} color="#967d6c" roughness={0.95} envMapIntensity={0.28} />
+      <mesh receiveShadow position={[11, 4.5, 0]} rotation={[0, Math.PI / 2, 0]}>
+        <boxGeometry args={[22.4, 13, 0.4]} /><meshStandardMaterial {...brickSide} color="#967d6c" roughness={0.95} envMapIntensity={0.28} />
       </mesh>
-      <mesh position={[0, 11, -1]} rotation={[Math.PI / 2, 0, 0]}><planeGeometry args={[24, 22]} /><meshStandardMaterial color="#120e0a" roughness={1} /></mesh>
+      <mesh position={[0, 11, 0]} rotation={[Math.PI / 2, 0, 0]}><planeGeometry args={[24, 24]} /><meshStandardMaterial color="#120e0a" roughness={1} /></mesh>
+      {/* front wall — closes the room (no more void when viewing side walls) */}
+      <mesh receiveShadow position={[0, 4.5, 11]}>
+        <boxGeometry args={[24, 13, 0.4]} /><meshStandardMaterial {...brickSide} color="#8d7663" roughness={0.95} envMapIntensity={0.25} />
+      </mesh>
       {/* baseboards */}
       <mesh position={[0, 0.14, -6.76]}><boxGeometry args={[24, 0.28, 0.08]} /><meshStandardMaterial map={tex.wood} color="#5a4128" roughness={0.7} /></mesh>
       {/* cove LED strip along the back wall top */}
@@ -160,23 +184,31 @@ export default function Hub() {
           <Model src="plant" fit={0.9} position={[-0.9, 0.1, 0.1]} />
         </group>
 
+        {/* ---- big fabric rug grounding the desk zone ---- */}
+        <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.012, -2.2]}>
+          <planeGeometry args={[13, 8]} />
+          <meshStandardMaterial {...rugFab} color="#31201a" roughness={0.98} />
+        </mesh>
+
         {/* ---- the desk + turntable + monitors + NOW PLAYING (Cooper's EP) ---- */}
-        <Model src="mixingdesk" fit={3.4} position={[0, 0, -4.2]} rotation={[0, 0, 0]} envIntensity={0.9} />
-        <Model src="turntable" fit={1.15} position={[-1.0, 1.15, -4.0]} rotation={[0, 0.3, 0]} envIntensity={1.1} />
+        <Model src="mixingdesk" fit={3.4} position={[0, 0, -4.2]} rotation={[0, 0, 0]} envIntensity={0.6} dim={0.62} />
+        <Model src="turntable" fit={1.3} position={[-1.0, 1.15, -3.95]} rotation={[0, 0.25, 0]} envIntensity={0.8} dim={0.8} />
+        {/* the vinyl sitting on the platter — makes the record player readable */}
+        <SpinningVinyl position={[-1.0, 1.46, -3.95]} />
         <Monitor position={[2.3, 1.5, -4.2]} rotation={[0, -0.4, 0]} />
         <Monitor position={[-3.2, 1.5, -4.2]} rotation={[0, 0.4, 0]} />
-        <Model src="chair" fit={1.15} position={[0, 0, -2.4]} rotation={[0, Math.PI, 0]} />
+        <Model src="chair" fit={1.15} position={[0, 0, -2.4]} rotation={[0, Math.PI, 0]} dim={0.75} />
         <Model src="mic" fit={0.62} position={[1.35, 1.16, -3.7]} rotation={[0.5, -0.3, 0]} cast />
         {/* EP on a desk stand — its own clear slot (was z-fighting inside the grid) */}
         {OWN[0] && (
-          <group position={[1.75, 1.14, -3.95]} rotation={[-0.1, -0.38, 0]}>
+          <group position={[1.85, 1.14, -3.95]} rotation={[-0.1, -0.38, 0]}>
             <AlbumPoster poster={OWN[0]} position={[0, 0.5, 0]} w={0.92} />
             <mesh position={[0, 0.16, -0.14]} rotation={[0.5, 0, 0]}><boxGeometry args={[0.5, 0.5, 0.04]} /><meshStandardMaterial color="#241a10" roughness={0.7} /></mesh>
           </group>
         )}
-        {/* pendant lamps hanging over the desk */}
-        <Pendant x={-1.7} z={-3.3} />
-        <Pendant x={1.7} z={-3.3} />
+        {/* pendant lamps hanging over the desk (calmer — the desk was blowing out) */}
+        <Pendant x={-2.2} z={-3.1} />
+        <Pendant x={2.2} z={-3.1} />
 
         {/* ---- guitars on stands (left) — clickable to Music ---- */}
         <ClickTo sectionKey="MUSIC">
@@ -193,18 +225,23 @@ export default function Hub() {
           <Model src="drums" fit={2.4} position={[6.4, 0, -3.6]} rotation={[0, -0.7, 0]} />
         </ClickTo>
 
-        {/* ---- lounge: sofa + coffee table + rug (the basement corner) ---- */}
-        <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]} position={[4.9, 0.012, 4.6]}>
-          <planeGeometry args={[7.2, 5]} />
+        {/* ---- lounge: sofa + coffee table + rug — visible left corner,
+             facing the desk (basement corner you can actually see) ---- */}
+        <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]} position={[-6.6, 0.014, 3.2]}>
+          <planeGeometry args={[6.6, 4.8]} />
           <meshStandardMaterial {...rugFab} color="#2e1a16" roughness={0.98} />
         </mesh>
-        <Model src="sofa" fit={3.1} position={[5.6, 0, 5.6]} rotation={[0, -2.35, 0]} />
-        <Model src="coffeetable" fit={1.4} position={[4.0, 0, 3.6]} rotation={[0, 0.3, 0]} />
-        <Model src="plant" fit={1.7} position={[8.8, 0, 3.0]} />
+        <Model src="sofa" fit={3.1} position={[-7.2, 0, 4.0]} rotation={[0, 0.85, 0]} dim={0.85} />
+        <Model src="coffeetable" fit={1.4} position={[-5.2, 0, 2.2]} rotation={[0, 0.2, 0]} dim={0.85} />
+        <Model src="plant" fit={1.7} position={[-9.4, 0, 6.2]} />
+
+        {/* ---- record bookshelf on the right wall (front section) ---- */}
+        <RecordShelf position={[10.55, 0, 6.9]} rotation={[0, -Math.PI / 2, 0]} cols={3} rows={2} />
+        <Model src="plant" fit={1.4} position={[8.9, 0, 8.6]} />
 
         {/* ---- ambience ---- */}
-        <Model src="lamp" fit={2.6} position={[-9.2, 0, 3.4]} rotation={[0, 0, 0]} envIntensity={1.2} />
-        <pointLight position={[-9.2, 2.4, 3.4]} intensity={1.3} distance={9} color="#ffb066" />
+        <Model src="lamp" fit={2.6} position={[-9.6, 0, 1.2]} rotation={[0, 0, 0]} envIntensity={1.2} />
+        <pointLight position={[-9.6, 2.4, 1.2]} intensity={1.3} distance={9} color="#ffb066" />
       </Suspense>
 
       {/* the face-out record display on the back wall */}

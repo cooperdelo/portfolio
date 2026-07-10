@@ -5,6 +5,7 @@ export const POSTERS = [
     "artist": "Pink Floyd",
     "album": "The Dark Side of the Moon",
     "year": "1973",
+    "appleId": 1065973699,
     "meta": [
       [
         "Artist",
@@ -46,6 +47,7 @@ export const POSTERS = [
     "artist": "Masayoshi Takanaka",
     "album": "Takanaka",
     "year": "1977",
+    "appleId": 1442808423,
     "meta": [
       [
         "Artist",
@@ -75,6 +77,7 @@ export const POSTERS = [
     "artist": "Masayoshi Takanaka",
     "album": "All of Me",
     "year": "2006",
+    "appleId": 1442920123,
     "meta": [
       [
         "Artist",
@@ -104,6 +107,7 @@ export const POSTERS = [
     "artist": "Alice In Chains",
     "album": "Dirt",
     "year": "1992",
+    "appleId": 157316517,
     "meta": [
       [
         "Artist",
@@ -145,6 +149,7 @@ export const POSTERS = [
     "artist": "The Smashing Pumpkins",
     "album": "Mellon Collie And The Infinite Sadness",
     "year": "1995",
+    "appleId": 721224313,
     "meta": [
       [
         "Artist",
@@ -186,6 +191,7 @@ export const POSTERS = [
     "artist": "The Smashing Pumpkins",
     "album": "Siamese Dream",
     "year": "1993",
+    "appleId": 1472818495,
     "meta": [
       [
         "Artist",
@@ -227,6 +233,7 @@ export const POSTERS = [
     "artist": "Pearl Jam",
     "album": "Vs.",
     "year": "1993",
+    "appleId": 426656353,
     "meta": [
       [
         "Artist",
@@ -268,6 +275,7 @@ export const POSTERS = [
     "artist": "Tame Impala",
     "album": "InnerSpeaker",
     "year": "2010",
+    "appleId": 1439752048,
     "meta": [
       [
         "Artist",
@@ -301,6 +309,7 @@ export const POSTERS = [
     "artist": "Tame Impala",
     "album": "Lonerism",
     "year": "2012",
+    "appleId": 1440825369,
     "meta": [
       [
         "Artist",
@@ -334,6 +343,7 @@ export const POSTERS = [
     "artist": "Led Zeppelin",
     "album": "Led Zeppelin II",
     "year": "1969",
+    "appleId": 836967288,
     "meta": [
       [
         "Artist",
@@ -375,6 +385,7 @@ export const POSTERS = [
     "artist": "Tedeschi Trucks Band",
     "album": "Revelator",
     "year": "2011",
+    "appleId": 434753148,
     "meta": [
       [
         "Artist",
@@ -404,6 +415,7 @@ export const POSTERS = [
     "artist": "Eagles",
     "album": "Hotel California",
     "year": "1976",
+    "appleId": 1293903288,
     "meta": [
       [
         "Artist",
@@ -445,6 +457,7 @@ export const POSTERS = [
     "artist": "Radiohead",
     "album": "In Rainbows",
     "year": "2007",
+    "appleId": 1109714933,
     "meta": [
       [
         "Artist",
@@ -456,7 +469,7 @@ export const POSTERS = [
       ],
       [
         "Recorded",
-        "1992–2003"
+        "February 2005 – June 2007"
       ],
       [
         "Length",
@@ -468,24 +481,25 @@ export const POSTERS = [
       ],
       [
         "Label",
-        "Parlophone, Capitol"
+        "* Self-released * XL * TBD (North America)"
       ],
       [
         "Producer",
-        "Radiohead, Sean Slade, Paul Q. Kolderie, John Leckie, Nigel "
+        "Nigel Godrich"
       ],
       [
         "Tracks",
         "10"
       ]
     ],
-    "blurb": "Radiohead Box Set is a box set of albums by the English rock band Radiohead, released on 10 December 2007. It collects their first six studio albums and one live album, recorded while Radiohead were signed to EMI."
+    "blurb": "In Rainbows is the seventh studio album by the English rock band Radiohead. It was self-released on 10 October 2007 as a download, followed by a retail release internationally through XL Recordings on 3 December 2007 and in North America through TBD Records on 1 January 2008."
   },
   {
     "img": "foo-fighters-the-colour-and-the-shape.jpg",
     "artist": "Foo Fighters",
     "album": "The Colour And The Shape",
     "year": "1997",
+    "appleId": 362133451,
     "meta": [
       [
         "Artist",
@@ -527,6 +541,7 @@ export const POSTERS = [
     "artist": "Led Zeppelin",
     "album": "Houses of the Holy",
     "year": "1973",
+    "appleId": 902619120,
     "meta": [
       [
         "Artist",
@@ -568,6 +583,7 @@ export const POSTERS = [
     "artist": "The Strokes",
     "album": "Is This It",
     "year": "2001",
+    "appleId": 266376953,
     "meta": [
       [
         "Artist",
@@ -609,6 +625,7 @@ export const POSTERS = [
     "artist": "Red Hot Chili Peppers",
     "album": "Blood Sugar Sex Magik",
     "year": "1991",
+    "appleId": 945581828,
     "meta": [
       [
         "Artist",
@@ -650,6 +667,7 @@ export const POSTERS = [
     "artist": "Pearl Jam",
     "album": "Ten",
     "year": "1991",
+    "appleId": 425465247,
     "meta": [
       [
         "Artist",
@@ -691,6 +709,7 @@ export const POSTERS = [
     "artist": "Grateful Dead",
     "album": "Grateful Dead (Skull & Roses)",
     "year": "1971",
+    "appleId": 1558949246,
     "meta": [
       [
         "Artist",
@@ -732,6 +751,7 @@ export const POSTERS = [
     "artist": "Eagles",
     "album": "Eagles",
     "year": "1972",
+    "appleId": 635791801,
     "meta": [
       [
         "Artist",
@@ -773,6 +793,7 @@ export const POSTERS = [
     "artist": "Pink Floyd",
     "album": "Wish You Were Here",
     "year": "1975",
+    "appleId": 1065973975,
     "meta": [
       [
         "Artist",
@@ -814,6 +835,7 @@ export const POSTERS = [
     "artist": "Deftones",
     "album": "Around the Fur",
     "year": "1997",
+    "appleId": 1099843198,
     "meta": [
       [
         "Artist",
@@ -855,6 +877,7 @@ export const POSTERS = [
     "artist": "Coldplay",
     "album": "Parachutes",
     "year": "2000",
+    "appleId": 1122782080,
     "meta": [
       [
         "Artist",
@@ -896,6 +919,7 @@ export const POSTERS = [
     "artist": "The Smashing Pumpkins",
     "album": "Pisces Iscariot",
     "year": "1994",
+    "appleId": 1471445093,
     "meta": [
       [
         "Artist",
@@ -933,6 +957,7 @@ export const POSTERS = [
     "artist": "The Backseat Lovers",
     "album": "When We Were Friends",
     "year": "2019",
+    "appleId": 1517139758,
     "meta": [
       [
         "Artist",
@@ -966,6 +991,7 @@ export const POSTERS = [
     "artist": "Mt. Joy",
     "album": "Mt. Joy",
     "year": "2018",
+    "appleId": 1746524780,
     "meta": [
       [
         "Artist",
@@ -974,6 +1000,10 @@ export const POSTERS = [
       [
         "Released",
         "2018-03-02"
+      ],
+      [
+        "Recorded",
+        "1988, June 1998–September 1999"
       ],
       [
         "Length",
@@ -985,20 +1015,25 @@ export const POSTERS = [
       ],
       [
         "Label",
-        "Constellation"
+        "* NPG * Arista"
+      ],
+      [
+        "Producer",
+        "Prince"
       ],
       [
         "Tracks",
         "13"
       ]
     ],
-    "blurb": "Thee Silver Mt. Zion Memorial Orchestra, also known simply as Silver Mt."
+    "blurb": "Rave Un2 the Joy Fantastic is the twenty-third studio album by American recording artist Prince, going by the unpronounceable \"Love Symbol\" as shown on the album cover. Released on November 9, 1999, by NPG Records and Arista Records, the album was issued shortly after the release of The Vault: Old Friends 4 Sale (19…"
   },
   {
     "img": "john-mayer-where-the-light-is-john-mayer-live-in-los-angeles.jpg",
     "artist": "John Mayer",
     "album": "Where the Light Is: John Mayer Live In Los Angeles",
     "year": "2008",
+    "appleId": 388127285,
     "meta": [
       [
         "Artist",
@@ -1040,6 +1075,7 @@ export const POSTERS = [
     "artist": "Daft Punk",
     "album": "Random Access Memories",
     "year": "2013",
+    "appleId": 1673536063,
     "meta": [
       [
         "Artist",
@@ -1081,6 +1117,7 @@ export const POSTERS = [
     "artist": "Pearl Jam",
     "album": "rearviewmirror (greatest hits 1991-2003)",
     "year": "2004",
+    "appleId": 1826659396,
     "meta": [
       [
         "Artist",
@@ -1122,6 +1159,7 @@ export const POSTERS = [
     "artist": "Title Fight",
     "album": "Floral Green",
     "year": "2012",
+    "appleId": 1880759521,
     "meta": [
       [
         "Artist",
@@ -1163,6 +1201,7 @@ export const POSTERS = [
     "artist": "The Jimi Hendrix Experience",
     "album": "Electric Ladyland",
     "year": "1968",
+    "appleId": 357652252,
     "meta": [
       [
         "Artist",
@@ -1204,6 +1243,7 @@ export const POSTERS = [
     "artist": "Mac DeMarco",
     "album": "This Old Dog",
     "year": "2017",
+    "appleId": 1198763583,
     "meta": [
       [
         "Artist",
@@ -1245,6 +1285,7 @@ export const POSTERS = [
     "artist": "Alex G",
     "album": "Trick",
     "year": "2012",
+    "appleId": 1483272616,
     "meta": [
       [
         "Artist",
@@ -1282,6 +1323,7 @@ export const POSTERS = [
     "artist": "Pinegrove",
     "album": "Cardinal",
     "year": "2016",
+    "appleId": 1496548232,
     "meta": [
       [
         "Artist",
@@ -1323,6 +1365,7 @@ export const POSTERS = [
     "artist": "Her's",
     "album": "Songs of Her's",
     "year": "2017",
+    "appleId": 1206909430,
     "meta": [
       [
         "Artist",
@@ -1356,6 +1399,7 @@ export const POSTERS = [
     "artist": "Adrianne Lenker",
     "album": "songs",
     "year": "2020",
+    "appleId": 1526437437,
     "meta": [
       [
         "Artist",
@@ -1397,6 +1441,7 @@ export const POSTERS = [
     "artist": "Blood Orange",
     "album": "Cupid Deluxe",
     "year": "2013",
+    "appleId": 716767448,
     "meta": [
       [
         "Artist",
@@ -1438,6 +1483,7 @@ export const POSTERS = [
     "artist": "Mac Miller",
     "album": "Swimming",
     "year": "2018",
+    "appleId": 1408996052,
     "meta": [
       [
         "Artist",
@@ -1479,6 +1525,7 @@ export const POSTERS = [
     "artist": "Dominic Fike",
     "album": "Don't Forget About Me, Demos",
     "year": "2018",
+    "appleId": 1494065882,
     "meta": [
       [
         "Artist",

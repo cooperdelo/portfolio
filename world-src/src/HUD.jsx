@@ -91,6 +91,7 @@ function Lightbox({ lightbox, close }) {
               </div>
             )}
             {lb.blurb && <p className="lb-blurb">{lb.blurb}</p>}
+            {lb.embed && <iframe className="lb-embed" title="album player" src={lb.embed} height="300" allow="autoplay *; encrypted-media *; clipboard-write" loading="lazy" />}
           </>
         )}
       </div>

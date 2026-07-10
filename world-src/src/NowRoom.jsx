@@ -19,7 +19,7 @@ function Countdown({ label, target }) {
     </div>
   );
   return (
-    <Html position={[0, 2.9, -11.55]} transform occlude distanceFactor={2.6} style={{ pointerEvents: 'none' }}>
+    <Html position={[0, 2.9, -11.55]} transform occlude zIndexRange={[25, 0]} distanceFactor={2.6} style={{ pointerEvents: 'none' }}>
       <div style={{ width: 320, textAlign: 'center', color: '#F4EFE6', fontFamily: 'Geist, sans-serif' }}>
         <div style={{ fontFamily: 'Geist Mono, monospace', fontSize: 9, letterSpacing: '.2em', textTransform: 'uppercase', color: ACCENT, marginBottom: 10 }}>{label}</div>
         {t > 0
@@ -55,7 +55,7 @@ export default function NowRoom({ section: s }) {
       {/* task board — sticky notes (right) */}
       <Label position={[8, 5.4, -3]} rotation={[0, -Math.PI / 2, 0]} size={0.4} color={ACCENT} font>THE BOARD</Label>
       {s.nowList.map(([tag, item], i) => (
-        <Html key={i} position={[9.7, 4.6 - i * 1.6, -3]} rotation={[0, -Math.PI / 2, 0]} transform occlude distanceFactor={2.4} style={{ pointerEvents: 'none' }}>
+        <Html key={i} position={[9.7, 4.6 - i * 1.6, -3]} rotation={[0, -Math.PI / 2, 0]} transform occlude zIndexRange={[25, 0]} distanceFactor={3.0} style={{ pointerEvents: 'none' }}>
           <div style={{ width: 210, padding: '11px 13px', borderRadius: 4, background: tag === 'this wk' ? 'rgba(143,163,130,.16)' : 'rgba(244,239,230,.06)', border: `1px solid ${ACCENT}44`, color: '#F4EFE6', fontFamily: 'Geist, sans-serif', boxShadow: '0 16px 40px -22px #000', transform: 'rotate(-1.5deg)' }}>
             <span style={{ fontFamily: 'Geist Mono, monospace', fontSize: 8, letterSpacing: '.16em', textTransform: 'uppercase', color: ACCENT }}>{tag}</span>
             <div style={{ fontSize: 12, lineHeight: 1.4, marginTop: 4 }}>{item}</div>

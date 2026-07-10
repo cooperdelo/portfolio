@@ -63,7 +63,7 @@ function Record({ section, position }) {
 
       {/* description card on hover */}
       {hover && (
-        <Html position={[SIZE * 0.72, 0.1, 0.1]} transform occlude distanceFactor={2.6} style={{ pointerEvents: 'none' }}>
+        <Html position={[SIZE * 0.72, 0.1, 0.1]} transform occlude zIndexRange={[25, 0]} distanceFactor={3.2} style={{ pointerEvents: 'none' }}>
           <div style={{
             width: 210, padding: '13px 15px', borderRadius: 12,
             background: 'linear-gradient(180deg, rgba(14,10,8,.9), rgba(14,10,8,.96))',
@@ -81,22 +81,12 @@ function Record({ section, position }) {
   );
 }
 
-// Animated invitation above the shelf so it's obvious the records are clickable.
+// Quiet section marker above the shelf (no pulsing gimmicks).
 function Cta({ y, z }) {
-  const g = useRef();
-  const arrow = useRef();
-  useFrame((state) => {
-    const t = state.clock.elapsedTime;
-    if (g.current) g.current.children.forEach((c) => { if (c.material) c.material.opacity = 0.75 + Math.sin(t * 2) * 0.25; });
-    if (arrow.current) arrow.current.position.y = -0.62 + Math.sin(t * 3) * 0.06;
-  });
   return (
-    <group ref={g} position={[0, y, z]}>
-      <Text fontSize={0.42} color="#F4EFE6" anchorX="center" anchorY="middle" letterSpacing={0.02} outlineWidth={0.006} outlineColor="#000" material-transparent material-opacity={1}>
+    <group position={[0, y, z]}>
+      <Text fontSize={0.3} color="#F4EFE6" anchorX="center" anchorY="middle" letterSpacing={0.16} outlineWidth={0.005} outlineColor="#000" fillOpacity={0.85}>
         PICK A RECORD
-      </Text>
-      <Text ref={arrow} position={[0, -0.62, 0]} fontSize={0.15} color="#FF4D2E" anchorX="center" anchorY="middle" letterSpacing={0.18} outlineWidth={0.004} outlineColor="#000" material-transparent material-opacity={1}>
-        ↓ CLICK ONE TO STEP INSIDE ↓
       </Text>
     </group>
   );

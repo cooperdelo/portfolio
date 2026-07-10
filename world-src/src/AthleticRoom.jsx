@@ -61,6 +61,7 @@ export default function AthleticRoom({ section: s }) {
         {/* the bag — 4 clubs */}
         {s.golf.bag.map((b, i) => (
           <InfoTile key={b.name} src={b.img} position={[9.9, 3.6 - (i % 2) * 2.1, -6.5 - Math.floor(i / 2) * 2.2]} rotation={[0, -Math.PI / 2, 0]} width={1.5} accent={ACCENT} cardSide={-1}
+            info={{ eyebrow: `THE BAG · ${b.badge}`, title: b.name, meta: b.specs }}
             card={<>
               <div style={{ fontFamily: 'Geist Mono, monospace', fontSize: 8.5, letterSpacing: '.16em', textTransform: 'uppercase', color: ACCENT }}>{b.badge}</div>
               <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 16, textTransform: 'uppercase', margin: '3px 0 6px' }}>{b.name}</div>

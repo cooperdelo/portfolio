@@ -28,7 +28,7 @@ Object.values(MODELS).forEach((u) => useGLTF.preload(u));
 // Loads a GLB, centers it on its base (feet on the floor), normalizes so its
 // largest dimension == `fit`, and applies shadows + optional emissive tint.
 // This makes wildly-scaled Poly Pizza assets placeable with predictable size.
-export function Model({ src, fit = 1, position = [0, 0, 0], rotation = [0, 0, 0], onFloor = true, envIntensity = 0.8, cast = true, receive = false, ...props }) {
+export function Model({ src, fit = 1, position = [0, 0, 0], rotation = [0, 0, 0], onFloor = true, envIntensity = 0.8, cast = true, receive = false, dim = 1, ...props }) {
   const url = MODELS[src] || src;
   const { scene } = useGLTF(url);
   const cloned = useMemo(() => {
@@ -50,10 +50,11 @@ export function Model({ src, fit = 1, position = [0, 0, 0], rotation = [0, 0, 0]
         if (o.material) {
           o.material = o.material.clone();
           o.material.envMapIntensity = envIntensity;
+          if (dim !== 1 && o.material.color) o.material.color.multiplyScalar(dim); // tame blown-out light plastics
         }
       }
     });
     return wrap;
-  }, [scene, fit, onFloor, cast, receive, envIntensity]);
+  }, [scene, fit, onFloor, cast, receive, envIntensity, dim]);
   return <primitive object={cloned} position={position} rotation={rotation} {...props} />;
 }

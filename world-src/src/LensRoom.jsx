@@ -56,6 +56,7 @@ export default function LensRoom({ section: s }) {
         <Model src="camera" fit={1.1} position={[-8.4, 2.3, -13.3]} rotation={[0, 0.4, 0]} />
         {s.kit.map((k, i) => (
           <InfoTile key={k.name} src={k.img} position={[-7.3 + i * 1.6, 3.4, -13.5]} width={1.4} accent={ACCENT} cardSide={i < 2 ? 1 : -1}
+            info={{ eyebrow: `THE KIT · ${k.badge}`, title: k.name, meta: k.specs }}
             card={<>
               <div style={{ fontFamily: 'Geist Mono, monospace', fontSize: 8.5, letterSpacing: '.16em', textTransform: 'uppercase', color: ACCENT }}>{k.badge}</div>
               <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 16, textTransform: 'uppercase', margin: '3px 0 6px' }}>{k.name}</div>

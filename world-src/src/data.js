@@ -13,7 +13,7 @@ export const thumb = (name) => T + name.replace(/\.(jpe?g|png|JPG)$/i, '.jpg');
 
 // Brand accents per section/room.
 export const ACCENTS = {
-  HOME: '#E8DCC6', PLUGVERSE: '#C9BEE6', MUSIC: '#FF4D2E',
+  HOME: '#E8DCC6', PLUGVERSE: '#FF8A3D', MUSIC: '#FF4D2E',
   ATHLETIC: '#9FC9C7', LENS: '#E7C9A0', NOW: '#8FA382'
 };
 

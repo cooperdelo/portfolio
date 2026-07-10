@@ -87,6 +87,7 @@ export default function MusicRoom({ section: s }) {
           const y = 4.6 - row * 2.5;
           return (
             <InfoTile key={g.name} src={g.img} position={[-10.6, y, z]} rotation={[0, Math.PI / 2, 0]} width={1.6} accent={ACCENT} cardSide={1}
+              info={{ eyebrow: `THE RIG · ${g.badge}`, title: g.name, meta: g.specs }}
               card={<>
                 <div style={{ fontFamily: 'Geist Mono, monospace', fontSize: 8.5, letterSpacing: '.16em', textTransform: 'uppercase', color: ACCENT }}>{g.badge}</div>
                 <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 17, textTransform: 'uppercase', margin: '3px 0 6px' }}>{g.name}</div>
@@ -108,6 +109,7 @@ export default function MusicRoom({ section: s }) {
           const y = 5.0 - row * 2.4;
           return (
             <InfoTile key={c.artist} src={c.img} position={[10.6, y, z]} rotation={[0, -Math.PI / 2, 0]} width={1.7} accent={ACCENT} cardSide={-1}
+              info={{ eyebrow: `SHOWS I'VE CAUGHT · ${c.tag}`, title: c.artist, meta: [['Date', c.date], ['Venue / Tour', c.venue]], blurb: c.blurb }}
               card={<>
                 <div style={{ fontFamily: 'Geist Mono, monospace', fontSize: 8, letterSpacing: '.14em', textTransform: 'uppercase', color: ACCENT }}>{c.tag}</div>
                 <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 16, textTransform: 'uppercase', margin: '2px 0 3px' }}>{c.artist}</div>

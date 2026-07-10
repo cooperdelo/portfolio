@@ -59,6 +59,8 @@ body.hot #cursor .clabel { opacity:1; }
 .lb-row span:first-child { font-family:'Geist Mono',monospace; font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; opacity:.5; }
 .lb-row span:last-child { text-align:right; }
 .lb-blurb { margin-top:22px; font-size:15px; line-height:1.6; opacity:.86; max-width:46ch; }
+.lb-info { max-height:84vh; overflow-y:auto; padding-right:4px; }
+.lb-embed { width:100%; border:0; border-radius:14px; margin-top:20px; background:#141414; }
 @media (max-width:760px){ .lightbox { grid-template-columns:1fr; grid-template-rows:1fr auto; gap:3vh; } .lb-art img { max-height:44vh; transform:none; } .lightbox.show .lb-art img { transform:none; } }
 
 /* needle-drop transition — TRANSPARENT while the record flies to the turntable

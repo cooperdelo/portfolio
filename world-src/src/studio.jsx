@@ -82,6 +82,11 @@ export function RoomShell({ halfW = 11, backZ = -13, height = 12, frontZ = 11, a
       <mesh position={[0, 0.14, backZ + 0.28]}><boxGeometry args={[halfW * 2, 0.28, 0.08]} /><meshStandardMaterial {...wood} color="#5a4128" roughness={0.7} /></mesh>
       <mesh position={[-halfW + 0.28, 0.14, midZ]} rotation={[0, Math.PI / 2, 0]}><boxGeometry args={[depth, 0.28, 0.08]} /><meshStandardMaterial {...wood} color="#5a4128" roughness={0.7} /></mesh>
       <mesh position={[halfW - 0.28, 0.14, midZ]} rotation={[0, Math.PI / 2, 0]}><boxGeometry args={[depth, 0.28, 0.08]} /><meshStandardMaterial {...wood} color="#5a4128" roughness={0.7} /></mesh>
+      {/* front wall — closes the room so side views never show open void */}
+      <mesh receiveShadow position={[0, height / 2 - 1, frontZ + 1.6]}>
+        <boxGeometry args={[halfW * 2 + 2, height + 2, 0.4]} />
+        <meshStandardMaterial {...brickBack} color="#8d7663" roughness={0.95} envMapIntensity={0.25} />
+      </mesh>
       {/* warm LED strips: cove line along the top of each wall + accent under back wall */}
       {strip(halfW * 2 - 1, [0, height - 1.6, backZ + 0.32])}
       {strip(depth - 1, [-halfW + 0.32, height - 1.6, midZ], [0, Math.PI / 2, 0])}
@@ -158,9 +163,60 @@ export function AlbumPoster({ poster, position, rotation, w = 1.35 }) {
   const src = posterSrc(poster);
   const meta = poster.meta || [['Artist', poster.artist], ['Released', poster.year]];
   const blurb = poster.blurb || NOTES[poster.album] || `${poster.album} — ${poster.artist} (${poster.year}).`;
+  // Playable album: Apple Music inline player (previews play in the lightbox)
+  const embed = poster.appleId ? `https://embed.music.apple.com/us/album/${poster.appleId}` : undefined;
   return (
     <FramedPoster src={src} position={position} rotation={rotation} w={w} h={w} accent="#FF4D2E"
-      onOpen={() => open({ src, eyebrow: poster.own ? 'MY RELEASE' : 'ON THE WALL · ALBUM', title: poster.album, meta, blurb, accent: '#FF4D2E' })} />
+      onOpen={() => open({ src, eyebrow: poster.own ? 'MY RELEASE' : 'ON THE WALL · ALBUM', title: poster.album, meta, blurb, embed, accent: '#FF4D2E' })} />
+  );
+}
+
+// ---- a wooden record bookshelf (kallax-style) filled with vinyl spines ----
+const SPINE_COLORS = ['#8a2f22', '#22343f', '#5a4a26', '#2f4a2a', '#3a2a4a', '#6b3a1a', '#1f1f24', '#7a6a4a', '#33424a', '#4a2530'];
+export function RecordShelf({ position, rotation = [0, 0, 0], cols = 3, rows = 2, cell = 1.05 }) {
+  const wood = usePBR('wood', [3, 1.2]);
+  const spines = useMemo(() => {
+    const out = [];
+    let seed = 7;
+    const rand = () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
+    for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) {
+      const n = 9 + Math.floor(rand() * 5);
+      for (let i = 0; i < n; i++) {
+        out.push({
+          x: c * cell + 0.12 + i * ((cell - 0.24) / 14) + rand() * 0.01,
+          y: r * cell + 0.08, h: 0.72 + rand() * 0.14, t: 0.045 + rand() * 0.02,
+          color: SPINE_COLORS[Math.floor(rand() * SPINE_COLORS.length)], lean: rand() < 0.12 ? 0.16 : 0
+        });
+      }
+    }
+    return out;
+  }, [cols, rows, cell]);
+  const W = cols * cell, H = rows * cell;
+  return (
+    <group position={position} rotation={rotation}>
+      {/* frame */}
+      <mesh castShadow receiveShadow position={[W / 2, H / 2, -0.02]}><boxGeometry args={[W + 0.12, H + 0.12, 0.44]} /><meshStandardMaterial {...wood} color="#6a4d30" roughness={0.72} /></mesh>
+      {/* cell dividers */}
+      {Array.from({ length: cols + 1 }, (_, c) => (
+        <mesh key={'v' + c} position={[c * cell, H / 2, 0.2]}><boxGeometry args={[0.06, H, 0.42]} /><meshStandardMaterial {...wood} color="#5a4128" /></mesh>
+      ))}
+      {Array.from({ length: rows + 1 }, (_, r) => (
+        <mesh key={'h' + r} position={[W / 2, r * cell, 0.2]}><boxGeometry args={[W, 0.06, 0.42]} /><meshStandardMaterial {...wood} color="#5a4128" /></mesh>
+      ))}
+      {/* back panel */}
+      <mesh position={[W / 2, H / 2, -0.19]}><boxGeometry args={[W, H, 0.04]} /><meshStandardMaterial color="#241a12" roughness={0.9} /></mesh>
+      {/* vinyl spines */}
+      {spines.map((s, i) => (
+        <mesh key={i} castShadow position={[s.x, s.y + s.h / 2, 0.16]} rotation={[0, 0, s.lean]}>
+          <boxGeometry args={[s.t, s.h, 0.32]} />
+          <meshStandardMaterial color={s.color} roughness={0.66} />
+        </mesh>
+      ))}
+      {/* warm strip under each row */}
+      {Array.from({ length: rows }, (_, r) => (
+        <mesh key={'l' + r} position={[W / 2, r * cell + 0.045, 0.36]}><boxGeometry args={[W - 0.2, 0.02, 0.02]} /><meshStandardMaterial color="#3a2a1a" emissive="#ff9b45" emissiveIntensity={1.4} /></mesh>
+      ))}
+    </group>
   );
 }
 
