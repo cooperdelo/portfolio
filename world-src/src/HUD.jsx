@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useStore } from './store.js';
 import { SECTIONS, sectionByKey } from './data.js';
+import { POSTERS } from './posters.js';
 
 // All the screen-space UI that lives over the canvas.
 export default function HUD() {
@@ -39,6 +40,12 @@ export default function HUD() {
 
       {/* record crate — jump between rooms anytime */}
       <Crate />
+
+      {/* readable room blurb (screen-space) */}
+      {phase === 'inroom' && active && <RoomBlurb section={active} />}
+
+      {/* jukebox — random album player */}
+      <Jukebox />
 
       {/* hint */}
       {phase === 'idle' && <div className="hint">drag to look · scroll to move · hover a record · click to drop the needle</div>}
@@ -127,7 +134,7 @@ function PovNav({ sectionKey, accent }) {
 }
 
 function Crate() {
-  const { room, phase, dive, returnToHub } = useStore();
+  const { room, phase, jumpTo } = useStore();
   if (phase === 'dropping' || phase === 'returning') return null;
   return (
     <div className="crate">
@@ -137,11 +144,7 @@ function Crate() {
           className={'crate-rec' + (room === s.key ? ' on' : '')}
           style={{ '--a': s.accent }}
           data-c
-          onClick={() => {
-            if (room === s.key) return;
-            if (phase === 'inroom') { returnToHub(); setTimeout(() => dive(s), 700); }
-            else dive(s);
-          }}
+          onClick={() => { if (room !== s.key) jumpTo(s); }}
         >
           <span className="dot" style={{ background: s.accent }} />{s.key}
         </button>
@@ -161,7 +164,51 @@ function Transition() {
   const accent = section ? section.accent : '#FF4D2E';
   return (
     <div className={'drop' + (covering ? ' cover' : '') + (active ? ' active' : '')} style={{ '--a': accent }}>
-      {covering && section && <div className="drop-label" style={{ color: accent }}>{phase === 'returning' ? 'back to the studio' : `▶ ${section.key.toLowerCase()}`}</div>}
+      {covering && (
+        <>
+          {/* diving INTO the record: spinning grooves zoom past the camera */}
+          <div className="drop-vinyl">
+            <div className="drop-grooves" />
+            <div className="drop-core" />
+          </div>
+          {section && <div className="drop-label" style={{ color: accent }}>{phase === 'returning' ? 'back to the studio' : `▶ ${section.key.toLowerCase()}`}</div>}
+        </>
+      )}
+    </div>
+  );
+}
+
+// Readable room blurb — screen-space, bottom-left (3D wall panels are decor;
+// this is the version you can actually read from anywhere).
+function RoomBlurb({ section }) {
+  return (
+    <div className="roomblurb" style={{ '--a': section.accent }}>
+      <div className="rb-eyebrow">{section.eyebrow}</div>
+      <div className="rb-text">{section.blurb}</div>
+    </div>
+  );
+}
+
+// Jukebox — plays a random album from the wall; shuffle keeps the session going.
+function Jukebox() {
+  const [open, setOpen] = useState(false);
+  const [album, setAlbum] = useState(null);
+  const playable = POSTERS.filter((p) => p.appleId);
+  const shuffle = () => setAlbum(playable[Math.floor(Math.random() * playable.length)]);
+  const toggle = () => { if (!open && !album) shuffle(); setOpen(!open); };
+  return (
+    <div className="jukebox">
+      {open && album && (
+        <div className="jb-panel" style={{ '--a': '#FF4D2E' }}>
+          <div className="jb-head">
+            <span className="jb-title">{album.album} — {album.artist}</span>
+            <button className="jb-btn" data-c onClick={shuffle}>⤮ shuffle</button>
+            <button className="jb-btn" data-c onClick={() => setOpen(false)}>×</button>
+          </div>
+          <iframe title="jukebox" src={`https://embed.music.apple.com/us/album/${album.appleId}`} height="175" allow="autoplay *; encrypted-media *;" loading="lazy" />
+        </div>
+      )}
+      <button className={'tbtn' + (open ? ' on' : '')} data-c onClick={toggle}>♪ Jukebox</button>
     </div>
   );
 }

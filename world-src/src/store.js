@@ -28,8 +28,13 @@ export const useStore = create((set, get) => ({
   swapToHub: () => set({ shown: 'hub' }),
   finishReturn: () => set({ phase: 'idle', room: 'hub', section: null, roomView: 'front' }),
 
-  // jump straight from one room to another (via the crate)
-  jumpTo: (section) => { const p = get().phase; if (p === 'idle') set({ phase: 'dropping', section }); },
+  // jump straight from one room to another (via the crate) — works from the
+  // hub AND from inside any room (the old idle-gate silently dropped clicks).
+  jumpTo: (section) => {
+    const p = get().phase;
+    if (p !== 'idle' && p !== 'inroom') return;
+    set({ phase: 'dropping', section, roomView: 'front', lightbox: null });
+  },
 
   // Accepts either (src, caption) for photos or a rich object
   // { src, title, meta:[[k,v]], blurb, kind:'album'|'photo', accent } for posters.

@@ -25,6 +25,7 @@ function Record({ section, position }) {
     const sc = hover ? 1.06 : 1;
     easing.damp3(g.current.scale, [sc, sc, sc], 0.18, dt);
     easing.damp(glow.current.material, 'opacity', hover ? 0.4 : 0, 0.2, dt);
+    glow.current.visible = glow.current.material.opacity > 0.02; // additive plane ghosts otherwise
   });
 
   return (
@@ -39,15 +40,6 @@ function Record({ section, position }) {
       <mesh ref={glow} position={[0, 0, -0.1]}>
         <planeGeometry args={[SIZE * 1.7, SIZE * 1.7]} />
         <meshBasicMaterial color={section.accent} transparent opacity={0} blending={THREE.AdditiveBlending} depthWrite={false} />
-      </mesh>
-      {/* vinyl disc peeking above the sleeve */}
-      <mesh ref={disc} position={[0, SIZE * 0.34, -0.06]}>
-        <cylinderGeometry args={[SIZE * 0.46, SIZE * 0.46, 0.03, 48]} />
-        <meshStandardMaterial color="#0a0a0c" roughness={0.55} metalness={0.35} envMapIntensity={0.5} />
-      </mesh>
-      <mesh position={[0, SIZE * 0.34, -0.045]}>
-        <cylinderGeometry args={[SIZE * 0.16, SIZE * 0.16, 0.032, 32]} />
-        <meshStandardMaterial color={section.accent} roughness={0.5} metalness={0.2} />
       </mesh>
       {/* sleeve */}
       <mesh castShadow>

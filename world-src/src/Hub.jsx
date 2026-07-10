@@ -7,7 +7,7 @@ import Records from './Records.jsx';
 import { useStore } from './store.js';
 import { sectionByKey, SECTIONS, thumb } from './data.js';
 import { POSTERS } from './posters.js';
-import { usePBR, useStudioTextures, AlbumPoster, PhotoPoster, CityWindow, ShelfUnit, Plaque, RecordShelf } from './studio.jsx';
+import { usePBR, useStudioTextures, AlbumPoster, PhotoPoster, CityWindow, ShelfUnit, Plaque, RecordShelf, Cable, ConsoleDesk, DESK } from './studio.jsx';
 
 // The record physically ejects from the shelf, arcs to the turntable and spins
 // flat onto the platter during the needle-drop (the overlay covers only the swap).
@@ -173,15 +173,15 @@ export default function Hub() {
         {/* window sits lower + smaller so it never covers a poster row */}
         <CityWindow position={[-10.68, 2.9, -1.5]} rotation={[0, Math.PI / 2, 0]} w={5.4} h={3.8} />
 
-        {/* ---- LED shelf unit with objects (right wall) ---- */}
+        {/* ---- LED shelf unit with objects (right wall), evenly dressed ---- */}
         <group position={[10.5, 0.4, -1.4]} rotation={[0, -Math.PI / 2, 0]}>
           <ShelfUnit position={[0, 0, 0]} wood={tex.woodLight} />
-          <Plaque position={[-0.9, 1.95, 0.15]} label="$20K" sub="Luby Pitch · 2026" />
-          <Plaque position={[0.9, 1.95, 0.15]} label="$1.85K" sub="1789 Venture Fund" accent="#C9BEE6" />
-          <Model src="camera" fit={0.7} position={[0.7, 0.1, 0.1]} rotation={[0, -0.6, 0]} />
-          <Model src="dumbbell" fit={0.55} position={[-0.8, 3.5, 0.1]} rotation={[0, 0.4, 0]} />
-          <Model src="golfclub" fit={1.1} position={[0.9, 3.45, 0.1]} rotation={[0, 0, 0.5]} />
-          <Model src="plant" fit={0.9} position={[-0.9, 0.1, 0.1]} />
+          <Plaque position={[-0.85, 1.98, 0.15]} label="$20K" sub="Luby Pitch · 2026" />
+          <Plaque position={[0.85, 1.98, 0.15]} label="$1.85K" sub="1789 Venture Fund" accent="#FF8A3D" />
+          <Model src="camera" fit={0.62} position={[-0.75, 0.08, 0.12]} rotation={[0, -0.5, 0]} />
+          <Model src="dumbbell" fit={0.5} position={[0.75, 0.1, 0.12]} rotation={[0, 0.4, 0]} />
+          <Model src="golfclub" fit={1.0} position={[0.95, 3.42, 0.1]} rotation={[0, 0, 0.5]} />
+          <Model src="plant" fit={0.85} position={[-0.85, 3.44, 0.1]} />
         </group>
 
         {/* ---- big fabric rug grounding the desk zone ---- */}
@@ -190,25 +190,39 @@ export default function Hub() {
           <meshStandardMaterial {...rugFab} color="#31201a" roughness={0.98} />
         </mesh>
 
-        {/* ---- the desk + turntable + monitors + NOW PLAYING (Cooper's EP) ---- */}
-        <Model src="mixingdesk" fit={3.4} position={[0, 0, -4.2]} rotation={[0, 0, 0]} envIntensity={0.6} dim={0.62} />
-        <Model src="turntable" fit={1.3} position={[-1.0, 1.15, -3.95]} rotation={[0, 0.25, 0]} envIntensity={0.8} dim={0.8} />
-        {/* the vinyl sitting on the platter — makes the record player readable */}
-        <SpinningVinyl position={[-1.0, 1.46, -3.95]} />
-        <Monitor position={[2.3, 1.5, -4.2]} rotation={[0, -0.4, 0]} />
-        <Monitor position={[-3.2, 1.5, -4.2]} rotation={[0, 0.4, 0]} />
-        <Model src="chair" fit={1.15} position={[0, 0, -2.4]} rotation={[0, Math.PI, 0]} dim={0.75} />
-        <Model src="mic" fit={0.62} position={[1.35, 1.16, -3.7]} rotation={[0.5, -0.3, 0]} cast />
-        {/* EP on a desk stand — its own clear slot (was z-fighting inside the grid) */}
+        {/* ---- the console desk: everything SITS on a real surface (DESK.top) ---- */}
+        <ConsoleDesk position={[0, 0, -4.1]} />
+        {/* turntable + spinning vinyl (the dive lands here) */}
+        <Model src="turntable" fit={1.25} position={[-1.15, DESK.top, -4.1]} rotation={[0, 0.22, 0]} envIntensity={0.8} dim={0.85} />
+        <SpinningVinyl position={[-1.15, DESK.top + 0.3, -4.1]} />
+        {/* the mixer as a piece of gear on the desk */}
+        <Model src="mixingdesk" fit={1.7} position={[0.7, DESK.top, -4.25]} rotation={[0, -0.06, 0]} envIntensity={0.55} dim={0.6} />
+        {/* near-field monitors at the desk's back corners */}
+        <Monitor position={[-2.6, DESK.top + 0.37, -4.45]} rotation={[0, 0.35, 0]} />
+        <Monitor position={[2.6, DESK.top + 0.37, -4.45]} rotation={[0, -0.35, 0]} />
+        <Model src="chair" fit={1.15} position={[0, 0, -2.5]} rotation={[0, Math.PI, 0]} dim={0.75} />
+        <Model src="mic" fit={0.6} position={[1.95, DESK.top, -3.85]} rotation={[0.45, -0.3, 0]} cast />
+        {/* EP on a desk stand — NOW PLAYING */}
         {OWN[0] && (
-          <group position={[1.85, 1.14, -3.95]} rotation={[-0.1, -0.38, 0]}>
-            <AlbumPoster poster={OWN[0]} position={[0, 0.5, 0]} w={0.92} />
+          <group position={[-2.45, DESK.top, -3.9]} rotation={[-0.08, 0.3, 0]}>
+            <AlbumPoster poster={OWN[0]} position={[0, 0.5, 0]} w={0.9} />
             <mesh position={[0, 0.16, -0.14]} rotation={[0.5, 0, 0]}><boxGeometry args={[0.5, 0.5, 0.04]} /><meshStandardMaterial color="#241a10" roughness={0.7} /></mesh>
           </group>
         )}
-        {/* pendant lamps hanging over the desk (calmer — the desk was blowing out) */}
+        {/* pendant lamps hanging over the desk */}
         <Pendant x={-2.2} z={-3.1} />
         <Pendant x={2.2} z={-3.1} />
+
+        {/* ---- CABLES — the room is wired like a real studio ---- */}
+        {/* guitars → amp */}
+        <Cable from={[-6.4, 0.5, -2.9]} to={[-8.1, 0.55, -1.7]} sag={0.45} />
+        <Cable from={[-5.5, 0.45, -2.6]} to={[-8.0, 0.5, -1.5]} sag={0.42} color="#2a1414" />
+        {/* amp → desk */}
+        <Cable from={[-8.2, 0.35, -1.9]} to={[-3.0, DESK.top - 0.2, -4.0]} mid={[-5.8, 0.03, -3.1]} />
+        {/* mic → mixer */}
+        <Cable from={[1.95, DESK.top + 0.05, -3.85]} to={[1.1, DESK.top - 0.06, -4.2]} sag={0.12} color="#20140f" radius={0.011} />
+        {/* desk → right speaker cab */}
+        <Cable from={[3.0, DESK.top - 0.25, -4.2]} to={[6.2, 0.4, -3.4]} mid={[4.6, 0.03, -3.6]} />
 
         {/* ---- guitars on stands (left) — clickable to Music ---- */}
         <ClickTo sectionKey="MUSIC">
@@ -236,8 +250,8 @@ export default function Hub() {
         <Model src="plant" fit={1.7} position={[-9.4, 0, 6.2]} />
 
         {/* ---- record bookshelf on the right wall (front section) ---- */}
-        <RecordShelf position={[10.55, 0, 6.9]} rotation={[0, -Math.PI / 2, 0]} cols={3} rows={2} />
-        <Model src="plant" fit={1.4} position={[8.9, 0, 8.6]} />
+        <RecordShelf position={[10.55, 0, 3.4]} rotation={[0, -Math.PI / 2, 0]} cols={4} rows={2} />
+        <Model src="plant" fit={1.5} position={[9.3, 0, 8.4]} />
 
         {/* ---- ambience ---- */}
         <Model src="lamp" fit={2.6} position={[-9.6, 0, 1.2]} rotation={[0, 0, 0]} envIntensity={1.2} />

@@ -290,3 +290,38 @@ export function Plaque({ position, rotation = [0, 0, 0], label, sub, accent = '#
 export function usePosterRows() {
   return useMemo(() => POSTERS, []);
 }
+
+// ---- an instrument cable: sagging curve between two points (real-studio feel) ----
+export function Cable({ from, to, sag = 0.5, mid, color = '#141210', radius = 0.016 }) {
+  const geo = useMemo(() => {
+    const a = new THREE.Vector3(...from), b = new THREE.Vector3(...to);
+    const m = mid ? new THREE.Vector3(...mid) : a.clone().lerp(b, 0.5);
+    if (!mid) m.y = Math.max(0.02, Math.min(a.y, b.y) - sag);
+    const curve = new THREE.CatmullRomCurve3([a, m, b]);
+    return new THREE.TubeGeometry(curve, 24, radius, 6, false);
+  }, [from.join(), to.join(), sag, mid && mid.join(), radius]);
+  return <mesh geometry={geo} castShadow><meshStandardMaterial color={color} roughness={0.55} metalness={0.1} /></mesh>;
+}
+
+// ---- a solid wood console desk with a DETERMINISTIC top height (desk.top) ----
+// The GLB desk's surface height was unknowable → gear floated. This one is real.
+export const DESK = { top: 1.06, w: 6.2, d: 1.9 };
+export function ConsoleDesk({ position, rotation = [0, 0, 0] }) {
+  const wood = usePBR('wood', [4, 1.4]);
+  const { top, w, d } = DESK;
+  return (
+    <group position={position} rotation={rotation}>
+      {/* top slab */}
+      <mesh castShadow receiveShadow position={[0, top - 0.045, 0]}>
+        <boxGeometry args={[w, 0.09, d]} /><meshStandardMaterial {...wood} color="#7a5a38" roughness={0.62} envMapIntensity={0.5} />
+      </mesh>
+      {/* side panels + back panel */}
+      <mesh castShadow position={[-w / 2 + 0.06, (top - 0.09) / 2, 0]}><boxGeometry args={[0.12, top - 0.09, d - 0.15]} /><meshStandardMaterial {...wood} color="#5f4429" roughness={0.7} /></mesh>
+      <mesh castShadow position={[w / 2 - 0.06, (top - 0.09) / 2, 0]}><boxGeometry args={[0.12, top - 0.09, d - 0.15]} /><meshStandardMaterial {...wood} color="#5f4429" roughness={0.7} /></mesh>
+      <mesh castShadow position={[0, (top - 0.09) / 2, -d / 2 + 0.05]}><boxGeometry args={[w - 0.2, top - 0.09, 0.1]} /><meshStandardMaterial {...wood} color="#553d24" roughness={0.75} /></mesh>
+      {/* warm LED under the front lip */}
+      <mesh position={[0, top - 0.11, d / 2 - 0.02]}><boxGeometry args={[w - 0.5, 0.025, 0.025]} /><meshStandardMaterial color="#3a2a1a" emissive="#ff9b45" emissiveIntensity={1.7} /></mesh>
+      <pointLight position={[0, top - 0.4, d / 2 + 0.4]} intensity={0.5} distance={4} color="#ffb877" />
+    </group>
+  );
+}
