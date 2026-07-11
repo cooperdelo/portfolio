@@ -14,15 +14,34 @@ const sevColor = (s) => s == null ? 'transparent'
 const avg = (a) => { const v = a.filter(x => x != null); return v.length ? v.reduce((x, y) => x + y, 0) / v.length : null; };
 
 // ---- pull data ----
-const [tl, br] = await Promise.all([
+const [tl, br, wko] = await Promise.all([
   sb.from('v_health_timeline').select('*').order('day', { ascending: false }).limit(45),
   sb.from('health_bristol').select('day,bristol,blood').order('day', { ascending: false }).limit(600),
+  sb.from('health_workout').select('*').order('start_time', { ascending: false }).limit(10),
 ]);
 
 const rows = tl.data || [];
 const kpis = document.getElementById('kpis');
 const tbody = document.getElementById('rows');
 const signal = document.getElementById('signal');
+const workoutsEl = document.getElementById('workouts');
+
+// ---- recent workouts (independent of the day-grain timeline) ----
+{
+  const wk = wko.data || [];
+  if (!wk.length) {
+    workoutsEl.innerHTML = 'No workouts synced yet — once garmin-sync picks up an activity it shows here.';
+  } else {
+    workoutsEl.innerHTML = wk.map(w => {
+      const d = new Date(w.start_time || `${w.day}T12:00:00`).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      const dur = w.duration_min ? (w.duration_min >= 60 ? `${Math.floor(w.duration_min / 60)}h${String(Math.round(w.duration_min % 60)).padStart(2, '0')}` : `${Math.round(w.duration_min)}min`) : '—';
+      return `<div style="display:flex;justify-content:space-between;gap:.6rem;padding:.35rem 0;border-bottom:1px solid #222;">
+        <span>${d} · ${(w.activity_type || 'workout').replace(/_/g, ' ')}${w.name ? ' — ' + w.name : ''}</span>
+        <span style="opacity:.7;">${dur}${w.calories ? ' · ' + w.calories + ' cal' : ''}${w.avg_hr ? ' · ' + w.avg_hr + 'bpm avg' : ''}</span>
+      </div>`;
+    }).join('');
+  }
+}
 
 // ---- liquid stools per day (Bristol 6–7) ----
 const liquidByDay = {};
@@ -50,13 +69,27 @@ function render() {
   const flareDays = rows.filter(r => r.flare || (r.symptom_severity ?? 0) >= 7).length;
   const bloodDays = rows.filter(r => r.any_blood).length;
 
+  // ---- fitness / cut metrics ----
+  const weighed = [...rows].filter(r => r.weight_lb != null).sort((a, b) => a.day.localeCompare(b.day));
+  const latestW = weighed.length ? weighed[weighed.length - 1].weight_lb : null;
+  const oldestW = weighed.length ? weighed[0].weight_lb : null;
+  const wDelta = (latestW != null && oldestW != null && weighed.length > 1) ? (latestW - oldestW) : null;
+  const avgSteps = avg(last7.map(r => r.steps));
+  const avgActiveCal = avg(last7.map(r => r.active_calories));
+  const netCalDays = last7.filter(r => r.food_calories && r.active_calories != null);
+  const avgNetCal = netCalDays.length ? avg(netCalDays.map(r => r.food_calories - r.active_calories)) : null;
+
   // KPIs
   kpis.innerHTML =
     card(hbi7 == null ? '—' : hbi7.toFixed(1), `HBI proxy · ${band}`, hbi7 == null ? '' : (hbi7 < 5 ? 'good' : hbi7 <= 7 ? 'warn' : 'bad')) +
     card(avg(last7.map(r => r.sleep_minutes)) == null ? '—' : fmtSleep(Math.round(avg(last7.map(r => r.sleep_minutes)))), 'Avg sleep (7d)') +
     card(avg(last7.map(r => r.stress_avg)) == null ? '—' : Math.round(avg(last7.map(r => r.stress_avg))), 'Garmin stress (7d)') +
     card(flareDays, 'Flare days (30d)', flareDays ? 'warn' : '') +
-    card(bloodDays, 'Blood days (30d)', bloodDays ? 'bad' : '');
+    card(bloodDays, 'Blood days (30d)', bloodDays ? 'bad' : '') +
+    card(latestW == null ? '—' : latestW, latestW == null ? 'Weight (lb)' : `Weight (lb)${wDelta != null ? ` · ${wDelta > 0 ? '+' : ''}${wDelta.toFixed(1)} / ${weighed.length}d` : ''}`, wDelta == null ? '' : (wDelta < 0 ? 'good' : wDelta > 0 ? 'warn' : '')) +
+    card(avgSteps == null ? '—' : Math.round(avgSteps).toLocaleString(), 'Avg steps (7d)') +
+    card(avgActiveCal == null ? '—' : Math.round(avgActiveCal), 'Avg active cal (7d)') +
+    card(avgNetCal == null ? '—' : Math.round(avgNetCal), 'Food − active cal (7d)', avgNetCal == null ? '' : (avgNetCal < 0 ? 'good' : 'warn'));
 
   // ---- ACTIONABLE INSIGHTS ----
   const insights = [];
@@ -85,7 +118,7 @@ function render() {
   const missedBud = rows.slice(0, 14).filter(r => r.mood != null); // proxy: days logged
   if (!insights.length) signal.innerHTML = 'Keep logging — actionable patterns (sleep, irritants, stress, HBI trend) unlock after ~1–2 weeks of data. The weekly task also emails a ranked trigger report.';
   else signal.innerHTML = insights.map(([i, t]) => `<div style="display:flex;gap:.6rem;padding:.4rem 0;"><span>${i}</span><span>${t}</span></div>`).join('')
-    + `<div style="opacity:.5;font-size:.72rem;margin-top:.5rem;">HBI proxy = wellbeing + abdominal pain + liquid stools/day (mass & complications not tracked → lower bound). Trend it; bring the real HBI to your GI. Not medical advice.</div>`;
+    + `<div style="opacity:.5;font-size:.72rem;margin-top:.5rem;">HBI proxy = wellbeing + abdominal pain + liquid stools/day (mass & complications not tracked → lower bound). Trend it; bring the real HBI to your GI. "Food − active cal" is a rough directional signal (photo-logged food calories vs. Garmin exercise calories) — it excludes resting metabolic burn, so it's not a true calorie balance; use the trend, not the absolute number. Not medical advice.</div>`;
 
   // ---- table ----
   tbody.innerHTML = rows.slice(0, 30).map(r => {

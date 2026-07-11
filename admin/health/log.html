@@ -4,6 +4,12 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="robots" content="noindex, nofollow, noarchive" />
+<link rel="manifest" href="/admin/health/manifest.json" />
+<link rel="apple-touch-icon" href="/favicon.svg" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Health" />
+<meta name="theme-color" content="#FF4D2E" />
 <title>Daily Log · CD Admin</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -99,6 +105,7 @@
       <div class="card" style="max-width:720px;">
         <h2>&#8986; Garmin <span class="count" id="garmin-sync"></span></h2>
         <div class="gstats" id="gstats"></div>
+        <div class="entries" id="workout-list" style="margin-top:.6rem;"></div>
       </div>
 
       <!-- CHECK-IN -->
@@ -128,6 +135,10 @@
         </div>
         <div class="row">
           <button class="tap warn" id="flare" style="flex:0 0 auto;">&#128293; Flare day</button>
+        </div>
+        <div class="field" style="margin-top:1rem;">
+          <label>Weight (lb) <span style="opacity:.55;">optional — auto-fills if a synced smart scale reports it</span></label>
+          <input type="number" id="weight-lb" step="0.1" min="0" placeholder="e.g. 172.4" />
         </div>
         <div class="field" style="margin-top:1rem;">
           <label>Note (optional)</label>

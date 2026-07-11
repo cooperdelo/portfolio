@@ -56,6 +56,7 @@ const bristol = tapGroup('bristol');
 const blood = toggleBtn('b-blood'), mucus = toggleBtn('b-mucus'), urgency = toggleBtn('b-urgency');
 const flare = toggleBtn('flare');
 const bPain = sliderBind('b-pain', 'b-pain-val'), sev = sliderBind('severity', 'sev-val'), alc = sliderBind('alcohol', 'alc-val');
+const weightInput = $('weight-lb');
 const medBud = $('med-bud'), medTrem = $('med-trem'), supZinc = $('sup-zinc');
 [medBud, medTrem, supZinc].forEach(b => b.addEventListener('click', () => b.classList.toggle('on')));
 
@@ -81,18 +82,21 @@ async function signedUrl(path) {
 
 async function loadDay() {
   const badge = $('loaded-badge'); badge.classList.remove('show');
-  const [d, tr, ml, ik] = await Promise.all([
+  const [d, tr, ml, ik, wk] = await Promise.all([
     sb.from('health_daily').select('*').eq('day', day).maybeSingle(),
     sb.from('health_bristol').select('*').eq('day', day).order('occurred_at', { ascending: true }),
     sb.from('health_food_log').select('*').eq('day', day).order('occurred_at', { ascending: true }),
     sb.from('health_intake').select('*').eq('day', day),
+    sb.from('health_workout').select('*').eq('day', day).order('start_time', { ascending: true }),
   ]);
 
   // ---- check-in + garmin ----
   const row = d.data || {};
   mood.set(row.mood); stress.set(row.stress_self); energy.set(row.energy);
   sev.set(row.symptom_severity ?? 0); flare.set(row.flare); $('day-note').value = row.note || '';
+  weightInput.value = row.weight_lb ?? '';
   renderGarmin(row);
+  renderWorkouts(wk.data || []);
 
   // ---- intake ----
   const intake = ik.data || [];
@@ -118,10 +122,29 @@ function renderGarmin(row) {
     ['Stress', row.stress_avg, row.stress_avg], ['Body batt', row.body_battery_high != null ? `${row.body_battery_low ?? '?'}–${row.body_battery_high}` : null, row.body_battery_high],
     ['HRV', row.hrv_ms != null ? `${row.hrv_ms}ms` : null, row.hrv_ms], ['Rest HR', row.resting_hr, row.resting_hr],
     ['Steps', row.steps != null ? row.steps.toLocaleString() : null, row.steps], ['Active cal', row.active_calories, row.active_calories],
+    ['Body fat', row.body_fat_pct != null ? `${row.body_fat_pct}%` : null, row.body_fat_pct],
   ].filter(s => s[2] != null);
   if (!stats.length) { box.innerHTML = `<div class="empty">No Garmin data for this day yet.</div>`; sync.textContent = 'not synced'; return; }
   box.innerHTML = stats.map(([l, v]) => `<div class="gstat"><div class="n">${v}</div><div class="l">${l}</div></div>`).join('');
   sync.textContent = row.garmin_synced_at ? `synced ${fmtTime(row.garmin_synced_at)}` : '';
+}
+
+function renderWorkouts(workouts) {
+  const list = $('workout-list');
+  if (!workouts.length) { list.innerHTML = ''; return; }
+  const fmtDur = (m) => m == null ? '' : (m >= 60 ? `${Math.floor(m / 60)}h${String(Math.round(m % 60)).padStart(2, '0')}` : `${Math.round(m)}min`);
+  list.innerHTML = workouts.map(w => `<div class="entry">
+      <span class="btype" style="width:auto;padding:.15rem .5rem;font-size:.72rem;">${(w.activity_type || 'workout').replace(/_/g, ' ')}</span>
+      <div class="body"><b>${w.name || (w.activity_type || 'Workout').replace(/_/g, ' ')}</b>
+        <div class="meta">${w.start_time ? fmtTime(w.start_time) : ''}${w.duration_min ? ' · ' + fmtDur(w.duration_min) : ''}${w.calories ? ' · ' + w.calories + ' cal' : ''}${w.avg_hr ? ' · avg HR ' + w.avg_hr : ''}</div></div>
+      <button class="del" data-del-workout="${w.id}" title="Delete">&times;</button>
+    </div>`).join('');
+  list.querySelectorAll('[data-del-workout]').forEach(b => b.addEventListener('click', async () => {
+    if (!confirm('Delete this workout?')) return;
+    const { error } = await sb.from('health_workout').delete().eq('id', b.dataset.delWorkout);
+    if (error) return toast(error.message, 'err');
+    toast('Deleted'); loadDay();
+  }));
 }
 
 // ---------------- bathroom trips ----------------
@@ -238,11 +261,15 @@ $('save-meal').addEventListener('click', async () => {
 // ---------------- check-in ----------------
 $('save-checkin').addEventListener('click', async () => {
   const btn = $('save-checkin'); btn.disabled = true;
-  const { error } = await sb.from('health_daily').upsert({
+  const payload = {
     day, mood: mood.get(), stress_self: stress.get(), energy: energy.get(),
     symptom_severity: sev.get(), flare: flare.get(),
     note: $('day-note').value.trim() || null, updated_at: new Date().toISOString(),
-  }, { onConflict: 'day' });
+  };
+  // only touch weight if typed — avoids nulling out a Garmin-synced value on days you don't weigh in
+  const wv = weightInput.value.trim();
+  if (wv) { payload.weight_lb = +wv; payload.weight_source = 'manual'; }
+  const { error } = await sb.from('health_daily').upsert(payload, { onConflict: 'day' });
   btn.disabled = false;
   if (error) { console.error(error); return toast(error.message || 'Save failed', 'err', 4000); }
   toast('Check-in saved ✓');

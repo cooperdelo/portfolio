@@ -4,6 +4,12 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="robots" content="noindex, nofollow, noarchive" />
+<link rel="manifest" href="/admin/health/manifest.json" />
+<link rel="apple-touch-icon" href="/favicon.svg" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Health" />
+<meta name="theme-color" content="#FF4D2E" />
 <title>Health Insights · CD Admin</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -42,6 +48,11 @@
     <div class="card" style="margin-bottom:1.2rem;">
       <h2 style="font-size:1.05rem;margin:.1rem 0 .6rem;">Trigger signal <span style="font-size:.72rem;opacity:.6;">(24–48h lag — hypotheses, not proof)</span></h2>
       <div class="hint" id="signal">Gathering data…</div>
+    </div>
+
+    <div class="card" style="margin-bottom:1.2rem;">
+      <h2 style="font-size:1.05rem;margin:.1rem 0 .6rem;">Recent workouts <span style="font-size:.72rem;opacity:.6;">(auto-synced from Garmin)</span></h2>
+      <div id="workouts" class="hint"></div>
     </div>
 
     <div class="card">

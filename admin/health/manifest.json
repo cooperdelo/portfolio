@@ -1,0 +1,13 @@
+{
+  "name": "CD Health",
+  "short_name": "Health",
+  "description": "Cooper Delo's Crohn's + fitness tracker",
+  "start_url": "/admin/health/log.html",
+  "scope": "/admin/health/",
+  "display": "standalone",
+  "background_color": "#0A0908",
+  "theme_color": "#FF4D2E",
+  "icons": [
+    { "src": "/favicon.svg", "type": "image/svg+xml", "sizes": "any", "purpose": "any maskable" }
+  ]
+}
