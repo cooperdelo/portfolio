@@ -1,0 +1,13 @@
+{
+  "name": "CD Admin",
+  "short_name": "CD Admin",
+  "description": "Cooper Delo's personal admin panel — finance, health, Plugverse, brand, contacts.",
+  "start_url": "/admin/",
+  "scope": "/admin/",
+  "display": "standalone",
+  "background_color": "#0A0908",
+  "theme_color": "#FF4D2E",
+  "icons": [
+    { "src": "/favicon.svg", "type": "image/svg+xml", "sizes": "any", "purpose": "any maskable" }
+  ]
+}
