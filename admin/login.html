@@ -92,23 +92,23 @@
     <a href="/" class="home-link">← Back to site</a>
     <div class="eyebrow">Admin · Restricted</div>
     <h1>SIGN <span class="accent">in</span></h1>
-    <p class="lede">Enter your admin email and the shared password. A magic sign-in link will be sent to allowlisted inboxes.</p>
+    <p class="lede">Enter your admin email and password.</p>
     <form id="login-form" autocomplete="off">
       <div class="field">
         <label for="email">Admin email</label>
         <input id="email" name="email" type="email" required autocomplete="email" placeholder="you@example.com" />
       </div>
       <div class="field">
-        <label for="password">Admin password</label>
+        <label for="password">Password</label>
         <input id="password" name="password" type="password" required autocomplete="current-password" placeholder="••••••••" />
       </div>
-      <button class="btn primary" type="submit" id="submit-btn">Send magic link</button>
+      <button class="btn primary" type="submit" id="submit-btn">Sign in</button>
     </form>
     <div class="ok-msg" id="ok-msg">
-      Sent. Check your inbox for the sign-in link.
+      Signed in — redirecting…
     </div>
     <div class="err-msg" id="err-msg">
-      Wrong password or email not on the allowlist.
+      Wrong email or password.
     </div>
     <div class="stamp">
       <span>cooperdelo.com</span>
@@ -117,11 +117,7 @@
   </div>
 
   <script type="module">
-    import { sendMagicLink, isAdmin } from '/admin/_shell/supabase.js';
-
-    // Shared password gate. Rotate by editing this string and redeploying.
-    // The real authn is the magic link (email-bound); this is a soft front gate.
-    const ADMIN_PASSWORD = 'plugverse2026';
+    import { sb, isAdmin } from '/admin/_shell/supabase.js';
 
     document.getElementById('ts').textContent = new Date().toISOString().slice(0,10);
 
@@ -145,21 +141,23 @@
       ok.classList.remove('show');
 
       const email = emailInput.value.trim().toLowerCase();
-      if (pwd.value !== ADMIN_PASSWORD || !email) {
+      if (!email || !pwd.value) return;
+
+      btn.disabled = true; btn.textContent = 'Signing in…';
+      const { error } = await sb.auth.signInWithPassword({ email, password: pwd.value });
+
+      if (error) {
         err.classList.add('show');
         pwd.value = '';
         pwd.focus();
+        btn.disabled = false; btn.textContent = 'Sign in';
         return;
       }
 
-      btn.disabled = true; btn.textContent = 'Sending…';
-      const next = params.get('next') || '/admin/';
-      const redirectTo = `${location.origin}${next}`;
-      const result = await sendMagicLink(email, redirectTo);
-      // Show success even on internal errors — don't reveal which emails exist.
       ok.classList.add('show');
-      btn.textContent = 'Sent';
-      setTimeout(() => { btn.disabled = false; btn.textContent = 'Send magic link'; }, 20000);
+      btn.textContent = 'Signed in';
+      const next = params.get('next') || '/admin/';
+      location.replace(next);
     });
   </script>
 </body>
