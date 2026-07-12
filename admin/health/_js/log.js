@@ -24,6 +24,8 @@ function tsFor(timeStr) {
   return new Date(`${day}T12:00:00`).toISOString();
 }
 const fmtTime = (iso) => new Date(iso).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+const timeInputVal = (iso) => { const d = new Date(iso); return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`; };
+const esc = (s) => (s || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
 const fmtSleep = (m) => (m == null ? '—' : `${Math.floor(m / 60)}h${String(m % 60).padStart(2, '0')}`);
 const $ = (id) => document.getElementById(id);
 
@@ -110,6 +112,7 @@ async function loadDay() {
   // ---- lists ----
   renderTrips(tr.data || []);
   await renderMeals(ml.data || []);
+  renderDayTotals(ml.data || []);
 
   const n = (tr.data?.length || 0) + (ml.data?.length || 0) + (d.data ? 1 : 0) + intake.length;
   if (n) { badge.textContent = `loaded · ${n} item${n > 1 ? 's' : ''}`; badge.classList.add('show'); }
@@ -155,11 +158,31 @@ function renderTrips(trips) {
   list.innerHTML = trips.map(t => {
     const flags = [t.blood && 'blood', t.mucus && 'mucus', t.urgency && 'urgency', t.pain ? `pain ${t.pain}` : null].filter(Boolean);
     const loose = t.bristol >= 6;
-    return `<div class="entry">
-      <span class="btype" style="${loose ? 'background:rgba(255,107,77,.25);color:#ff9b7d' : ''}">${t.bristol}</span>
-      <div class="body"><b>Bristol ${t.bristol}</b>
-        <div class="meta">${fmtTime(t.occurred_at)}${flags.length ? ' · ' + flags.join(' · ') : ''}</div></div>
-      <button class="del" data-del-trip="${t.id}" title="Delete">&times;</button>
+    return `<div data-trip-wrap="${t.id}">
+      <div class="entry">
+        <span class="btype" style="${loose ? 'background:rgba(255,107,77,.25);color:#ff9b7d' : ''}">${t.bristol}</span>
+        <div class="body"><b>Bristol ${t.bristol}</b>
+          <div class="meta">${fmtTime(t.occurred_at)}${flags.length ? ' · ' + flags.join(' · ') : ''}</div></div>
+        <button class="edit-btn" data-edit-trip="${t.id}" title="Edit">&#9998;</button>
+        <button class="del" data-del-trip="${t.id}" title="Delete">&times;</button>
+      </div>
+      <div class="editform" data-editform-trip="${t.id}" style="display:none;">
+        <div class="row">
+          <div class="field" style="flex:0 0 90px;"><label>Bristol</label>
+            <select class="e-bristol">${[1,2,3,4,5,6,7].map(n => `<option value="${n}" ${n===t.bristol?'selected':''}>${n}</option>`).join('')}</select></div>
+          <div class="field" style="flex:0 0 auto;"><label>Time</label><input type="time" class="e-time" value="${timeInputVal(t.occurred_at)}" /></div>
+          <div class="field" style="flex:1 1 100px;"><label>Pain (0-10)</label><input type="number" class="e-pain" min="0" max="10" value="${t.pain ?? 0}" /></div>
+        </div>
+        <div class="row">
+          <button class="tap warn e-blood ${t.blood ? 'on' : ''}">Blood</button>
+          <button class="tap warn e-mucus ${t.mucus ? 'on' : ''}">Mucus</button>
+          <button class="tap warn e-urgency ${t.urgency ? 'on' : ''}">Urgency</button>
+        </div>
+        <div class="row">
+          <button class="btn primary e-save">Save</button>
+          <button class="btn ghost e-cancel">Cancel</button>
+        </div>
+      </div>
     </div>`;
   }).join('');
   list.querySelectorAll('[data-del-trip]').forEach(b => b.addEventListener('click', async () => {
@@ -168,6 +191,28 @@ function renderTrips(trips) {
     if (error) return toast(error.message, 'err');
     toast('Deleted'); loadDay();
   }));
+  list.querySelectorAll('[data-edit-trip]').forEach(b => b.addEventListener('click', () => {
+    const wrap = list.querySelector(`[data-trip-wrap="${b.dataset.editTrip}"]`);
+    wrap.querySelector('.entry').style.display = 'none';
+    wrap.querySelector('[data-editform-trip]').style.display = 'flex';
+  }));
+  list.querySelectorAll('[data-editform-trip]').forEach(f => {
+    f.querySelectorAll('.e-blood,.e-mucus,.e-urgency').forEach(b => b.addEventListener('click', () => b.classList.toggle('on')));
+    f.querySelector('.e-cancel').addEventListener('click', () => loadDay());
+    f.querySelector('.e-save').addEventListener('click', async () => {
+      const id = f.dataset.editformTrip;
+      const { error } = await sb.from('health_bristol').update({
+        bristol: +f.querySelector('.e-bristol').value,
+        occurred_at: tsFor(f.querySelector('.e-time').value),
+        pain: +f.querySelector('.e-pain').value || 0,
+        blood: f.querySelector('.e-blood').classList.contains('on'),
+        mucus: f.querySelector('.e-mucus').classList.contains('on'),
+        urgency: f.querySelector('.e-urgency').classList.contains('on'),
+      }).eq('id', id);
+      if (error) return toast(error.message, 'err');
+      toast('Trip updated ✓'); loadDay();
+    });
+  });
 }
 
 $('save-bristol').addEventListener('click', async () => {
@@ -200,16 +245,33 @@ async function renderMeals(meals) {
   if (!meals.length) { list.innerHTML = `<div class="empty">No meals logged this day.</div>`; return; }
   const rows = await Promise.all(meals.map(async (m) => {
     const url = await signedUrl(m.photo_path);
+    const calBadge = (m.status === 'analyzed' && m.calories != null) ? `<span class="calbadge">${m.calories} cal</span>` : '';
     const macros = m.status === 'analyzed'
-      ? `<div class="meta">${m.calories ?? '?'} cal · ${m.protein_g ?? '?'}p/${m.carbs_g ?? '?'}c/${m.fat_g ?? '?'}f${m.flagged_irritants?.length ? ' · ⚠ ' + m.flagged_irritants.join(', ') : ''}</div>` : '';
-    return `<div class="entry">
-      ${url ? `<img src="${url}" alt="">` : `<div class="entry" style="width:52px;height:52px;background:#222;"></div>`}
-      <div class="body">
-        <b data-edit-meal="${m.id}" style="cursor:pointer;" title="Tap to edit">${m.caption || '(no caption)'}</b>
-        <span class="pill ${m.status}" style="margin-left:.4rem;">${m.status}</span>
-        <div class="meta">${fmtTime(m.occurred_at)}</div>${macros}
+      ? `<div class="meta">${m.protein_g ?? '?'}p · ${m.carbs_g ?? '?'}c · ${m.fat_g ?? '?'}f${m.flagged_irritants?.length ? ' · ⚠ ' + m.flagged_irritants.join(', ') : ''}</div>` : '';
+    return `<div data-meal-wrap="${m.id}">
+      <div class="entry">
+        ${url ? `<img src="${url}" alt="">` : `<div class="entry" style="width:52px;height:52px;background:#222;"></div>`}
+        <div class="body">
+          <div style="display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;">
+            <b>${m.caption || '(no caption)'}</b>${calBadge}
+          </div>
+          <span class="pill ${m.status}">${m.status}</span>
+          <div class="meta">${fmtTime(m.occurred_at)}</div>${macros}
+        </div>
+        <button class="edit-btn" data-edit-meal="${m.id}" title="Edit">&#9998;</button>
+        <button class="del" data-del-meal="${m.id}" title="Delete">&times;</button>
       </div>
-      <button class="del" data-del-meal="${m.id}" title="Delete">&times;</button>
+      <div class="editform" data-editform-meal="${m.id}" style="display:none;">
+        <div class="row">
+          <div class="field" style="flex:0 0 auto;"><label>Time</label><input type="time" class="e-time" value="${timeInputVal(m.occurred_at)}" /></div>
+          <div class="field" style="flex:1 1 200px;"><label>Caption</label><input type="text" class="e-caption" value="${esc(m.caption)}" /></div>
+        </div>
+        <div class="pending-note">Editing the caption re-queues this meal for the nightly macro re-analysis.</div>
+        <div class="row">
+          <button class="btn primary e-save">Save</button>
+          <button class="btn ghost e-cancel">Cancel</button>
+        </div>
+      </div>
     </div>`;
   }));
   list.innerHTML = rows.join('');
@@ -219,13 +281,48 @@ async function renderMeals(meals) {
     if (error) return toast(error.message, 'err');
     toast('Deleted'); loadDay();
   }));
-  list.querySelectorAll('[data-edit-meal]').forEach(el => el.addEventListener('click', async () => {
-    const next = prompt('Edit caption:', el.textContent === '(no caption)' ? '' : el.textContent);
-    if (next == null) return;
-    const { error } = await sb.from('health_food_log').update({ caption: next.trim() }).eq('id', el.dataset.editMeal);
-    if (error) return toast(error.message, 'err');
-    toast('Updated'); loadDay();
+  list.querySelectorAll('[data-edit-meal]').forEach(b => b.addEventListener('click', () => {
+    const wrap = list.querySelector(`[data-meal-wrap="${b.dataset.editMeal}"]`);
+    wrap.querySelector('.entry').style.display = 'none';
+    wrap.querySelector('[data-editform-meal]').style.display = 'flex';
   }));
+  list.querySelectorAll('[data-editform-meal]').forEach(f => {
+    f.querySelector('.e-cancel').addEventListener('click', () => loadDay());
+    f.querySelector('.e-save').addEventListener('click', async () => {
+      const id = f.dataset.editformMeal;
+      const meal = meals.find(m => String(m.id) === String(id));
+      const newCaption = f.querySelector('.e-caption').value.trim();
+      const captionChanged = newCaption !== (meal?.caption || '');
+      const payload = { occurred_at: tsFor(f.querySelector('.e-time').value), caption: newCaption };
+      if (captionChanged) {
+        // re-queue for the nightly agent so macros match the corrected caption
+        Object.assign(payload, {
+          status: meal?.photo_path ? 'pending' : 'manual',
+          analyzed_at: null, calories: null, protein_g: null, carbs_g: null, fat_g: null, fiber_g: null,
+          foods: null, dairy: false, flagged_irritants: null,
+        });
+      }
+      const { error } = await sb.from('health_food_log').update(payload).eq('id', id);
+      if (error) return toast(error.message, 'err');
+      toast('Meal updated ✓'); loadDay();
+    });
+  });
+}
+
+// ---------------- today's totals (from analyzed meals only — no target, just what's logged) ----------------
+function renderDayTotals(meals) {
+  const box = $('daytotals'), note = $('totals-note');
+  const analyzed = meals.filter(m => m.status === 'analyzed');
+  const pending = meals.filter(m => m.status === 'pending' || m.status === 'manual').length;
+  const sum = (k) => analyzed.reduce((a, m) => a + (Number(m[k]) || 0), 0);
+  if (!meals.length) { box.innerHTML = `<div class="empty">Nothing logged yet today.</div>`; note.textContent = ''; return; }
+  box.innerHTML = [
+    ['Calories', Math.round(sum('calories'))],
+    ['Protein', `${Math.round(sum('protein_g'))}g`],
+    ['Carbs', `${Math.round(sum('carbs_g'))}g`],
+    ['Fat', `${Math.round(sum('fat_g'))}g`],
+  ].map(([l, v]) => `<div class="t"><b>${v}</b><span>${l}</span></div>`).join('');
+  note.textContent = pending ? `${pending} meal${pending > 1 ? 's' : ''} awaiting tonight's analysis` : (analyzed.length ? 'all analyzed' : '');
 }
 
 $('save-meal').addEventListener('click', async () => {

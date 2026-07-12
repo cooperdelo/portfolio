@@ -73,6 +73,19 @@
   .field input[type=text], .field input[type=time] { width:100%; }
   .savedbadge { font-size:.72rem; color:#8fdc6b; opacity:0; transition:.3s; }
   .savedbadge.show { opacity:1; }
+
+  /* edit-in-place + Cal-AI-ish polish */
+  .calbadge { font-family:'Geist Mono',monospace; font-weight:700; font-size:.78rem; background:rgba(200,255,77,.14); color:#c8ff4d; border-radius:999px; padding:.1rem .5rem; }
+  .edit-btn { border:none; background:transparent; color:inherit; opacity:.5; cursor:pointer; font-size:1rem; flex:0 0 auto; }
+  .edit-btn:hover { opacity:1; }
+  .editform { display:flex; flex-direction:column; gap:.6rem; border:1px solid var(--line,#2a2a2a); border-radius:12px; padding:.7rem .8rem; margin-bottom:.5rem; }
+  .editform .row { align-items:flex-end; }
+  .editform input[type=time], .editform input[type=text], .editform input[type=number] { width:100%; }
+  .daytotals { display:flex; flex-wrap:wrap; gap:1.2rem; padding:.2rem 0 .6rem; }
+  .daytotals .t { font-family:'Geist Mono',monospace; }
+  .daytotals .t b { font-size:1.3rem; display:block; }
+  .daytotals .t span { font-size:.68rem; opacity:.6; text-transform:uppercase; letter-spacing:.05em; }
+  .pending-note { font-size:.75rem; opacity:.6; margin-top:.2rem; }
 </style>
 </head>
 <body>
@@ -100,6 +113,12 @@
     </div>
 
     <div class="stack">
+
+      <!-- TODAY'S TOTALS (from analyzed meals — no target, just what's logged) -->
+      <div class="card" style="max-width:720px;">
+        <h2>&#127859; Logged today <span class="count" id="totals-note"></span></h2>
+        <div class="daytotals" id="daytotals"></div>
+      </div>
 
       <!-- GARMIN (readonly) -->
       <div class="card" style="max-width:720px;">
