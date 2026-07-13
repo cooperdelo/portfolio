@@ -125,6 +125,21 @@
         <h2>&#8986; Garmin <span class="count" id="garmin-sync"></span></h2>
         <div class="gstats" id="gstats"></div>
         <div class="entries" id="workout-list" style="margin-top:.6rem;"></div>
+
+        <div class="addform">
+          <div class="sublabel">Add a workout Garmin didn't catch (hot yoga, lifting, walk, etc.) — describe it, the nightly agent estimates duration/calories</div>
+          <div class="row" style="align-items:flex-end;">
+            <div class="field" style="flex:1 1 220px;">
+              <label>What did you do?</label>
+              <input type="text" id="workout-desc" placeholder="e.g. hot yoga, 60 min, moderate intensity" />
+            </div>
+            <div class="field" style="flex:0 0 auto;">
+              <label>Time</label>
+              <input type="time" id="workout-time" />
+            </div>
+            <button class="btn primary" id="save-workout" style="flex:0 0 auto;">+ Add workout</button>
+          </div>
+        </div>
       </div>
 
       <!-- CHECK-IN -->

@@ -136,12 +136,18 @@ function renderWorkouts(workouts) {
   const list = $('workout-list');
   if (!workouts.length) { list.innerHTML = ''; return; }
   const fmtDur = (m) => m == null ? '' : (m >= 60 ? `${Math.floor(m / 60)}h${String(Math.round(m % 60)).padStart(2, '0')}` : `${Math.round(m)}min`);
-  list.innerHTML = workouts.map(w => `<div class="entry">
-      <span class="btype" style="width:auto;padding:.15rem .5rem;font-size:.72rem;">${(w.activity_type || 'workout').replace(/_/g, ' ')}</span>
-      <div class="body"><b>${w.name || (w.activity_type || 'Workout').replace(/_/g, ' ')}</b>
-        <div class="meta">${w.start_time ? fmtTime(w.start_time) : ''}${w.duration_min ? ' · ' + fmtDur(w.duration_min) : ''}${w.calories ? ' · ' + w.calories + ' cal' : ''}${w.avg_hr ? ' · avg HR ' + w.avg_hr : ''}</div></div>
+  list.innerHTML = workouts.map(w => {
+    const label = w.name || (w.activity_type || 'Workout').replace(/_/g, ' ');
+    const statusPill = w.source === 'manual' ? `<span class="pill ${w.status}" style="margin-left:.4rem;">${w.status}</span>` : '';
+    const details = w.status === 'pending'
+      ? `<div class="meta">${w.start_time ? fmtTime(w.start_time) : ''} · awaiting tonight's analysis</div>${w.note ? `<div class="meta">"${w.note}"</div>` : ''}`
+      : `<div class="meta">${w.start_time ? fmtTime(w.start_time) : ''}${w.duration_min ? ' · ' + fmtDur(w.duration_min) : ''}${w.calories ? ' · ' + w.calories + ' cal' : ''}${w.avg_hr ? ' · avg HR ' + w.avg_hr : ''}</div>`;
+    return `<div class="entry">
+      <span class="btype" style="width:auto;padding:.15rem .5rem;font-size:.72rem;">${(w.activity_type || (w.source === 'manual' ? 'logging…' : 'workout')).replace(/_/g, ' ')}</span>
+      <div class="body"><b>${label}</b>${statusPill}${details}</div>
       <button class="del" data-del-workout="${w.id}" title="Delete">&times;</button>
-    </div>`).join('');
+    </div>`;
+  }).join('');
   list.querySelectorAll('[data-del-workout]').forEach(b => b.addEventListener('click', async () => {
     if (!confirm('Delete this workout?')) return;
     const { error } = await sb.from('health_workout').delete().eq('id', b.dataset.delWorkout);
@@ -149,6 +155,20 @@ function renderWorkouts(workouts) {
     toast('Deleted'); loadDay();
   }));
 }
+
+$('save-workout').addEventListener('click', async () => {
+  const desc = $('workout-desc').value.trim();
+  if (!desc) { toast('Describe the workout first', 'err'); return; }
+  const btn = $('save-workout'); btn.disabled = true;
+  const { error } = await sb.from('health_workout').insert({
+    day, start_time: tsFor($('workout-time').value), note: desc, source: 'manual', status: 'pending',
+  });
+  btn.disabled = false;
+  if (error) { console.error(error); return toast(error.message || 'Save failed', 'err', 4000); }
+  toast('Workout added ✓ — analyzed tonight');
+  $('workout-desc').value = ''; $('workout-time').value = '';
+  loadDay();
+});
 
 // ---------------- bathroom trips ----------------
 function renderTrips(trips) {
