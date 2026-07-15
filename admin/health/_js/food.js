@@ -34,6 +34,7 @@ const preview   = document.getElementById('preview');
 const dropText  = document.getElementById('drop-text');
 const drop      = document.getElementById('drop');
 const captionEl = document.getElementById('caption');
+const symptomEl = document.getElementById('symptom-note');
 let picked = null;
 
 fileInput.addEventListener('change', () => {
@@ -68,13 +69,14 @@ async function saveEntry({ withPhoto }) {
   const { error } = await sb.from('health_food_log').insert({
     photo_path, caption, occurred_at: tsFor(),
     status: withPhoto ? 'pending' : 'manual',
+    symptom_note: symptomEl.value.trim() || null,
   });
   btnP.disabled = btnT.disabled = false;
   if (error) { console.error(error); toast(error.message || 'Save failed', 'err', 4000); return; }
 
   toast('Logged ✓');
   // reset
-  picked = null; fileInput.value = ''; captionEl.value = '';
+  picked = null; fileInput.value = ''; captionEl.value = ''; symptomEl.value = '';
   preview.style.display = 'none'; drop.classList.remove('hasimg');
   dropText.textContent = '📷 Tap to take / choose a photo';
   loadToday();
@@ -103,6 +105,9 @@ async function loadToday() {
     const macros = r.status === 'analyzed'
       ? `<div class="macros">${r.calories ?? '?'} cal · ${r.protein_g ?? '?'}p / ${r.carbs_g ?? '?'}c / ${r.fat_g ?? '?'}f${r.flagged_irritants?.length ? ' · ⚠ ' + r.flagged_irritants.join(', ') : ''}</div>`
       : '';
+    const symptomNote = r.symptom_note
+      ? `<div class="macros" style="opacity:.8;margin-top:.25rem;">💬 ${r.symptom_note}</div>`
+      : '';
     return `<div class="entry">
       ${url ? `<img src="${url}" alt="">` : '<div class="entry" style="width:56px;height:56px;border-radius:9px;background:#222;"></div>'}
       <div style="flex:1 1 auto;">
@@ -111,6 +116,7 @@ async function loadToday() {
         </div>
         <div class="macros" style="opacity:.5;">${t}</div>
         ${macros}
+        ${symptomNote}
       </div></div>`;
   }));
   list.innerHTML = rows.join('');

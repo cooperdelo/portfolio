@@ -268,6 +268,7 @@ async function renderMeals(meals) {
     const calBadge = (m.status === 'analyzed' && m.calories != null) ? `<span class="calbadge">${m.calories} cal</span>` : '';
     const macros = m.status === 'analyzed'
       ? `<div class="meta">${m.protein_g ?? '?'}p · ${m.carbs_g ?? '?'}c · ${m.fat_g ?? '?'}f${m.flagged_irritants?.length ? ' · ⚠ ' + m.flagged_irritants.join(', ') : ''}</div>` : '';
+    const symptomNote = m.symptom_note ? `<div class="meta" style="opacity:.85;margin-top:.15rem;">💬 ${esc(m.symptom_note)}</div>` : '';
     return `<div data-meal-wrap="${m.id}">
       <div class="entry">
         ${url ? `<img src="${url}" alt="">` : `<div class="entry" style="width:52px;height:52px;background:#222;"></div>`}
@@ -276,7 +277,7 @@ async function renderMeals(meals) {
             <b>${m.caption || '(no caption)'}</b>${calBadge}
           </div>
           <span class="pill ${m.status}">${m.status}</span>
-          <div class="meta">${fmtTime(m.occurred_at)}</div>${macros}
+          <div class="meta">${fmtTime(m.occurred_at)}</div>${macros}${symptomNote}
         </div>
         <button class="edit-btn" data-edit-meal="${m.id}" title="Edit">&#9998;</button>
         <button class="del" data-del-meal="${m.id}" title="Delete">&times;</button>
@@ -286,7 +287,11 @@ async function renderMeals(meals) {
           <div class="field" style="flex:0 0 auto;"><label>Time</label><input type="time" class="e-time" value="${timeInputVal(m.occurred_at)}" /></div>
           <div class="field" style="flex:1 1 200px;"><label>Caption</label><input type="text" class="e-caption" value="${esc(m.caption)}" /></div>
         </div>
-        <div class="pending-note">Editing the caption re-queues this meal for the nightly macro re-analysis.</div>
+        <div class="field">
+          <label>How did it feel? <span style="opacity:.55;text-transform:none;letter-spacing:0;">(add/edit anytime — doesn't trigger re-analysis)</span></label>
+          <textarea class="e-symptom" style="min-height:60px;">${esc(m.symptom_note)}</textarea>
+        </div>
+        <div class="pending-note">Editing the caption re-queues this meal for the nightly macro re-analysis. The symptom note doesn't.</div>
         <div class="row">
           <button class="btn primary e-save">Save</button>
           <button class="btn ghost e-cancel">Cancel</button>
@@ -313,7 +318,10 @@ async function renderMeals(meals) {
       const meal = meals.find(m => String(m.id) === String(id));
       const newCaption = f.querySelector('.e-caption').value.trim();
       const captionChanged = newCaption !== (meal?.caption || '');
-      const payload = { occurred_at: tsFor(f.querySelector('.e-time').value), caption: newCaption };
+      const payload = {
+        occurred_at: tsFor(f.querySelector('.e-time').value), caption: newCaption,
+        symptom_note: f.querySelector('.e-symptom').value.trim() || null,
+      };
       if (captionChanged) {
         // re-queue for the nightly agent so macros match the corrected caption
         Object.assign(payload, {
@@ -347,6 +355,7 @@ function renderDayTotals(meals) {
 
 $('save-meal').addEventListener('click', async () => {
   const caption = $('mealcap').value.trim();
+  const symptomNote = $('meal-symptom').value.trim() || null;
   if (!mealFiles.length && !caption) { toast('Add a photo or a caption', 'err'); return; }
   const btn = $('save-meal'); btn.disabled = true;
   const occurred_at = tsFor($('meal-time').value);
@@ -360,15 +369,15 @@ $('save-meal').addEventListener('click', async () => {
         if (up.error) throw up.error;
         // stagger timestamps a few minutes so order is stable
         const ts = new Date(new Date(occurred_at).getTime() + i * 60000).toISOString();
-        const ins = await sb.from('health_food_log').insert({ occurred_at: ts, photo_path: path, caption: caption || null, status: 'pending' });
+        const ins = await sb.from('health_food_log').insert({ occurred_at: ts, photo_path: path, caption: caption || null, status: 'pending', symptom_note: symptomNote });
         if (ins.error) throw ins.error;
       }
     } else {
-      const ins = await sb.from('health_food_log').insert({ occurred_at, caption, status: 'manual' });
+      const ins = await sb.from('health_food_log').insert({ occurred_at, caption, status: 'manual', symptom_note: symptomNote });
       if (ins.error) throw ins.error;
     }
     toast(`Added ${mealFiles.length || 1} meal${(mealFiles.length || 1) > 1 ? 's' : ''} ✓`);
-    mealFiles = []; $('mealphoto').value = ''; $('mealcap').value = ''; $('mealthumbs').innerHTML = '';
+    mealFiles = []; $('mealphoto').value = ''; $('mealcap').value = ''; $('meal-symptom').value = ''; $('mealthumbs').innerHTML = '';
     $('drop-text').textContent = '📷 Tap to add meal photo(s)'; $('meal-time').value = '';
     loadDay();
   } catch (err) { console.error(err); toast(err.message || 'Save failed', 'err', 4000); }

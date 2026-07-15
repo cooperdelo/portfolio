@@ -80,6 +80,7 @@ function railHTML(activePath, email, role) {
     <aside class="rail">
       <div class="brand"><span class="dot"></span>CD <small>Admin</small>${roleBadge}</div>
       <button class="rail-search" data-openpalette><span class="rs-mag">⌕</span><span>Search…</span><kbd>⌘K</kbd></button>
+      <button class="rail-toggle" data-railtoggle aria-label="Menu" aria-expanded="false">&#9776;</button>
       ${sections}
       <div class="rail-foot">
         <span>Signed in as</span>
@@ -238,6 +239,19 @@ export async function mountShell({ title } = {}) {
 
   // 4) Hook sign-out
   wrap.querySelector('[data-signout]')?.addEventListener('click', signOut);
+
+  // 4b) Mobile hamburger — expands the rail's nav sections + sign-out into an
+  // in-flow dropdown panel (below 900px the rail collapses to a slim top bar
+  // and hides the nav by default; this is the only way to reach it on mobile).
+  const railEl = wrap.querySelector('.rail');
+  const toggleBtn = wrap.querySelector('[data-railtoggle]');
+  const setMenu = (open) => {
+    railEl.classList.toggle('menu-open', open);
+    toggleBtn?.setAttribute('aria-expanded', String(open));
+    if (toggleBtn) toggleBtn.innerHTML = open ? '&times;' : '&#9776;';
+  };
+  toggleBtn?.addEventListener('click', () => setMenu(!railEl.classList.contains('menu-open')));
+  railEl.querySelectorAll('a.nav-item').forEach(a => a.addEventListener('click', () => setMenu(false)));
 
   // 5) Tile-level role gating (anything in the DOM with data-role)
   filterTilesByRole(role);

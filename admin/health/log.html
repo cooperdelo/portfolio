@@ -34,15 +34,19 @@
   @media(max-width:640px){ .biggrid .tap{ font-size:1rem; } }
 
   /* date navigator */
-  .datenav { display:flex; align-items:center; gap:.5rem; }
+  .datenav { display:flex; align-items:center; gap:.5rem; flex-wrap:wrap; }
   .datenav button { border:1px solid var(--line,#2a2a2a); background:transparent; color:inherit; border-radius:10px;
-        width:38px; height:38px; font-size:1.1rem; cursor:pointer; transition:.12s; }
+        width:38px; height:38px; font-size:1.1rem; cursor:pointer; transition:.12s; flex:0 0 auto; }
   .datenav button:hover:not(:disabled){ border-color:#666; }
   .datenav button:disabled{ opacity:.3; cursor:default; }
   .datenav input[type=date]{ background:transparent; border:1px solid var(--line,#2a2a2a); color:inherit; font:inherit;
-        border-radius:10px; padding:.5rem .7rem; }
-  .datenav .today-btn{ width:auto; padding:0 .8rem; font-size:.8rem; font-family:'Geist Mono',monospace; letter-spacing:.05em; }
+        border-radius:10px; padding:.5rem .7rem; flex:1 1 140px; min-width:0; max-width:180px; }
+  .datenav .today-btn{ width:auto; padding:0 .8rem; font-size:.8rem; font-family:'Geist Mono',monospace; letter-spacing:.05em; flex:0 0 auto; }
   .daylabel{ font-family:'Geist Mono',monospace; font-size:.8rem; opacity:.7; text-transform:uppercase; letter-spacing:.1em; }
+  @media (max-width:480px){
+    .biggrid { grid-template-columns:repeat(4,1fr); }
+    .datenav input[type=date]{ max-width:none; }
+  }
 
   /* garmin stat row */
   .gstats { display:grid; grid-template-columns:repeat(auto-fit,minmax(92px,1fr)); gap:.5rem; }
@@ -229,6 +233,10 @@
           <div class="field" style="margin-top:.6rem;">
             <label>Caption <span style="opacity:.55;">(optional — applied to the batch; auto-analysis fills the rest)</span></label>
             <input type="text" id="mealcap" placeholder="e.g. grilled chicken bowl, white rice, broccoli, no sauce" />
+          </div>
+          <div class="field" style="margin-top:.6rem;">
+            <label>How did it feel? <span style="opacity:.55;text-transform:none;letter-spacing:0;">(optional — applied to the batch; you can always add/edit this later per meal)</span></label>
+            <textarea id="meal-symptom" placeholder="e.g. bloated + cramping ~30 min after" style="min-height:60px;"></textarea>
           </div>
           <div class="row" style="align-items:flex-end;">
             <div class="field" style="flex:0 0 auto;">
