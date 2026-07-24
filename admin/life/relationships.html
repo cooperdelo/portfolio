@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="robots" content="noindex, nofollow, noarchive" />
+<title>Life · Relationships · CD Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Geist+Mono:wght@300..700&family=Geist:wght@300..700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/admin/_shell/admin-shell.css" />
+<style>
+  .lead-in{font-family:"Fraunces",serif;font-style:italic;font-size:1.05rem;color:var(--ink-2);max-width:62ch;line-height:1.4;margin:-.6rem 0 1.6rem}
+  .ro{font-family:"Geist Mono",monospace;font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:.14rem .5rem}
+  .pill.over{color:var(--rust)}.pill.soon{color:#E7C97A}.pill.ok{color:var(--good)}
+</style>
+</head>
+<body>
+  <main>
+    <div class="page-head">
+      <div>
+        <div class="eyebrow">Life · people &amp; connection</div>
+        <h1>Relation<span class="accent">ships</span></h1>
+      </div>
+      <div class="actions"><span class="live-dot" id="synced">Auto-synced</span><span class="ro">read-only</span></div>
+    </div>
+    <p class="lead-in">Built from your vault. The pattern to fight is being reactive — this surfaces who you owe a touch so it stops slipping.</p>
+
+    <div class="kpi-grid">
+      <div class="card"><div class="label">Reconnect queue</div><div class="value" id="k-over" style="color:var(--rust)">—</div><div class="delta flat">people overdue a touch</div></div>
+      <div class="card"><div class="label">Pattern</div><div class="value" style="font-size:1.4rem">Reactive</div><div class="delta flat">initiates too little — the growth edge</div></div>
+      <div class="card"><div class="label">Dating</div><div class="value" style="font-size:1.4rem">No progress</div><div class="delta flat">Q-goal: date ≥ 2 people</div></div>
+      <div class="card"><div class="label">Standing habit</div><div class="value" style="font-size:1.4rem">Mon block</div><div class="delta flat">weekly outreach · midday</div></div>
+    </div>
+
+    <h2 class="section-h">Reconnect <span class="accent">queue</span></h2>
+    <div class="card" style="padding:0;overflow:hidden;"><div class="tbl-wrap"><table class="data">
+      <thead><tr><th>Person</th><th>Why</th><th>Owed action</th><th>Status</th></tr></thead>
+      <tbody id="q-body"></tbody>
+    </table></div></div>
+
+    <h2 class="section-h">Anchor <span class="accent">people</span></h2>
+    <div class="card" style="padding:0;overflow:hidden;"><div class="tbl-wrap"><table class="data">
+      <thead><tr><th>Person</th><th>Role</th><th>Cadence</th></tr></thead>
+      <tbody id="a-body"></tbody>
+    </table></div></div>
+  </main>
+
+  <script type="module">
+    import { mountShell } from '/admin/_shell/admin-shell.js';
+    await mountShell({ title: 'Life · Relationships' });
+
+    // ==== AGENT-SYNCED DATA (nightly/weekly agent rewrites from People/ + memory) ====
+    const SYNCED = '2026-07-24';
+    const queue = [
+      { p: 'Corey Bobs', why: "Bob's venue owner — Franklin St door", owed: 'Text after exams (still owed)', st: 'over' },
+      { p: 'Dugout / Adam', why: 'Owed a thank-you within 24h of the 4/20 call', owed: 'Send the thank-you', st: 'over' },
+      { p: 'Roxanne Fortney', why: 'Gave a referral list + brokered an intro', owed: 'Reply / thank + follow the intro', st: 'over' },
+      { p: 'Willie (The Pitch)', why: 'Said he would reach out; never followed up', owed: 'Friendly check-in', st: 'soon' },
+      { p: 'Southend Entertainment', why: 'Warm booking contact', owed: 'Keep-warm note', st: 'soon' },
+      { p: 'Kurt (step-brother)', why: 'Introduced the vault; close', owed: 'Text weekly', st: 'ok' },
+    ];
+    const anchors = [
+      { p: 'Adam Schifferdecker', role: 'Mentor', cad: 'He calls first — flip it, call him' },
+      { p: 'Jennifer Hewitt', role: 'Truist exec · connector', cad: 'Calendar reconnects; Singapore help' },
+      { p: 'Kurt Brischke', role: 'Step-brother', cad: 'Weekly text' },
+    ];
+    // ==============================================================================
+
+    document.getElementById('synced').textContent = 'Auto-synced · ' + SYNCED;
+    document.getElementById('k-over').textContent = queue.filter(q => q.st === 'over').length;
+    const lbl = { over: 'overdue', soon: 'soon', ok: 'on track' };
+    document.getElementById('q-body').innerHTML = queue.map(q =>
+      `<tr><td class="desc">${q.p}</td><td class="meta">${q.why}</td><td>${q.owed}</td><td><span class="pill ${q.st}">${lbl[q.st]}</span></td></tr>`).join('');
+    document.getElementById('a-body').innerHTML = anchors.map(a =>
+      `<tr><td class="desc">${a.p}</td><td class="meta">${a.role}</td><td>${a.cad}</td></tr>`).join('');
+  </script>
+</body>
+</html>

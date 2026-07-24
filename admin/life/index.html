@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="robots" content="noindex, nofollow, noarchive" />
+<title>Life · Review · CD Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Geist+Mono:wght@300..700&family=Geist:wght@300..700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/admin/_shell/admin-shell.css" />
+<style>
+  .lead-in{font-family:"Fraunces",serif;font-style:italic;font-size:1.05rem;color:var(--ink-2);max-width:60ch;line-height:1.4;margin:-.6rem 0 1.6rem}
+  .score-tbl .bar{display:inline-block;height:6px;border-radius:3px;background:var(--rust);vertical-align:middle;margin-right:.5rem}
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+  @media(max-width:820px){.two-col{grid-template-columns:1fr}}
+  .llist{list-style:none;margin:.4rem 0 0;padding:0;display:flex;flex-direction:column;gap:.7rem}
+  .llist li{display:flex;gap:.7rem;font-size:.9rem;color:var(--ink-2);line-height:1.4}
+  .llist li .n{font-family:"Anton",sans-serif;color:var(--rust);flex:0 0 auto}
+  .ro{font-family:"Geist Mono",monospace;font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:.14rem .5rem}
+</style>
+</head>
+<body>
+  <main>
+    <div class="page-head">
+      <div>
+        <div class="eyebrow">Life · the operating system layer</div>
+        <h1>Weekly <span class="accent">review</span></h1>
+      </div>
+      <div class="actions"><span class="live-dot" id="synced">Auto-synced</span><span class="ro">read-only</span></div>
+    </div>
+    <p class="lead-in">Everything here is written by the nightly/weekly agent from your vault — nothing to edit.</p>
+
+    <div class="kpi-grid">
+      <div class="card"><div class="label">Domains average</div><div class="value" id="k-avg">—</div><div class="delta flat">across 8 life domains</div></div>
+      <div class="card"><div class="label">Needs attention</div><div class="value" id="k-weak" style="color:var(--rust)">—</div><div class="delta flat" id="k-weak-sub">lowest-scoring domain</div></div>
+      <div class="card"><div class="label">This week</div><div class="value" id="k-focus">—</div><div class="delta flat">active focuses</div></div>
+      <div class="card"><div class="label">Quarter</div><div class="value" id="k-q" style="font-size:1.5rem">Q3 2026</div><div class="delta flat">Truist · pivot test</div></div>
+    </div>
+
+    <h2 class="section-h">This week's <span class="accent">focus</span></h2>
+    <div class="card"><ul class="llist" id="focus-list"></ul></div>
+
+    <h2 class="section-h">Domain <span class="accent">scorecard</span></h2>
+    <div class="card" style="padding:0;overflow:hidden;"><div class="tbl-wrap"><table class="data score-tbl">
+      <thead><tr><th>Domain</th><th>Score</th><th>Status</th></tr></thead>
+      <tbody id="score-body"></tbody>
+    </table></div></div>
+
+    <div class="two-col" style="margin-top:1.4rem;">
+      <div class="card">
+        <h2 class="section-h" style="margin-top:0;">North <span class="accent">star</span></h2>
+        <ul class="llist" id="ns-list"></ul>
+      </div>
+      <div class="card">
+        <h2 class="section-h" style="margin-top:0;">Quarter <span class="accent">priorities</span></h2>
+        <ul class="llist" id="pri-list"></ul>
+      </div>
+    </div>
+  </main>
+
+  <script type="module">
+    import { mountShell } from '/admin/_shell/admin-shell.js';
+    await mountShell({ title: 'Life · Review' });
+
+    // ==== AGENT-SYNCED DATA (nightly/weekly agent rewrites this block from the vault) ====
+    const SYNCED = '2026-07-24';
+    const focus = [
+      'Plugverse — work the venue pipeline: confirm the Carter → Shawn Wilfong intro, keep the brand-to-events test moving.',
+      'Relationships — break the isolation pattern: clear the reconnect queue, one real social thing this week.',
+      'Health & body — hold training consistency through the build; log meals + workouts nightly.',
+    ];
+    const domains = [
+      { d: 'Academics', s: 8 }, { d: 'Learning & Growth', s: 8 },
+      { d: 'Work / Career (Plugverse)', s: 7 }, { d: 'Health & Fitness', s: 7 }, { d: 'Home & Environment', s: 7 },
+      { d: 'Finance & Investing', s: 5 }, { d: 'Relationships', s: 5 }, { d: 'Recreation & Fun', s: 5 },
+    ];
+    const northStar = [
+      'Sell Plugverse for real money — or keep owning it at high returns.',
+      'Custom house with a music studio; city high-rise first, beach house later.',
+      'Stay lean and strong; create music as the primary creative outlet; golf regularly.',
+      'Travel the world; married, two kids, life without constant financial worry.',
+    ];
+    const priorities = [
+      'Run the Plugverse test that ends the not-knowing (brand-to-events / venue B2B).',
+      'Truist internship — strong finish, allocate income (max Roth, build buffer).',
+      'Relationships & social balance — proactive, not reactive.',
+    ];
+    // ====================================================================================
+
+    const fmtStatus = (s) => s >= 7 ? ['strong', 'var(--good)'] : s >= 5 ? ['holding', 'var(--muted)'] : ['at risk', 'var(--rust)'];
+    document.getElementById('synced').textContent = 'Auto-synced · ' + SYNCED;
+    const avg = (domains.reduce((a, x) => a + x.s, 0) / domains.length).toFixed(1);
+    document.getElementById('k-avg').textContent = avg + ' / 10';
+    const weak = [...domains].sort((a, b) => a.s - b.s)[0];
+    document.getElementById('k-weak').textContent = weak.s + '/10';
+    document.getElementById('k-weak-sub').textContent = weak.d;
+    document.getElementById('k-focus').textContent = focus.length;
+
+    document.getElementById('focus-list').innerHTML = focus.map((f, i) => `<li><span class="n">${i + 1}</span><span>${f}</span></li>`).join('');
+    document.getElementById('score-body').innerHTML = [...domains].sort((a, b) => b.s - a.s).map(x => {
+      const [lbl, clr] = fmtStatus(x.s);
+      return `<tr><td class="desc">${x.d}</td><td><span class="bar" style="width:${x.s * 9}px;background:${clr}"></span><b>${x.s}</b><span class="meta"> / 10</span></td><td style="color:${clr};font-family:'Geist Mono',monospace;font-size:.72rem;text-transform:uppercase;letter-spacing:.08em">${lbl}</td></tr>`;
+    }).join('');
+    document.getElementById('ns-list').innerHTML = northStar.map(n => `<li><span>${n}</span></li>`).join('');
+    document.getElementById('pri-list').innerHTML = priorities.map((p, i) => `<li><span class="n">${i + 1}</span><span>${p}</span></li>`).join('');
+  </script>
+</body>
+</html>

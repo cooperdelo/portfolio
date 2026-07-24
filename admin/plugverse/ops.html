@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="robots" content="noindex, nofollow, noarchive" />
+<title>Plugverse · Ops · CD Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Geist+Mono:wght@300..700&family=Geist:wght@300..700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/admin/_shell/admin-shell.css" />
+<style>
+  .lead-in{font-family:"Fraunces",serif;font-style:italic;font-size:1.05rem;color:var(--ink-2);max-width:64ch;line-height:1.4;margin:-.6rem 0 1.6rem}
+  .ro{font-family:"Geist Mono",monospace;font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:.14rem .5rem}
+  .pill.p1{color:var(--rust)}.pill.p2{color:var(--pastel-lavender)}.pill.warm{color:var(--good)}.pill.cold{color:var(--muted)}
+  .pill.green{color:var(--good)}.pill.red{color:var(--rust)}.pill.amber{color:#E7C97A}
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1.4rem}
+  @media(max-width:900px){.two-col{grid-template-columns:1fr}}
+  .llist{list-style:none;margin:.3rem 0 0;padding:0;display:flex;flex-direction:column;gap:.6rem}
+  .llist li{font-size:.88rem;color:var(--ink-2);line-height:1.45}.llist li b{color:var(--ink)}
+</style>
+</head>
+<body>
+  <main>
+    <div class="page-head">
+      <div>
+        <div class="eyebrow">Build · running the company</div>
+        <h1><span class="accent">Ops</span> — pipeline · team · QA</h1>
+      </div>
+      <div class="actions"><span class="live-dot" id="synced">Auto-synced</span><span class="ro">read-only</span></div>
+    </div>
+    <p class="lead-in">The operating layer under the KPIs — who's in the pipeline, who's on the team, and whether the build is green. Synced from the vault.</p>
+
+    <div class="kpi-grid">
+      <div class="card"><div class="label">Pipeline</div><div class="value" id="k-pipe">—</div><div class="delta flat">tracked leads</div></div>
+      <div class="card"><div class="label">Hot leads</div><div class="value" id="k-hot" style="color:var(--rust)">—</div><div class="delta flat">P1 · reach out now</div></div>
+      <div class="card"><div class="label">Team output</div><div class="value" style="font-size:1.4rem;color:var(--rust)">Low</div><div class="delta flat">interns ~0 deliverables — address</div></div>
+      <div class="card"><div class="label">Focus</div><div class="value" style="font-size:1.3rem">Brand→events</div><div class="delta flat">+ venue B2B (per verdict)</div></div>
+    </div>
+
+    <h2 class="section-h">Sales <span class="accent">pipeline</span></h2>
+    <div class="card" style="padding:0;overflow:hidden;"><div class="tbl-wrap"><table class="data">
+      <thead><tr><th>Lead</th><th>What they are</th><th>Next action</th><th>Priority</th></tr></thead>
+      <tbody id="pipe-body"></tbody>
+    </table></div></div>
+
+    <h2 class="section-h">Team</h2>
+    <div class="card" style="padding:0;overflow:hidden;"><div class="tbl-wrap"><table class="data">
+      <thead><tr><th>Person</th><th>Role</th><th>Status</th></tr></thead>
+      <tbody id="team-body"></tbody>
+    </table></div></div>
+
+    <div class="two-col">
+      <div class="card">
+        <h2 class="section-h" style="margin-top:0;">Build / QA <span class="accent">status</span></h2>
+        <ul class="llist" id="qa-list"></ul>
+      </div>
+      <div class="card">
+        <h2 class="section-h" style="margin-top:0;">Strategic <span class="accent">focus</span></h2>
+        <ul class="llist" id="strat-list"></ul>
+      </div>
+    </div>
+  </main>
+
+  <script type="module">
+    import { mountShell } from '/admin/_shell/admin-shell.js';
+    await mountShell({ title: 'Plugverse · Ops' });
+
+    // ==== AGENT-SYNCED DATA (nightly agent rewrites from Projects/plugverse + People/) ====
+    const SYNCED = '2026-07-24';
+    const pipeline = [
+      { n: 'Shawn Wilfong', w: 'Owns 4 Charlotte venues + musician (Southside Watt)', a: 'Warm intro via Carter Wilfong', pr: 'p1' },
+      { n: "Corey / Bob's", w: 'Franklin St venue owner', a: 'Text after exams (overdue)', pr: 'p1' },
+      { n: 'Willie / The Pitch', w: 'Franklin St founder hub + music community', a: 'Check-in; venue intros', pr: 'p2' },
+      { n: 'Dugout Entertainment', w: 'Booking / entertainment co', a: 'Owed thank-you + follow-up', pr: 'p2' },
+      { n: 'Roxanne Fortney', w: 'Connector — referral list', a: 'Follow the brokered intro', pr: 'p2' },
+      { n: 'Southend Entertainment', w: 'Booking contact', a: 'Keep-warm note', pr: 'cold' },
+    ];
+    const team = [
+      { p: 'Kendall Babb', r: 'Music marketing', s: 'warm', st: 'Paid by referral — active' },
+      { p: 'Lawson Keagy', r: 'Greek-life outreach (intern)', s: 'red', st: '~0 deliverables in ~2mo' },
+      { p: 'Liam Gates', r: 'Greek-life outreach (intern)', s: 'red', st: '~0 deliverables in ~2mo' },
+      { p: 'Griffin DeVivo', r: 'Greek-life outreach (intern)', s: 'red', st: '~0 deliverables in ~2mo' },
+      { p: 'Adler Rice', r: 'Pitch partner (0 equity)', s: 'warm', st: 'On-stage only — not operational' },
+    ];
+    const qa = [
+      '<b>Infra:</b> Stripe Connect, ticketing, QR redemption, brand-campaign checkout — all live code.',
+      '<b>QA:</b> chronic scheduled-QA silent-fails were root-caused (PowerShell parse / Chrome MCP) and patched.',
+      '<b>Revenue:</b> $0 GMV · 0 cold bookings ever — the model, not the build, is the open question.',
+    ];
+    const strat = [
+      '<b>Kill:</b> the artist booking-fee marketplace (validated dead).',
+      '<b>Test first:</b> brand-to-live-events transaction — infra already built, real unprompted signal.',
+      '<b>Watch:</b> venue talent-buyer B2B (advancing/settlement) — real payers, lower personal energy.',
+      '<b>This week:</b> phone calls, not code — brand field-marketing + venue talent buyers.',
+    ];
+    // ====================================================================================
+
+    document.getElementById('synced').textContent = 'Auto-synced · ' + SYNCED;
+    document.getElementById('k-pipe').textContent = pipeline.length;
+    document.getElementById('k-hot').textContent = pipeline.filter(p => p.pr === 'p1').length;
+    const prl = { p1: 'P1', p2: 'P2', cold: 'cold' };
+    document.getElementById('pipe-body').innerHTML = pipeline.map(p =>
+      `<tr><td class="desc">${p.n}</td><td class="meta">${p.w}</td><td>${p.a}</td><td><span class="pill ${p.pr}">${prl[p.pr]}</span></td></tr>`).join('');
+    const sl = { warm: 'active', red: 'stalled', amber: 'watch' };
+    document.getElementById('team-body').innerHTML = team.map(t =>
+      `<tr><td class="desc">${t.p}</td><td class="meta">${t.r}</td><td><span class="pill ${t.s}">${sl[t.s] || t.s}</span> <span class="meta">${t.st}</span></td></tr>`).join('');
+    document.getElementById('qa-list').innerHTML = qa.map(x => `<li>${x}</li>`).join('');
+    document.getElementById('strat-list').innerHTML = strat.map(x => `<li>${x}</li>`).join('');
+  </script>
+</body>
+</html>

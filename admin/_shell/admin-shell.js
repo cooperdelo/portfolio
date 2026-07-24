@@ -11,44 +11,46 @@ import { requireAdminOrRedirect, signOut, getSession, getAdminRole } from './sup
 
 // `roles` declares which admin_role values can see each nav item.
 // Default is both. Items not listed in `roles` are visible to everyone signed in.
+// Consolidated into 5 life domains (2026-07 redesign). Each domain groups the
+// pages that actually get used; deep/rarely-used reports live inside their
+// dashboard rather than as top-level rail items. Life pages are read-only and
+// auto-synced by the nightly/weekly agent.
 const NAV = [
   { section: 'Overview', items: [
     { href: '/admin/',                          label: 'Home' },
+  ]},
+  { section: 'Money', items: [
     { href: '/admin/finance/',                  label: 'Finance Dashboard' },
-  ]},
-  { section: 'Health', items: [
-    { href: '/admin/health/log.html',           label: 'Daily Log', roles: ['full'] },
-    { href: '/admin/health/dashboard.html',     label: 'Health Insights', roles: ['full'] },
-  ]},
-  { section: 'Academics', items: [
-    { href: '/admin/academics/',                label: 'Degree Progress', roles: ['full'] },
-  ]},
-  { section: 'Finance', items: [
+    { href: '/admin/finance/networth.html',     label: 'Net Worth', roles: ['full'] },
     { href: '/admin/finance/transactions.html', label: 'Transactions' },
     { href: '/admin/finance/entry.html',        label: 'Quick Add' },
     { href: '/admin/finance/investments.html',  label: 'Investments', roles: ['full'] },
+    { href: '/admin/finance/funding.html',      label: 'Funding Sources' },
+    { href: '/admin/finance/tax.html',          label: 'Tax Prep', roles: ['full'] },
+    { href: '/admin/finance/export.html',       label: 'Export XLSX', roles: ['full'] },
   ]},
-  { section: 'Inventory', items: [
-    { href: '/admin/merch/',                    label: 'Merch Tracker', roles: ['full'] },
+  { section: 'Health & Body', items: [
+    { href: '/admin/health/log.html',           label: 'Daily Log', roles: ['full'] },
+    { href: '/admin/health/dashboard.html',     label: 'Insights', roles: ['full'] },
   ]},
-  { section: 'Projects', items: [
-    { href: '/admin/plugverse/',                label: 'Plugverse KPIs' },
-    { href: '/admin/social/',                   label: 'Social Analytics', roles: ['full'] },
+  { section: 'Build · Plugverse', items: [
+    { href: '/admin/plugverse/',                label: 'KPIs' },
+    { href: '/admin/plugverse/ops.html',        label: 'Ops · pipeline · team · QA' },
+    { href: '/admin/finance/plugverse.html',    label: 'P&L' },
+    { href: '/admin/finance/fund.html',         label: '1789 Fund' },
+  ]},
+  { section: 'Life · auto-synced', items: [
+    { href: '/admin/life/',                     label: 'Review', roles: ['full'] },
+    { href: '/admin/life/relationships.html',   label: 'Relationships', roles: ['full'] },
+    { href: '/admin/life/music.html',           label: 'Music', roles: ['full'] },
+    { href: '/admin/academics/',                label: 'Academics', roles: ['full'] },
   ]},
   { section: 'Brand', items: [
+    { href: '/admin/social/',                   label: 'Content' },
     { href: '/admin/carousels/',                label: 'Carousel Studio', roles: ['full'] },
     { href: '/admin/playbook/',                 label: 'Playbook' },
     { href: '/admin/contacts/',                 label: 'Contacts' },
-  ]},
-  { section: 'Reports', items: [
-    { href: '/admin/finance/plugverse.html',    label: 'Plugverse P&L' },
-    { href: '/admin/finance/funding.html',      label: 'Funding Sources' },
-    { href: '/admin/finance/fund.html',         label: '1789 Fund' },
-    { href: '/admin/finance/food-log.html',     label: 'Food Log', roles: ['full'] },
-    { href: '/admin/finance/tax.html',          label: 'Tax Prep', roles: ['full'] },
-  ]},
-  { section: 'Data', items: [
-    { href: '/admin/finance/export.html',       label: 'Export XLSX', roles: ['full'] },
+    { href: '/admin/merch/',                    label: 'Merch Tracker', roles: ['full'] },
   ]},
 ];
 
