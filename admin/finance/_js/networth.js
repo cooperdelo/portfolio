@@ -50,7 +50,7 @@ const data = {
     { name: 'Variable ND filter', meta: '', cls: 'personal', value: 50, include: true },
     { name: 'tomtoc 22L bag', meta: '', cls: 'personal', value: 50, include: true },
     { name: 'Golf set — T100 irons · TSi3 driver + 3W · TM hybrid · 3× SM9 wedges · TM putter', meta: 'used: irons ~$700, TSi3 driver ~$260, TSi3 3W ~$200, hybrid ~$90, 3× SM9 ~$285, putter ~$175', cls: 'personal', value: 1710, include: true },
-    { name: 'Sony A7C II kit (+ Sigma 28-70 f/2.8 · 35mm f/1.4 · gimbal · light)', meta: 'PLANNED buy from the $20K — off until purchased', cls: 'plugverse', value: 4400, include: false },
+    { name: 'Sony A7C II kit (+ Sigma 28-70 f/2.8 · 35mm f/1.4 · gimbal · light)', meta: 'PLANNED buy from the $20K — off until purchased', cls: 'plugverse', value: 5000, include: false },
     { name: 'Car / vehicle', meta: 'parent-titled — not yours', cls: 'flag', value: null, include: false },
   ],
   liab: [
