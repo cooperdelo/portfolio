@@ -52,12 +52,12 @@ main, footer { position: relative; z-index: 1; }
   text-transform: uppercase; line-height: 0.85;
 }
 .display-italic {
-  font-family: "Fraunces", Georgia, serif;
+  font-family: "Spectral", Georgia, serif;
   font-style: italic; font-weight: 300;
   font-variation-settings: "opsz" 144, "WONK" 1, "SOFT" 100;
 }
 .display-serif {
-  font-family: "Fraunces", Georgia, serif;
+  font-family: "Spectral", Georgia, serif;
   font-weight: 400;
   font-variation-settings: "opsz" 144, "SOFT" 50;
 }
@@ -557,7 +557,7 @@ h1.poster {
   text-transform: uppercase;
 }
 h1.poster .accent {
-  font-family: "Fraunces", Georgia, serif;
+  font-family: "Spectral", Georgia, serif;
   font-style: italic; font-weight: 300; text-transform: none;
   font-variation-settings: "opsz" 144, "WONK" 1, "SOFT" 100;
   color: var(--rust);
@@ -569,7 +569,7 @@ h2.section-poster {
   text-transform: uppercase;
 }
 h2.section-poster .accent {
-  font-family: "Fraunces", Georgia, serif;
+  font-family: "Spectral", Georgia, serif;
   font-style: italic; font-weight: 300; text-transform: none;
   font-variation-settings: "opsz" 144, "WONK" 1, "SOFT" 100;
   color: var(--rust);
@@ -581,7 +581,7 @@ h3.row-poster {
   text-transform: uppercase;
 }
 
-.lede { font-family: "Fraunces", Georgia, serif; font-size: clamp(1.4rem, 2.4vw, 2.4rem); line-height: 1.18; }
+.lede { font-family: "Spectral", Georgia, serif; font-size: clamp(1.4rem, 2.4vw, 2.4rem); line-height: 1.18; }
 .body-prose { font-size: 1.08rem; line-height: 1.7; color: var(--ink-2); max-width: 38rem; }
 
 /* Number plate */
@@ -590,7 +590,7 @@ h3.row-poster {
   padding: 0.5rem 0.95rem; border-radius: 999px;
 }
 .plate .num {
-  font-family: "Fraunces", Georgia, serif; font-style: italic;
+  font-family: "Spectral", Georgia, serif; font-style: italic;
   font-size: 1.1rem; color: var(--rust);
 }
 
@@ -796,7 +796,7 @@ body.has-page-bg .ambient { display: none; }
   letter-spacing: -0.01em; color: var(--rust);
 }
 .wins-list .title {
-  font-family: "Fraunces", Georgia, serif;
+  font-family: "Spectral", Georgia, serif;
   font-size: clamp(1.2rem, 1.6vw, 1.6rem); line-height: 1.2;
 }
 .wins-list .when {
@@ -1153,7 +1153,7 @@ body.has-page-bg .ambient { display: none; }
   margin-bottom: 0.4rem; color: var(--ink);
 }
 .gear-card .gear-desc {
-  font-family: "Fraunces", Georgia, serif;
+  font-family: "Spectral", Georgia, serif;
   font-style: italic; font-size: 0.95rem;
   color: var(--ink-2); margin-bottom: 0.9rem;
   line-height: 1.4;
@@ -1513,7 +1513,7 @@ body.has-page-bg .ambient { display: none; }
 .trip-detail .trip-meta-row .accent { color: var(--rust); }
 .trip-detail .trip-meta-row span { color: var(--muted); }
 .trip-detail .trip-blurb {
-  font-family: "Fraunces", Georgia, serif;
+  font-family: "Spectral", Georgia, serif;
   font-size: clamp(1.05rem, 1.6vw, 1.3rem);
   line-height: 1.55;
   color: var(--ink-2);
@@ -2462,7 +2462,7 @@ footer.site {
 
 .travel-card.show-card .show-blurb {
   margin-top: 0.7rem;
-  font-family: 'Fraunces', 'Times New Roman', serif;
+  font-family: 'Spectral', 'Times New Roman', serif;
   font-size: 0.84rem;
   line-height: 1.45;
   color: rgba(244,239,230,0.85);
@@ -3458,7 +3458,7 @@ section.world-builder.has-bg {
 }
 .role-card p {
   margin: 0;
-  font-family: 'Fraunces', Georgia, serif;
+  font-family: 'Spectral', Georgia, serif;
   font-size: 0.92rem;
   line-height: 1.4;
   color: rgba(244,239,230,0.78);
@@ -3542,7 +3542,7 @@ footer.site > div {
 }
 .lineup-intro p {
   margin: 0.5rem 0 0 0;
-  font-family: 'Fraunces', Georgia, serif;
+  font-family: 'Spectral', Georgia, serif;
   font-size: 1.05rem;
   line-height: 1.35;
   color: rgba(244,239,230,0.92);
@@ -3571,7 +3571,7 @@ footer.site > div {
     drop-shadow(0 6px 14px rgba(255,77,46,0.18));
 }
 .setlist-sub {
-  font-family: 'Fraunces', Georgia, serif;
+  font-family: 'Spectral', Georgia, serif;
   font-size: clamp(1.05rem, 1.6vw, 1.4rem);
   line-height: 1.3;
   color: rgba(244,239,230,0.88);
@@ -3687,3 +3687,19 @@ footer.site > div {
     line-height: 0.92 !important;
   }
 }
+
+
+/* ============================================================
+   2026-08 refresh
+   - remove the 01..08 section numbers (keep the small label pill)
+   - remove the rust caption dot and the pulsing "live" dot
+   - editorial serif is now Spectral, upright (no AI italic serif)
+   ============================================================ */
+.plate .num { display: none !important; }
+.caption-shard::before { display: none !important; }
+.fx-live-dot::before { display: none !important; }
+.display-italic,
+h1 .accent, h2 .accent, h3 .accent,
+.lede { font-style: normal !important; }
+/* Spectral carries a touch less weight than Fraunces at display size */
+h1.poster .accent, h2.section-poster .accent { font-weight: 500; }
