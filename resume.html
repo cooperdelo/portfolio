@@ -34,8 +34,7 @@
   /* Deeper, darker surface for this page + vintage grain */
   body.resume-page {
     background:
-      radial-gradient(ellipse at 20% 0%, rgba(255,77,46,0.10) 0%, rgba(255,77,46,0) 55%),
-      radial-gradient(ellipse at 90% 85%, rgba(107,63,160,0.10) 0%, rgba(107,63,160,0) 55%),
+      radial-gradient(ellipse at 20% 0%, rgba(244,239,230,0.05) 0%, rgba(244,239,230,0) 55%),
       linear-gradient(180deg, #060504 0%, #0A0908 45%, #0d0b09 100%);
   }
   /* Heavier engraved grain layer, sits above the base but under content */
@@ -63,25 +62,17 @@
     font-size: clamp(2.9rem, 9vw, 7rem);
     line-height: 0.92; letter-spacing: -0.01em;
     text-transform: uppercase;
-    color: #17140f;
-    /* Multi-layer text-shadow = engraved / pressed-into-surface feel */
-    text-shadow:
-      0 1px 0 rgba(255,255,255,0.10),
-      0 -1px 0 rgba(0,0,0,0.9),
-      0 -2px 1px rgba(0,0,0,0.7),
-      0 2px 2px rgba(255,255,255,0.06),
-      0 3px 6px rgba(0,0,0,0.5);
-    background: linear-gradient(180deg, #efe7d8 0%, #c9c0af 48%, #8f887a 100%);
+    color: #f3eee4;
+    background: linear-gradient(180deg, #f7f2e8 0%, #ded6c6 55%, #b3aa99 100%);
     -webkit-background-clip: text; background-clip: text;
     -webkit-text-fill-color: transparent;
     filter: drop-shadow(0 3px 10px rgba(0,0,0,0.6));
   }
-  .engraved-name .dot { color: var(--rust); -webkit-text-fill-color: var(--rust); }
 
   .resume-subtitle {
     margin-top: 1.5rem;
-    font-family: "Spectral", Georgia, serif; font-style: italic; font-weight: 300;
-    font-variation-settings: "opsz" 144, "WONK" 1, "SOFT" 100;
+    font-family: "Spectral", Georgia, serif; font-weight: 300;
+    font-variation-settings: "opsz" 144, "WONK" 0, "SOFT" 100;
     font-size: clamp(1.05rem, 2.2vw, 1.6rem);
     color: var(--ink-2); line-height: 1.35;
   }
@@ -92,7 +83,7 @@
     letter-spacing: 0.14em; font-size: 0.72rem; color: var(--muted);
   }
   .resume-contact a { color: var(--ink-2); transition: color 0.3s; }
-  .resume-contact a:hover { color: var(--rust); }
+  .resume-contact a:hover { color: var(--ink); }
 
   .resume-actions { margin-top: 2.4rem; display: flex; justify-content: center; }
   .download-btn {
@@ -132,8 +123,7 @@
     box-shadow:
       0 1px 0 rgba(244,239,230,0.12) inset,
       0 -1px 0 rgba(0,0,0,0.5) inset,
-      0 30px 90px -32px rgba(0,0,0,0.75),
-      0 60px 120px -50px rgba(255,77,46,0.12);
+      0 30px 90px -32px rgba(0,0,0,0.75);
     transform: perspective(1400px) rotateX(1.2deg);
     transform-style: preserve-3d;
     transition: transform 0.7s cubic-bezier(0.22,1,0.36,1), border-color 0.5s, box-shadow 0.5s;
@@ -141,12 +131,11 @@
   }
   .resume-plate:hover {
     transform: perspective(1400px) rotateX(0deg) translateY(-4px);
-    border-color: rgba(255,77,46,0.32);
+    border-color: rgba(244,239,230,0.3);
     box-shadow:
       0 1px 0 rgba(244,239,230,0.16) inset,
       0 -1px 0 rgba(0,0,0,0.5) inset,
-      0 40px 110px -32px rgba(0,0,0,0.85),
-      0 80px 150px -50px rgba(255,77,46,0.35);
+      0 40px 110px -32px rgba(0,0,0,0.85);
   }
   /* engraved top sheen on each plate */
   .resume-plate::before {
@@ -170,11 +159,7 @@
     margin-bottom: 1.6rem;
     display: flex; align-items: baseline; gap: 1rem;
   }
-  .plate-title .idx {
-    font-family: "Spectral", Georgia, serif; font-style: italic; font-weight: 300;
-    font-size: 1rem; color: var(--rust); -webkit-text-fill-color: initial;
-    text-shadow: none;
-  }
+  .plate-title .idx { display: none; }
 
   /* ── Entries ── */
   .entry { padding: 1.2rem 0; border-top: 1px solid rgba(244,239,230,0.10); }
@@ -194,7 +179,7 @@
   .entry-role {
     margin-top: 0.25rem;
     font-family: "Geist Mono", monospace; text-transform: uppercase;
-    letter-spacing: 0.16em; font-size: 0.74rem; color: var(--rust);
+    letter-spacing: 0.16em; font-size: 0.74rem; color: var(--ink);
   }
   .entry-sub {
     margin-top: 0.1rem;
@@ -207,9 +192,9 @@
     font-size: 0.98rem; line-height: 1.55; color: var(--ink-2); max-width: 62ch;
   }
   .entry ul li::before {
-    content: ""; position: absolute; left: 0; top: 0.62em;
-    width: 6px; height: 6px; border-radius: 50%;
-    background: var(--rust); box-shadow: 0 0 8px rgba(255,77,46,0.7);
+    content: ""; position: absolute; left: 0; top: 0.7em;
+    width: 0.7rem; height: 1px;
+    background: rgba(244,239,230,0.35);
   }
 
   /* Education block (compact) */
@@ -217,7 +202,7 @@
   .edu-meta { margin-top: 0.35rem; color: var(--ink-2); font-size: 0.98rem; line-height: 1.55; }
   .edu-gpa {
     margin-top: 0.6rem; font-family: "Geist Mono", monospace; text-transform: uppercase;
-    letter-spacing: 0.14em; font-size: 0.72rem; color: var(--rust);
+    letter-spacing: 0.14em; font-size: 0.72rem; color: var(--ink-2);
   }
 
   /* Additional info — tag chips */
@@ -237,7 +222,7 @@
     box-shadow: 0 1px 0 rgba(244,239,230,0.08) inset;
     transition: border-color 0.3s, color 0.3s;
   }
-  .chip:hover { border-color: rgba(255,77,46,0.4); color: var(--ink); }
+  .chip:hover { border-color: rgba(244,239,230,0.4); color: var(--ink); }
   .info-text { color: var(--ink-2); font-size: 0.95rem; line-height: 1.6; }
 
   @media (max-width: 640px) {
