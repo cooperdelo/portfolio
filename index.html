@@ -1,472 +1,501 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-<link rel="alternate icon" type="image/png" href="/favicon-32.png" sizes="32x32" />
-<link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
-<link rel="manifest" href="/site.webmanifest" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Cooper Delo</title>
-<meta name="description" content="Builder · Musician · Athlete · Lens. Plugverse, Rubber Band, 34,000+ streams." />
-<meta property="og:type" content="website" />
-<meta property="og:title" content="Cooper Delo" />
-<meta property="og:description" content="Builder · Musician · Athlete · Lens" />
-<meta property="og:image" content="https://cooperdelo.com/photos/og-cover.png" />
-<meta property="og:image:width" content="1200" />
-<meta property="og:image:height" content="1200" />
-<meta property="og:url" content="https://cooperdelo.com" />
-<meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="Cooper Delo" />
-<meta name="twitter:description" content="Builder · Musician · Athlete · Lens" />
-<meta name="twitter:image" content="https://cooperdelo.com/photos/og-cover.png" />
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link rel="preload" as="image" href="photos/hero.jpg?v=2" fetchpriority="high" />
-<link rel="preload" as="style" href="shell.css" />
-<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&family=Geist+Mono:wght@400;500&family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="shell.css" />
-<style>
-  /* Hero (page-specific) */
-  section.hero { min-height: 100vh; padding: 6rem 2.4rem 3rem; display: flex; flex-direction: column; justify-content: flex-end; position: relative; perspective: 1600px; }
-  .hero-meta { position: absolute; top: 6.4rem; left: 2.4rem; right: 2.4rem; display: flex; justify-content: space-between; opacity: 0.85; font-family: "Geist Mono", monospace; text-transform: uppercase; letter-spacing: 0.2em; font-size: 0.72rem; color: var(--ink); text-shadow: 0 1px 8px rgba(0,0,0,0.5); }
-  .hero h1 {
-    margin-top: 1.6rem;
-    transform-style: preserve-3d;
-    will-change: transform;
-    transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
-    filter:
-      drop-shadow(0 1px 0 rgba(255,255,255,0.18))
-      drop-shadow(0 30px 60px rgba(0,0,0,0.55))
-      drop-shadow(0 6px 14px rgba(255,77,46,0.15));
-  }
-  .hero h1 .row { display: block; overflow: hidden; }
-  .hero h1 .row span { display: inline-block; transform: translateY(110%); transition: transform 1.2s cubic-bezier(0.22, 1, 0.36, 1); }
-  .hero h1.in .row span { transform: translateY(0); }
-  .hero h1 .row > span {
-    background: linear-gradient(180deg, #FFF8EC 0%, #F4EFE6 45%, #C2B7A4 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    color: transparent;
-  }
-  .hero h1 .row.delo > span,
-  .hero h1 .row > span.accent {
-    background: linear-gradient(180deg, #FFAA8C 0%, #FF6A47 45%, #B8442B 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cooper Delo. Builder, bassist, founder of Plugverse.</title>
+  <meta name="description" content="Cooper Delo builds Plugverse, plays bass in Rubber Band, and ships things from Chapel Hill. One page. Everything actionable." />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
+  <meta property="og:title" content="Cooper Delo" />
+  <meta property="og:description" content="Founder of Plugverse. Bassist in Rubber Band. Builds and ships from Chapel Hill." />
+  <meta property="og:image" content="https://cooperdelo.com/photos/og-cover.png" />
+  <meta property="og:url" content="https://cooperdelo.com" />
 
-  .hero-bottom { margin-top: 3.5rem; display: flex; flex-direction: column; gap: 2rem; }
-  @media (min-width: 900px) { .hero-bottom { flex-direction: row; justify-content: space-between; align-items: flex-end; } }
-  .hero-bottom .lead-glass {
-    max-width: 34rem;
-    padding: 1.4rem 1.6rem;
-    border-radius: 22px;
-    background: rgba(244,239,230,0.06);
-    backdrop-filter: blur(26px) saturate(160%);
-    -webkit-backdrop-filter: blur(26px) saturate(160%);
-    border: 1px solid rgba(244,239,230,0.18);
-    box-shadow:
-      0 1px 0 rgba(244,239,230,0.22) inset,
-      0 -1px 0 rgba(0,0,0,0.4) inset,
-      0 32px 80px -28px rgba(0,0,0,0.7);
-    position: relative;
-    overflow: hidden;
-  }
-  .hero-bottom .lead-glass::before {
-    content: ""; position: absolute; inset: 0; pointer-events: none;
-    background: linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0) 60%);
-  }
-  .hero-bottom .lead {
-    font-family: "Spectral", Georgia, serif;
-    font-size: clamp(1.3rem, 1.9vw, 1.9rem);
-    line-height: 1.22; color: var(--ink);
-    text-shadow: 0 1px 12px rgba(0,0,0,0.5);
-  }
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Spectral:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="preload" as="image" href="photos/gig_rubber_big_stage_1.jpg" />
 
-  .role-glass { padding: 0.5rem 0.9rem 0.5rem 1.2rem; border-radius: 999px; display: inline-flex; align-items: center; gap: 1.1rem; }
-  .role-track { height: 2.4rem; overflow: hidden; font-family: "Anton", Impact, sans-serif; font-size: 1.9rem; line-height: 2.4rem; color: var(--rust); text-transform: uppercase; }
-  .role-track .inner { transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1); }
-  .role-track .inner span { display: block; height: 2.4rem; }
-  .scroll-cue { position: absolute; bottom: 1.5rem; left: 50%; transform: translateX(-50%); color: var(--ink); font-family: "Geist Mono", monospace; text-transform: uppercase; letter-spacing: 0.3em; font-size: 0.7rem; text-shadow: 0 1px 8px rgba(0,0,0,0.5); }
-</style>
+  <style>
+    :root {
+      --bg: #0b0a09;
+      --ink: #f3efe8;
+      --dim: rgba(243, 239, 232, 0.62);
+      --faint: rgba(243, 239, 232, 0.38);
+      --rust: #c4553a;
+      --glass: rgba(16, 14, 12, 0.42);
+      --glass-strong: rgba(14, 12, 10, 0.62);
+      --edge: rgba(243, 239, 232, 0.14);
+      --edge-hover: rgba(243, 239, 232, 0.34);
+      --radius: 20px;
+      --mono: "Geist Mono", ui-monospace, monospace;
+      --serif: "Spectral", Georgia, serif;
+      --display: "Anton", Impact, sans-serif;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--serif);
+      font-weight: 300;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    ::selection { background: var(--rust); color: var(--ink); }
+
+    /* ---------- primitives ---------- */
+
+    .mono {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.22em;
+    }
+
+    .glass {
+      background: var(--glass);
+      -webkit-backdrop-filter: blur(18px) saturate(140%);
+      backdrop-filter: blur(18px) saturate(140%);
+      border: 1px solid var(--edge);
+      border-radius: var(--radius);
+    }
+
+    .wrap { max-width: 1280px; margin: 0 auto; padding: 0 clamp(1.2rem, 4vw, 3rem); }
+
+    a { color: inherit; text-decoration: none; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.7em;
+      padding: 0.95rem 1.5rem;
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: var(--ink);
+      background: var(--glass);
+      -webkit-backdrop-filter: blur(18px) saturate(140%);
+      backdrop-filter: blur(18px) saturate(140%);
+      border: 1px solid var(--edge);
+      border-radius: 999px;
+      transition: border-color 0.25s ease, background 0.25s ease, transform 0.25s ease;
+      white-space: nowrap;
+    }
+    .btn:hover { border-color: var(--edge-hover); transform: translateY(-2px); }
+    .btn .arr { font-family: var(--serif); font-size: 1rem; line-height: 1; transition: transform 0.25s ease; }
+    .btn:hover .arr { transform: translate(2px, -2px); }
+    .btn.primary { background: var(--rust); border-color: var(--rust); }
+    .btn.primary:hover { background: #d2603f; border-color: #d2603f; }
+
+    /* ---------- reveal ---------- */
+
+    .reveal { opacity: 0; transform: translateY(26px); transition: opacity 0.8s ease, transform 0.8s ease; }
+    .reveal.in { opacity: 1; transform: none; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .reveal { opacity: 1; transform: none; transition: none; }
+      html { scroll-behavior: auto; }
+    }
+
+    /* ---------- photo scenes ---------- */
+
+    .scene {
+      position: relative;
+      isolation: isolate;
+    }
+    .scene::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -2;
+      background-size: cover;
+      background-position: center;
+    }
+    .scene::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      background:
+        linear-gradient(to bottom, rgba(11,10,9,0.92) 0%, rgba(11,10,9,0.55) 22%, rgba(11,10,9,0.55) 78%, rgba(11,10,9,0.96) 100%);
+    }
+
+    /* ---------- nav ---------- */
+
+    nav {
+      position: fixed;
+      top: 1rem;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      gap: 1.6rem;
+      padding: 0.7rem 1.4rem;
+      border-radius: 999px;
+      width: max-content;
+      max-width: calc(100vw - 2rem);
+    }
+    nav .name { font-family: var(--display); font-size: 0.95rem; letter-spacing: 0.06em; text-transform: uppercase; }
+    nav a.mono { color: var(--dim); transition: color 0.2s ease; }
+    nav a.mono:hover { color: var(--ink); }
+
+    /* ---------- hero ---------- */
+
+    .hero {
+      min-height: 100svh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding-bottom: clamp(2.5rem, 6vh, 5rem);
+    }
+    .hero::before { background-image: url("photos/gig_rubber_big_stage_1.jpg"); }
+
+    .hero h1 {
+      font-family: var(--display);
+      font-weight: 400;
+      font-size: clamp(4.2rem, 14.5vw, 13.5rem);
+      line-height: 0.92;
+      letter-spacing: 0.01em;
+      text-transform: uppercase;
+      margin-bottom: 1.6rem;
+    }
+    .hero .lede {
+      font-size: clamp(1.15rem, 2vw, 1.5rem);
+      max-width: 34em;
+      color: var(--dim);
+      font-style: italic;
+      margin-bottom: 2.4rem;
+    }
+    .hero .lede b { color: var(--ink); font-weight: 500; font-style: normal; }
+
+    .actions { display: flex; flex-wrap: wrap; gap: 0.8rem; }
+
+    .hero .meta-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-top: 3rem;
+      color: var(--faint);
+      flex-wrap: wrap;
+    }
+
+    /* ---------- sections ---------- */
+
+    section { padding: clamp(5rem, 12vh, 9rem) 0; }
+
+    .kicker {
+      display: inline-block;
+      padding: 0.5rem 1rem;
+      border-radius: 999px;
+      color: var(--dim);
+      margin-bottom: 2.2rem;
+    }
+
+    h2 {
+      font-family: var(--display);
+      font-weight: 400;
+      text-transform: uppercase;
+      font-size: clamp(2.6rem, 6.5vw, 5.5rem);
+      line-height: 0.95;
+      letter-spacing: 0.01em;
+      margin-bottom: clamp(2rem, 5vh, 3.5rem);
+    }
+    h2 .thin { color: var(--faint); }
+
+    /* ---------- work ---------- */
+
+    .feature {
+      display: grid;
+      grid-template-columns: 1.15fr 1fr;
+      overflow: hidden;
+      margin-bottom: 1.2rem;
+    }
+    .feature .txt { padding: clamp(1.8rem, 4vw, 3.2rem); display: flex; flex-direction: column; }
+    .feature h3 {
+      font-family: var(--display);
+      font-weight: 400;
+      text-transform: uppercase;
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      line-height: 1;
+      margin: 0.9rem 0 1.1rem;
+    }
+    .feature p { color: var(--dim); max-width: 46ch; }
+    .feature .img { position: relative; min-height: 320px; }
+    .feature .img img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    .feature .img::after {
+      content: "";
+      position: absolute; inset: 0;
+      background: linear-gradient(to right, rgba(14,12,10,0.55), rgba(14,12,10,0) 45%);
+    }
+
+    .stats { display: flex; flex-wrap: wrap; gap: 0.6rem; margin: 1.6rem 0 2rem; }
+    .stat {
+      padding: 0.55rem 0.95rem;
+      border: 1px solid var(--edge);
+      border-radius: 12px;
+      font-family: var(--mono);
+      font-size: 0.66rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--dim);
+    }
+    .stat b { color: var(--ink); font-weight: 500; }
+
+    .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.2rem; }
+    .card {
+      padding: clamp(1.6rem, 3vw, 2.2rem);
+      display: flex;
+      flex-direction: column;
+      gap: 0.9rem;
+      transition: border-color 0.25s ease, transform 0.25s ease;
+    }
+    a.card:hover { border-color: var(--edge-hover); transform: translateY(-4px); }
+    .card h3 {
+      font-family: var(--display);
+      font-weight: 400;
+      text-transform: uppercase;
+      font-size: 1.45rem;
+      line-height: 1.05;
+      letter-spacing: 0.02em;
+    }
+    .card p { color: var(--dim); font-size: 1rem; flex: 1; }
+    .card .go { color: var(--ink); }
+
+    /* ---------- band ---------- */
+
+    .band::before { background-image: url("photos/bobs_bar_gig_pic.jpeg"); }
+    .band-panel {
+      background: var(--glass-strong);
+      -webkit-backdrop-filter: blur(22px) saturate(140%);
+      backdrop-filter: blur(22px) saturate(140%);
+      border: 1px solid var(--edge);
+      border-radius: var(--radius);
+      padding: clamp(2rem, 4.5vw, 3.5rem);
+      max-width: 720px;
+    }
+    .band-panel p.big { font-size: clamp(1.1rem, 1.8vw, 1.35rem); color: var(--dim); margin-bottom: 1.6rem; }
+    .band-panel p.big b { color: var(--ink); font-weight: 500; }
+
+    /* ---------- about ---------- */
+
+    .about-grid { display: grid; grid-template-columns: 1.3fr 1fr; gap: clamp(2rem, 5vw, 4rem); align-items: center; }
+    .about-grid .portrait { overflow: hidden; border-radius: var(--radius); border: 1px solid var(--edge); }
+    .about-grid .portrait img { width: 100%; height: 100%; object-fit: cover; display: block; aspect-ratio: 4 / 3; }
+    .about p { font-size: clamp(1.1rem, 1.7vw, 1.3rem); color: var(--dim); margin-bottom: 1.2rem; max-width: 54ch; }
+    .about p b { color: var(--ink); font-weight: 500; }
+
+    /* ---------- signals ---------- */
+
+    .rows { display: flex; flex-direction: column; }
+    .row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 1.5rem;
+      padding: 1.4rem 0.4rem;
+      border-top: 1px solid var(--edge);
+      transition: background 0.2s ease, padding-left 0.25s ease;
+    }
+    .row:last-child { border-bottom: 1px solid var(--edge); }
+    .row:hover { background: rgba(243,239,232,0.04); padding-left: 1rem; }
+    .row .label { font-family: var(--display); text-transform: uppercase; font-size: clamp(1.3rem, 3vw, 2.1rem); letter-spacing: 0.02em; }
+    .row .sub { color: var(--faint); font-size: 0.95rem; font-style: italic; flex: 1; }
+    .row .mono { color: var(--dim); }
+
+    /* ---------- footer ---------- */
+
+    footer { padding: clamp(4rem, 10vh, 7rem) 0 2.5rem; text-align: center; }
+    footer .email {
+      font-family: var(--display);
+      text-transform: uppercase;
+      font-size: clamp(1.6rem, 5vw, 3.6rem);
+      letter-spacing: 0.02em;
+      transition: color 0.25s ease;
+    }
+    footer .email:hover { color: var(--rust); }
+    footer .fine { margin-top: 2.2rem; color: var(--faint); display: flex; justify-content: center; gap: 2rem; flex-wrap: wrap; }
+
+    /* ---------- responsive ---------- */
+
+    @media (max-width: 900px) {
+      .feature { grid-template-columns: 1fr; }
+      .feature .img { min-height: 260px; order: -1; }
+      .feature .img::after { background: linear-gradient(to top, rgba(14,12,10,0.55), rgba(14,12,10,0) 45%); }
+      .cards { grid-template-columns: 1fr; }
+      .about-grid { grid-template-columns: 1fr; }
+      nav .hide-m { display: none; }
+      .scene::before { background-attachment: scroll; }
+    }
+  </style>
 </head>
-<body class="grain">
+<body>
 
-<!-- Loader -->
-<div class="loader" id="loader">
-  <div class="label">Cooper Delo / Portfolio 2026</div>
-  <div class="name">Cooper<br/>Delo.</div>
-  <div class="progress"></div>
-</div>
+  <nav class="glass">
+    <span class="name">Cooper Delo</span>
+    <a class="mono hide-m" href="#work">Work</a>
+    <a class="mono hide-m" href="#band">Band</a>
+    <a class="mono hide-m" href="#about">About</a>
+    <a class="mono" href="https://cal.com/cooper-delo" target="_blank" rel="noreferrer">Book a time</a>
+  </nav>
 
-<!-- Page transition veil -->
-<div class="transition-veil" id="veil"><span class="label"></span></div>
-
-<!-- Three.js background -->
-<canvas class="scene-canvas" id="scene-canvas"></canvas>
-
-<!-- Custom cursor -->
-<div class="cursor" id="cursor"></div>
-
-<nav class="top" id="topnav">
-  <a href="index.html" class="nav-logo" data-cursor="HOME" data-no-transition>Cooper Delo</a>
-  <div class="nav-pill">
-    <div class="nav-links" id="navLinks">
-      <span class="nav-indicator" id="navIndicator"></span>
-      <a href="index.html" class="nav-link active" data-cursor="VIEW" data-no-transition>Home</a>
-      <a href="plugverse.html" class="nav-link" data-cursor="VIEW" data-transition="PLUGVERSE">Plugverse</a>
-      <a href="rubber-band.html" class="nav-link" data-cursor="VIEW" data-transition="MUSIC">Music</a>
-      <a href="athletic.html" class="nav-link" data-cursor="VIEW" data-transition="ATHLETIC">Athletic</a>
-      <a href="lens.html" class="nav-link" data-cursor="VIEW" data-transition="LENS">Lens</a>
-      <a href="now.html" class="nav-link" data-cursor="VIEW" data-transition="NOW">Now</a>
-    </div>
-  </div>
-  <button class="nav-cta" data-cursor="OPEN" data-contact>Get in touch</button>
-</nav>
-<div class="nav-progress-track"><div class="nav-progress" id="navProgress"></div></div>
-
-<main>
-
-<section class="hero">
-  <div class="hero-bg">
-    <img src="photos/hero.jpg?v=2" alt="Cooper Delo pitching Plugverse at UNC Innovate Carolina Junction" fetchpriority="high" />
-  </div>
-
-  <div class="hero-meta">
-    <span>Portfolio / 2026</span><span>35.913N / 79.056W</span><span>Vol. 01</span>
-  </div>
-
-  <h1 id="hero-title" class="poster">
-    <span class="row"><span>Cooper</span></span>
-    <span class="row"><span class="accent">Delo.</span></span>
-  </h1>
-
-  <div class="hero-bottom">
-    <div class="lead-glass">
-      <p class="lead">Plugverse · Rubber Band · Cooper Delo. Building the booking layer for local music.</p>
-    </div>
-    <div class="role-glass glass">
-      <span class="eyebrow">Role</span>
-      <div class="role-track"><div class="inner" id="roleInner">
-        <span>Builder.</span><span>Founder.</span><span>Musician.</span><span>Student.</span><span>Writer.</span>
-      </div></div>
-    </div>
-  </div>
-
-  <div class="scroll-cue">Scroll</div>
-</section>
-
-<div class="marquee-band">
-  <div class="marquee-track">
-    <span>Plugverse</span><span>Rubber Band</span><span>Cooper Delo</span><span>UNC Chapel Hill</span><span>Truist 2026</span><span>1789 Fund</span><span>Chi Phi</span>
-    <span>Plugverse</span><span>Rubber Band</span><span>Cooper Delo</span><span>UNC Chapel Hill</span><span>Truist 2026</span><span>1789 Fund</span><span>Chi Phi</span>
-  </div>
-</div>
-
-<!-- Manifesto: header on the photo, paragraphs in floating glass containers -->
-<section class="glass-section">
-  <div class="gs-bg">
-    <img src="photos/thailand_trip_canal_house.jpg" alt="" loading="lazy" />
-  </div>
-  <div class="grid">
-    <div class="col-12">
-      <div class="manifesto-card reveal">
-        <span class="plate glass"><span class="num">01</span><span class="eyebrow" style="margin:0;">Manifesto</span></span>
-        <p class="lede" style="margin-top: 1.5rem;">Build. Ship. Learn what hit. Run it back.</p>
-        <p class="body-prose" style="margin-top: 1rem;">Junior at UNC. Business and CS.</p>
+  <!-- HERO -->
+  <header class="hero scene">
+    <div class="wrap">
+      <p class="mono reveal" style="color: var(--dim); margin-bottom: 1.2rem;">Chapel Hill, NC. 35.913N / 79.056W</p>
+      <h1 class="reveal">Cooper<br />Delo</h1>
+      <p class="lede reveal">I build <b>Plugverse</b>, play bass in <b>Rubber Band</b>, and ship things before I sleep. Everything I make is on this page. Pick a door.</p>
+      <div class="actions reveal">
+        <a class="btn primary" href="https://plugverse.app" target="_blank" rel="noreferrer">Open Plugverse <span class="arr">&#8599;</span></a>
+        <a class="btn" href="#band">Book the band</a>
+        <a class="btn" href="https://cal.com/cooper-delo" target="_blank" rel="noreferrer">Book a time <span class="arr">&#8599;</span></a>
+        <a class="btn" href="resume.html">Resume</a>
+      </div>
+      <div class="meta-row mono reveal">
+        <span>UNC Chapel Hill. CS + Business.</span>
+        <span>Founder. Bassist. Builder.</span>
       </div>
     </div>
-  </div>
-</section>
+  </header>
 
-<!-- Plugverse -->
-<section class="block world-plugverse has-bg">
-  <div class="section-bg">
-    <img src="photos/plugverse-background.jpg" alt="" loading="lazy" />
-  </div>
-  <div class="fx-cable">
-    <svg viewBox="0 0 1400 800" preserveAspectRatio="none">
-      <path class="cable-line" d="M -20 720 Q 200 720 280 600 T 600 480 T 920 360 T 1280 200 L 1380 160" />
-      <circle class="cable-plug" cx="1380" cy="160" r="10" />
-    </svg>
-  </div>
-  <div class="grid">
-    <div class="col-6">
-      <div class="reveal">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-          <span class="plate glass"><span class="num">02</span><span class="eyebrow" style="margin:0;">The headline project</span></span>
-          <span class="eyebrow">Live at plugverse.app</span>
-        </div>
-        <h2 class="section-poster" style="display: block; font-size: clamp(3.4rem, 9.5vw, 9rem);">PLUG<span class="accent">verse.</span></h2>
-        <p class="lede" style="margin-top: 2rem;">Every gig starts from scratch. Bio, setlist, rate, contract. No LinkedIn for local music. That's what I'm building.</p>
-        <div class="stats" style="margin-top: 2rem;">
-          <div class="stat-card glass"><span class="label">Founded</span><span class="value">Nov 2024</span></div>
-          <div class="stat-card glass"><span class="label">Funding</span><span class="value">$21,850</span></div>
-          <div class="stat-card glass"><span class="label">Built by</span><span class="value">One person</span></div>
-          <div class="stat-card glass"><span class="label">Status</span><span class="value">Private beta</span></div>
-        </div>
-        <div style="display: flex; gap: 1.6rem; flex-wrap: wrap; margin-top: 2.5rem;">
-          <a href="plugverse.html" class="under" data-cursor="DEEP DIVE" data-transition="PLUGVERSE" style="font-family: 'Geist Mono', monospace; text-transform: uppercase; letter-spacing: 0.22em; font-size: 0.78rem; color: var(--rust);">Read the full story</a>
-          <a href="https://plugverse.app" target="_blank" rel="noreferrer" data-cursor="VISIT" data-no-transition onclick="window.open(this.href,'_blank');return false;" class="under" style="font-family: 'Geist Mono', monospace; text-transform: uppercase; letter-spacing: 0.22em; font-size: 0.78rem; color: var(--ink);">Visit plugverse.app ↗</a>
-        </div>
-      </div>
-    </div>
-    <div class="col-6">
-      <div class="reveal" style="display: flex; flex-direction: column; gap: 1rem; max-width: 420px; margin: 0 auto;">
-        <div class="photo-frame" style="margin: 0; padding: 6px 0 38px;">
-          <div class="photo has-media square">
-            <img src="photos/Plugverse_picture.jpeg" alt="Plugverse brand: PLUG IN. guitar plug visual" loading="lazy" />
+  <!-- WORK -->
+  <section id="work">
+    <div class="wrap">
+      <span class="kicker mono glass reveal">The work</span>
+      <h2 class="reveal">Things you can<br /><span class="thin">actually use.</span></h2>
+
+      <a class="feature glass reveal" href="https://plugverse.app" target="_blank" rel="noreferrer">
+        <div class="txt">
+          <span class="mono" style="color: var(--rust);">Flagship</span>
+          <h3>Plugverse</h3>
+          <p>The booking layer for local music. Artists get a page that says who they are, what they charge, when they are free, contract included. Venues book in minutes instead of group chats.</p>
+          <div class="stats">
+            <span class="stat">Founded <b>Nov 2024</b></span>
+            <span class="stat">Funding <b>$21,850</b></span>
+            <span class="stat">Built by <b>one person</b></span>
           </div>
-          <div class="caption-shard glass-light" style="position: static; margin-top: 0.5rem; transform: rotate(-1.2deg); font-size: 0.62rem;">Plugverse / brand / 2026</div>
+          <span class="mono go">Open plugverse.app &#8599;</span>
         </div>
-        <div class="photo-frame" style="margin: 0; padding: 6px 0 38px;">
-          <div class="photo has-media landscape">
-            <img src="photos/luby_pic_with_check.jpg" alt="Luby Pitch Competition $20K win" loading="lazy" />
+        <div class="img"><img src="photos/hero.jpg" alt="Cooper pitching Plugverse at Innovate Carolina" loading="lazy" /></div>
+      </a>
+
+      <div class="cards">
+        <div class="card glass reveal">
+          <span class="mono" style="color: var(--faint);">2026 / Claude + Supabase</span>
+          <h3>Personal AI Operating System</h3>
+          <p>A 300-file vault with twelve advisor agents that runs my schedule, finances, and half of this site. It logged the coffee I bought this morning.</p>
+        </div>
+        <a class="card glass reveal" href="resume.html">
+          <span class="mono" style="color: var(--faint);">2026 / Next.js + OpenAI</span>
+          <h3>Resume Generator</h3>
+          <p>Got tired of re-typing my resume into every portal, so I built the tool that does it for me. The resume on this site came out of it.</p>
+          <span class="mono go">See the output &#8599;</span>
+        </a>
+        <div class="card glass reveal">
+          <span class="mono" style="color: var(--faint);">Summers 2025 + 2026</span>
+          <h3>Truist &amp; CleverCX</h3>
+          <p>Enterprise tech in Truist's 2026 T&amp;I program. Before that, AI product features at CleverCX, a fintech serving advisors.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BAND -->
+  <section id="band" class="band scene">
+    <div class="wrap">
+      <div class="band-panel reveal">
+        <span class="mono" style="color: var(--rust);">Rubber Band</span>
+        <h2 style="margin: 1rem 0 1.4rem;">Book the band.</h2>
+        <p class="big">Five-piece cover band out of UNC. Country, rock, alt, whatever moves the room. We play sorority and frat houses, Chapel Hill bars, weddings, and the occasional road trip to NC State or ECU. <b>$1k to $1.8k per gig.</b> I hold down bass.</p>
+        <div class="actions">
+          <a class="btn primary" href="https://mail.google.com/mail/?view=cm&fs=1&to=cooperdelo6@gmail.com&su=Booking%20Rubber%20Band" target="_blank" rel="noreferrer">Email a date <span class="arr">&#8599;</span></a>
+          <a class="btn" href="https://instagram.com/cooperdelo" target="_blank" rel="noreferrer">DM on Instagram <span class="arr">&#8599;</span></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about" class="about">
+    <div class="wrap">
+      <span class="kicker mono glass reveal">Background</span>
+      <div class="about-grid">
+        <div class="reveal">
+          <h2>Who is<br /><span class="thin">doing this.</span></h2>
+          <p>Junior at UNC studying computer science and business, music minor in everything but the paperwork. I run on autonomy and short deadlines. <b>Build, ship, learn what hit, run it back.</b></p>
+          <p>I would rather own one thing than be a piece of ten. Right now that one thing is Plugverse.</p>
+          <div class="actions" style="margin-top: 1.8rem;">
+            <a class="btn" href="resume.html">Read the resume</a>
+            <a class="btn" href="https://cal.com/cooper-delo" target="_blank" rel="noreferrer">Talk to me <span class="arr">&#8599;</span></a>
           </div>
-          <div class="caption-shard glass-light" style="position: static; margin-top: 0.5rem; transform: rotate(1.2deg); font-size: 0.62rem;">$20K / Luby Pitch / Apr 2026</div>
+        </div>
+        <div class="portrait reveal">
+          <img src="photos/solo_cooper_bass.jpeg" alt="Cooper playing guitar mid-set" loading="lazy" />
         </div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<div class="marquee-band accent">
-  <div class="marquee-track">
-    <span>Where local music gets booked</span><span>Built by a musician</span><span>Where local music gets booked</span><span>Built by a musician</span>
-  </div>
-</div>
-
-<!-- Drag-able gallery section -->
-<section class="drag-section">
-  <div class="drag-bg">
-    <img src="photos/thailand_trip_bangkok_skyline.jpg" alt="Bangkok skyline" loading="lazy" />
-  </div>
-  <div style="padding: 0 2.4rem;">
-    <div class="grid">
-      <div class="col-12 reveal">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-          <span class="plate glass"><span class="num">03</span><span class="eyebrow" style="margin:0;">The work, dragged</span></span>
-          <span class="eyebrow">Click and drag</span>
-        </div>
+  <!-- SIGNALS -->
+  <section id="signals">
+    <div class="wrap">
+      <span class="kicker mono glass reveal">Follow the work</span>
+      <div class="rows reveal">
+        <a class="row" href="https://instagram.com/cooperdelo" target="_blank" rel="noreferrer">
+          <span class="label">Instagram</span>
+          <span class="sub">Plugverse build-in-public, gigs, life</span>
+          <span class="mono">@cooperdelo &#8599;</span>
+        </a>
+        <a class="row" href="https://tiktok.com/@cooperdelo" target="_blank" rel="noreferrer">
+          <span class="label">TikTok</span>
+          <span class="sub">The in-the-wild footage</span>
+          <span class="mono">@cooperdelo &#8599;</span>
+        </a>
+        <a class="row" href="https://www.linkedin.com/in/cooperdelo/" target="_blank" rel="noreferrer">
+          <span class="label">LinkedIn</span>
+          <span class="sub">The professional record</span>
+          <span class="mono">/in/cooperdelo &#8599;</span>
+        </a>
+        <a class="row" href="https://open.spotify.com/artist/5ADdu7EYmsFlIUPrH5azhc" target="_blank" rel="noreferrer">
+          <span class="label">Spotify</span>
+          <span class="sub">Solo catalog, 34,000+ streams</span>
+          <span class="mono">Cooper Delo &#8599;</span>
+        </a>
+        <a class="row" href="https://music.apple.com/artist/cooper-delo" target="_blank" rel="noreferrer">
+          <span class="label">Apple Music</span>
+          <span class="sub">Same songs, different app</span>
+          <span class="mono">Cooper Delo &#8599;</span>
+        </a>
       </div>
     </div>
-    <div id="drag-gallery" class="drag-gallery" data-cursor="DRAG">
-      <div class="drag-track" id="dragTrack">
-        <div class="drag-card"><img src="photos/hero.jpg?v=2" alt="Cooper pitching at Innovate Carolina" loading="lazy" /><div class="card-grain"></div><div class="card-meta"><span class="title">Pitching</span><span class="year">2026</span></div></div>
-        <div class="drag-card"><img src="photos/luby_pic_with_check.jpg" alt="Luby Pitch Competition $20k win" loading="lazy" /><div class="card-grain"></div><div class="card-meta"><span class="title">$20K Win</span><span class="year">2026</span></div></div>
-        <div class="drag-card"><img src="photos/Plugverse_picture.jpeg" alt="Plugverse brand" loading="lazy" /><div class="card-grain"></div><div class="card-meta"><span class="title">Plugverse</span><span class="year">2024</span></div></div>
-        <div class="drag-card is-video"><video autoplay muted loop playsinline preload="metadata" poster="photos/rubber_band_full_pic.jpeg"><source src="videos/whole%20band%20rubber%20vid.MOV" type="video/mp4" /></video><img src="photos/rubber_band_full_pic.jpeg" alt="Rubber Band live clip" loading="lazy" /><div class="card-grain"></div><div class="card-meta"><span class="title">Live Clip</span><span class="year">2025</span></div></div>
-        <div class="drag-card"><img src="photos/cooper_laughing_with_bass.jpg" alt="Cooper laughing with green Embassy bass" loading="lazy" /><div class="card-grain"></div><div class="card-meta"><span class="title">Mid-Gig</span><span class="year">2025</span></div></div>
-        <div class="drag-card"><img src="photos/gig_rubber_big_stage_2.jpg" alt="Rubber Band on a big stage with full crowd" loading="lazy" /><div class="card-grain"></div><div class="card-meta"><span class="title">Big Stage</span><span class="year">2025</span></div></div>
-        <div class="drag-card"><img src="photos/gig_rubber_tent_purple.jpg" alt="Rubber Band tent gig in purple lighting" loading="lazy" /><div class="card-grain"></div><div class="card-meta"><span class="title">Tent Show</span><span class="year">2025</span></div></div>
-        <div class="drag-card"><img src="photos/gig_rubber_wedding_lineup.jpg" alt="Rubber Band wedding gig lineup" loading="lazy" /><div class="card-grain"></div><div class="card-meta"><span class="title">Wedding Set</span><span class="year">2025</span></div></div>
-        <div class="drag-card"><img src="photos/gig_rubber_toga_bw.jpg" alt="Rubber Band toga gig with trumpet, B&W" loading="lazy" /><div class="card-grain"></div><div class="card-meta"><span class="title">Toga / B&W</span><span class="year">2025</span></div></div>
-        <div class="drag-card is-video"><video autoplay muted loop playsinline preload="metadata" poster="photos/Plugverse_picture.jpeg"><source src="videos/plugverse_ui.mp4" type="video/mp4" /></video><img src="photos/Plugverse_picture.jpeg" alt="Plugverse UI demo" loading="lazy" /><div class="card-grain"></div><div class="card-meta"><span class="title">App Demo</span><span class="year">2026</span></div></div>
-        <div class="drag-card"><img src="photos/solo_cooper_bass.jpeg" alt="Cooper performing under stage lights" loading="lazy" /><div class="card-grain"></div><div class="card-meta"><span class="title">Stage Lit</span><span class="year">2026</span></div></div>
-        <div class="drag-card"><img src="photos/concert_pearl_jam_may2025.jpg" alt="Pearl Jam, May 2025" loading="lazy" /><div class="card-grain"></div><div class="card-meta"><span class="title">Pearl Jam</span><span class="year">2025</span></div></div>
-        <div class="drag-card"><img src="photos/concert_rhcp_bofa.jpg" alt="Red Hot Chili Peppers at BofA Stadium" loading="lazy" /><div class="card-grain"></div><div class="card-meta"><span class="title">RHCP</span><span class="year">2023</span></div></div>
-        <div class="drag-card"><img src="photos/cooper_tux_with_canon.jpg" alt="Cooper in tuxedo holding Canon S100" loading="lazy" /><div class="card-grain"></div><div class="card-meta"><span class="title">Through The Lens</span><span class="year">2025</span></div></div>
-        <div class="drag-card"><img src="photos/thailand_trip_wat_arun.jpg" alt="Wat Arun, Bangkok" loading="lazy" /><div class="card-grain"></div><div class="card-meta"><span class="title">Bangkok</span><span class="year">2024</span></div></div>
-        <div class="drag-card"><img src="photos/ireland_trip_1.jpg" alt="Ireland coast" loading="lazy" /><div class="card-grain"></div><div class="card-meta"><span class="title">Ireland</span><span class="year">2023</span></div></div>
-        <div class="drag-card"><img src="photos/cancun_trip_1.jpg" alt="Cancún" loading="lazy" /><div class="card-grain"></div><div class="card-meta"><span class="title">Cancún</span><span class="year">2024</span></div></div>
-        <div class="drag-card"><img src="photos/golf_portrait.jpg" alt="Cooper mid-swing on a fairway" loading="lazy" /><div class="card-grain"></div><div class="card-meta"><span class="title">Iron Range</span><span class="year">2025</span></div></div>
-        <div class="drag-card"><img src="photos/guitar_portrait_playing.jpeg" alt="Cooper Delo with bass" loading="lazy" /><div class="card-grain"></div><div class="card-meta"><span class="title">Cooper Delo</span><span class="year">2026</span></div></div>
-        <div class="drag-card"><img src="photos/bobs_bar_gig_pic.jpeg" alt="Cooper at Bob's Bar" loading="lazy" /><div class="card-grain"></div><div class="card-meta"><span class="title">Bob's Bar</span><span class="year">2026</span></div></div>
-        <div class="drag-card"><img src="photos/cooper_bass_outdoor_solo.jpg" alt="Cooper alone with green Embassy bass" loading="lazy" /><div class="card-grain"></div><div class="card-meta"><span class="title">Solo / Outdoor</span><span class="year">2025</span></div></div>
-        <div class="drag-card"><img src="photos/concert_rubber_band_live.jpg" alt="Rubber Band live" loading="lazy" /><div class="card-grain"></div><div class="card-meta"><span class="title">Rubber Live</span><span class="year">2025</span></div></div>
-        <div class="drag-card"><img src="photos/gig_rubber_wedding_bass_close.jpg" alt="Wedding gig bass close-up" loading="lazy" /><div class="card-grain"></div><div class="card-meta"><span class="title">Wedding</span><span class="year">2025</span></div></div>
-        <div class="drag-card"><img src="photos/cooper_suit_campus.jpg" alt="Cooper in suit on campus" loading="lazy" /><div class="card-grain"></div><div class="card-meta"><span class="title">Pitching</span><span class="year">2026</span></div></div>
-        <div class="drag-card"><img src="photos/cooper_park_portrait.jpg" alt="Cooper outdoor park portrait" loading="lazy" /><div class="card-grain"></div><div class="card-meta"><span class="title">Park</span><span class="year">2024</span></div></div>
-        <div class="drag-card"><img src="photos/charleston_trip_1.jpg" alt="Charleston trip" loading="lazy" /><div class="card-grain"></div><div class="card-meta"><span class="title">Charleston</span><span class="year">2024</span></div></div>
-        <div class="drag-card"><img src="photos/vegas_trip_1.jpg" alt="Las Vegas Strip" loading="lazy" /><div class="card-grain"></div><div class="card-meta"><span class="title">Vegas</span><span class="year">2024</span></div></div>
-        <div class="drag-card"><img src="photos/obx_sunset_portrait.jpg" alt="OBX sunset portrait" loading="lazy" /><div class="card-grain"></div><div class="card-meta"><span class="title">OBX Sunset</span><span class="year">2023</span></div></div>
-        <div class="drag-card"><img src="photos/obx_beach_friends.jpg" alt="OBX beach with friends" loading="lazy" /><div class="card-grain"></div><div class="card-meta"><span class="title">OBX</span><span class="year">2023</span></div></div>
-        <div class="drag-card"><img src="photos/concert_its_murph.jpg" alt="It's Murph concert" loading="lazy" /><div class="card-grain"></div><div class="card-meta"><span class="title">It's Murph</span><span class="year">2024</span></div></div>
-        <div class="drag-card"><img src="photos/shirtless_guitar.jpg" alt="Cooper with green Embassy bass at day gig" loading="lazy" /><div class="card-grain"></div><div class="card-meta"><span class="title">Day Gig</span><span class="year">2025</span></div></div>
-        <div class="drag-card"><img src="photos/concert_rhcp_bofa_stadium.jpg" alt="Cooper at RHCP at BofA Stadium" loading="lazy" /><div class="card-grain"></div><div class="card-meta"><span class="title">RHCP / Stadium</span><span class="year">2023</span></div></div>
-        <div class="drag-card"><img src="photos/hs_grad.jpg" alt="HS graduation" loading="lazy" /><div class="card-grain"></div><div class="card-meta"><span class="title">HS Grad</span><span class="year">2023</span></div></div>
-        <div class="drag-card"><img src="photos/plugverse_merch.jpg" alt="Plugverse merch" loading="lazy" /><div class="card-grain"></div><div class="card-meta"><span class="title">Merch</span><span class="year">2026</span></div></div>
+  </section>
+
+  <footer>
+    <div class="wrap">
+      <p class="mono reveal" style="color: var(--faint); margin-bottom: 1rem;">One email away</p>
+      <a class="email reveal" href="https://mail.google.com/mail/?view=cm&fs=1&to=cooperdelo6@gmail.com" target="_blank" rel="noreferrer">cooperdelo6@gmail.com</a>
+      <div class="fine mono reveal">
+        <span>Chapel Hill, NC</span>
+        <span>&copy; 2026 Cooper Delo</span>
+        <a href="privacy.html" style="color: var(--faint);">Privacy</a>
       </div>
     </div>
-  </div>
-</section>
+  </footer>
 
-<!-- 04 — Rubber Band (cover band) — broken-apart floating glass over big-stage gig backdrop -->
-<section class="glass-section world-rubber">
-  <div class="gs-bg">
-    <img src="photos/gig_rubber_big_stage_1.jpg" alt="" loading="lazy" />
-  </div>
-  <div class="grid">
-    <div class="col-12">
-      <div class="glass-row reveal">
-        <span class="plate glass"><span class="num">04</span><span class="eyebrow" style="margin:0;">The cover band</span></span>
-        <span class="eyebrow">$3K a semester · 5 piece</span>
-      </div>
-      <h2 class="section-poster gs-poster reveal">Rubber <span class="accent">Band.</span></h2>
-      <p class="lede reveal" style="margin-top: 2rem; max-width: 50rem;">Five-piece cover band at UNC. I play bass. Sorority houses, frats, Chapel Hill bars. 45 songs learned in eight weeks.</p>
-      <div class="stats reveal" style="margin-top: 2.4rem;">
-        <div class="stat-card glass"><span class="label">Per gig</span><span class="value">$1k to $1.8k</span></div>
-        <div class="stat-card glass"><span class="label">Take</span><span class="value">$200 to $360</span></div>
-        <div class="stat-card glass"><span class="label">Circuit</span><span class="value">UNC NCSU ECU</span></div>
-        <div class="stat-card glass"><span class="label">Role</span><span class="value">Bass</span></div>
-      </div>
-      <div class="reveal" style="margin-top: 2rem;">
-        <a href="rubber-band.html" data-cursor="DEEP DIVE" data-transition="MUSIC" class="glass-pill">Inside the band</a>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- 05 — Cooper Delo (solo project) — vintage-tinted backdrop -->
-<section class="block world-cooper has-bg cooper-section">
-  <div class="section-bg">
-    <img src="photos/cooper_with_guitar_outdoor.jpg" alt="" loading="lazy" />
-  </div>
-  <div class="grid">
-    <div class="col-7">
-      <div class="reveal">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-          <span class="plate glass"><span class="num">05</span><span class="eyebrow" style="margin:0;">The solo project</span></span>
-          <span class="eyebrow">34,000+ streams</span>
-        </div>
-        <h2 class="section-poster">Cooper<br/><span class="accent">Delo.</span></h2>
-        <p class="lede" style="margin-top: 2rem; max-width: 44rem;">Solo project. Alt-rock, dream pop, indie rap. 34,000+ streams. Recorded in Ableton.</p>
-        <div class="stats" style="margin-top: 2rem;">
-          <div class="stat-card glass"><span class="label">DAW</span><span class="value">Ableton Live</span></div>
-          <div class="stat-card glass"><span class="label">Streams</span><span class="value">34,000+</span></div>
-          <div class="stat-card glass"><span class="label">Sound</span><span class="value">Alt rock dream pop</span></div>
-          <div class="stat-card glass"><span class="label">Catalog</span><span class="value">Out now</span></div>
-        </div>
-        <div style="display: flex; gap: 0.6rem; margin-top: 1.8rem; flex-wrap: wrap;">
-          <a href="https://open.spotify.com" target="_blank" rel="noreferrer" data-cursor="LISTEN" data-no-transition onclick="window.open(this.href,'_blank');return false;" class="stat-card glass" style="padding: 0.7rem 1rem; font-family: 'Geist Mono', monospace; text-transform: uppercase; letter-spacing: 0.18em; font-size: 0.72rem;">Listen on Spotify</a>
-          <a href="https://music.apple.com" target="_blank" rel="noreferrer" data-cursor="LISTEN" data-no-transition onclick="window.open(this.href,'_blank');return false;" class="stat-card glass" style="padding: 0.7rem 1rem; font-family: 'Geist Mono', monospace; text-transform: uppercase; letter-spacing: 0.18em; font-size: 0.72rem;">Apple Music</a>
-          <a href="rubber-band.html" data-cursor="DEEP DIVE" data-transition="MUSIC" class="stat-card glass" style="padding: 0.7rem 1rem; font-family: 'Geist Mono', monospace; text-transform: uppercase; letter-spacing: 0.18em; font-size: 0.72rem; color: var(--rust);">More on the artist</a>
-        </div>
-      </div>
-    </div>
-    <div class="col-5">
-      <div class="reveal"><div class="photo-frame" style="max-width: 460px; margin-left: auto;">
-        <div class="photo has-media portrait-tall" data-world="cooper">
-          <img src="photos/guitar_portrait_playing.jpeg" alt="Cooper Delo with bass, motion blur stage" loading="lazy" />
-        </div>
-        <div class="caption-shard">Cooper Delo / 2026</div>
-      </div></div>
-    </div>
-  </div>
-</section>
-
-<!-- Builder (cream insert, with Vegas strip backdrop bleeding through) -->
-<section class="block world-builder has-bg">
-  <div class="section-bg">
-    <img src="photos/vegas_trip_2.jpg" alt="" loading="lazy" onerror="this.style.display='none'" />
-  </div>
-  <div class="grid">
-    <div class="col-12 reveal">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-        <span class="plate" style="background: rgba(10,9,8,0.08); border: 1px solid rgba(10,9,8,0.12);"><span class="num">06</span><span class="eyebrow" style="margin:0;">Builder</span></span>
-        <span class="eyebrow">Selected work</span>
-      </div>
-      <h2 class="section-poster" style="color: var(--bg);">Things I have <span class="accent">shipped.</span></h2>
-    </div>
-  </div>
-  <div style="max-width: 1600px; margin: 4rem auto 0; border-top: 1px solid rgba(10,9,8,0.18);">
-    <div class="project-row reveal">
-      <div class="meta">2024 to now</div>
-      <div><h3 class="row-poster" style="color: var(--bg);">Plugverse</h3><p class="body-prose" style="margin-top: 0.6rem;">Marketplace for booking local music. Stripe Connect, Supabase auth, generated contracts, escrow payouts.</p></div>
-      <div class="meta">Solo founder</div>
-    </div>
-    <div class="project-row reveal">
-      <div class="meta">2026</div>
-      <div><h3 class="row-poster" style="color: var(--bg);">Personal AI Operating System</h3><p class="body-prose" style="margin-top: 0.6rem;">A 329-file vault that runs my life. Twelve advisor agents, scheduled briefings, automatic financial logging.</p></div>
-      <div class="meta">Designer / operator</div>
-    </div>
-    <div class="project-row reveal">
-      <div class="meta">2026</div>
-      <div><h3 class="row-poster" style="color: var(--bg);">Resume Generator</h3><p class="body-prose" style="margin-top: 0.6rem;">Got tired of re-typing my resume into every portal. Built the version that does it for me.</p></div>
-      <div class="meta">Full stack</div>
-    </div>
-    <div class="project-row reveal">
-      <div class="meta">Summer 2025</div>
-      <div><h3 class="row-poster" style="color: var(--bg);">CleverCX</h3><p class="body-prose" style="margin-top: 0.6rem;">Built AI features for a fintech serving advisors and enterprise clients.</p></div>
-      <div class="meta">Fintech intern</div>
-    </div>
-  </div>
-</section>
-
-<!-- Now (full-bleed gig stage backdrop, heavier tint for legibility) -->
-<section class="block has-bg now-section">
-  <div class="section-bg">
-    <img src="photos/gig_rubber_big_stage_2.jpg" alt="" loading="lazy" onerror="this.style.display='none'" />
-  </div>
-  <div class="grid">
-    <div class="col-12 reveal">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-        <span class="plate glass"><span class="num">07</span><span class="eyebrow" style="margin:0;">Live</span></span>
-        <span class="eyebrow">Updated August 9, 2026</span>
-      </div>
-      <h2 class="section-poster">Now<span class="accent">.</span></h2>
-    </div>
-  </div>
-  <div class="grid" style="margin-top: 3rem;">
-    <div class="col-9">
-      <ul class="now-list reveal">
-        <li><span class="tag">this wk</span><span>Heads-down on the next Plugverse build</span></li>
-        <li><span class="tag">this wk</span><span>Junior year at UNC just started</span></li>
-        <li><span class="tag">this wk</span><span>Rubber Band back for the fall gig season</span></li>
-      </ul>
-    </div>
-    <div class="col-3">
-      <a href="now.html" class="under" data-cursor="ENTER" data-transition="NOW" style="display: inline-block; margin-top: 2rem; font-family: 'Geist Mono', monospace; text-transform: uppercase; letter-spacing: 0.22em; font-size: 0.78rem; color: var(--rust);">Open the now-page</a>
-    </div>
-  </div>
-</section>
-
-</main>
-
-<footer class="site">
-  <div style="max-width: 1600px; margin: 0 auto; display: grid; grid-template-columns: 1fr; gap: 2.5rem; position: relative;">
-    <div>
-      <span class="eyebrow">Get in touch</span>
-      <button class="under" data-contact data-cursor="OPEN" style="display: block; margin-top: 1rem; text-align: left; font-family: 'Anton', Impact, sans-serif; font-size: clamp(2.6rem, 7vw, 6rem); line-height: 0.95; text-transform: uppercase; color: var(--ink);">cooperdelo6@gmail.com</button>
-    </div>
-    <div class="massive">cooperdelo</div>
-    <div style="display: flex; justify-content: space-between; font-family: 'Geist Mono', monospace; text-transform: uppercase; letter-spacing: 0.22em; font-size: 0.72rem; opacity: 0.7;">
-      <span>Chapel Hill, NC</span><span>2026</span>
-    </div>
-  </div>
-</footer>
-
-<!-- Modal -->
-<div class="modal-backdrop" id="modal">
-  <div class="modal">
-    <h3>Get in touch.</h3>
-    <p style="font-family: 'Geist Mono', monospace; text-transform: uppercase; letter-spacing: 0.22em; font-size: 0.7rem; color: var(--muted); margin-bottom: 1.4rem;">Book a time or send an email</p>
-    <!-- BOOK A TIME: live Cal.com scheduling page -->
-    <a href="https://cal.com/cooper-delo" target="_blank" rel="noreferrer" data-cursor="OPEN" data-no-transition onclick="window.open(this.href, '_blank'); return false;" style="display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:0.9rem 1.2rem; margin-bottom:1.2rem; border-radius:10px; background:var(--rust); color:var(--bg); font-family:'Geist Mono', monospace; text-transform:uppercase; letter-spacing:0.18em; font-size:0.78rem; font-weight:600;">
-      <span>Book a time</span>
-      <span aria-hidden="true">&rarr;</span>
-    </a>
-    <div class="email-row">
-      <span>cooperdelo6@gmail.com</span>
-      <button class="copy-btn" data-cursor="COPY" id="copyBtn">Copy</button>
-    </div>
-    <div class="options">
-      <a href="https://mail.google.com/mail/?view=cm&fs=1&to=cooperdelo6@gmail.com" target="_blank" rel="noreferrer" data-cursor="OPEN" data-no-transition onclick="window.open(this.href, '_blank'); return false;">Gmail</a>
-      <a href="https://www.linkedin.com/in/cooperdelo/" target="_blank" rel="noreferrer" data-cursor="OPEN" data-no-transition onclick="window.open(this.href, '_blank'); return false;">LinkedIn</a>
-      <a href="https://instagram.com/cooperdelo" target="_blank" rel="noreferrer" data-cursor="OPEN" data-no-transition onclick="window.open(this.href, '_blank'); return false;">Instagram</a>
-    </div>
-    <div style="display: flex; justify-content: flex-end; align-items: center; padding-top: 0.6rem;">
-      <button class="close under" data-cursor="CLOSE" id="closeModal">Close</button>
-    </div>
-  </div>
-</div>
-<div class="toast" id="toast">Copied to clipboard</div>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" defer></script>
-<script src="shell.js" defer></script>
+  <script>
+    const io = new IntersectionObserver(
+      (entries) => entries.forEach((e) => e.isIntersecting && e.target.classList.add("in")),
+      { threshold: 0.12 }
+    );
+    document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
+  </script>
 </body>
 </html>
-      
