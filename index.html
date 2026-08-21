@@ -127,6 +127,29 @@
       background:
         linear-gradient(to bottom, rgba(11,10,9,0.92) 0%, rgba(11,10,9,0.55) 22%, rgba(11,10,9,0.55) 78%, rgba(11,10,9,0.96) 100%);
     }
+    /* deep scrim for content-heavy sections: photo texture, still readable */
+    .scene.dim::after {
+      background:
+        linear-gradient(to bottom, rgba(11,10,9,0.97) 0%, rgba(11,10,9,0.86) 30%, rgba(11,10,9,0.86) 70%, rgba(11,10,9,0.97) 100%);
+    }
+    .work-scene::before { background-image: url("photos/plugverse-background.jpg"); }
+    .about-scene::before { background-image: url("photos/studio_recording_session.jpg"); }
+    .signals-scene::before { background-image: url("photos/gig_rubber_big_stage_2.jpg"); }
+    .footer-scene::before { background-image: url("photos/concert_rhcp_bofa_stadium.jpg"); }
+
+    /* ---------- photo strip ---------- */
+
+    .strip-wrap { overflow: hidden; padding: 0.6rem 0; }
+    .strip { display: flex; gap: 0.8rem; width: max-content; animation: drift 55s linear infinite; }
+    .strip img {
+      height: clamp(160px, 24vh, 240px);
+      width: auto;
+      border-radius: 14px;
+      border: 1px solid var(--edge);
+      display: block;
+    }
+    @keyframes drift { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+    @media (prefers-reduced-motion: reduce) { .strip { animation: none; flex-wrap: wrap; width: auto; } }
 
     /* ---------- nav ---------- */
 
@@ -367,7 +390,7 @@
   </header>
 
   <!-- WORK -->
-  <section id="work">
+  <section id="work" class="scene dim work-scene">
     <div class="wrap">
       <span class="kicker mono glass reveal">The work</span>
       <h2 class="reveal">Things you can<br /><span class="thin">actually use.</span></h2>
@@ -414,7 +437,7 @@
       <div class="band-panel reveal">
         <span class="mono" style="color: var(--faint);">Rubber Band</span>
         <h2 style="margin: 1rem 0 1.4rem;">Book the band.</h2>
-        <p class="big">Five-piece cover band out of UNC. <b>$1k to $1.8k per gig.</b> We bring the room.</p>
+        <p class="big">Five-piece cover band out of UNC. <b>We bring the room.</b></p>
         <div class="actions">
           <a class="btn primary" href="https://plugverse.app/a/2499f269-dff2-4025-85a6-cf1ff8991382?ref=9CRDUTEJ&utm_source=profile-share&utm_medium=link&utm_campaign=profile-share" target="_blank" rel="noreferrer">Book on Plugverse <span class="arr">&#8599;</span></a>
           <a class="btn" href="https://instagram.com/cooperdelo" target="_blank" rel="noreferrer">DM on Instagram <span class="arr">&#8599;</span></a>
@@ -423,8 +446,30 @@
     </div>
   </section>
 
+  <!-- STRIP -->
+  <div class="strip-wrap" aria-hidden="true">
+    <div class="strip">
+      <img src="photos/guitar_portrait_playing.jpeg" alt="" loading="lazy" />
+      <img src="photos/gig_rubber_wedding_lineup.jpg" alt="" loading="lazy" />
+      <img src="photos/hole_in_one_par_4.JPG" alt="" loading="lazy" />
+      <img src="photos/flicker_of_time_ep_cover.jpg" alt="" loading="lazy" />
+      <img src="photos/thailand_trip_wat_arun.jpg" alt="" loading="lazy" />
+      <img src="photos/workspace_studio_desk.jpg" alt="" loading="lazy" />
+      <img src="photos/concert_coldplay.jpg" alt="" loading="lazy" />
+      <img src="photos/gig_rubber_outdoor_deck.jpg" alt="" loading="lazy" />
+      <img src="photos/guitar_portrait_playing.jpeg" alt="" loading="lazy" />
+      <img src="photos/gig_rubber_wedding_lineup.jpg" alt="" loading="lazy" />
+      <img src="photos/hole_in_one_par_4.JPG" alt="" loading="lazy" />
+      <img src="photos/flicker_of_time_ep_cover.jpg" alt="" loading="lazy" />
+      <img src="photos/thailand_trip_wat_arun.jpg" alt="" loading="lazy" />
+      <img src="photos/workspace_studio_desk.jpg" alt="" loading="lazy" />
+      <img src="photos/concert_coldplay.jpg" alt="" loading="lazy" />
+      <img src="photos/gig_rubber_outdoor_deck.jpg" alt="" loading="lazy" />
+    </div>
+  </div>
+
   <!-- ABOUT -->
-  <section id="about" class="about">
+  <section id="about" class="about scene dim about-scene">
     <div class="wrap">
       <span class="kicker mono glass reveal">Background</span>
       <div class="about-grid">
@@ -444,7 +489,7 @@
   </section>
 
   <!-- SIGNALS -->
-  <section id="signals">
+  <section id="signals" class="scene dim signals-scene">
     <div class="wrap">
       <span class="kicker mono glass reveal">Follow the work</span>
       <div class="rows reveal">
@@ -477,7 +522,7 @@
     </div>
   </section>
 
-  <footer>
+  <footer class="scene dim footer-scene">
     <div class="wrap">
       <p class="mono reveal" style="color: var(--faint); margin-bottom: 1rem;">One email away</p>
       <a class="email reveal" href="https://mail.google.com/mail/?view=cm&fs=1&to=cooperdelo6@gmail.com" target="_blank" rel="noreferrer">cooperdelo6@gmail.com</a>
