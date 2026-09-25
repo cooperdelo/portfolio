@@ -40,7 +40,7 @@ export default function MusicRoom({ section: s }) {
       {/* ---- stage (back) ---- */}
       <mesh receiveShadow castShadow position={[0, 0.2, -9.5]}><boxGeometry args={[16, 0.4, 5]} /><meshStandardMaterial color="#0f0a07" roughness={0.8} /></mesh>
       <Label position={[0, 8.6, -12.6]} size={1.5} color={ACCENT} font max={26}>RUBBER BAND</Label>
-      <Label position={[0, 7.2, -12.6]} size={0.3} color="#F4EFE6" mono opacity={0.75} max={26}>BASS · COOPER DELO · 5-PIECE</Label>
+      <Label position={[0, 7.2, -12.6]} size={0.3} color="#F4EFE6" mono opacity={0.75} max={26}>GUITAR · COOPER DELO · 5-PIECE</Label>
       {/* rust marquee bars */}
       <mesh position={[0, 5.9, -12.7]}><boxGeometry args={[16, 0.05, 0.05]} /><meshStandardMaterial color="#4a1a12" emissive={ACCENT} emissiveIntensity={1.4} /></mesh>
 
@@ -124,8 +124,8 @@ export default function MusicRoom({ section: s }) {
            (peripheral — you see them when you turn, they never block the stage) ---- */}
       <Suspense fallback={null}>
         <Embed position={[5.2, 2.8, 1.2]} rotation={[0, -0.4, 0]} url={s.embeds[0].url} label={s.embeds[0].label} accent={ACCENT} w={310} h={460} df={2.5} />
-        <Frame src="rubber_band_full_pic.jpeg" position={[-8.7, 2.5, 0.8]} rotation={[0, 0.72, 0]} width={3.0} accent={ACCENT} caption="Rubber Band — live" />
-        <Frame src="cooper_laughing_with_bass.jpg" position={[8.7, 2.5, 3.6]} rotation={[0, -0.72, 0]} width={3.0} accent={ACCENT} caption="Cat's Cradle" />
+        <Frame src="gig_rubber_big_stage_1.jpg" position={[-8.7, 2.5, 0.8]} rotation={[0, 0.72, 0]} width={3.0} accent={ACCENT} caption="Rubber Band — live" />
+        <Frame src="gig_rubber_big_stage_2.jpg" position={[8.7, 2.5, 3.6]} rotation={[0, -0.72, 0]} width={3.0} accent={ACCENT} caption="Cat's Cradle" />
       </Suspense>
       <Panel position={[-7.0, 3.9, -12.5]} width={230} accent={ACCENT}>
         <div style={{ fontFamily: 'Fraunces, serif', fontStyle: 'italic', fontSize: 14, opacity: 0.9, lineHeight: 1.4 }}>{s.blurb}</div>

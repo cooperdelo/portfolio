@@ -30,7 +30,7 @@ export const CONTACT = {
 // surfaced directly in the hub (manifesto sign, facts, portraits, contact).
 export const HOME = {
   key: 'HOME', accent: ACCENTS.HOME, eyebrow: 'cooper delo',
-  blurb: 'Sophomore at UNC Kenan-Flagler, solo founder of Plugverse, bassist, photographer, lifter. Build it, ship it, run it back.',
+  blurb: 'Junior at UNC Kenan-Flagler, solo founder of Plugverse, guitarist, photographer, lifter. Build it, ship it, run it back.',
   manifesto: ['Build. Ship.', 'Learn what hit.', 'Run it back.'],
   facts: [
     ['Age', '20 · Chapel Hill'], ['School', 'UNC Kenan-Flagler'], ['Majors', 'Business + CS'],
@@ -38,7 +38,7 @@ export const HOME = {
   ],
   roles: ['Builder.', 'Founder.', 'Musician.', 'Student.', 'Writer.'],
   portraits: ['cooper_park_portrait.jpg', 'cooper_suit_campus.jpg', 'cooper_tux_with_canon.jpg',
-    'cooper_with_guitar_outdoor.jpg', 'cooper_laughing_with_bass.jpg', 'hs_grad.jpg', 'front-page-hero.jpg']
+    'cooper_with_guitar_outdoor.jpg', 'hs_grad.jpg', 'front-page-hero.jpg']
 };
 
 // The 5 records on the shelf. `cover` is the sleeve art; `blurb` is the
@@ -72,20 +72,20 @@ export const SECTIONS = [
     embeds: []
   },
   {
-    key: 'MUSIC', room: 'liveroom', accent: ACCENTS.MUSIC, eyebrow: 'bass · Cooper Delo',
+    key: 'MUSIC', room: 'liveroom', accent: ACCENTS.MUSIC, eyebrow: 'guitar · Cooper Delo',
     cover: 'flicker_of_time_ep_cover.jpg',
-    blurb: 'Bass in the 5-piece cover band Rubber Band, and originals as Cooper Delo — 34,000+ streams across alt-rock, dream-pop, indie-rap. 45-song set learned in eight weeks.',
-    bandStats: [['Per gig', '$1k–$1.8k'], ['Per member', '$200–$360'], ['Cooper', 'Bass'], ['Circuit', 'UNC · NCSU · ECU']],
+    blurb: 'Guitar in the 5-piece cover band Rubber Band, and originals as Cooper Delo — 34,000+ streams across alt-rock, dream-pop, indie-rap. 45-song set learned in eight weeks.',
+    bandStats: [['Per gig', '$1k–$1.8k'], ['Per member', '$200–$360'], ['Cooper', 'Guitar'], ['Circuit', 'UNC · NCSU · ECU']],
     lineup: [
-      ['Bass', 'Cooper', 'Sophomore · Chi Phi', true], ['Lead Guitar', 'Jackson', 'Senior · Sig Chi', false],
-      ['Vocals', 'Stewart', 'Senior · Chi Phi', false], ['Rhythm Guitar', 'Nick', 'Senior · Chi Phi', false],
-      ['Drums', 'Ben', 'Senior · Pi Kapp', false]
+      ['Guitar', 'Cooper', 'Junior · Chi Phi', true], ['Bass', 'Mateo', '', false],
+      ['Rhythm Guitar', 'Grayson', '', false], ['Vocals', 'Carys / Brody', 'Trade off', false],
+      ['Drums', 'Ben', '', false]
     ],
     soloStats: [['DAW', 'Ableton Live'], ['Streams', '34,000+'], ['Sound', 'Alt-rock dream-pop']],
     influences: ['Smashing Pumpkins', 'Tame Impala', 'Dominic Fike', 'Phoebe Bridgers', 'Radiohead', 'Beabadoobee'],
     rig: [
-      { badge: 'Bass · live', name: 'Epiphone Embassy', img: 'gear-rig-bass.jpg', specs: [['Body', 'Mahogany · SlimTaper'], ['Pickups', '2 × ProBucker'], ['Scale', '34"'], ['Tuning', 'Standard E']] },
-      { badge: 'Electric', name: 'PRS Custom 24-08', img: 'gear-rig-prs.jpg', specs: [['Body', 'Mahogany · maple top'], ['Pickups', '85/15 humbuckers'], ['Switching', '3-way + 2 push-pull'], ['Bridge', 'PRS Tremolo']] },
+      { badge: 'Bass', name: 'Epiphone Embassy', img: 'gear-rig-bass.jpg', specs: [['Body', 'Mahogany · SlimTaper'], ['Pickups', '2 × ProBucker'], ['Scale', '34"'], ['Tuning', 'Standard E']] },
+      { badge: 'Guitar · live', name: 'PRS Custom 24-08', img: 'gear-rig-prs.jpg', specs: [['Body', 'Mahogany · maple top'], ['Pickups', '85/15 humbuckers'], ['Switching', '3-way + 2 push-pull'], ['Bridge', 'PRS Tremolo']] },
       { badge: 'Acoustic', name: 'Takamine GN51CE', img: 'gear-rig-takamine.jpg', specs: [['Shape', 'NEX cutaway'], ['Top', 'Solid spruce'], ['Back', 'Mahogany'], ['Preamp', 'TK-40D']] },
       { badge: 'Bass amp', name: 'Fender Rumble 500', img: 'gear-rig-amp.jpg', specs: [['Power', '500W'], ['Speaker', '2 × 10"'], ['DI', 'Built-in XLR'], ['Ver', 'v3']] },
       { badge: 'Guitar amp', name: 'Marshall DSL40CR', img: 'gear-rig-marshall.jpg', specs: [['Power', '40W tube'], ['Tubes', 'EL34 · ECC83'], ['Speaker', '12" Celestion'], ['FX', 'Reverb · loop']] },
@@ -102,16 +102,13 @@ export const SECTIONS = [
       { artist: 'The Backseat Lovers', tag: 'Indie folk', date: 'Fall 2024', venue: 'The Fillmore · Charlotte', img: 'concert_backseat_lovers_fillmore.jpg', blurb: 'Everyone singing ‘Kilby Girl’ loud enough that the band could’ve stopped playing.' },
       { artist: 'Zach Bryan', tag: 'Country folk / Outdoor', date: 'Summer 2024', venue: 'Credit One · Charleston', img: 'concert_zach_bryan_charleston.jpg', blurb: '30,000 people in cowboy boots remembering they could feel something. Lowcountry sunset doing half the work.' },
       { artist: 'Vance Joy', tag: 'Indie pop / Folk', date: 'Spring 2024', venue: 'The Fillmore · Charlotte', img: 'concert_vance_joy_fillmore.jpg', blurb: '‘Riptide’ hits different in a 2,000-cap room. The crowd finished the chorus for him.' },
-      { artist: 'Red Hot Chili Peppers', tag: 'Funk rock / First stadium', date: '2023', venue: 'BofA Stadium · Charlotte', img: 'concert_rhcp_bofa.jpg', blurb: 'First stadium show I ever saw. Frusciante back. The bassline that’s the reason I picked up the instrument.' },
+      { artist: 'Red Hot Chili Peppers', tag: 'Funk rock / First stadium', date: '2023', venue: 'BofA Stadium · Charlotte', img: 'concert_rhcp_bofa.jpg', blurb: 'First stadium show I ever saw. Frusciante back.' },
       { artist: 'Keshi', tag: 'Bedroom pop / R&B', date: '2023', venue: 'The Fillmore · Charlotte', img: 'concert_keshi_fillmore.jpg', blurb: 'Dream-pop ceiling, the venue washed in red. Bedroom-pop production filling out into something arena-shaped.' },
       { artist: 'Smashing Pumpkins', tag: 'Alt rock / Direct influence', date: '2024', venue: 'World is a Vampire', img: 'concert_smashing_pumpkins.jpg', blurb: 'Direct influence on the Cooper Delo sound. ‘1979’ through a wall of cabs is its own genre.' }
     ],
     photos: ['flicker_of_time_ep_cover.jpg', 'gig_rubber_big_stage_1.jpg', 'gig_rubber_big_stage_2.jpg', 'gig_rubber_big_stage_3.jpg',
-      'gig_rubber_bass_bw.jpg', 'gig_rubber_outdoor_deck.jpg', 'gig_rubber_tent_purple.jpg', 'gig_rubber_toga_bw.jpg',
-      'gig_rubber_wedding_lineup.jpg', 'gig_rubber_wedding_bass_close.jpg', 'solo_cooper_bass.jpeg', 'bobs_bar_gig_pic.jpeg',
-      'concert_rubber_band_live.jpg', 'rubber_band_full_pic.jpeg', 'recording_studio.jpg', 'studio_recording_session.jpg',
-      'guitar_portrait_playing.jpeg', 'cooper_with_guitar_outdoor.jpg'],
-    reels: ['rubber_band_live_4.mov', 'cat_cradle_performance.mov'],
+      'recording_studio.jpg', 'studio_recording_session.jpg', 'gear-rig-prs.jpg', 'cooper_with_guitar_outdoor.jpg'],
+    reels: ['cat_cradle_performance.mov'],
     hero_video: 'whole band rubber vid.MOV',
     embeds: [
       { kind: 'spotify', label: 'The setlist', url: 'https://open.spotify.com/embed/playlist/1e8B61S0vylDgN4fsHrl3K' },
@@ -176,7 +173,7 @@ export const SECTIONS = [
       { badge: 'Audio', name: 'DJI Mic', img: 'gear-camera-dji-mic.jpg', specs: [['Channels', '2 TX'], ['Range', '250m'], ['Rec', '8GB']] }
     ],
     reels: [
-      { v: 'cat_cradle_performance.mov', poster: 'cooper_laughing_with_bass.jpg', label: 'LIVE' },
+      { v: 'cat_cradle_performance.mov', poster: 'gig_rubber_big_stage_2.jpg', label: 'LIVE' },
       { v: 'coldplay_crowd.mov', poster: 'concert_coldplay.jpg', label: 'CROWD' },
       { v: 'golf_swing_iron.mov', poster: 'golf_portrait.jpg', label: 'SWING' },
       { v: 'studio_overview.mov', poster: 'recording_studio.jpg', label: 'STUDIO' }

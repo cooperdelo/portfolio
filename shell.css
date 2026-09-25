@@ -1021,7 +1021,7 @@ body.has-page-bg .ambient { display: none; }
 }
 .member-card .member-name {
   font-family: "Anton", Impact, sans-serif;
-  font-size: clamp(2.4rem, 4vw, 4.2rem); line-height: 0.9;
+  font-size: clamp(1.8rem, 2.8vw, 3.2rem); line-height: 0.95; overflow-wrap: anywhere;
   text-transform: uppercase; color: var(--ink);
   transition: color 0.3s;
 }
