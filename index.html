@@ -4,12 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cooper Delo. Builder, guitarist, founder of Plugverse.</title>
-  <meta name="description" content="Cooper Delo builds Plugverse, plays lead guitar in Rubber Band, and ships things from Chapel Hill. One page. Everything actionable." />
+  <meta name="description" content="Cooper Delo builds Plugverse, plays guitar in Rubber Band, and ships things from Chapel Hill. Book a call, read the resume, or follow along." />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <link rel="manifest" href="/site.webmanifest" />
   <meta property="og:title" content="Cooper Delo" />
-  <meta property="og:description" content="Founder of Plugverse. Lead guitarist in Rubber Band. Builds and ships from Chapel Hill." />
+  <meta property="og:description" content="Founder of Plugverse. Guitarist in Rubber Band. Builds and ships from Chapel Hill." />
   <meta property="og:image" content="https://cooperdelo.com/photos/og-cover.png" />
   <meta property="og:url" content="https://cooperdelo.com" />
 
@@ -347,6 +347,18 @@
     footer .email:hover { color: var(--rust); }
     footer .fine { margin-top: 2.2rem; color: var(--faint); display: flex; justify-content: center; gap: 2rem; flex-wrap: wrap; }
 
+
+    /* ---------- paths (who are you) ---------- */
+    .paths { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.2rem; }
+    .path { padding: clamp(1.6rem, 3vw, 2.2rem); display: flex; flex-direction: column; gap: 0.9rem; }
+    .path h3 { font-family: var(--display); font-weight: 400; text-transform: uppercase; font-size: 1.6rem; line-height: 1.05; letter-spacing: 0.02em; }
+    .path p { color: var(--dim); font-size: 1rem; flex: 1; }
+    .path .links { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+    .path .btn { padding: 0.75rem 1.1rem; font-size: 0.64rem; }
+    .cards.two { grid-template-columns: repeat(2, 1fr); }
+    .band { padding: clamp(3.5rem, 8vh, 5.5rem) 0; }
+    @media (max-width: 900px) { .paths, .cards.two { grid-template-columns: 1fr; } }
+
     /* ---------- responsive ---------- */
 
     @media (max-width: 900px) {
@@ -365,9 +377,9 @@
   <nav class="glass">
     <span class="name">Cooper Delo</span>
     <a class="mono hide-m" href="#work">Work</a>
-    <a class="mono hide-m" href="#band">Band</a>
     <a class="mono hide-m" href="#about">About</a>
-    <a class="mono" href="https://cal.com/cooper-delo1" target="_blank" rel="noreferrer">Book a time</a>
+    <a class="mono hide-m" href="#band">Band</a>
+    <a class="mono" href="https://cal.com/cooper-delo1" target="_blank" rel="noreferrer">Book a call</a>
   </nav>
 
   <!-- HERO -->
@@ -375,19 +387,56 @@
     <div class="wrap">
       <p class="mono reveal" style="color: var(--dim); margin-bottom: 1.2rem;">Chapel Hill, NC. 35.913N / 79.056W</p>
       <h1 class="reveal">Cooper<br />Delo</h1>
-      <p class="lede reveal">Founder of <b>Plugverse</b>. Lead guitarist in <b>Rubber Band</b>. Everything I make is one click below.</p>
+      <p class="lede reveal">I build things, play guitar, and film all of it. Founder of <b>Plugverse</b>. Guitarist in <b>Rubber Band</b>.</p>
       <div class="actions reveal">
-        <a class="btn primary" href="https://plugverse.app" target="_blank" rel="noreferrer">Open Plugverse <span class="arr">&#8599;</span></a>
-        <a class="btn" href="#band">Book the band</a>
-        <a class="btn" href="https://cal.com/cooper-delo1" target="_blank" rel="noreferrer">Book a time <span class="arr">&#8599;</span></a>
+        <a class="btn primary" href="https://cal.com/cooper-delo1" target="_blank" rel="noreferrer">Book a call <span class="arr">&#8599;</span></a>
+        <a class="btn" href="https://instagram.com/cooperdelo" target="_blank" rel="noreferrer">Follow @cooperdelo <span class="arr">&#8599;</span></a>
         <a class="btn" href="resume.html">Resume</a>
+        <a class="btn" href="https://www.linkedin.com/in/cooperdelo/" target="_blank" rel="noreferrer">LinkedIn <span class="arr">&#8599;</span></a>
       </div>
       <div class="meta-row mono reveal">
-        <span>UNC Chapel Hill. CS + Business.</span>
+        <span>UNC Chapel Hill. CS + Business. Music minor.</span>
         <span>Founder. Guitarist. Builder.</span>
       </div>
     </div>
   </header>
+
+  <!-- PATHS -->
+  <section id="start" class="scene dim signals-scene">
+    <div class="wrap">
+      <span class="kicker mono glass reveal">Start here</span>
+      <h2 class="reveal">What brought<br /><span class="thin">you here?</span></h2>
+      <div class="paths">
+        <div class="path glass reveal">
+          <span class="mono" style="color: var(--faint);">Connect</span>
+          <h3>Want to talk?</h3>
+          <p>Grab a time on my calendar or reach out on LinkedIn.</p>
+          <div class="links">
+            <a class="btn primary" href="https://cal.com/cooper-delo1" target="_blank" rel="noreferrer">Book a call <span class="arr">&#8599;</span></a>
+            <a class="btn" href="https://www.linkedin.com/in/cooperdelo/" target="_blank" rel="noreferrer">LinkedIn <span class="arr">&#8599;</span></a>
+          </div>
+        </div>
+        <div class="path glass reveal">
+          <span class="mono" style="color: var(--faint);">The work</span>
+          <h3>See what I'm building</h3>
+          <p>Plugverse is live. The resume has the rest.</p>
+          <div class="links">
+            <a class="btn primary" href="https://plugverse.app" target="_blank" rel="noreferrer">plugverse.app <span class="arr">&#8599;</span></a>
+            <a class="btn" href="resume.html">Resume</a>
+          </div>
+        </div>
+        <div class="path glass reveal">
+          <span class="mono" style="color: var(--faint);">Just curious</span>
+          <h3>Follow along</h3>
+          <p>I post the building, the gigs, and everything in between.</p>
+          <div class="links">
+            <a class="btn primary" href="https://instagram.com/cooperdelo" target="_blank" rel="noreferrer">Instagram <span class="arr">&#8599;</span></a>
+            <a class="btn" href="https://tiktok.com/@cooperdelo" target="_blank" rel="noreferrer">TikTok <span class="arr">&#8599;</span></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <!-- WORK -->
   <section id="work" class="scene dim work-scene">
@@ -399,29 +448,22 @@
         <div class="txt">
           <span class="mono" style="color: var(--faint);">Flagship</span>
           <h3>Plugverse</h3>
-          <p>The booking layer for local music. Page, rate, availability, contract. Booked in minutes.</p>
+          <p>Booking tools for bands that book themselves. Every show, one link. Started because my own band ran on DMs, Google Docs and Venmo.</p>
           <div class="stats">
-            <span class="stat">Founded <b>Nov 2024</b></span>
-            <span class="stat">Funding <b>$21,850</b></span>
-            <span class="stat">Built by <b>one person</b></span>
+            <span class="stat">Started <b>Nov 2024</b></span>
+            <span class="stat">Raised <b>$21,850</b> non-dilutive</span>
           </div>
           <span class="mono go">Open plugverse.app &#8599;</span>
         </div>
         <div class="img"><img src="photos/hero.jpg" alt="Cooper pitching Plugverse at Innovate Carolina" loading="lazy" /></div>
       </a>
 
-      <div class="cards">
+      <div class="cards two">
         <div class="card glass reveal">
           <span class="mono" style="color: var(--faint);">2026 / Claude + Supabase</span>
           <h3>Personal AI Operating System</h3>
           <p>A vault of agents that runs my schedule, my money, and half of this site.</p>
         </div>
-        <a class="card glass reveal" href="resume.html">
-          <span class="mono" style="color: var(--faint);">2026 / Next.js + OpenAI</span>
-          <h3>Resume Generator</h3>
-          <p>Built the tool that writes my resume so I never re-type it again.</p>
-          <span class="mono go">See the output &#8599;</span>
-        </a>
         <div class="card glass reveal">
           <span class="mono" style="color: var(--faint);">Summers 2025 + 2026</span>
           <h3>Truist &amp; CleverCX</h3>
@@ -431,43 +473,6 @@
     </div>
   </section>
 
-  <!-- BAND -->
-  <section id="band" class="band scene">
-    <div class="wrap">
-      <div class="band-panel reveal">
-        <span class="mono" style="color: var(--faint);">Rubber Band</span>
-        <h2 style="margin: 1rem 0 1.4rem;">Book the band.</h2>
-        <p class="big">Five-piece cover band out of UNC. <b>We bring the room.</b></p>
-        <div class="actions">
-          <a class="btn primary" href="https://plugverse.app/a/2499f269-dff2-4025-85a6-cf1ff8991382?ref=9CRDUTEJ&utm_source=profile-share&utm_medium=link&utm_campaign=profile-share" target="_blank" rel="noreferrer">Book on Plugverse <span class="arr">&#8599;</span></a>
-          <a class="btn" href="https://instagram.com/cooperdelo" target="_blank" rel="noreferrer">DM on Instagram <span class="arr">&#8599;</span></a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- STRIP -->
-  <div class="strip-wrap" aria-hidden="true">
-    <div class="strip">
-      <img src="photos/cooper_with_guitar_outdoor.jpg" alt="" loading="lazy" />
-      <img src="photos/gig_rubber_wedding_lineup.jpg" alt="" loading="lazy" />
-      <img src="photos/hole_in_one_par_4.JPG" alt="" loading="lazy" />
-      <img src="photos/flicker_of_time_ep_cover.jpg" alt="" loading="lazy" />
-      <img src="photos/thailand_trip_wat_arun.jpg" alt="" loading="lazy" />
-      <img src="photos/workspace_studio_desk.jpg" alt="" loading="lazy" />
-      <img src="photos/concert_coldplay.jpg" alt="" loading="lazy" />
-      <img src="photos/gig_rubber_outdoor_deck.jpg" alt="" loading="lazy" />
-      <img src="photos/cooper_with_guitar_outdoor.jpg" alt="" loading="lazy" />
-      <img src="photos/gig_rubber_wedding_lineup.jpg" alt="" loading="lazy" />
-      <img src="photos/hole_in_one_par_4.JPG" alt="" loading="lazy" />
-      <img src="photos/flicker_of_time_ep_cover.jpg" alt="" loading="lazy" />
-      <img src="photos/thailand_trip_wat_arun.jpg" alt="" loading="lazy" />
-      <img src="photos/workspace_studio_desk.jpg" alt="" loading="lazy" />
-      <img src="photos/concert_coldplay.jpg" alt="" loading="lazy" />
-      <img src="photos/gig_rubber_outdoor_deck.jpg" alt="" loading="lazy" />
-    </div>
-  </div>
-
   <!-- ABOUT -->
   <section id="about" class="about scene dim about-scene">
     <div class="wrap">
@@ -475,10 +480,11 @@
       <div class="about-grid">
         <div class="reveal">
           <h2>Who is<br /><span class="thin">doing this.</span></h2>
-          <p>Junior at UNC. Computer science and business. <b>Build, ship, learn what hit, run it back.</b></p>
+          <p>Junior at UNC. Computer science and business, music minor. I run a company, play guitar in a cover band, and put out my own music on the side. My EP <b>Flicker of Time</b> passed 34,000 streams.</p>
+          <p><b>Build, ship, learn what hit, run it back.</b></p>
           <div class="actions" style="margin-top: 1.8rem;">
+            <a class="btn primary" href="https://cal.com/cooper-delo1" target="_blank" rel="noreferrer">Talk to me <span class="arr">&#8599;</span></a>
             <a class="btn" href="resume.html">Read the resume</a>
-            <a class="btn" href="https://cal.com/cooper-delo1" target="_blank" rel="noreferrer">Talk to me <span class="arr">&#8599;</span></a>
           </div>
         </div>
         <div class="portrait reveal">
@@ -488,10 +494,32 @@
     </div>
   </section>
 
+  <!-- STRIP -->
+  <div class="strip-wrap" aria-hidden="true">
+    <div class="strip">
+      <img src="photos/cooper_with_guitar_outdoor.jpg" alt="" loading="lazy" />
+      <img src="photos/obx_sunset_portrait.jpg" alt="" loading="lazy" />
+      <img src="photos/hole_in_one_par_4.JPG" alt="" loading="lazy" />
+      <img src="photos/flicker_of_time_ep_cover.jpg" alt="" loading="lazy" />
+      <img src="photos/thailand_trip_wat_arun.jpg" alt="" loading="lazy" />
+      <img src="photos/workspace_studio_desk.jpg" alt="" loading="lazy" />
+      <img src="photos/concert_coldplay.jpg" alt="" loading="lazy" />
+      <img src="photos/golf_swing_finish.jpg" alt="" loading="lazy" />
+      <img src="photos/cooper_with_guitar_outdoor.jpg" alt="" loading="lazy" />
+      <img src="photos/obx_sunset_portrait.jpg" alt="" loading="lazy" />
+      <img src="photos/hole_in_one_par_4.JPG" alt="" loading="lazy" />
+      <img src="photos/flicker_of_time_ep_cover.jpg" alt="" loading="lazy" />
+      <img src="photos/thailand_trip_wat_arun.jpg" alt="" loading="lazy" />
+      <img src="photos/workspace_studio_desk.jpg" alt="" loading="lazy" />
+      <img src="photos/concert_coldplay.jpg" alt="" loading="lazy" />
+      <img src="photos/golf_swing_finish.jpg" alt="" loading="lazy" />
+    </div>
+  </div>
+
   <!-- SIGNALS -->
   <section id="signals" class="scene dim signals-scene">
     <div class="wrap">
-      <span class="kicker mono glass reveal">Follow the work</span>
+      <span class="kicker mono glass reveal">Follow along</span>
       <div class="rows reveal">
         <a class="row" href="https://instagram.com/cooperdelo" target="_blank" rel="noreferrer">
           <span class="label">Instagram</span>
@@ -518,6 +546,21 @@
           <span class="sub"></span>
           <span class="mono">Cooper Delo &#8599;</span>
         </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- BAND -->
+  <section id="band" class="band scene">
+    <div class="wrap">
+      <div class="band-panel reveal">
+        <span class="mono" style="color: var(--faint);">On the side</span>
+        <h2 style="margin: 1rem 0 1.4rem;">Rubber Band.</h2>
+        <p class="big">Five-piece cover band out of UNC. I play guitar. <b>We bring the room.</b></p>
+        <div class="actions">
+          <a class="btn" href="https://plugverse.app/a/2499f269-dff2-4025-85a6-cf1ff8991382?ref=9CRDUTEJ&utm_source=profile-share&utm_medium=link&utm_campaign=profile-share" target="_blank" rel="noreferrer">Book the band <span class="arr">&#8599;</span></a>
+          <a class="btn" href="rubber-band.html">Band page</a>
+        </div>
       </div>
     </div>
   </section>
