@@ -41,7 +41,7 @@ const tokenRow = (plat, name, exp, extra = '') => {
 document.getElementById('tokens').innerHTML = [
   ...(ig.data || []).map(r => tokenRow('instagram', r.username, r.expires_at, r.refreshed_at ? ` · refreshed ${ago(r.refreshed_at)}` : '')),
   ...(tt.data || []).map(r => tokenRow('tiktok', r.username || r.display_name, r.expires_at, r.refresh_expires_at ? ` · refresh token until ${fmtDay(r.refresh_expires_at)}` : '')),
-  `<div class="row">${platMark('linkedin', 'cooperdelo')}<div class="grow"><div class="s">No API connection. Community Management API application pending; data comes from the Stanley export (2026-09-27) and browser pulls.</div></div><span class="chip quiet">not connected</span></div>`,
+  `<div class="row">${platMark('linkedin', 'cooperdelo')}<div class="grow"><div class="s">No API connection yet (LinkedIn Community Management API not set up). Numbers come from the Stanley export (2026-09-27) and browser pulls.</div></div><span class="chip quiet">not connected</span></div>`,
   `<div class="row">${platMark('youtube', 'cooperdelo')}<div class="grow"><div class="s">No API connection yet. Subscriber count from the Stanley export (2026-09-27).</div></div><span class="chip quiet">not connected</span></div>`,
 ].join('');
 

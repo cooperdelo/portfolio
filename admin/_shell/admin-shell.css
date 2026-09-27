@@ -886,7 +886,7 @@ table.data .right { font-variant-numeric: tabular-nums; }
 @media (max-width: 1100px) { .sv-grid.c4 { grid-template-columns: repeat(2, minmax(0,1fr)); } .sv-grid.c3, .sv-grid.split { grid-template-columns: 1fr; } }
 @media (max-width: 560px) { .sv-grid.c2, .sv-grid.c4 { grid-template-columns: 1fr; } }
 .sv-section { margin-top: 1.75rem; }
-.sv-section > .sv-h { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; margin-bottom: .75rem; flex-wrap: wrap; }
+.sv-h { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; margin-bottom: .75rem; flex-wrap: wrap; }
 .sv-h h2 { font-size: 1.05rem; font-weight: 650; letter-spacing: -.015em; color: var(--text); }
 .sv-h .sv-sub { font-size: .8rem; color: var(--text-3); }
 .sv-h a { font-size: .82rem; color: var(--accent-ink); font-weight: 550; }
@@ -952,6 +952,7 @@ table.data .right { font-variant-numeric: tabular-nums; }
 .post .media { aspect-ratio: 4/5; border-radius: 12px; overflow: hidden; background: var(--accent-tint); display: flex; align-items: flex-end; }
 .post .media img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .post .media img + .firstline { display: none; }
+.post .media:not(:has(img)) ~ .cap { display: none; }
 .post .media .firstline { padding: 1rem; font-size: 1.02rem; font-weight: 600; line-height: 1.3; letter-spacing: -.01em; color: var(--accent-ink); display: -webkit-box; -webkit-line-clamp: 6; -webkit-box-orient: vertical; overflow: hidden; }
 .post .stats { display: flex; gap: .9rem; font-size: .8rem; color: var(--text-3); font-variant-numeric: tabular-nums; flex-wrap: wrap; }
 .post .stats b { color: var(--text); font-weight: 600; }
@@ -1005,3 +1006,10 @@ table.data .right { font-variant-numeric: tabular-nums; }
 
 /* doc viewer */
 .doc { white-space: pre-wrap; font-family: "Geist Mono", ui-monospace, monospace; font-size: .8rem; line-height: 1.55; color: var(--text-2); max-height: 60vh; overflow: auto; background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 1rem; }
+
+/* v5 layout guards: wide children (heatmap, long notes, tables) must never widen the page */
+.admin-app { grid-template-columns: var(--rail-w) minmax(0, 1fr); }
+@media (max-width: 900px) { .admin-app { grid-template-columns: minmax(0, 1fr); } .rail { min-width: 0; } }
+.main { min-width: 0; }
+.produced a, .produced span { display: block; }
+.note, .sv-meta, .sv-text { overflow-wrap: anywhere; }

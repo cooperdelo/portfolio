@@ -33,7 +33,7 @@ const metricHTML = (p) => p.reach == null ? '<span>no metrics on file</span>'
 document.getElementById('followers').innerHTML = list.length ? list.map(s => {
   const win = windows.filter(w => w.platform === s.platform && w.handle === s.handle).sort((a, b) => b.date.localeCompare(a.date))[0];
   return `<div class="sv-card">
-    ${platMark(s.platform, s.handle)}${s.personal ? '' : ' <span class="chip">PlugVerse</span>'}
+    ${platMark(s.platform, s.handle)}${s.personal ? '' : /plugverse/i.test(s.handle) ? ' <span class="chip">PlugVerse</span>' : ' <span class="chip quiet">old handle</span>'}
     <div class="sv-num md">${fmtNum(s.latest.followers)}</div>
     <div class="sv-label">${s.platform === 'youtube' ? 'subscribers' : 'followers'} ${deltaChip(s.latest.followers, s.prev?.followers)}</div>
     ${win ? `<div class="sv-meta"><b>${fmtNum(win.impressions)}</b> impressions, past ${win.window_days} days (as of ${esc(fmtDay(win.date))})</div>` : ''}

@@ -111,9 +111,10 @@ async function pulse() {
 
 // ---------- Health ----------
 async function health() {
-  const { data, error } = await sb.from('health_daily').select('day,sleep_minutes,sleep_score,steps,resting_hr,hrv_ms,body_battery_high,garmin_synced_at').order('day', { ascending: false }).limit(1);
+  const { data, error } = await sb.from('health_daily').select('day,sleep_minutes,sleep_score,steps,resting_hr,hrv_ms,body_battery_high,garmin_synced_at').order('day', { ascending: false }).limit(14);
   if (error) throw error;
-  const r = data?.[0];
+  // newest day that actually has Garmin numbers (manual mood-only rows have none)
+  const r = (data || []).find(x => x.sleep_minutes != null || x.steps != null || x.resting_hr != null) || data?.[0];
   if (!r) { $('health').innerHTML = `<div class="sv-h"><h2>Body</h2></div>` + emptyState('No health data', 'Fed by the Garmin sync (health_daily).'); return; }
   const cell = (k, v) => `<div><div class="k">${k}</div><div class="v">${v}</div></div>`;
   const sleep = r.sleep_minutes != null ? `${Math.floor(r.sleep_minutes / 60)}h ${r.sleep_minutes % 60}m` : '—';
