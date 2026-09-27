@@ -8,10 +8,10 @@ await mountShell({ title: 'Finance · Overview' });
 
 // Brand palette (matches shell.css)
 const C = {
-  ink:     '#F4EFE6',
-  ink2:    '#DDD4C5',
-  muted:   '#6F6A60',
-  rust:    '#FF4D2E',
+  ink:     __cv('--text','#F4EFE6'),
+  ink2:    __cv('--text-2','#DDD4C5'),
+  muted:   __cv('--text-3','#6F6A60'),
+  rust:    __cv('--accent','#FF4D2E'),
   crimson: '#C8102E',
   stage:   '#6B3FA0',
   pink:    '#F2C1D1',
@@ -25,12 +25,12 @@ const C = {
 Chart.defaults.color = C.ink2;
 Chart.defaults.font.family = '"Geist Mono", ui-monospace, monospace';
 Chart.defaults.font.size = 11;
-Chart.defaults.borderColor = 'rgba(244,239,230,0.10)';
+Chart.defaults.borderColor = __cv('--border','rgba(244,239,230,0.10)');
 Chart.defaults.plugins.legend.labels.color = C.ink2;
-Chart.defaults.plugins.tooltip.backgroundColor = 'rgba(20,17,15,0.95)';
+Chart.defaults.plugins.tooltip.backgroundColor = __cv('--surface','rgba(20,17,15,0.95)');
 Chart.defaults.plugins.tooltip.titleColor = C.ink;
 Chart.defaults.plugins.tooltip.bodyColor = C.ink2;
-Chart.defaults.plugins.tooltip.borderColor = 'rgba(244,239,230,0.18)';
+Chart.defaults.plugins.tooltip.borderColor = __cv('--border-2','rgba(244,239,230,0.18)');
 Chart.defaults.plugins.tooltip.borderWidth = 1;
 Chart.defaults.plugins.tooltip.padding = 10;
 Chart.defaults.plugins.tooltip.cornerRadius = 8;
@@ -238,9 +238,9 @@ function chartOpts({ grid = false, money = false, time = false } = {}) {
     },
     scales: {
       x: time
-        ? { type: 'time', time: { unit: 'month', tooltipFormat: 'MMM yyyy' }, grid: { color: 'rgba(244,239,230,0.05)' } }
-        : { grid: { color: 'rgba(244,239,230,0.05)' }, ticks: { autoSkip: true, maxRotation: 0 } },
-      y: { grid: grid ? { color: 'rgba(244,239,230,0.05)' } : { display: false }, ticks: { callback: (v) => money ? fmtUSDCompact(v) : v } },
+        ? { type: 'time', time: { unit: 'month', tooltipFormat: 'MMM yyyy' }, grid: { color: __cv('--border','rgba(244,239,230,0.05)') } }
+        : { grid: { color: __cv('--border','rgba(244,239,230,0.05)') }, ticks: { autoSkip: true, maxRotation: 0 } },
+      y: { grid: grid ? { color: __cv('--border','rgba(244,239,230,0.05)') } : { display: false }, ticks: { callback: (v) => money ? fmtUSDCompact(v) : v } },
     },
   };
 }

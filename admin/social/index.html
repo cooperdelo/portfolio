@@ -332,7 +332,7 @@
         return;
       }
       const ctx = document.getElementById('post-chart').getContext('2d');
-      const palette = { views:'#FF4D2E', likes:'#F2C1D1', comments:'#B2E3E1', shares:'#C9BEE6', saves:'#7A8A6E', reach:'#DDD4C5' };
+      const palette = { views:__cv('--accent','#FF4D2E'), likes:'#F2C1D1', comments:'#B2E3E1', shares:'#C9BEE6', saves:'#7A8A6E', reach:__cv('--text-2','#DDD4C5') };
       const datasets = ['views','likes','comments','shares','saves','reach']
         .filter(k => history.some(h => h[k] != null))
         .map(k => ({
@@ -346,11 +346,11 @@
         data: { datasets },
         options: {
           maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
-          plugins: { legend: { labels: { color: '#DDD4C5', font: { family: '"Geist Mono", monospace', size: 10 } } },
-                     tooltip: { backgroundColor: 'rgba(20,17,15,0.95)', titleColor: '#F4EFE6', bodyColor: '#DDD4C5', borderColor: 'rgba(244,239,230,0.18)', borderWidth: 1 } },
+          plugins: { legend: { labels: { color: __cv('--text-2','#DDD4C5'), font: { family: '"Geist Mono", monospace', size: 10 } } },
+                     tooltip: { backgroundColor: __cv('--surface','rgba(20,17,15,0.95)'), titleColor: __cv('--text','#F4EFE6'), bodyColor: __cv('--text-2','#DDD4C5'), borderColor: __cv('--border-2','rgba(244,239,230,0.18)'), borderWidth: 1 } },
           scales: {
-            x: { type: 'time', time: { unit: 'day' }, ticks: { color: '#6F6A60', font: { family: '"Geist Mono", monospace', size: 9 } }, grid: { color: 'rgba(244,239,230,0.05)' } },
-            y: { ticks: { color: '#6F6A60', font: { family: '"Geist Mono", monospace', size: 9 } }, grid: { color: 'rgba(244,239,230,0.05)' } },
+            x: { type: 'time', time: { unit: 'day' }, ticks: { color: __cv('--text-3','#6F6A60'), font: { family: '"Geist Mono", monospace', size: 9 } }, grid: { color: __cv('--border','rgba(244,239,230,0.05)') } },
+            y: { ticks: { color: __cv('--text-3','#6F6A60'), font: { family: '"Geist Mono", monospace', size: 9 } }, grid: { color: __cv('--border','rgba(244,239,230,0.05)') } },
           },
         },
       });

@@ -4,7 +4,7 @@ import { mountShell, toast, monthsBack, monthKey } from '/admin/_shell/admin-she
 if (!(await requireFullAdminOrRedirect())) throw new Error('access denied');
 await mountShell({ title: 'Food Log · Finance' });
 
-const C = { rust: '#FF4D2E', sage: '#7A8A6E', ink2: '#DDD4C5' };
+const C = { rust: __cv('--accent','#FF4D2E'), sage: '#7A8A6E', ink2: __cv('--text-2','#DDD4C5') };
 Chart.defaults.color = C.ink2;
 Chart.defaults.font.family = '"Geist Mono", ui-monospace, monospace';
 
@@ -67,7 +67,7 @@ function render() {
     options: {
       maintainAspectRatio: false,
       plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => `${fmtUSD(c.parsed.y)}` } } },
-      scales: { y: { ticks: { callback: (v) => fmtUSDCompact(v) }, grid: { color: 'rgba(244,239,230,0.05)' } }, x: { grid: { display: false } } },
+      scales: { y: { ticks: { callback: (v) => fmtUSDCompact(v) }, grid: { color: __cv('--border','rgba(244,239,230,0.05)') } }, x: { grid: { display: false } } },
     },
   });
 

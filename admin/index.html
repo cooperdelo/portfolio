@@ -8,130 +8,64 @@
 <link rel="apple-touch-icon" href="/favicon.svg" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-title" content="CD Admin" />
-<meta name="theme-color" content="#FF4D2E" />
-<title>Admin · Cooper Delo</title>
+<meta name="theme-color" content="#8B7CF6" />
+<title>Home · CD Admin</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Geist+Mono:wght@300..700&family=Geist:wght@300..700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@300..700&family=Geist:wght@300..700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/admin/_shell/admin-shell.css" />
 <style>
-  /* ===== Editorial home — masthead + five domain cards ===== */
-  .masthead{border-bottom:1px solid rgba(244,239,230,.14);padding-bottom:1.6rem;margin-bottom:1.6rem;
-    display:grid;grid-template-columns:1fr auto;align-items:end;gap:1rem}
-  .masthead .issue{font-family:"Geist Mono",monospace;font-size:.6rem;letter-spacing:.34em;text-transform:uppercase;color:var(--muted);margin-bottom:1rem}
-  .masthead h1{font-family:"Anton",sans-serif;text-transform:uppercase;font-size:clamp(2.8rem,7vw,5.2rem);line-height:.86;letter-spacing:-.02em;
-    background:linear-gradient(92deg,var(--ink) 30%,#EAD9C8 62%,var(--ink) 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
-  .masthead h1 .a{-webkit-text-fill-color:var(--rust)}
-  .masthead .dek{font-family:"Fraunces",serif;font-style:italic;font-size:1rem;color:var(--ink-2);max-width:34ch;line-height:1.35}
-  .masthead .stamp{font-family:"Geist Mono",monospace;font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-2);text-align:right;white-space:nowrap}
-  .masthead .stamp b{color:var(--rust)}
-  @media(max-width:640px){.masthead{grid-template-columns:1fr}.masthead .stamp{text-align:left}}
-
-  .qa-row{display:flex;align-items:center;gap:.55rem;flex-wrap:wrap;margin:0 0 2.4rem}
-  .qa-row .qe{font-family:"Geist Mono",monospace;font-size:.56rem;letter-spacing:.26em;text-transform:uppercase;color:var(--muted);margin-right:.3rem}
-  .qa{display:inline-flex;align-items:center;gap:.45rem;padding:.55rem .9rem;border-radius:999px;font-family:"Geist Mono",monospace;font-size:.64rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-2);border:1px solid rgba(244,239,230,.14);background:rgba(244,239,230,.03);backdrop-filter:blur(12px);transition:.25s}
-  .qa .p{color:var(--rust);font-weight:700}
-  .qa:hover{transform:translateY(-2px);border-color:rgba(255,77,46,.45);color:var(--ink);background:rgba(255,77,46,.06)}
-  .qa.search{margin-left:auto;color:var(--muted)}
-  .qa.search kbd{font-family:"Geist Mono",monospace;font-size:.56rem;padding:.05rem .32rem;border-radius:4px;border:1px solid rgba(244,239,230,.16);color:var(--ink-2);background:rgba(0,0,0,.25)}
-  @media(max-width:560px){.qa.search{margin-left:0}}
-
-  .domains{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1.1rem;align-items:start}
-  @media(max-width:1180px){.domains{grid-template-columns:repeat(2,minmax(0,1fr))}}
-  @media(max-width:680px){.domains{grid-template-columns:1fr}}
-  .dom{--ac:var(--rust);position:relative;overflow:hidden;border-radius:22px;padding:1.5rem 1.6rem 1.45rem;display:block;
-    background:linear-gradient(180deg,rgba(244,239,230,.055),rgba(20,17,15,.30));border:1px solid rgba(244,239,230,.13);
-    backdrop-filter:blur(26px) saturate(150%);-webkit-backdrop-filter:blur(26px) saturate(150%);
-    box-shadow:0 1px 0 rgba(244,239,230,.08) inset,0 30px 90px -46px rgba(0,0,0,.85);
-    transition:transform .4s cubic-bezier(.22,1,.36,1),border-color .4s}
-  .dom::before{content:"";position:absolute;left:0;top:1.4rem;bottom:1.4rem;width:3px;border-radius:3px;background:var(--ac)}
-  .dom:hover{transform:translateY(-4px);border-color:color-mix(in srgb,var(--ac) 55%,transparent)}
-  .dom{min-width:0}
-  .dom .kicker{display:flex;align-items:center;gap:.55rem;margin-bottom:1rem;min-width:0}
-  .dom .kicker .dt{width:9px;height:9px;border-radius:50%;background:var(--ac);box-shadow:0 0 12px var(--ac);flex:0 0 auto}
-  .dom .kicker .nm{font-family:"Anton",sans-serif;text-transform:uppercase;font-size:1.15rem;letter-spacing:.02em;flex:0 0 auto}
-  .dom .kicker .no{font-family:"Geist Mono",monospace;font-size:.58rem;letter-spacing:.2em;color:var(--muted);margin-left:auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
-  @media(max-width:420px){.dom .kicker .no{display:none}}
-  .dom .hl{display:flex;align-items:baseline;gap:.55rem;margin-bottom:.15rem;flex-wrap:wrap}
-  .dom .hl .n{font-family:"Anton",sans-serif;font-size:2rem;line-height:1;letter-spacing:-.01em}
-  .dom .hl .u{font-family:"Geist Mono",monospace;font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
-  .dom .dek{font-family:"Geist Mono",monospace;font-size:.61rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2);margin-bottom:1.05rem;line-height:1.5}
-  .dom .links{display:flex;flex-wrap:wrap;gap:.4rem}
-  .dom .links a{font-family:"Geist Mono",monospace;font-size:.59rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-2);padding:.4rem .68rem;border-radius:999px;border:1px solid rgba(244,239,230,.12);background:rgba(244,239,230,.02);transition:.2s}
-  .dom .links a:hover{border-color:var(--ac);color:var(--ink)}
-  .dom .badge{display:inline-flex;align-items:center;gap:.3rem;font-family:"Geist Mono",monospace;font-size:.5rem;letter-spacing:.18em;text-transform:uppercase;color:var(--ac);border:1px solid currentColor;border-radius:999px;padding:.12rem .48rem;margin-left:.45rem;vertical-align:middle}
-  .dom.money{--ac:var(--pastel-cyan)}.dom.health{--ac:var(--sage)}.dom.build{--ac:var(--rust)}.dom.life{--ac:var(--pastel-lavender)}.dom.brand{--ac:var(--pastel-pink)}
+  .hello h1 { font-size: clamp(1.7rem, 3vw, 2.3rem); font-weight: 650; letter-spacing: -.03em; color: var(--text); }
+  .hello .d { color: var(--text-3); font-size: .95rem; margin-top: .2rem; }
+  .quick { display: flex; gap: .5rem; flex-wrap: wrap; margin: 1.1rem 0 .4rem; }
+  .jump { display: flex; gap: .5rem; flex-wrap: wrap; }
+  .jump a { font-size: .84rem; font-weight: 550; color: var(--text-2); padding: .45rem .8rem; border-radius: 999px; background: var(--surface); border: 1px solid var(--border); }
+  .jump a:hover { border-color: var(--border-2); color: var(--text); }
+  .health-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: .9rem 1rem; margin-top: .6rem; }
+  .health-grid .k { font-size: .76rem; color: var(--text-3); }
+  .health-grid .v { font-size: 1.35rem; font-weight: 600; letter-spacing: -.02em; font-variant-numeric: tabular-nums; color: var(--text); }
+  .streaks { display: flex; flex-direction: column; gap: .5rem; margin-top: .9rem; }
 </style>
 </head>
 <body>
-  <main>
-    <section class="masthead">
-      <div>
-        <div class="issue">Personal Operating System · Vol. 2026</div>
-        <h1>COOPER <span class="a">DELO</span></h1>
-      </div>
-      <div>
-        <div class="dek">Five domains, one glance. Log what you do; the rest syncs itself.</div>
-        <div class="stamp" id="stamp">—</div>
-      </div>
-    </section>
+<main>
+  <section class="hello">
+    <h1 id="greet">Hi, Cooper</h1>
+    <div class="d" id="today"></div>
+    <div class="quick">
+      <a class="btn primary" href="/admin/health/log.html" data-role="full">Log a meal</a>
+      <a class="btn" href="/admin/health/log.html" data-role="full">Log a workout</a>
+      <a class="btn" href="/admin/finance/entry.html">Add expense</a>
+      <a class="btn" href="/admin/contacts/">Add contact</a>
+      <button class="btn ghost" data-openpalette>Search <kbd style="font-size:.72rem;color:var(--text-3)">Ctrl K</kbd></button>
+    </div>
+  </section>
 
-    <section class="qa-row">
-      <span class="qe">Quick log</span>
-      <a class="qa" href="/admin/health/log.html" data-role="full"><span class="p">+</span>Meal</a>
-      <a class="qa" href="/admin/health/log.html" data-role="full"><span class="p">+</span>Workout</a>
-      <a class="qa" href="/admin/finance/entry.html"><span class="p">+</span>Expense</a>
-      <a class="qa" href="/admin/contacts/"><span class="p">+</span>Contact</a>
-      <button class="qa search" data-openpalette><span class="p">⌕</span>Search <kbd>⌘K</kbd></button>
-    </section>
+  <section class="sv-section sv-grid split" data-role="full">
+    <div class="sv-card pad-lg" id="mustdos"><div class="shimmer" style="height:120px"></div></div>
+    <div class="sv-card pad-lg" id="decide"><div class="shimmer" style="height:120px"></div></div>
+  </section>
 
-    <section class="domains">
-      <a class="dom money" href="/admin/finance/">
-        <div class="kicker"><span class="dt"></span><span class="nm">Money</span><span class="no">01 · finance · tax · runway</span></div>
-        <div class="hl"><span class="n" data-live="networth">~$19K</span><span class="u">net worth</span></div>
-        <div class="dek">Dashboard · net worth · transactions — tax, funding &amp; export live inside.</div>
-        <div class="links"><a href="/admin/finance/">Dashboard</a><a href="/admin/finance/networth.html">Net Worth</a><a href="/admin/finance/transactions.html">Transactions</a></div>
-      </a>
+  <section class="sv-section" data-role="full">
+    <div class="sv-h"><h2>Pulse</h2><a href="/admin/insights/">All insights</a></div>
+    <div class="sv-grid c4" id="pulse"><div class="shimmer" style="height:120px"></div></div>
+  </section>
 
-      <a class="dom health" href="/admin/health/dashboard.html">
-        <div class="kicker"><span class="dt"></span><span class="nm">Health &amp; Body</span><span class="no">02 · crohn's · training · food</span></div>
-        <div class="hl"><span class="n" data-live="health_today">Today</span><span class="u">log status</span></div>
-        <div class="dek">Bristol · meds · workouts · calories — one daily log <span class="badge">merged</span></div>
-        <div class="links"><a href="/admin/health/log.html">Daily Log</a><a href="/admin/health/dashboard.html">Insights</a></div>
-      </a>
+  <section class="sv-section sv-grid c2" data-role="full">
+    <div class="sv-card pad-lg" id="health"><div class="shimmer" style="height:120px"></div></div>
+    <div class="sv-card pad-lg" id="overnight"><div class="shimmer" style="height:120px"></div></div>
+  </section>
 
-      <a class="dom build" href="/admin/plugverse/">
-        <div class="kicker"><span class="dt"></span><span class="nm">Build · Plugverse</span><span class="no">03 · the company</span></div>
-        <div class="hl"><span class="n" data-live="mrr">$0</span><span class="u">MRR · beta</span></div>
-        <div class="dek">KPIs + one Ops view for pipeline, team &amp; QA. P&amp;L lives in Money.</div>
-        <div class="links"><a href="/admin/plugverse/">KPIs</a><a href="/admin/plugverse/ops.html">Ops</a><a href="/admin/finance/plugverse.html">P&amp;L</a></div>
-      </a>
-
-      <a class="dom life" href="/admin/life/">
-        <div class="kicker"><span class="dt"></span><span class="nm">Life</span><span class="no">04 · auto-synced</span></div>
-        <div class="hl"><span class="n" data-live="life_week">This week</span><span class="u">focus</span></div>
-        <div class="dek">Goals · relationships · music · academics <span class="badge">read-only · nightly</span></div>
-        <div class="links"><a href="/admin/life/">Review</a><a href="/admin/life/relationships.html">Relationships</a><a href="/admin/life/music.html">Music</a><a href="/admin/academics/">Academics</a></div>
-      </a>
-
-      <a class="dom brand" href="/admin/social/">
-        <div class="kicker"><span class="dt"></span><span class="nm">Brand</span><span class="no">05 · content · network · merch</span></div>
-        <div class="hl"><span class="n" data-live="followers">~128</span><span class="u">followers · growth</span></div>
-        <div class="dek">Content (social + carousels) · playbook · contacts · merch.</div>
-        <div class="links"><a href="/admin/social/">Content</a><a href="/admin/playbook/">Playbook</a><a href="/admin/contacts/">Contacts</a><a href="/admin/merch/">Merch</a></div>
-      </a>
-    </section>
-  </main>
-
-  <script type="module">
-    import { mountShell } from '/admin/_shell/admin-shell.js';
-    await mountShell({ title: 'Admin' });
-    const h = new Date().getHours();
-    const part = h < 5 ? 'late night' : h < 12 ? 'good morning' : h < 17 ? 'good afternoon' : h < 22 ? 'good evening' : 'late night';
-    const date = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
-    document.getElementById('stamp').innerHTML = `<b>${part}</b> · ${date}`;
-    // NOTE: data-live headline stats are placeholders for now; wired to Supabase
-    // (finance rollup, health log, plugverse KPIs, social sync) in a later pass.
-  </script>
+  <section class="sv-section">
+    <div class="sv-h"><h2>Everything else</h2><span class="sv-sub">The existing admin pages, restyled</span></div>
+    <div class="jump">
+      <a href="/admin/finance/">Finance</a><a href="/admin/finance/networth.html" data-role="full">Net worth</a><a href="/admin/finance/transactions.html">Transactions</a>
+      <a href="/admin/health/dashboard.html" data-role="full">Health insights</a><a href="/admin/plugverse/">PlugVerse KPIs</a><a href="/admin/plugverse/ops.html">PlugVerse ops</a>
+      <a href="/admin/life/" data-role="full">Life review</a><a href="/admin/academics/" data-role="full">Academics</a><a href="/admin/social/">Social dashboard</a>
+      <a href="/admin/carousels/" data-role="full">Carousel Studio</a><a href="/admin/playbook/">Playbook</a><a href="/admin/contacts/">Contacts</a><a href="/admin/merch/" data-role="full">Merch</a>
+    </div>
+  </section>
+</main>
+<script type="module" src="/admin/_js/home.js"></script>
 </body>
 </html>
