@@ -24,6 +24,7 @@ window.__cv = (name, fallback) => getComputedStyle(document.documentElement).get
 const NAV = [
   { section: 'Today', items: [
     { href: '/admin/',                          label: 'Home' },
+    { href: '/admin/schedule/',                 label: 'Schedule', roles: ['full'] },
     { href: '/admin/vault/',                    label: 'Vault', roles: ['full'] },
     { href: '/admin/decisions/',                label: 'Decisions', roles: ['full'] },
     { href: '/admin/rituals/',                  label: 'Rituals', roles: ['full'] },
@@ -74,7 +75,7 @@ const NAV = [
 
 // Mobile bottom tabs (max 4 + Menu). Text only, per DESIGN.md (no icons).
 const TABS = {
-  full:      [['/admin/', 'Home'], ['/admin/vault/', 'Vault'], ['/admin/insights/', 'Insights'], ['/admin/content/', 'Content']],
+  full:      [['/admin/', 'Home'], ['/admin/schedule/', 'Schedule'], ['/admin/vault/', 'Vault'], ['/admin/content/', 'Content']],
   plugverse: [['/admin/', 'Home'], ['/admin/plugverse/', 'KPIs'], ['/admin/plugverse/ops.html', 'Ops'], ['/admin/finance/plugverse.html', 'P&L']],
 };
 

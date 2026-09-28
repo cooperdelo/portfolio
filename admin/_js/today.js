@@ -117,7 +117,7 @@ function paintLadder() {
       <div class="td-txt"><div class="td-t">${esc(r.piece)}</div>${r.note && r.status !== 'posted' ? `<div class="td-b">${esc(r.note)}</div>` : ''}${opts}</div>
       <span class="td-pill ${cls}">${esc(label)}</span></li>`;
   };
-  el.innerHTML = `<div class="sv-h"><h2 class="disp">This week</h2><span class="td-count">${posted} of ${LADDER.length} posted</span></div>
+  el.innerHTML = `<div class="sv-h"><h2 class="disp">This week</h2><span class="td-count">${posted} of ${LADDER.length} posted · <a href="/admin/schedule/">Schedule</a></span></div>
     <ol class="td-ladder-list">${LADDER.map(row).join('')}</ol>`;
   el.querySelectorAll('.td-opt').forEach(b => b.addEventListener('click', () => pickRung(+b.closest('[data-id]').dataset.id, b.dataset.v)));
   el.querySelectorAll('.td-undo').forEach(b => b.addEventListener('click', () => pickRung(+b.closest('[data-id]').dataset.id, null)));
