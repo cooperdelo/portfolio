@@ -49,7 +49,7 @@ export const SECTIONS = [
     cover: 'Plugverse_picture.jpeg',
     blurb: 'A three-sided marketplace for local music — artists, venues, organizers. Built solo. $20K Luby Pitch, 0% equity. Live at plugverse.app.',
     tagline: 'The marketplace for local artists, venues, and organizers.',
-    stats: [['Founded', 'Dec 2025'], ['Form', 'NC LLC'], ['Built by', 'Cooper, solo'],
+    stats: [['Founded', 'Nov 2025'], ['Form', 'NC LLC'], ['Built by', 'Cooper, solo'],
       ['Stack', 'Next · Supabase · Stripe'], ['Raised', '$21,850'], ['Equity given', '0%'], ['Status', 'Live']],
     story: [
       { h: 'The problem', t: 'Every gig starts from scratch. Bio rewritten. Setlist re-attached. Rate re-explained. Contract copy-pasted from a Google Doc. No LinkedIn for local music.' },
