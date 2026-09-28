@@ -1,0 +1,100 @@
+/* motion.css: motion layer for cooperdelo.com.
+   Everything is scoped under html.m-on, which motion.js only sets when the
+   visitor has not asked for reduced motion. Without it the page is static. */
+
+:root { --m-ease: cubic-bezier(0.16, 1, 0.3, 1); --m-ease-in: cubic-bezier(0.7, 0, 0.84, 0); }
+
+/* ---- page veil (fade in on arrival, fade out on internal navigation) ---- */
+.m-veil {
+  position: fixed; inset: 0; z-index: 9999; background: #0a0a0a;
+  pointer-events: none; opacity: 0; transition: opacity 0.55s var(--m-ease);
+}
+html.m-on .m-veil { opacity: 1; }
+html.m-on.m-arrived .m-veil { opacity: 0; }
+html.m-on.m-leaving .m-veil { opacity: 1; transition: opacity 0.42s var(--m-ease-in); }
+
+/* ---- smooth scroll (Lenis) ---- */
+html.lenis, html.lenis body { height: auto; }
+html.m-on.lenis { scroll-behavior: auto !important; }
+.lenis.lenis-stopped { overflow: hidden; }
+
+/* ---- line and character masks ---- */
+.m-line { display: block; overflow: hidden; padding-bottom: 0.06em; margin-bottom: -0.06em; }
+.m-line > .m-lin { display: block; }
+.m-ch { display: inline-block; will-change: transform; }
+html.m-on .m-split .m-ch { transform: translate3d(0, 108%, 0); }
+html.m-on .m-split .m-lin.m-words { transform: translate3d(0, 108%, 0); }
+html.m-on .m-split.m-go .m-ch,
+html.m-on .m-split.m-go .m-lin.m-words {
+  transform: none;
+  transition: transform 1.15s var(--m-ease);
+  transition-delay: var(--cd, 0ms);
+}
+
+/* ---- scroll reveals (stagger is applied by delaying the .in class) ---- */
+html.m-on.m-home .reveal { transform: translate3d(0, 38px, 0); }
+html.m-on.m-home .reveal.in {
+  transform: none;
+  transition: opacity 1s var(--m-ease), transform 1.25s var(--m-ease);
+}
+html.m-on.m-home .reveal.in.m-mag { transform: translate3d(var(--mx, 0px), var(--my, 0px), 0); transition: opacity 1s var(--m-ease), color 0.25s ease, transform 0.5s var(--m-ease); }
+
+/* ---- cinematic image reveal: frame opens from the centre ---- */
+html.m-on .m-clip { clip-path: inset(14% 10% 14% 10% round 20px); transition: clip-path 1.5s var(--m-ease); }
+html.m-on .m-clip.in, html.m-on .in .m-clip, html.m-on .m-clip.m-open { clip-path: inset(0 0 0 0 round 20px); }
+
+/* ---- parallax ---- */
+html.m-on .scene { overflow: hidden; }
+html.m-on .scene::before {
+  transform: translate3d(0, var(--py, 0px), 0);
+  scale: var(--ps, 1.16);
+  will-change: transform;
+}
+html.m-on .hero::before { --ps: 1.28; transition: scale 2.8s var(--m-ease); }
+html.m-on.m-arrived .hero::before { --ps: 1.16; }
+html.m-on .m-px { will-change: transform; transform: translate3d(0, var(--py, 0px), 0) scale(var(--ps, 1.14)); }
+html.m-on .hero > .wrap { will-change: transform, opacity; }
+
+/* ---- scene video (band) ---- */
+.scene-video {
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+  z-index: -2; opacity: 0; transition: opacity 1.2s ease;
+}
+.scene-video.m-playing { opacity: 1; }
+html.m-on .scene-video { transform: translate3d(0, var(--py, 0px), 0) scale(1.16); }
+
+/* ---- magnetic links / buttons ---- */
+html.m-on .m-mag { transform: translate3d(var(--mx, 0px), var(--my, 0px), 0); }
+html.m-on .m-mag:hover { transform: translate3d(var(--mx, 0px), calc(var(--my, 0px) - 2px), 0); }
+html.m-on nav a.m-mag { display: inline-block; transition: color 0.2s ease, transform 0.35s var(--m-ease); }
+html.m-on .btn.m-mag { transition: border-color 0.25s ease, background 0.25s ease, transform 0.4s var(--m-ease); }
+html.m-on footer .email.m-mag { display: inline-block; transition: color 0.25s ease, transform 0.5s var(--m-ease); }
+
+/* ---- card tilt (after the reveal has finished) ---- */
+html.m-on .m-tilt.m-ready {
+  transform: perspective(1100px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translate3d(0, var(--ty, 0px), 0);
+  transition: transform 0.6s var(--m-ease), border-color 0.25s ease;
+}
+html.m-on a.m-tilt.m-ready:hover, html.m-on .m-tilt.m-ready:hover { --ty: -4px; }
+html.m-on .feature .img img { transition: scale 1.2s var(--m-ease); }
+html.m-on .feature:hover .img img { scale: 1.04; }
+
+/* ---- nav hides on the way down, returns on the way up ---- */
+html.m-on body > nav.glass { transition: transform 0.6s var(--m-ease), opacity 0.4s ease; }
+html.m-on body > nav.glass.m-hide { transform: translate(-50%, -160%); opacity: 0; }
+
+/* ---- photo strip ---- */
+html.m-on .strip img { transition: scale 0.8s var(--m-ease), filter 0.8s ease; }
+html.m-on .strip-wrap:hover .strip { animation-play-state: paused; }
+html.m-on .strip img:hover { scale: 1.035; }
+
+/* ---- rows ---- */
+html.m-on .row { transition: background 0.3s ease, padding-left 0.5s var(--m-ease); }
+
+/* ---- numbers ---- */
+.m-count { font-variant-numeric: tabular-nums; }
+
+@media (prefers-reduced-motion: reduce) {
+  .m-veil { display: none; }
+  .scene-video { display: none; }
+}

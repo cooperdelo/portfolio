@@ -17,6 +17,14 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Anton&family=Spectral:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="preload" as="image" href="photos/gig_rubber_big_stage_1.jpg" />
+  <link rel="stylesheet" href="motion.css" />
+  <script>
+    (function (d) {
+      if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      d.classList.add("m-on", "m-home");
+      setTimeout(function () { d.classList.add("m-arrived"); }, 2200);
+    })(document.documentElement);
+  </script>
 
   <style>
     :root {
@@ -373,6 +381,7 @@
   </style>
 </head>
 <body>
+  <div class="m-veil" aria-hidden="true"></div>
 
   <nav class="glass">
     <span class="name">Cooper Delo</span>
@@ -552,6 +561,7 @@
 
   <!-- BAND -->
   <section id="band" class="band scene">
+    <video class="scene-video" muted loop playsinline preload="none" poster="photos/gig_rubber_big_stage_3.jpg" data-src="videos/cat_cradle_performance.mov" aria-hidden="true"></video>
     <div class="wrap">
       <div class="band-panel reveal">
         <span class="mono" style="color: var(--faint);">On the side</span>
@@ -577,12 +587,19 @@
     </div>
   </footer>
 
+  <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.20/dist/lenis.min.js" defer></script>
+  <script src="motion.js" data-page="home" defer></script>
   <script>
-    const io = new IntersectionObserver(
-      (entries) => entries.forEach((e) => e.isIntersecting && e.target.classList.add("in")),
-      { threshold: 0.12 }
-    );
-    document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
+    // Fallback reveals when motion.js is off (reduced motion) or failed to load.
+    document.addEventListener("DOMContentLoaded", () => {
+      if (window.__motion) return;
+      document.documentElement.classList.add("m-arrived");
+      const io = new IntersectionObserver(
+        (entries) => entries.forEach((e) => e.isIntersecting && e.target.classList.add("in")),
+        { threshold: 0.12 }
+      );
+      document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
+    });
   </script>
 </body>
 </html>
