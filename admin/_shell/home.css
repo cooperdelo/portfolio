@@ -217,7 +217,7 @@ a.mx-row:hover .mx-name { color: var(--text); }
 .td-dot.bad { background: var(--neg); box-shadow: 0 0 0 3px var(--neg-tint); transform: translateY(-1px); }
 .td-status:not(.ok):not(.bad) .td-dot { background: var(--silver); box-shadow: none; }
 
-.td-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 1rem; align-items: start; }
+.td-grid { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 1rem; align-items: start; }
 .today .sv-h { margin-bottom: .6rem; }
 .td-decide > .sv-h { padding-top: 1.35rem; margin-bottom: .9rem; }
 @media (max-width: 1100px) { .td-decide > .sv-h { padding-top: .4rem; } }
@@ -296,3 +296,17 @@ a.mx-row:hover .mx-name { color: var(--text); }
   .td-cards { grid-template-columns: minmax(0, 1fr); }
   .td-status { font-size: .86rem; }
 }
+
+/* v9 Today list: progress, feeling check, groups, carry */
+.td-prog { height: 4px; border-radius: 999px; background: var(--border); overflow: hidden; margin: .15rem 0 .85rem; }
+.td-prog i { display: block; height: 100%; background: linear-gradient(90deg, var(--silver), var(--accent)); border-radius: inherit; transition: width .5s var(--ease-out); }
+.td-feel { display: inline-flex; gap: 2px; padding: 2px; border: 1px solid var(--border); border-radius: 999px; margin-bottom: .6rem; }
+.td-fb { font: inherit; font-size: .78rem; font-weight: 600; color: var(--text-3); background: transparent; border: 0; border-radius: 999px; padding: .3rem .8rem; cursor: pointer; transition: background .18s var(--ease-out), color .18s var(--ease-out); }
+.td-fb:hover { color: var(--text); }
+.td-fb[aria-pressed="true"] { background: var(--text); color: var(--canvas); }
+.td-fb[data-v="drained"][aria-pressed="true"] { background: var(--accent); color: #fff; }
+.td-g + .td-g { margin-top: .55rem; }
+.td-gl { font-size: .7rem; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; color: var(--silver); padding: .35rem 0 .15rem; }
+.td-time { display: inline-block; min-width: 5.6rem; margin-right: .5rem; font-size: .8rem; font-weight: 600; color: var(--text-2); font-variant-numeric: tabular-nums; }
+.td-carry { margin-left: .5rem; font-size: .72rem; font-weight: 600; color: var(--text-3); border: 1px solid var(--border-2); padding: .05rem .4rem; border-radius: 999px; white-space: nowrap; vertical-align: 1px; }
+.td-item.is-deferred .td-t { color: var(--text-3); }

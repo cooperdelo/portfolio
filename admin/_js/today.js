@@ -4,7 +4,7 @@
 // No file paths on screen: a row's source shows only as a hover title on "source".
 import { toast } from '/admin/_shell/admin-shell.js';
 import { esc, ago } from '/admin/_shell/ui.js';
-import { commandCenter, updateCommand, contentLadder, answerLadder, systemBroken } from '/admin/_shell/live-data.js';
+import { commandCenter, updateCommand, contentLadder, answerLadder, systemBroken, todayList, checkToday, setFeeling } from '/admin/_shell/live-data.js';
 import { reveal } from '/admin/_shell/motion.js';
 
 const $ = (id) => document.getElementById(id);
@@ -15,11 +15,11 @@ const todayKey = () => new Date().toLocaleDateString('en-CA', { timeZone: TZ });
 const src = (r) => r.source_path ? `<span class="td-src" tabindex="0" title="${esc(r.source_path)}">source</span>` : '';
 const optLabel = (opts, v) => (opts || []).find(o => o.v === v)?.label || v;
 
-let CC = [], LADDER = [];
+let CC = [], LADDER = [], LIST = null;
 
 export async function mountToday() {
-  const [cc, ladder] = await Promise.all([commandCenter(), contentLadder().catch(e => { console.error(e); return null; })]);
-  CC = cc; LADDER = ladder;
+  const [cc, ladder, list] = await Promise.all([commandCenter(), contentLadder().catch(e => { console.error(e); return null; }), todayList().catch(e => { console.error(e); return null; })]);
+  CC = cc; LADDER = ladder; LIST = list;
   status().catch(e => { console.error(e); $('tdStatus').innerHTML = `<span class="td-dot bad"></span><span>Couldn't read system status</span>`; });
   paintDo(); paintDecide(); paintLadder();
   reveal(document.querySelectorAll('#today .td-do, #today .td-decide > *, #today .td-ladder'), { stagger: 60, y: 10 });
@@ -47,29 +47,55 @@ async function status() {
   </ul>`;
 }
 
-// ---------- Do today ----------
+// ---------- Today: one live list (v_today_list = calendar, content, tasks) ----------
+// Order, carry-over and the "drained" collapse are decided in SQL so the page and the
+// 7:52am email always show the same list.
+const GROUPS = [['calendar', 'Calendar'], ['content', 'Content'], ['task', 'Tasks']];
+const FEEL = [['energized', 'Energized'], ['normal', 'Normal'], ['drained', 'Drained']];
+const isEod = (iso) => /11:59\s?pm/i.test(new Date(iso).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', timeZone: TZ }));
+function when(r) {
+  if (r.grp === 'calendar') return r.all_day ? 'All day' : `${time(r.at_time)}${r.end_at ? `–${time(r.end_at)}` : ''}`;
+  if (!r.at_time || r.done || dayKey(r.at_time) !== todayKey() || isEod(r.at_time)) return '';
+  return r.grp === 'content' ? `at ${time(r.at_time)}` : `by ${time(r.at_time)}`;
+}
 function paintDo() {
-  const today = todayKey();
-  const rows = CC.filter(r => r.kind === 'do');
-  const open = rows.filter(r => !r.done).sort((a, b) => (a.due ? new Date(a.due) : Infinity) - (b.due ? new Date(b.due) : Infinity) || a.priority - b.priority);
-  const done = rows.filter(r => r.done && (!r.answered_at || dayKey(r.answered_at) === today || dayKey(r.updated_at || r.created_at) === today));
-  const shown = open.slice(0, 5), more = open.length - shown.length;
-  const item = (r) => `<li class="td-item${r.done ? ' is-done' : ''}" data-id="${r.id}">
-      <button class="td-check" aria-pressed="${r.done}" aria-label="${r.done ? 'Mark not done' : 'Mark done'}: ${esc(r.title)}"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7"/></svg></button>
-      <div class="td-txt"><div class="td-t">${esc(r.title)}${r.due && !r.done && dayKey(r.due) === today && !r.title.includes(time(r.due).replace(/[ap]m$/, '')) ? `<span class="td-due">by ${esc(time(r.due))}</span>` : ''}</div>
-      ${r.body && !r.done ? `<div class="td-b">${esc(r.body)}</div>` : ''}</div>${src(r)}</li>`;
-  $('tdDo').innerHTML = `<div class="sv-h"><h2 class="disp">Do today</h2><span class="td-count">${open.length ? `${open.length} left` : 'All done'}</span></div>
-    ${shown.length ? `<ul class="td-list">${shown.map(item).join('')}</ul>` : `<p class="td-empty">Nothing on your list.</p>`}
-    ${more > 0 ? `<p class="td-more">${more} more after these</p>` : ''}
-    ${done.length ? `<details class="td-done"><summary>${done.length} done</summary><ul class="td-list">${done.map(item).join('')}</ul></details>` : ''}`;
-  $('tdDo').querySelectorAll('.td-check').forEach(b => b.addEventListener('click', async () => {
-    const id = +b.closest('.td-item').dataset.id, r = CC.find(x => x.id === id);
-    const val = !r.done;
-    r.done = val; r.answered_at = val ? new Date().toISOString() : null; r.updated_at = new Date().toISOString();
-    paintDo();
-    try { await updateCommand(id, { done: val, answered_at: r.answered_at }); }
+  const el = $('tdDo');
+  if (LIST == null) { el.innerHTML = `<div class="sv-h"><h2 class="disp">Today</h2></div><p class="td-empty">Couldn't read today's list.</p>`; return; }
+  const feeling = LIST[0]?.feeling || 'normal';
+  const live = LIST.filter(r => !r.deferred), deferred = LIST.filter(r => r.deferred);
+  const done = live.filter(r => r.done).length, total = live.length;
+  const item = (r) => {
+    const w = when(r);
+    const sub = r.grp === 'calendar' ? r.location : r.grp === 'content' ? r.sub : (!r.done ? r.sub : '');
+    return `<li class="td-item${r.done ? ' is-done' : ''}${r.deferred ? ' is-deferred' : ''}" data-grp="${r.grp}" data-ref="${esc(r.ref)}">
+      <button class="td-check" aria-pressed="${!!r.done}" aria-label="${r.done ? 'Mark not done' : 'Mark done'}: ${esc(r.title)}"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7"/></svg></button>
+      <div class="td-txt"><div class="td-t">${r.grp === 'calendar' && w ? `<span class="td-time">${esc(w)}</span>` : ''}${esc(r.title)}${r.grp !== 'calendar' && w ? `<span class="td-due">${esc(w)}</span>` : ''}${r.carried_count ? `<span class="td-carry">carried ${r.carried_count}x</span>` : ''}${r.deferred ? '<span class="td-carry">deferred</span>' : ''}</div>
+      ${sub ? `<div class="td-b">${esc(sub)}</div>` : ''}</div></li>`;
+  };
+  const groups = GROUPS.map(([g, label]) => {
+    const rows = live.filter(r => r.grp === g);
+    return rows.length ? `<div class="td-g"><div class="td-gl">${label}</div><ul class="td-list">${rows.map(item).join('')}</ul></div>` : '';
+  }).join('');
+  el.innerHTML = `<div class="sv-h"><h2 class="disp">Today</h2><span class="td-count">${total ? `${done} of ${total} done` : 'Nothing today'}</span></div>
+    <div class="td-prog" role="progressbar" aria-valuemin="0" aria-valuemax="${total}" aria-valuenow="${done}"><i style="width:${total ? Math.round(done / total * 100) : 0}%"></i></div>
+    <div class="td-feel" role="group" aria-label="How are you feeling today">${FEEL.map(([v, l]) => `<button class="td-fb" data-v="${v}" aria-pressed="${feeling === v}">${l}</button>`).join('')}</div>
+    ${groups || `<p class="td-empty">Nothing on your list.</p>`}
+    ${deferred.length ? `<details class="td-done"><summary>${deferred.length} deferred to tomorrow</summary><ul class="td-list">${deferred.map(item).join('')}</ul></details>` : ''}`;
+  el.querySelectorAll('.td-check').forEach(b => b.addEventListener('click', async () => {
+    const li = b.closest('.td-item'), r = LIST.find(x => x.grp === li.dataset.grp && String(x.ref) === li.dataset.ref);
+    const val = !r.done; r.done = val; paintDo();
+    try { await checkToday(r.grp, r.ref, val); refreshList(); }
     catch (e) { r.done = !val; paintDo(); toast(e.message || 'Save failed', 'err'); }
   }));
+  el.querySelectorAll('.td-fb').forEach(b => b.addEventListener('click', async () => {
+    const v = b.dataset.v; if (v === feeling) return;
+    LIST.forEach(r => { r.feeling = v; }); paintDo();
+    try { await setFeeling(v); await refreshList(); if (v === 'drained') toast('Cut to your top 3. The rest waits for tomorrow.', 'ok'); }
+    catch (e) { LIST.forEach(r => { r.feeling = feeling; }); paintDo(); toast(e.message || 'Save failed', 'err'); }
+  }));
+}
+async function refreshList() {
+  try { LIST = await todayList(); paintDo(); } catch (e) { console.error(e); }
 }
 
 // ---------- Decide ----------
