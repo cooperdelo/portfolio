@@ -4,7 +4,7 @@
 // Data embedded here (updates ~once/semester). Easy to move to Supabase later.
 // =====================================================================
 import { mountShell } from '/admin/_shell/admin-shell.js';
-await mountShell({ title: 'Academics' });
+await mountShell({ title: 'Academics', demo: true });
 
 const DATA = {
   gpa: 3.867, gradTerm: 'Spring 2028',
@@ -29,14 +29,18 @@ const DATA = {
   terms: [
     { term:'Fall 2026', title:'Junior Fall', state:'enrolled', where:'Chapel Hill',
       courses:[['BUSI 405 Leading & Managing','3'],['BUSI 406 Marketing','3'],['BUSI 408 Corp Finance','3'],['BUSI 608 FinTech','1.5'],['COMP 426 Modern Web','3']] },
-    { term:'Spring 2027', title:'Singapore', abroad:true, where:'NUS / SMU exchange',
-      courses:[['4–5 business courses','12–15'],['→ clears most BUSI electives','Pass/Fail'],['BUSI 404 Ethics (if approved)','1.5']] },
+    // Singapore exchange CANCELLED (Aug 17 2026, academic owner; playbook "Career facts"
+    // row 2026-09-24). Spring 2027 is in Chapel Hill; courses not registered yet.
+    { term:'Spring 2027', title:'Junior Spring', where:'Chapel Hill',
+      courses:[['Remaining BUSI core + electives','not registered yet']] },
     { term:'Fall 2027', title:'Senior Fall', where:'Chapel Hill',
       courses:[['BUSI 410 Analytics','3'],['BUSI 403 Operations','3'],['BUSI 402 / ECON 410','3'],['BUSI 411 Strategy I','1.5'],['Human Past gen-ed','3'],['CS course (311/420+)','3']] },
     { term:'Spring 2028', title:'Senior Spring · GRAD', where:'Chapel Hill',
       courses:[['BUSI 412 Strategy II (capstone)','3'],['Research & Discovery gen-ed','3'],['Music minor course','3'],['BUSI 404 / elective','1.5–3']] },
   ],
-  abroad: { pick:'Singapore — NUS (1st) · SMU (backup)', deadline:'2026-08-20T21:00:00-04:00' },
+  // Degree numbers come from the 2026-07-07 audit. Rule (admin-stale-sweep 2026-09-28):
+  // anything past-dated or older than its cadence is flagged, never shown as current.
+  auditDate: '2026-07-07', auditCadenceDays: 150, // re-audit once a semester
 };
 
 const el = (h) => { const t=document.createElement('template'); t.innerHTML=h.trim(); return t.content.firstElementChild; };
@@ -60,7 +64,7 @@ root.appendChild(el(`
     <div class="fact"><div class="k">Cumulative GPA</div><div class="v rust">${DATA.gpa}</div></div>
     <div class="fact"><div class="k">Credits</div><div class="v">${after}<small> / ${DATA.creditsTotal} after Fall ’26</small></div></div>
     <div class="fact"><div class="k">Graduation</div><div class="v">${DATA.gradTerm}</div></div>
-    <div class="fact"><div class="k">Study Abroad</div><div class="v">Singapore<small> · Spring 2027</small></div></div>
+    <div class="fact"><div class="k">Degree audit</div><div class="v">${new Date(DATA.auditDate+'T12:00').toLocaleDateString('en-US',{month:'short',day:'numeric'})}<small> · ${Math.round((Date.now()-new Date(DATA.auditDate+'T12:00'))/864e5)}d old${(Date.now()-new Date(DATA.auditDate+'T12:00'))/864e5 > DATA.auditCadenceDays ? ' · STALE, re-run audit' : ''}</small></div></div>
   </div>
 </div>`));
 requestAnimationFrame(()=>{ const r=document.getElementById('ring'); r.style.transition='stroke-dashoffset 1.1s cubic-bezier(.22,1,.36,1)'; r.style.strokeDashoffset=off; });
@@ -101,19 +105,4 @@ DATA.terms.forEach(t=>{
 });
 root.appendChild(tl);
 
-// ---- study abroad ----
-root.appendChild(el(`<h2 class="section-h">Study <span class="accent">abroad</span></h2>`));
-const days = Math.max(0, Math.ceil((new Date(DATA.abroad.deadline)-new Date())/864e5));
-root.appendChild(el(`
-<div class="card sa-card">
-  <div>
-    <div style="font-family:var(--f-display);font-size:1.3rem;">${DATA.abroad.pick}</div>
-    <p style="font-size:0.82rem;color:var(--ink-2);margin-top:0.5rem;line-height:1.5;max-width:52ch;">
-      Best mix of career brand, SE-Asia travel hub, and safest healthcare/food while on Tremfya. Apply NUS first, SMU backup — Singapore either way. Full comparison in the vault.</p>
-  </div>
-  <div class="deadline">
-    <div class="d-lab">Application deadline</div>
-    <div class="d-val">Aug 20</div>
-    <div class="d-cd">${days} days left · 9:00pm EST</div>
-  </div>
-</div>`));
+// Study-abroad section removed 2026-09-28: Singapore Spring 2027 was cancelled Aug 17.

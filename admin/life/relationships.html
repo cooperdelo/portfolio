@@ -45,7 +45,7 @@
 
   <script type="module">
     import { mountShell } from '/admin/_shell/admin-shell.js';
-    await mountShell({ title: 'Life · Relationships' });
+    await mountShell({ title: 'Life · Relationships', demo: true });
 
     // ==== AGENT-SYNCED DATA (nightly/weekly agent rewrites from People/ + memory) ====
     const SYNCED = '2026-07-24';
@@ -59,7 +59,7 @@
     ];
     const anchors = [
       { p: 'Adam Schifferdecker', role: 'Mentor', cad: 'He calls first — flip it, call him' },
-      { p: 'Jennifer Hewitt', role: 'Truist exec · connector', cad: 'Calendar reconnects; Singapore help' },
+      { p: 'Jennifer Hewitt', role: 'Truist exec · connector', cad: 'Calendar reconnects' },
       { p: 'Kurt Brischke', role: 'Step-brother', cad: 'Weekly text' },
     ];
     // ==============================================================================
@@ -71,6 +71,9 @@
       `<tr><td class="desc">${q.p}</td><td class="meta">${q.why}</td><td>${q.owed}</td><td><span class="pill ${q.st}">${lbl[q.st]}</span></td></tr>`).join('');
     document.getElementById('a-body').innerHTML = anchors.map(a =>
       `<tr><td class="desc">${a.p}</td><td class="meta">${a.role}</td><td>${a.cad}</td></tr>`).join('');
+  
+    // Staleness rule (2026-09-28): past its cadence this page says so instead of "Auto-synced".
+    (await import('/admin/_shell/ui.js')).staleSnapshot(SYNCED, 7, { what: 'The relationships page' });
   </script>
 </body>
 </html>

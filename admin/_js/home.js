@@ -324,8 +324,12 @@ async function mustDos() {
   if (error) throw error; if (e2) throw e2;
   const doc = docs?.[0];
   let body = '';
+  // Staleness rule (2026-09-28): an earlier day's driver is never shown as today's list.
+  const docDay = doc?.path.match(/\d{4}-\d{2}-\d{2}/)?.[0];
   if (!doc) {
     body = emptyState('No must-dos yet today.', '');
+  } else if (docDay && docDay !== today) {
+    body = `${emptyState("Today's driver hasn't been written yet.", '')}<div class="sv-meta">Last one was ${esc(fmtDay(docDay, { weekday: 'short', month: 'short', day: 'numeric' }))}, hidden because it's not today's.</div>`;
   } else {
     const lines = doc.content.split('\n').map(s => s.trim()).filter(Boolean).filter(s => !s.startsWith('#'));
     const todos = lines.filter(s => /^\d+\.\s/.test(s)).map(s => s.replace(/^\d+\.\s*/, ''));

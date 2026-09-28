@@ -19,12 +19,32 @@ export function isDemo() {
   const local = location.protocol === 'http:' && (location.hostname === 'localhost' || location.hostname === '127.0.0.1');
   return local && new URLSearchParams(location.search).has('demo');
 }
-let _snap;
+let _snap, _full;
 async function snap() {
   if (_snap !== undefined) return _snap;
-  try { _snap = (await (await fetch('/admin/_dev/snapshot.local.json', { cache: 'no-store' })).json())?.live || null; }
-  catch { _snap = null; }
+  try { _full = await (await fetch('/admin/_dev/snapshot.local.json', { cache: 'no-store' })).json(); _snap = _full?.live || null; }
+  catch { _snap = null; _full = null; }
   return _snap;
+}
+
+/** Newest follower/post-count snapshot per platform+handle (social_account_snapshots,
+ *  filled by the laptop Apify/social-stats jobs and the Stanley export). Each row keeps
+ *  its own date + source so the page can say "as of" and flag staleness. */
+export async function accountSnapshotsLatest() {
+  let rows;
+  if (isDemo()) {
+    await snap();
+    rows = (_full?.accounts || []).map(([date, platform, handle, followers, captured_at]) => ({ date, platform, handle, followers, captured_at, posts_total: null, source: 'demo snapshot' }));
+  } else {
+    const { data, error } = await sb.from('social_account_snapshots')
+      .select('date,platform,handle,followers,posts_total,source,captured_at')
+      .order('date', { ascending: false }).order('captured_at', { ascending: false }).limit(400);
+    if (error) throw error;
+    rows = data || [];
+  }
+  const out = {};
+  for (const r of rows) { const k = r.platform + '|' + String(r.handle || '').toLowerCase(); (out[k] ??= { ...r, history: [] }).history.push({ date: r.date, followers: r.followers }); }
+  return Object.values(out);
 }
 
 /** Personal brand + PlugVerse accounts that belong in the "All posts" feed. */

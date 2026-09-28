@@ -82,7 +82,7 @@ async function syncLiquidFromInvestments() {
     (acctRes.data || []).forEach(a => { total += Number(a.cash_balance || 0); });
     if (total > 0) {
       data.liquid[0].value = Math.round(total);
-      data.liquid[0].meta = 'live from Investments · synced ' + SNAPSHOT;
+      data.liquid[0].meta = 'live from Investments (investment_positions)';
     }
   } catch (_) { /* keep snapshot fallback */ }
 }
@@ -129,11 +129,32 @@ document.addEventListener('input', (e) => {
 });
 
 const stamp = document.getElementById('nw-stamp');
-if (stamp) stamp.textContent = 'Snapshot · ' + SNAPSHOT;
+if (stamp) stamp.textContent = 'Balances live · physical items hand-valued ' + SNAPSHOT;
 const foot = document.getElementById('nw-foot');
 if (foot) foot.innerHTML = 'Liquid is pulled live from the Investments page (one source of truth) — only personal checking is entered here. Personal net worth = liquid + owned physical − liabilities. Business (Plugverse) is tracked separately. The Sony camera is off by default (funded by the $20K). The replica Breitling counts as $0.';
 
-await syncLiquidFromInvestments();
+// 2026-09-28 stale sweep: the Mercury rows were a hand-typed Jul 24 figure ($137.48)
+// shown as "live". They now read the automatic balance feeds (Mercury API ->
+// account_balances; money-watch -> personal_balance_snapshots) with their own dates.
+async function syncBalances() {
+  try {
+    const { balances } = await import('/admin/_shell/live-data.js');
+    const b = await balances();
+    const pick = (re) => b.business.find(r => re.test(r.account_label || ''));
+    const chk = pick(/checking/i), sav = pick(/saving/i);
+    const d = (x) => new Date(x + 'T12:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    if (chk) { data.biz[1].value = Number(chk.balance); data.biz[1].meta = `Mercury API · as of ${d(chk.as_of)}`; }
+    if (sav) { data.biz[2].value = Number(sav.balance); data.biz[2].meta = `Mercury API · as of ${d(sav.as_of)}`; }
+    if (chk) data.biz[0].meta = `REVIEW: Mercury checking is now ${fmt(chk.balance)} (as of ${d(chk.as_of)}). If the prize was deposited there, untick this row so it isn't counted twice.`;
+    const personal = b.personal.filter(r => /check/i.test(r.account || '') && r.balance != null);
+    if (personal.length) {
+      data.liquid[1].value = Math.round(personal.reduce((a, r) => a + Number(r.balance), 0));
+      data.liquid[1].meta = personal.map(r => `${r.account} as of ${d(String(r.as_of).slice(0, 10))}`).join(' · ') + ' (email alerts)';
+    }
+  } catch (_) { /* leave rows as-is; the stamp below still says snapshot */ }
+}
+
+await Promise.all([syncLiquidFromInvestments(), syncBalances()]);
 renderAll();
 
 // TODO: persist physical/liabilities to Supabase (e.g. finance.net_worth_items)

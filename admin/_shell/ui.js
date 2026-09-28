@@ -176,6 +176,27 @@ export function postCard(p, { metric } = {}) {
   </a>`;
 }
 
+// THE STALENESS RULE (admin-stale-sweep 2026-09-28): anything past-dated or older than
+// its cadence is shown as stale, never as current. Pages that still embed a hand-written
+// snapshot call this with the snapshot date + how often it is supposed to refresh.
+// Past the cadence: the "Auto-synced" label is replaced with the real age, a banner says
+// the data is history, and the content is dimmed so it can't be read as current.
+export function staleSnapshot(asOfDate, cadenceDays, { what = 'This page' } = {}) {
+  const d = toDate(asOfDate); if (!d) return false;
+  const age = Math.floor((Date.now() - d.getTime()) / 864e5);
+  const label = document.getElementById('synced');
+  const when = fmtDay(d, { month: 'short', day: 'numeric', year: 'numeric' });
+  if (age <= cadenceDays) { if (label) label.textContent = `Snapshot · ${when}`; return false; }
+  if (label) { label.textContent = `Stale · ${when} · ${age}d old`; label.style.color = 'var(--rust)'; label.classList.remove('live-dot'); }
+  const head = document.querySelector('main .page-head');
+  if (head && !document.getElementById('stale-banner')) {
+    head.insertAdjacentHTML('afterend', `<div id="stale-banner" class="err-banner" style="font-family:'Geist Mono',monospace;font-size:.72rem;letter-spacing:.06em;color:var(--rust);padding:.75rem 1rem;border:1px solid rgba(255,77,46,.4);border-radius:10px;background:rgba(255,77,46,.05);margin-bottom:1.2rem"><strong>Out of date.</strong> ${esc(what)} is a snapshot from ${esc(when)} (${age} days old; it should refresh every ${cadenceDays} days). Nothing below is current. Kept greyed out as history until an automatic feed replaces it.</div>`);
+    let n = document.getElementById('stale-banner').nextElementSibling;
+    while (n) { n.style.opacity = '0.4'; n.style.filter = 'grayscale(1)'; n = n.nextElementSibling; }
+  }
+  return true;
+}
+
 export function statusChip(s) {
   const k = { ok: 'ok', failed: 'fail', partial: 'partial', quiet: 'quiet' }[s] || 'quiet';
   return `<span class="chip ${k}">${esc(s || 'no runs')}</span>`;

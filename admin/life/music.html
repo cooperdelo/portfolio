@@ -66,7 +66,7 @@
 
   <script type="module">
     import { mountShell } from '/admin/_shell/admin-shell.js';
-    await mountShell({ title: 'Life · Music' });
+    await mountShell({ title: 'Life · Music', demo: true });
 
     // ==== AGENT-SYNCED DATA (nightly/weekly agent rewrites from vault + finance band_income) ====
     const SYNCED = '2026-07-24';
@@ -81,6 +81,9 @@
     const fmt = (n) => n == null ? '<span class="meta">logged in finance</span>' : '$' + n.toLocaleString('en-US');
     document.getElementById('gig-body').innerHTML = gigs.map(x =>
       `<tr><td class="desc">${x.g}</td><td class="meta">${x.t}</td><td class="right">${fmt(x.pay)}</td></tr>`).join('');
+  
+    // Staleness rule (2026-09-28): past its cadence this page says so instead of "Auto-synced".
+    (await import('/admin/_shell/ui.js')).staleSnapshot(SYNCED, 7, { what: 'The music page' });
   </script>
 </body>
 </html>

@@ -58,7 +58,7 @@
 
   <script type="module">
     import { mountShell } from '/admin/_shell/admin-shell.js';
-    await mountShell({ title: 'Life · Review' });
+    await mountShell({ title: 'Life · Review', demo: true });
 
     // ==== AGENT-SYNCED DATA (nightly/weekly agent rewrites this block from the vault) ====
     const SYNCED = '2026-07-24';
@@ -101,6 +101,9 @@
     }).join('');
     document.getElementById('ns-list').innerHTML = northStar.map(n => `<li><span>${n}</span></li>`).join('');
     document.getElementById('pri-list').innerHTML = priorities.map((p, i) => `<li><span class="n">${i + 1}</span><span>${p}</span></li>`).join('');
+  
+    // Staleness rule (2026-09-28): past its cadence this page says so instead of "Auto-synced".
+    (await import('/admin/_shell/ui.js')).staleSnapshot(SYNCED, 7, { what: 'The weekly review' });
   </script>
 </body>
 </html>

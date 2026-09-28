@@ -61,7 +61,7 @@
 
   <script type="module">
     import { mountShell } from '/admin/_shell/admin-shell.js';
-    await mountShell({ title: 'Plugverse · Ops' });
+    await mountShell({ title: 'Plugverse · Ops', demo: true });
 
     // ==== AGENT-SYNCED DATA (nightly agent rewrites from Projects/plugverse + People/) ====
     const SYNCED = '2026-07-24';
@@ -104,6 +104,9 @@
       `<tr><td class="desc">${t.p}</td><td class="meta">${t.r}</td><td><span class="pill ${t.s}">${sl[t.s] || t.s}</span> <span class="meta">${t.st}</span></td></tr>`).join('');
     document.getElementById('qa-list').innerHTML = qa.map(x => `<li>${x}</li>`).join('');
     document.getElementById('strat-list').innerHTML = strat.map(x => `<li>${x}</li>`).join('');
+  
+    // Staleness rule (2026-09-28): past its cadence this page says so instead of "Auto-synced".
+    (await import('/admin/_shell/ui.js')).staleSnapshot(SYNCED, 7, { what: 'The ops page' });
   </script>
 </body>
 </html>
