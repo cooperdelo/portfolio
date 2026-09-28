@@ -163,6 +163,28 @@ export async function answerLadder(id, patch) {
   if (error) throw error;
 }
 
+/** Content schedule (v_content_schedule): this week, both lanes, with posts matched
+ *  from social_posts ("auto") and past unposted days marked "missed". */
+export async function contentSchedule() {
+  if (isDemo()) { await snap(); return (_full?.schedule || []).map(r => ({ ...r, ...(_demoWrites.get('cp' + r.id) || {}) })); }
+  const { data, error } = await sb.from('v_content_schedule').select('*');
+  if (error) throw error;
+  return data || [];
+}
+/** Persist auto-posted matches + keep today's "do" rows in step (also runs every 20 min via pg_cron). */
+export async function scheduleSync() {
+  if (isDemo()) return null;
+  const { data, error } = await sb.rpc('content_schedule_sync');
+  if (error) throw error;
+  return data;
+}
+/** One-tap fallback when a post hasn't synced yet. */
+export async function markPosted(id, posted) {
+  if (isDemo()) { _demoWrites.set('cp' + id, { ...(_demoWrites.get('cp' + id) || {}), status: posted ? 'posted' : 'ready', posted_via: posted ? 'manual' : null }); return; }
+  const { error } = await sb.rpc('content_mark_posted', { p_id: id, p_posted: posted });
+  if (error) throw error;
+}
+
 /** Broken things only: stale/empty feeds + tasks whose latest run in 24h failed or was partial. */
 export async function systemBroken() {
   const fresh = await dataFreshness();
