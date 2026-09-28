@@ -31,14 +31,13 @@ const NAV = [
   { section: 'Grow', items: [
     { href: '/admin/insights/',                 label: 'Insights', roles: ['full'] },
     { href: '/admin/people/',                   label: 'People in orbit', roles: ['full'] },
-    { href: '/admin/content/',                  label: 'Content calendar', roles: ['full'] },
+    { href: '/admin/content/',                  label: 'Content', roles: ['full'] },
     { href: '/admin/earn/',                     label: 'Earn', roles: ['full'] },
   ]},
   { section: 'Money', items: [
     { href: '/admin/finance/',                  label: 'Finance Dashboard' },
     { href: '/admin/finance/networth.html',     label: 'Net Worth', roles: ['full'] },
     { href: '/admin/finance/transactions.html', label: 'Transactions' },
-    { href: '/admin/finance/entry.html',        label: 'Quick Add' },
     { href: '/admin/finance/investments.html',  label: 'Investments', roles: ['full'] },
     { href: '/admin/finance/funding.html',      label: 'Funding Sources' },
     { href: '/admin/finance/tax.html',          label: 'Tax Prep', roles: ['full'] },

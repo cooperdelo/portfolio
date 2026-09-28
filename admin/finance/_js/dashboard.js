@@ -3,8 +3,39 @@
 // =====================================================================
 import { sb, fmtUSD, fmtUSDCompact, fmtMonth, subscribeTransactions } from '/admin/_shell/supabase.js';
 import { mountShell, toast, monthsBack, monthKey } from '/admin/_shell/admin-shell.js';
+import { balances } from '/admin/_shell/live-data.js';
+import { reveal, countUp } from '/admin/_shell/motion.js';
 
-await mountShell({ title: 'Finance · Overview' });
+const ctx = await mountShell({ title: 'Finance · Overview', demo: true });
+const DEMO = !!ctx?.demo;
+
+// ---------------- Balances (Mercury auto + money-watch email alerts) ----------------
+const ACCT = { wells_fargo_checking: 'Wells Fargo checking', roth_ira: 'Roth IRA', coinbase_crypto: 'Coinbase' };
+const acctName = (a) => ACCT[a] || String(a || '').replace(/_/g, ' ').replace(/^./, c => c.toUpperCase());
+const dayLbl = (d) => new Date(String(d).length === 10 ? d + 'T12:00:00' : d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'America/New_York' });
+const hrsOld = (d) => (Date.now() - new Date(String(d).length === 10 ? d + 'T23:59:00' : d).getTime()) / 3.6e6;
+async function renderBalances() {
+  const el = document.getElementById('balances');
+  let b;
+  try { b = await balances(); } catch (e) { el.innerHTML = `<div class="sv-empty"><div class="e1">Couldn't load balances</div><div class="e2">${escapeHtml(e?.message || e)}</div></div>`; return; }
+  const group = (title, rows, name, cls, src, staleH) => {
+    if (!rows.length) return `<div class="bal-group ${cls}"><h3>${title}</h3><div class="sv-empty"><div class="e1">No balance yet</div></div></div>`;
+    const tot = rows.reduce((a, r) => a + Number(r.balance || 0), 0);
+    const asof = rows.map(r => r.as_of).sort().pop();
+    const stale = hrsOld(asof) > staleH;
+    return `<div class="bal-group ${cls}"><h3>${title}</h3>
+      <div class="bal-tot"><span class="v" data-usd="${tot}">${fmtUSD(tot)}</span></div>
+      ${rows.map(r => `<div class="bal-row"><span class="n">${escapeHtml(name(r))}</span><span class="v">${fmtUSD(r.balance)}</span></div>`).join('')}
+      <div class="bal-meta">${src} · as of ${dayLbl(asof)}${stale ? ' <span class="chip stale red">stale</span>' : ''}</div></div>`;
+  };
+  el.innerHTML = `<div class="bal-grid">
+    ${group('PlugVerse · Mercury', b.business, r => r.account_label + (r.balance_kind && r.balance_kind !== 'available' ? ` (${r.balance_kind})` : ''), 'pv', 'Mercury, available', 48)}
+    ${group('Personal', b.personal, r => acctName(r.account), '', 'Balance alert emails', 24 * 7)}
+  </div>`;
+  reveal(el.querySelectorAll('.bal-group'), { stagger: 80 });
+  el.querySelectorAll('[data-usd]').forEach((n, i) => countUp(n, Number(n.dataset.usd), { delay: 120 + i * 80, format: (v) => fmtUSD(v) }));
+}
+renderBalances();
 
 // Brand palette (matches shell.css)
 const C = {
@@ -285,10 +316,15 @@ function escapeHtml(s) { return String(s || '').replace(/[&<>"']/g, c => ({ '&':
 // ---------------- Realtime ----------------
 
 const indicator = document.getElementById('live-indicator');
-subscribeTransactions((payload) => {
-  indicator.textContent = 'Live · updated';
-  loadAll().then(() => setTimeout(() => { indicator.textContent = 'Live · syncing'; }, 1800));
-});
-
-await loadAll();
-indicator.textContent = 'Live · syncing';
+if (DEMO) {
+  // Localhost demo: balances only (transactions are not in the demo snapshot).
+  indicator.textContent = 'Demo';
+  document.getElementById('recent-tbody').innerHTML = `<tr><td colspan="6" class="empty">Private. Shows when you sign in.</td></tr>`;
+} else {
+  subscribeTransactions((payload) => {
+    indicator.textContent = 'Live · updated';
+    loadAll().then(() => setTimeout(() => { indicator.textContent = 'Live · syncing'; }, 1800));
+  });
+  await loadAll();
+  indicator.textContent = 'Live · syncing';
+}

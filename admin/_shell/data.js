@@ -51,7 +51,8 @@ export async function postsWithMetrics() {
   for (const s of snaps || []) if (!latest[s.post_id]) latest[s.post_id] = s;
   return (posts || []).map(p => {
     const m = latest[p.id] || null;
-    const reach = m ? (m.impressions ?? m.views ?? m.reach ?? null) : null;
+    // LinkedIn: impressions only (a reaction or view count is never shown as impressions).
+    const reach = m ? (p.platform === 'linkedin' ? (m.impressions ?? null) : (m.impressions ?? m.views ?? m.reach ?? null)) : null;
     return {
       ...p, m, reach, as_of: m?.as_of || null,
       reachLabel: p.platform === 'linkedin' ? 'impressions' : 'views',

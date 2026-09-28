@@ -13,15 +13,17 @@
   <main>
     <div class="page-head">
       <div>
-        <div class="eyebrow">Single source of truth</div>
         <h1>FINANCIAL <span class="accent">overview</span></h1>
       </div>
       <div class="actions">
         <span class="live-dot" id="live-indicator">Live · syncing</span>
         <a class="btn" href="/admin/finance/transactions.html">View all</a>
-        <a class="btn primary" href="/admin/finance/entry.html">+ Add</a>
+        <a class="btn ghost small" href="/admin/finance/entry.html" title="Mercury and card-alert emails fill transactions automatically">Add missing</a>
       </div>
     </div>
+
+    <!-- Balances: Mercury (auto, connector) + personal (money-watch email alerts). No bank logins. -->
+    <div class="card bal-card" id="balances"><div class="shimmer" style="height:120px"></div></div>
 
     <!-- KPI cards -->
     <div class="kpi-grid" id="kpis">

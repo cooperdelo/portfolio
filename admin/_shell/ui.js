@@ -195,3 +195,15 @@ export function modal(html) {
   document.body.appendChild(m);
   return m;
 }
+
+// Data freshness strip (v_admin_data_freshness_status via live-data.js dataFreshness()).
+// One line per stale/empty feed; a single green line when every feed is fresh.
+export function freshStrip(rows, { link = '/admin/vault/' } = {}) {
+  const bad = (rows || []).filter(r => r.status !== 'fresh').sort((a, b) => (Number(b.age_hours) || 1e9) - (Number(a.age_hours) || 1e9));
+  const age = (h) => h == null ? 'no data' : h < 1 ? 'under 1h ago' : h < 48 ? `${Math.round(h)}h ago` : `${Math.round(h / 24)} days ago`;
+  const vault = link ? `<a class="fs-link" href="${esc(link)}">Vault</a>` : '';
+  if (!rows?.length) return `<div class="fstrip"><div class="fs-line bad"><i></i><span>Feed status unavailable</span>${vault}</div></div>`;
+  if (!bad.length) return `<div class="fstrip"><div class="fs-line ok"><i></i><span>All ${rows.length} feeds fresh</span>${vault}</div></div>`;
+  return `<div class="fstrip">${bad.map((r, i) => `<div class="fs-line bad"><i></i><span><b>${esc(r.label)}</b> ${r.status === 'empty' ? 'empty' : 'stale'} · last update ${esc(age(r.age_hours == null ? null : Number(r.age_hours)))}${r.max_age_days ? ` · expected every ${r.max_age_days}d` : ''}</span>${i === 0 ? vault : ''}</div>`).join('')}
+    <div class="fs-line ok dim"><i></i><span>${rows.length - bad.length} of ${rows.length} feeds fresh</span></div></div>`;
+}

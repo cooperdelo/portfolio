@@ -11,6 +11,8 @@ import { sb } from '/admin/_shell/supabase.js';
 import { mountShell, toast } from '/admin/_shell/admin-shell.js';
 import { esc, fmtNum, fmtCompact, fmtDay, ago, deltaChip, platMark, platName, emptyState, sparkline, statusChip, todayET, toDate, staleChip, asOf } from '/admin/_shell/ui.js';
 import { accountSeries, groupAccounts, postsWithMetrics } from '/admin/_shell/data.js';
+import { dataFreshness } from '/admin/_shell/live-data.js';
+import { freshStrip } from '/admin/_shell/ui.js';
 import { REDUCED, reveal, countUp, drawOn, growBars, growX, pop, spotlight, onVisible, liveAgo } from '/admin/_shell/motion.js';
 
 const ctx = await mountShell({ title: 'Home', demo: true });
@@ -80,6 +82,7 @@ if (ctx?.role === 'full') {
   const pAcc = loadAccounts();
   const pOpen = loadOpen();
   const pRuns = loadRuns();
+  freshness().catch(e => fail('fresh', 'feed status', e));
   hero(pAcc, pOpen).catch(e => fail('heroGrid', 'today numbers', e));
   heroChart(loadLinkedInPosts()).catch(e => fail('heroChart', 'LinkedIn posts', e));
   system(pRuns).catch(e => fail('system', 'task runs', e));
@@ -89,6 +92,13 @@ if (ctx?.role === 'full') {
   decide(pOpen).catch(e => fail('decide', 'decisions', e));
   vaultCard(pRuns).catch(e => fail('vaultCard', 'vault sync', e));
   document.querySelectorAll('main > .sv-section').forEach(s => onVisible(s, () => reveal(s.querySelectorAll(':scope > .sv-h, :scope > .sv-card, :scope > .sv-grid > *, :scope > .sv-card'), { stagger: 80 })));
+}
+
+// ---------- Feed status strip (v_admin_data_freshness_status) ----------
+async function freshness() {
+  const el = $('fresh');
+  el.innerHTML = freshStrip(await dataFreshness(), { link: '/admin/vault/' });
+  reveal(el.querySelectorAll('.fs-line'), { stagger: 50, y: 6 });
 }
 
 // ---------- HERO: four big numbers ----------

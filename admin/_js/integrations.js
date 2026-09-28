@@ -4,17 +4,22 @@
 import { sb } from '/admin/_shell/supabase.js';
 import { mountShell } from '/admin/_shell/admin-shell.js';
 import { requireFullAdminOrRedirect } from '/admin/_shell/supabase.js';
-import { esc, ago, fmtDay, fmtWhen, emptyState, pageHead, platMark, staleChip, statusChip } from '/admin/_shell/ui.js';
+import { esc, ago, fmtDay, fmtWhen, emptyState, pageHead, platMark, staleChip, statusChip, freshStrip } from '/admin/_shell/ui.js';
+import { dataFreshness } from '/admin/_shell/live-data.js';
 
 if (!(await requireFullAdminOrRedirect())) throw new Error('not full admin');
 await mountShell({ title: 'Integrations' });
 const app = document.getElementById('app');
 app.innerHTML = pageHead('System', 'Integrations') + `
+  <div id="fresh"></div>
   <div class="sv-h"><h2>Data pulls</h2><span class="sv-sub">social_pipeline_health, written by the social-pull task</span></div>
   <div class="sv-grid auto" id="pulls"></div>
   <section class="sv-section"><div class="sv-h"><h2>API tokens</h2><span class="sv-sub">Expiry only. Tokens are never loaded into this page.</span></div><div class="sv-card"><div class="rows" id="tokens"></div></div></section>
   <section class="sv-section"><div class="sv-h"><h2>Latest snapshot per account</h2></div><div class="sv-card"><div class="rows" id="snaps"></div></div></section>
   <section class="sv-section"><div class="sv-h"><h2>Watchers</h2></div><div class="sv-card"><div class="rows" id="watch"></div></div></section>`;
+
+dataFreshness().then(r => { document.getElementById('fresh').innerHTML = freshStrip(r, { link: '/admin/vault/' }); })
+  .catch(e => { document.getElementById('fresh').innerHTML = emptyState("Couldn't load feed status", esc(e?.message || String(e))); });
 
 const [ph, ig, tt, sn, runs] = await Promise.all([
   sb.from('social_pipeline_health').select('platform,handle,last_successful_pull,expected_cadence_days,status,failure_note,updated_at'),
