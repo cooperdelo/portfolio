@@ -307,6 +307,7 @@ a.mx-row:hover .mx-name { color: var(--text); }
 .td-fb[data-v="drained"][aria-pressed="true"] { background: var(--accent); color: #fff; }
 .td-g + .td-g { margin-top: .55rem; }
 .td-gl { font-size: .7rem; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; color: var(--silver); padding: .35rem 0 .15rem; }
-.td-time { display: inline-block; min-width: 5.6rem; margin-right: .5rem; font-size: .8rem; font-weight: 600; color: var(--text-2); font-variant-numeric: tabular-nums; }
+.td-time { display: inline-block; min-width: 7.4rem; margin-right: .5rem; font-size: .8rem; font-weight: 600; color: var(--text-2); font-variant-numeric: tabular-nums; }
 .td-carry { margin-left: .5rem; font-size: .72rem; font-weight: 600; color: var(--text-3); border: 1px solid var(--border-2); padding: .05rem .4rem; border-radius: 999px; white-space: nowrap; vertical-align: 1px; }
 .td-item.is-deferred .td-t { color: var(--text-3); }
+@media (max-width: 640px) { .td-time { display: block; min-width: 0; margin: 0 0 .1rem; font-size: .76rem; color: var(--text-3); } }

@@ -152,14 +152,20 @@ export async function updateCommand(id, patch) {
 
 /** Today's full list (v_today_list): calendar, content, tasks, with feeling + deferral applied in SQL. */
 export async function todayList() {
-  if (isDemo()) { await snap(); return _full?.today?.list || []; }
+  if (isDemo()) {
+    await snap();
+    return (_full?.today?.list || []).map(r => {
+      const w = _demoWrites.get('tl' + r.grp + r.ref) || {}, feeling = _demoWrites.get('feeling') || r.feeling;
+      return { ...r, ...w, feeling, deferred: feeling === 'drained' && r.must_rank > 3 };
+    });
+  }
   const { data, error } = await sb.from('v_today_list').select('*');
   if (error) throw error;
   return data || [];
 }
 /** One tap on a Today row: routes the write by group. */
 export async function checkToday(grp, ref, done) {
-  if (isDemo()) return;
+  if (isDemo()) { _demoWrites.set('tl' + grp + ref, { done }); return; }
   const q = grp === 'calendar' ? sb.from('calendar_today').update({ done }).eq('event_id', ref)
     : grp === 'content' ? sb.rpc('content_mark_posted', { p_id: +ref, p_posted: done })
     : sb.from('command_center').update({ done, answered_at: done ? new Date().toISOString() : null }).eq('id', +ref);
@@ -168,7 +174,7 @@ export async function checkToday(grp, ref, done) {
 }
 /** How are you feeling today: energized | normal | drained. */
 export async function setFeeling(feeling) {
-  if (isDemo()) return;
+  if (isDemo()) { _demoWrites.set('feeling', feeling); return; }
   const day = new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
   const { error } = await sb.from('daily_checkin').upsert({ day, feeling, set_at: new Date().toISOString() }, { onConflict: 'day' });
   if (error) throw error;

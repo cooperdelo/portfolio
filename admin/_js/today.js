@@ -74,6 +74,7 @@ function paintDo() {
   };
   const groups = GROUPS.map(([g, label]) => {
     const rows = live.filter(r => r.grp === g);
+    if (g !== 'calendar') rows.sort((a, b) => a.done - b.done); // open first, done sinks (stable)
     return rows.length ? `<div class="td-g"><div class="td-gl">${label}</div><ul class="td-list">${rows.map(item).join('')}</ul></div>` : '';
   }).join('');
   el.innerHTML = `<div class="sv-h"><h2 class="disp">Today</h2><span class="td-count">${total ? `${done} of ${total} done` : 'Nothing today'}</span></div>
