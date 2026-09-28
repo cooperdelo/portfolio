@@ -134,7 +134,7 @@ export async function commandCenter() {
   if (isDemo()) { await snap(); rows = (_full?.today?.cc || []).map(r => ({ ...r, ...(_demoWrites.get('cc' + r.id) || {}) })); }
   else {
     const { data, error } = await sb.from('command_center')
-      .select('id,kind,title,body,options,answer,answered_at,source_task,source_path,priority,due,created_at,updated_at,expires_at,done')
+      .select('id,kind,title,body,context,options,answer,answered_at,source_task,source_path,priority,due,created_at,updated_at,expires_at,done')
       .order('priority', { ascending: true }).limit(200);
     if (error) throw error;
     rows = data || [];
@@ -148,6 +148,17 @@ export async function updateCommand(id, patch) {
   if (isDemo()) { _demoWrites.set('cc' + id, { ...(_demoWrites.get('cc' + id) || {}), ...patch }); return; }
   const { error } = await sb.from('command_center').update(patch).eq('id', id);
   if (error) throw error;
+}
+
+/** "What to improve" (v_home_recommendations, 2026-09-28): 3 to 6 rows computed in SQL from
+ *  social_posts, content_plan, plugverse_contacts and the outreach send queue. Every number in
+ *  `evidence` carries its platform, handle and as-of date. Fields: sort, area, headline, evidence,
+ *  detail, action, link, severity (0 on goal .. 3 far off). */
+export async function homeRecommendations() {
+  if (isDemo()) { await snap(); return _full?.home_recs || []; }
+  const { data, error } = await sb.from('v_home_recommendations').select('*').order('sort');
+  if (error) throw error;
+  return data || [];
 }
 
 /** Today's full list (v_today_list): calendar, content, tasks, with feeling + deferral applied in SQL. */
@@ -208,6 +219,29 @@ export async function scheduleSync() {
   if (error) throw error;
   return data;
 }
+/** Full option details (what's on screen, payoff line, rendered file) keyed by option id. */
+export async function optionBank() {
+  if (isDemo()) { await snap(); return Object.fromEntries((_full?.option_bank || []).map(o => [o.id, o])); }
+  const { data, error } = await sb.from('content_option_bank')
+    .select('id,label,lane,format,on_screen,payoff,caption,render_path,preview_url,reference_url,reference_stats,framework,personalize,source');
+  if (error) throw error;
+  return Object.fromEntries((data || []).map(o => [o.id, o]));
+}
+/** Messages Cooper sent Claude about one thing (e.g. a schedule slot) and Claude's replies. */
+export async function inboxFor(refTable, refId) {
+  if (isDemo()) return (_demoWrites.get('inbox' + refTable + refId) || []);
+  const { data, error } = await sb.from('claude_inbox').select('id,created_at,kind,message,status,response,responded_at')
+    .eq('ref_table', refTable).eq('ref_id', String(refId)).order('created_at', { ascending: false }).limit(20);
+  if (error) throw error;
+  return data || [];
+}
+export async function sendInbox({ refTable, refId, kind, message, context }) {
+  const row = { ref_table: refTable, ref_id: String(refId), kind, message, context: context || null, source: 'admin' };
+  if (isDemo()) { const k = 'inbox' + refTable + refId; _demoWrites.set(k, [{ ...row, created_at: new Date().toISOString(), status: 'open' }, ...(_demoWrites.get(k) || [])]); return; }
+  const { error } = await sb.from('claude_inbox').insert(row);
+  if (error) throw error;
+}
+
 /** One-tap fallback when a post hasn't synced yet. */
 export async function markPosted(id, posted) {
   if (isDemo()) { _demoWrites.set('cp' + id, { ...(_demoWrites.get('cp' + id) || {}), status: posted ? 'posted' : 'ready', posted_via: posted ? 'manual' : null }); return; }

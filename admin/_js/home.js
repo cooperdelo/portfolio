@@ -11,7 +11,7 @@ import { sb } from '/admin/_shell/supabase.js';
 import { mountShell, toast } from '/admin/_shell/admin-shell.js';
 import { esc, fmtNum, fmtCompact, fmtDay, ago, deltaChip, platMark, platName, emptyState, sparkline, statusChip, todayET, toDate, staleChip, asOf } from '/admin/_shell/ui.js';
 import { accountSeries, groupAccounts, postsWithMetrics } from '/admin/_shell/data.js';
-import { dataFreshness } from '/admin/_shell/live-data.js';
+import { dataFreshness, homeRecommendations } from '/admin/_shell/live-data.js';
 import { freshStrip } from '/admin/_shell/ui.js';
 import { mountToday } from '/admin/_js/today.js';
 import { REDUCED, reveal, countUp, drawOn, growBars, growX, pop, spotlight, onVisible, liveAgo } from '/admin/_shell/motion.js';
@@ -84,6 +84,7 @@ if (ctx?.role === 'full') {
   const pOpen = loadOpen();
   const pRuns = loadRuns();
   mountToday().catch(e => fail('tdDo', 'today', e));
+  improve().catch(e => fail('improve', 'recommendations', e));
   hero(pAcc, pOpen).catch(e => fail('heroGrid', 'today numbers', e));
   heroChart(loadLinkedInPosts()).catch(e => fail('heroChart', 'LinkedIn posts', e));
   system(pRuns).catch(e => fail('system', 'task runs', e));
@@ -93,6 +94,32 @@ if (ctx?.role === 'full') {
   else { health().catch(e => fail('health', 'health', e)); }
   vaultCard(pRuns).catch(e => fail('vaultCard', 'vault sync', e));
   document.querySelectorAll('main > .sv-section').forEach(s => onVisible(s, () => reveal(s.querySelectorAll(':scope > .sv-h, :scope > .sv-card, :scope > .sv-grid > *, :scope > .sv-card'), { stagger: 80 })));
+}
+
+// ---------- What to improve (v_home_recommendations) ----------
+// Rules live in SQL so every number is computed from the same rows the rest of the admin
+// reads. Tap a row to see the detail; the action goes to the page where you fix it.
+async function improve() {
+  const AREA = { posting: 'Posting', content: 'Content', people: 'People', acquisition: 'Artists' };
+  const SEVL = ['On goal', 'Worth a look', 'Behind', 'Far behind'];
+  const rows = await homeRecommendations();
+  const el = $('improve');
+  const clean = (s) => esc(String(s ?? '').replace(/\s*[—–]\s*/g, ', '));
+  const item = (r, i) => `<li class="imp-i sev${Number(r.severity) || 0}">
+      <details${i === 0 ? ' open' : ''}>
+        <summary>
+          <span class="imp-area">${esc(AREA[r.area] || r.area)}</span>
+          <span class="imp-txt"><span class="imp-h">${clean(r.headline)}</span><span class="imp-ev">${clean(r.evidence)}</span></span>
+          <span class="imp-sev" title="${esc(SEVL[r.severity] || '')}"><i></i>${esc(SEVL[r.severity] || '')}</span>
+        </summary>
+        <div class="imp-body">
+          ${r.detail ? `<p>${clean(r.detail)}</p>` : ''}
+          <a class="imp-act" href="${esc(r.link || '/admin/')}">${clean(r.action)} <span aria-hidden="true">→</span></a>
+        </div>
+      </details></li>`;
+  el.innerHTML = `<div class="sv-h"><h2 class="disp">What to improve</h2><span class="td-count">From your last 7 to 14 days</span></div>
+    ${rows.length ? `<ol class="imp-list">${rows.map(item).join('')}</ol>` : emptyState('Nothing to flag right now.', '')}`;
+  reveal(el.querySelectorAll('.imp-i'), { stagger: 50, y: 8 });
 }
 
 // ---------- Feed status strip (v_admin_data_freshness_status) ----------

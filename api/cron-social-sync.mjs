@@ -1,7 +1,7 @@
 // =====================================================================
 // /api/cron-social-sync.mjs
-// Vercel cron entry point. Daily at 13:00 UTC (9am ET), calls IG + TikTok
-// sync endpoints with the shared CRON_SECRET so they bypass admin-JWT.
+// Vercel cron entry point. Daily at 13:00 UTC (9am ET), calls the TikTok
+// sync endpoint with the shared CRON_SECRET so it bypasses admin-JWT.
 // =====================================================================
 
 export default async function handler(req, res) {
@@ -34,15 +34,17 @@ export default async function handler(req, res) {
     }
   };
 
-  const [ig, tt] = await Promise.all([
-    callSync('/api/instagram-sync'),
-    callSync('/api/tiktok-sync'),
-  ]);
+  // Instagram is no longer pulled here (2026-09-28). Postgres owns it now:
+  // pg_cron 'social-api-pull' -> public.instagram_api_pull() writes per-post
+  // insights into social_post_snapshots for every connected account, and
+  // 'ig-token-refresh' keeps the tokens alive. /api/instagram-sync stays for
+  // manual use only; calling it daily created duplicate social_posts rows.
+  const tt = await callSync('/api/tiktok-sync');
 
-  const ok = ig.ok && tt.ok;
+  const ok = tt.ok;
   return res.status(ok ? 200 : 207).json({
     ran_at: new Date().toISOString(),
     ok,
-    results: [ig, tt],
+    results: [tt],
   });
 }
