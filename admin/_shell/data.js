@@ -16,6 +16,13 @@ export async function accountSeries() {
     .select('date,platform,handle,followers,posts_total,total_views,impressions,window_days,source,captured_at,raw')
     .order('date', { ascending: false }).limit(1000);
   if (error) throw error;
+  return groupAccounts(data || []);
+}
+
+/** Group snapshot rows (any order) into per-account series. Also used by the
+ *  localhost-only demo snapshot on the home page. */
+export function groupAccounts(data) {
+  data = [...data].sort((a, b) => String(b.date).localeCompare(String(a.date)));
   const series = {};
   for (const r of data || []) {
     if (r.window_days !== 0 || r.followers == null) continue;

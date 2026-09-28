@@ -1,29 +1,315 @@
-// /admin/_js/home.js — "Good morning" home (v5).
-// Reads: vault_documents (Daily/driver/<date>.md), daily_driver, decisions,
-// opportunities, social_account_snapshots, health_daily, task_run_log.
+// /admin/_js/home.js — Home (v6 "signature" pass, 2026-09-28).
+// Reads: social_account_snapshots, social_posts + social_post_snapshots (LinkedIn
+// impressions per post), task_run_log (14 days), decisions, opportunities,
+// vault_documents (Daily/driver/<date>.md), daily_driver, health_daily.
+// Every number is real or an honest empty state. No placeholder figures.
+//
+// Localhost-only design preview: http://localhost:<port>/admin/?demo renders the
+// same layout from admin/_dev/snapshot.local.json (gitignored, never deployed).
+// On any other host ?demo is ignored and the normal auth gate applies.
 import { sb } from '/admin/_shell/supabase.js';
 import { mountShell, toast } from '/admin/_shell/admin-shell.js';
-import { esc, fmtNum, fmtDay, ago, asOf, deltaChip, platMark, emptyState, sparkline, statusChip, todayET, toDate, staleChip } from '/admin/_shell/ui.js';
-import { accountSeries } from '/admin/_shell/data.js';
+import { esc, fmtNum, fmtCompact, fmtDay, ago, deltaChip, platMark, platName, emptyState, sparkline, statusChip, todayET, toDate, staleChip, asOf } from '/admin/_shell/ui.js';
+import { accountSeries, groupAccounts, postsWithMetrics } from '/admin/_shell/data.js';
+import { REDUCED, reveal, countUp, drawOn, growBars, growX, pop, spotlight, onVisible, liveAgo } from '/admin/_shell/motion.js';
 
-const ctx = await mountShell({ title: 'Home' });
+const ctx = await mountShell({ title: 'Home', demo: true });
 const $ = (id) => document.getElementById(id);
-
-const h = Number(new Date().toLocaleString('en-US', { hour: 'numeric', hour12: false, timeZone: 'America/New_York' }));
-$('greet').textContent = (h < 5 ? 'Up late' : h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening') + ', Cooper';
-$('today').textContent = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', timeZone: 'America/New_York' });
-
-const fail = (id, what, e) => { console.error(what, e); $(id).innerHTML = emptyState(`Couldn't load ${what}`, esc(e?.message || String(e))); };
-
-if (ctx?.role === 'full') {
-  mustDos().catch(e => fail('mustdos', 'must-dos', e));
-  decide().catch(e => fail('decide', 'decisions', e));
-  pulse().catch(e => fail('pulse', 'followers', e));
-  health().catch(e => fail('health', 'health', e));
-  overnight().catch(e => fail('overnight', 'overnight runs', e));
+const DEMO = !!ctx?.demo;
+let SNAP = null;
+if (DEMO) {
+  try { SNAP = await (await fetch('/admin/_dev/snapshot.local.json', { cache: 'no-store' })).json(); }
+  catch (e) { SNAP = null; console.error('demo snapshot missing', e); }
 }
 
-// ---------- Must-dos + streaks ----------
+// ---------- masthead ----------
+function paintClock() {
+  const now = new Date();
+  const h = Number(now.toLocaleString('en-US', { hour: 'numeric', hour12: false, timeZone: 'America/New_York' }));
+  const part = h < 5 ? 'Up late' : h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
+  $('greet').innerHTML = `${part}, Cooper<span class="stop">.</span>`;
+  const d = now.toLocaleDateString('en-US', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric', timeZone: 'America/New_York' });
+  const t = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', timeZone: 'America/New_York' });
+  $('today').textContent = `${d} · ${t} ET · Chapel Hill`;
+}
+paintClock(); setInterval(paintClock, 30000);
+reveal(document.querySelectorAll('#mast .kicker, #mast h1, #mast .quick'), { stagger: 90, y: 22 });
+spotlight(document);
+
+if (DEMO) {
+  const flag = document.createElement('div');
+  flag.className = 'demo-flag mono';
+  flag.innerHTML = SNAP
+    ? `<b>Demo snapshot</b> · localhost only · real aggregates read ${esc(fmtDay(SNAP.captured_at, { month: 'short', day: 'numeric' }))} ${esc(new Date(SNAP.captured_at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', timeZone: 'America/New_York' }))} ET · private panels hidden`
+    : '<b>Demo</b> · admin/_dev/snapshot.local.json not found';
+  document.querySelector('main').prepend(flag);
+}
+
+const fail = (id, what, e) => { console.error(what, e); const el = $(id); if (el) el.innerHTML = emptyState(`Couldn't load ${what}`, esc(e?.message || String(e))); };
+const privateCard = (title) => `<div class="sv-h" style="margin-bottom:.4rem"><h2 class="disp">${esc(title)}</h2></div>
+  ${emptyState('Hidden in the demo snapshot', 'This panel reads private rows (your notes, health or titles). It renders when you are signed in.')}`;
+
+// ---------- data ----------
+async function loadAccounts() {
+  if (DEMO) return groupAccounts((SNAP?.accounts || []).map(([date, platform, handle, followers, captured_at]) => ({ date, platform, handle, followers, captured_at, window_days: 0 }))).list;
+  return (await accountSeries()).list;
+}
+async function loadLinkedInPosts() {
+  if (DEMO) return (SNAP?.linkedin_posts || []).map(([date, value]) => ({ date, value }));
+  const posts = await postsWithMetrics();
+  return posts.filter(p => p.platform === 'linkedin' && String(p.account_handle).toLowerCase() === 'cooperdelo' && p.reach != null && p.posted_at)
+    .map(p => ({ date: String(p.posted_at).slice(0, 10), value: p.reach, as_of: p.as_of }));
+}
+async function loadRuns() {
+  if (DEMO) return (SNAP?.runs || []).map(([task, ran_at, status]) => ({ task, ran_at, status }));
+  const since = new Date(Date.now() - 14 * 864e5).toISOString();
+  const { data, error } = await sb.from('task_run_log').select('task,ran_at,status,note').gte('ran_at', since).order('ran_at', { ascending: false }).limit(2000);
+  if (error) throw error;
+  return data || [];
+}
+async function loadOpen() {
+  if (DEMO) return { counts: SNAP?.open || { decisions: 0, opportunities: 0 }, dec: null, opp: null };
+  const [{ data: dec, error: e1 }, { data: opp, error: e2 }] = await Promise.all([
+    sb.from('decisions').select('id,title,recommendation,created_at').eq('status', 'open').order('created_at', { ascending: false }),
+    sb.from('opportunities').select('id,title,fit,time_hours,proof,estimate').eq('status', 'open').order('rank'),
+  ]);
+  if (e1) throw e1; if (e2) throw e2;
+  return { counts: { decisions: dec?.length || 0, opportunities: opp?.length || 0 }, dec: dec || [], opp: opp || [] };
+}
+
+if (ctx?.role === 'full') {
+  const pAcc = loadAccounts();
+  const pOpen = loadOpen();
+  const pRuns = loadRuns();
+  hero(pAcc, pOpen).catch(e => fail('heroGrid', 'today numbers', e));
+  heroChart(loadLinkedInPosts()).catch(e => fail('heroChart', 'LinkedIn posts', e));
+  system(pRuns).catch(e => fail('system', 'task runs', e));
+  audience(pAcc).catch(e => fail('pulse', 'followers', e));
+  if (DEMO) { $('mustdos').innerHTML = privateCard("Today's must-dos"); $('health').innerHTML = privateCard('Body'); }
+  else { mustDos().catch(e => fail('mustdos', 'must-dos', e)); health().catch(e => fail('health', 'health', e)); }
+  decide(pOpen).catch(e => fail('decide', 'decisions', e));
+  document.querySelectorAll('main > .sv-section').forEach(s => onVisible(s, () => reveal(s.querySelectorAll(':scope > .sv-h, :scope > .sv-card, :scope > .sv-grid > *, :scope > .sv-card'), { stagger: 80 })));
+}
+
+// ---------- HERO: four big numbers ----------
+async function hero(pAcc, pOpen) {
+  const [list, open] = await Promise.all([pAcc, pOpen.catch(() => null)]);
+  const find = (p) => list.find(s => s.personal && s.platform === p);
+  const li = find('linkedin'), ig = find('instagram');
+  const acctCell = (s, platform) => {
+    if (!s) return `<div class="hero-cell off"><div class="hc-top"><span class="hc-label mono">${esc(platName(platform))}</span></div>
+      <div class="hc-num dim">—</div><div class="hc-sub">no follower snapshot yet</div><div class="hc-meta mono">Fed by social_account_snapshots</div></div>`;
+    const L = s.latest;
+    return `<a class="hero-cell" href="/admin/insights/">
+      <div class="hc-top"><span class="hc-label mono">${esc(platName(platform))}</span><span class="hc-handle mono">@${esc(s.handle)}</span></div>
+      <div class="hc-num" data-count="${Number(L.followers)}">0</div>
+      <div class="hc-sub">${platform === 'youtube' ? 'subscribers' : 'followers'} ${deltaChip(L.followers, s.prev?.followers)}</div>
+      ${sparkline(s.rows.slice(0, 30).reverse().map(r => r.followers), { w: 220, h: 34 }) || '<div class="hc-flat"><i></i><span class="mono">first data point</span></div>'}
+      <div class="hc-meta mono">${asOf(L.captured_at || L.date)}${s.prev ? ` · vs ${esc(fmtDay(s.prev.date))}` : ''}</div>
+    </a>`;
+  };
+  const booking = `<div class="hero-cell off">
+      <div class="hc-top"><span class="hc-label mono">Booking link</span><span class="tag mono">not tracked yet</span></div>
+      <div class="hc-num dim">—</div>
+      <div class="hc-sub">opens</div>
+      <div class="hc-flat"><i></i><span class="mono">no source</span></div>
+      <div class="hc-meta mono">Nothing records booking-link clicks yet. A tracked redirect would feed this.</div>
+    </div>`;
+  let waiting;
+  if (!open) waiting = `<div class="hero-cell off"><div class="hc-top"><span class="hc-label mono">Waiting on you</span></div><div class="hc-num dim">—</div><div class="hc-sub">couldn't read decisions</div></div>`;
+  else {
+    const { decisions: d, opportunities: o } = open.counts, n = d + o;
+    waiting = `<a class="hero-cell hot" href="/admin/decisions/">
+      <div class="hc-top"><span class="hc-label mono">Waiting on you</span><span class="hc-handle mono">requests</span></div>
+      <div class="hc-num" data-count="${n}">0</div>
+      <div class="hc-sub">open items to decide</div>
+      <div class="split-bar" aria-hidden="true">${n ? `<i class="d" data-growx style="flex:${d || 0}"></i><i class="o" data-growx style="flex:${o || 0}"></i>` : '<i class="z"></i>'}</div>
+      <div class="hc-meta mono"><span class="k d"></span>${d} decision${d === 1 ? '' : 's'} · <span class="k o"></span>${o} opportunit${o === 1 ? 'y' : 'ies'}</div>
+    </a>`;
+  }
+  const grid = $('heroGrid');
+  grid.innerHTML = acctCell(li, 'linkedin') + acctCell(ig, 'instagram') + booking + waiting;
+  const cells = grid.querySelectorAll('.hero-cell');
+  reveal(cells, { stagger: 110, delay: 150, y: 26 });
+  cells.forEach((c, i) => {
+    const num = c.querySelector('[data-count]');
+    if (num) countUp(num, Number(num.dataset.count), { delay: 350 + i * 110 });
+    pop(c.querySelectorAll('.chip, .tag'), { delay: 1300 + i * 110 });
+    drawOn(c, { delay: 700 + i * 110 });
+    growX(c, { delay: 900 + i * 110 });
+  });
+}
+
+// ---------- HERO: LinkedIn impressions per post, last 12 months ----------
+async function heroChart(pPosts) {
+  const posts = (await pPosts).filter(p => p.value != null);
+  const host = $('heroChart');
+  const end = toDate(todayET()).getTime() + 864e5, start = end - 365 * 864e5;
+  const inWin = posts.filter(p => { const t = toDate(p.date).getTime(); return t >= start && t <= end; }).sort((a, b) => toDate(a.date) - toDate(b.date));
+  if (!inWin.length) { host.innerHTML = `<div class="hc-empty mono">No LinkedIn post metrics on file for the last 12 months. Fed by social_post_snapshots.</div>`; return; }
+  const max = Math.max(...inWin.map(p => p.value));
+  const total = inWin.reduce((a, p) => a + p.value, 0);
+  const peak = inWin.find(p => p.value === max);
+  const X = (d) => (toDate(d).getTime() - start) / (end - start) * 100;
+  const H = 100;
+  const bars = inWin.map((p, i) => {
+    const h = Math.max(1.2, p.value / max * H);
+    return `<rect data-grow data-i="${i}" class="${p === peak ? 'peak' : ''}" x="${(X(p.date) * 10 - 3).toFixed(1)}" y="${(H - h).toFixed(2)}" width="6" height="${h.toFixed(2)}" rx="1"/>`;
+  }).join('');
+  let months = '';
+  for (let m = 0; m < 12; m++) {
+    const d = new Date(end - 365 * 864e5); d.setDate(1); d.setMonth(d.getMonth() + m + 1);
+    if (d.getTime() > end) break;
+    months += `<span style="left:${X(d).toFixed(2)}%">${d.toLocaleDateString('en-US', { month: 'short' })}</span>`;
+  }
+  const px = X(peak.date);
+  host.innerHTML = `
+    <div class="hch-head">
+      <div><div class="eyebrow mono">LinkedIn · @cooperdelo · impressions per post</div>
+        <div class="hch-total"><span class="hc-num sm" id="liTotal">0</span><span class="mono">impressions across ${inWin.length} posts on file · last 12 months</span></div></div>
+      <div class="hch-legend mono"><span><i class="lg-bar"></i>one post</span><span><i class="lg-bar peak"></i>best post</span></div>
+    </div>
+    <div class="hch-plot">
+      <div class="hch-rule" style="bottom:100%"><span class="mono">${fmtCompact(max)}</span></div>
+      <div class="hch-rule" style="bottom:50%"><span class="mono">${fmtCompact(Math.round(max / 2))}</span></div>
+      <svg viewBox="0 0 1000 ${H}" preserveAspectRatio="none" role="img" aria-label="LinkedIn impressions per post, last 12 months">${bars}</svg>
+      <div class="hch-peak${px > 82 ? ' r' : px < 10 ? ' l' : ''}" style="left:${px.toFixed(2)}%"><span class="mono">${fmtNum(max)} · ${esc(fmtDay(peak.date, { month: 'short', day: 'numeric' }))}</span></div>
+      <div class="hch-tip mono" hidden></div>
+    </div>
+    <div class="hch-months mono">${months}</div>`;
+  const svg = host.querySelector('svg'), tip = host.querySelector('.hch-tip'), plot = host.querySelector('.hch-plot');
+  svg.querySelectorAll('rect').forEach(r => {
+    r.addEventListener('pointerenter', () => {
+      const p = inWin[+r.dataset.i];
+      tip.hidden = false; tip.innerHTML = `<b>${fmtNum(p.value)}</b> impressions · ${esc(fmtDay(p.date, { month: 'short', day: 'numeric', year: 'numeric' }))}`;
+      const pr = plot.getBoundingClientRect(), rr = r.getBoundingClientRect();
+      tip.style.left = Math.min(pr.width - 220, Math.max(0, rr.left - pr.left - 90)) + 'px';
+      r.classList.add('on');
+    });
+    r.addEventListener('pointerleave', () => { tip.hidden = true; r.classList.remove('on'); });
+  });
+  onVisible(host, () => {
+    growBars(svg, { delay: 450, stagger: 22 });
+    countUp($('liTotal'), total, { delay: 450, dur: 1900 });
+    reveal(host.querySelectorAll('.hch-peak'), { delay: 1300, y: 10 });
+  });
+}
+
+// ---------- System pulse (task_run_log) ----------
+const SEV = { failed: 4, partial: 3, ok: 2, quiet: 1 };
+async function system(pRuns) {
+  const runs = await pRuns;
+  const now = Date.now();
+  const day = runs.filter(r => now - new Date(r.ran_at).getTime() < 864e5);
+  const cnt = (k) => day.filter(r => r.status === k).length;
+  const c = { ok: cnt('ok'), partial: cnt('partial'), quiet: cnt('quiet'), failed: cnt('failed') };
+  const last = runs[0];
+  const tasks24 = new Set(day.map(r => r.task)).size;
+
+  // hero pill
+  const pill = $('pulsePill');
+  pill.classList.toggle('bad', c.failed > 0);
+  pill.innerHTML = last
+    ? `<i></i><span>${tasks24} agents ran · 24h</span><span class="sep">/</span><span>${c.failed ? `${c.failed} failed` : 'no failures'}</span><span class="sep">/</span><span>last <b data-ago="${esc(last.ran_at)}">${esc(ago(last.ran_at))}</b></span>`
+    : `<i></i><span>No runs logged in 14 days</span>`;
+
+  if (!runs.length) { $('system').innerHTML = emptyState('No runs logged', 'Fed by task_run_log. Every scheduled task writes one row per run.'); return; }
+
+  // matrix: 14 days x tasks (most recently run first)
+  const days = [];
+  const today0 = toDate(todayET());
+  for (let i = 13; i >= 0; i--) { const d = new Date(today0); d.setDate(d.getDate() - i); days.push(d); }
+  const keyET = (iso) => new Date(iso).toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
+  const dayKeys = days.map(d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`);
+  const byTask = new Map();
+  for (const r of runs) {
+    if (!byTask.has(r.task)) byTask.set(r.task, { last: r, cells: {} });
+    const k = keyET(r.ran_at), t = byTask.get(r.task);
+    if (!t.cells[k] || SEV[r.status] > SEV[t.cells[k]]) t.cells[k] = r.status;
+  }
+  // Rows: the agents with the most active days first (shows rhythm and repeat
+  // failures), ties broken by most recent run.
+  const taskRows = [...byTask.entries()]
+    .sort((a, b) => (Object.keys(b[1].cells).length - Object.keys(a[1].cells).length) || (new Date(b[1].last.ran_at) - new Date(a[1].last.ran_at)))
+    .slice(0, 14);
+  const matrix = `<div class="mx" style="--cols:${days.length}">
+      <div class="mx-row mx-head"><span class="mx-name"></span>${days.map((d, i) => `<span class="mx-d mono${i === days.length - 1 ? ' now' : ''}">${i % 2 === (days.length - 1) % 2 ? d.toLocaleDateString('en-US', { day: 'numeric' }) : ''}</span>`).join('')}<span class="mx-last"></span></div>
+      ${taskRows.map(([task, t], ri) => `<a class="mx-row" href="/admin/rituals/#${encodeURIComponent(task)}">
+        <span class="mx-name mono" title="${esc(task)}">${esc(task)}</span>
+        ${dayKeys.map((k, ci) => `<i class="c ${t.cells[k] || ''}" style="--d:${ri + ci}" title="${esc(task)} · ${esc(fmtDay(k))}${t.cells[k] ? ' · ' + esc(t.cells[k]) : ' · no run'}"></i>`).join('')}
+        <span class="mx-last mono" data-ago="${esc(t.last.ran_at)}">${esc(ago(t.last.ran_at))}</span></a>`).join('')}
+    </div>`;
+  const total = day.length || 1;
+  const seg = (k) => c[k] ? `<i class="${k}" data-growx style="flex:${c[k]}" title="${c[k]} ${k}"></i>` : '';
+  $('system').innerHTML = `<div class="sys-grid">
+      <div class="sys-l">
+        <div class="eyebrow mono">Runs in the last 24 hours</div>
+        <div class="hc-num sys-num" id="runs24" data-count="${day.length}">0</div>
+        <div class="sys-sub">${tasks24} different agents · ${byTask.size} active in 14 days</div>
+        <div class="stack" aria-label="Run outcomes, last 24 hours">${day.length ? seg('ok') + seg('partial') + seg('quiet') + seg('failed') : '<i class="z"></i>'}</div>
+        <div class="legend mono">
+          <span><i class="c ok"></i>${c.ok} ok</span><span><i class="c partial"></i>${c.partial} partial</span>
+          <span><i class="c quiet"></i>${c.quiet} quiet</span><span><i class="c failed"></i>${c.failed} failed</span>
+        </div>
+        <div class="sys-last">
+          <div class="eyebrow mono">Latest</div>
+          ${runs.slice(0, 5).map(r => `<div class="lr"><i class="c ${esc(r.status)}"></i><span class="t mono">${esc(r.task)}</span><span class="a mono" data-ago="${esc(r.ran_at)}">${esc(ago(r.ran_at))}</span></div>`).join('')}
+        </div>
+      </div>
+      <div class="sys-r">
+        <div class="eyebrow mono">Last 14 days · worst outcome per day · red means something broke</div>
+        ${matrix}
+      </div>
+    </div>`;
+  const el = $('system');
+  onVisible(el, () => {
+    countUp($('runs24'), day.length, { dur: 1200 });
+    growX(el.querySelector('.stack'), { delay: 200, stagger: 90 });
+    el.classList.add('in');
+  });
+  liveAgo(document, (x) => ago(x));
+  void total;
+}
+
+// ---------- Audience ----------
+async function audience(pAcc) {
+  const list = await pAcc;
+  const mine = list.filter(s => s.personal);
+  const card = (s, pv) => `<a class="sv-card aud-card${pv ? ' pvc' : ''}" href="${pv ? '/admin/plugverse/' : '/admin/insights/'}">
+      ${platMark(s.platform, s.handle)}
+      <div class="hc-num md" data-count="${Number(s.latest.followers)}">0</div>
+      <div class="sv-label">${s.platform === 'youtube' ? 'subscribers' : 'followers'} ${deltaChip(s.latest.followers, s.prev?.followers)}</div>
+      ${sparkline(s.rows.slice(0, 30).reverse().map(r => r.followers)) || '<div class="hc-flat light"><i></i><span class="mono">first data point</span></div>'}
+      <div class="sv-meta mono">${asOf(s.latest.captured_at || s.latest.date)}${s.prev ? ` · vs ${esc(fmtDay(s.prev.date))}` : ''}</div>
+    </a>`;
+  const animate = (grid) => onVisible(grid, () => grid.querySelectorAll('.aud-card').forEach((c, i) => {
+    countUp(c.querySelector('[data-count]'), Number(c.querySelector('[data-count]').dataset.count), { delay: 150 + i * 90 });
+    drawOn(c, { delay: 400 + i * 90 }); pop(c.querySelectorAll('.chip'), { delay: 1100 + i * 90 });
+  }));
+  $('pulse').innerHTML = mine.length ? mine.map(s => card(s, false)).join('') : emptyState('No follower snapshots', 'Fed by the social-pull task (social_account_snapshots).');
+  animate($('pulse'));
+  const pv = list.filter(s => /plugverse/i.test(s.handle));
+  if (pv.length) { $('pvSec').hidden = false; $('pvGrid').innerHTML = pv.map(s => card(s, true)).join(''); animate($('pvGrid')); }
+}
+
+// ---------- Waiting on you ----------
+async function decide(pOpen) {
+  const open = await pOpen;
+  const { decisions: d, opportunities: o } = open.counts, n = d + o;
+  const list = open.dec == null
+    ? emptyState('Titles hidden in the demo snapshot', `${d} decision${d === 1 ? '' : 's'} and ${o} opportunities are open. Titles render when you are signed in.`)
+    : `<div class="rows">
+      ${open.dec.slice(0, 3).map(x => `<a class="row" href="/admin/decisions/"><div class="grow"><div class="t">${esc(x.title)}</div><div class="s">Decision · ${esc(x.recommendation || '')}</div></div><span class="chip accent">decide</span></a>`).join('')}
+      ${open.opp.slice(0, 3).map(x => `<a class="row" href="/admin/earn/"><div class="grow"><div class="t">${esc(x.title)}</div><div class="s">${esc(x.id)} · ${esc(x.estimate || '')}</div></div><span class="chip">FIT ${x.fit ?? '—'}</span></a>`).join('')}
+    </div>${n ? '' : emptyState('Nothing waiting', 'Fed by the decisions and opportunities tables (Opportunity Scout).')}`;
+  $('decide').innerHTML = `<div class="sv-h" style="margin-bottom:.2rem"><h2 class="disp">Waiting on you</h2><a href="/admin/decisions/">All decisions</a></div>
+    <div class="dec-num"><span class="hc-num md" data-count="${n}">0</span><span class="mono">open · ${d} decision${d === 1 ? '' : 's'} · ${o} opportunities</span></div>
+    ${list}
+    <div class="sv-meta"><a href="/admin/earn/" style="color:var(--accent-ink)">All opportunities</a></div>`;
+  onVisible($('decide'), () => countUp($('decide').querySelector('[data-count]'), n, { dur: 900 }));
+}
+
+// ---------- Must-dos + streaks (signed in only) ----------
 async function mustDos() {
   const today = todayET();
   const [{ data: docs, error }, { data: dd, error: e2 }] = await Promise.all([
@@ -40,15 +326,15 @@ async function mustDos() {
     const todos = lines.filter(s => /^\d+\.\s/.test(s)).map(s => s.replace(/^\d+\.\s*/, ''));
     const other = lines.filter(s => !/^\d+\.\s/.test(s));
     const isToday = doc.path.includes(today);
-    body = `${todos.map((t, i) => `<div class="todo"><span class="n">${i + 1}</span><div class="x">${esc(t)}</div></div>`).join('') || emptyState('No numbered must-dos in today\'s file', 'The daily-driver file exists but has no numbered list.')}
+    body = `${todos.map((t, i) => `<div class="todo"><span class="n mono">${String(i + 1).padStart(2, '0')}</span><div class="x">${esc(t)}</div></div>`).join('') || emptyState('No numbered must-dos in today\'s file', 'The daily-driver file exists but has no numbered list.')}
       ${other.length ? `<div class="sv-meta" style="display:block;line-height:1.55">${other.map(esc).join('<br>')}</div>` : ''}
       <div class="sv-meta">from <b>${esc(doc.path)}</b> · updated ${esc(ago(doc.updated_at))}${isToday ? '' : ' <span class="chip stale">not today\'s file</span>'}</div>`;
   }
-  $('mustdos').innerHTML = `<div class="sv-h" style="margin-bottom:.4rem"><h2>Today's must-dos</h2><a href="/admin/rituals/#daily-driver">Daily driver</a></div>${body}
+  $('mustdos').innerHTML = `<div class="sv-h" style="margin-bottom:.4rem"><h2 class="disp">Today's must-dos</h2><a href="/admin/rituals/#daily-driver">Daily driver</a></div>${body}
     <div class="streaks" id="streaks"></div>`;
   renderStreaks(dd || [], today);
+  reveal($('mustdos').querySelectorAll('.todo'), { stagger: 60, delay: 100, y: 10 });
 }
-
 function streakFor(rows, key) {
   let n = 0, last = null;
   for (const r of rows) {
@@ -77,48 +363,15 @@ function renderStreaks(rows, today) {
   }));
 }
 
-// ---------- Decisions waiting ----------
-async function decide() {
-  const [{ data: dec, error: e1 }, { data: opp, error: e2 }] = await Promise.all([
-    sb.from('decisions').select('id,title,recommendation,created_at').eq('status', 'open').order('created_at', { ascending: false }),
-    sb.from('opportunities').select('id,title,fit,time_hours,proof,estimate').eq('status', 'open').order('rank'),
-  ]);
-  if (e1) throw e1; if (e2) throw e2;
-  const n = (dec?.length || 0) + (opp?.length || 0);
-  $('decide').innerHTML = `<div class="sv-h" style="margin-bottom:.2rem"><h2>Waiting on you</h2></div>
-    <div class="sv-num">${n}<small>open</small></div>
-    <div class="rows">
-      ${(dec || []).slice(0, 3).map(d => `<a class="row" href="/admin/decisions/"><div class="grow"><div class="t">${esc(d.title)}</div><div class="s">Decision · ${esc(d.recommendation || '')}</div></div><span class="chip accent">decide</span></a>`).join('')}
-      ${(opp || []).slice(0, 3).map(o => `<a class="row" href="/admin/earn/"><div class="grow"><div class="t">${esc(o.title)}</div><div class="s">${esc(o.id)} · ${esc(o.estimate || '')}</div></div><span class="chip">FIT ${o.fit ?? '—'}</span></a>`).join('')}
-    </div>
-    ${n ? '' : emptyState('Nothing waiting', 'Fed by the decisions and opportunities tables (Opportunity Scout).')}
-    <div class="sv-meta"><a href="/admin/decisions/" style="color:var(--accent-ink)">All decisions</a> · <a href="/admin/earn/" style="color:var(--accent-ink)">All opportunities</a></div>`;
-}
-
-// ---------- Pulse ----------
-async function pulse() {
-  const { list } = await accountSeries();
-  const mine = list.filter(s => s.personal);
-  if (!mine.length) { $('pulse').innerHTML = emptyState('No follower snapshots', 'Fed by the social-pull task (social_account_snapshots).'); return; }
-  $('pulse').innerHTML = mine.slice(0, 4).map(s => `<a class="sv-card" href="/admin/insights/">
-      ${platMark(s.platform, s.handle)}
-      <div class="sv-num md">${fmtNum(s.latest.followers)}</div>
-      <div class="sv-label">${s.platform === 'youtube' ? 'subscribers' : 'followers'} ${deltaChip(s.latest.followers, s.prev?.followers)}</div>
-      <div class="sv-meta">${asOf(s.latest.captured_at || s.latest.date)}${s.prev ? `<span>· change vs ${esc(fmtDay(s.prev.date))}</span>` : '<span>· first snapshot</span>'}</div>
-      ${sparkline(s.rows.slice(0, 30).reverse().map(r => r.followers))}
-    </a>`).join('');
-}
-
-// ---------- Health ----------
+// ---------- Body (signed in only) ----------
 async function health() {
   const { data, error } = await sb.from('health_daily').select('day,sleep_minutes,sleep_score,steps,resting_hr,hrv_ms,body_battery_high,garmin_synced_at').order('day', { ascending: false }).limit(14);
   if (error) throw error;
-  // newest day that actually has Garmin numbers (manual mood-only rows have none)
   const r = (data || []).find(x => x.sleep_minutes != null || x.steps != null || x.resting_hr != null) || data?.[0];
-  if (!r) { $('health').innerHTML = `<div class="sv-h"><h2>Body</h2></div>` + emptyState('No health data', 'Fed by the Garmin sync (health_daily).'); return; }
-  const cell = (k, v) => `<div><div class="k">${k}</div><div class="v">${v}</div></div>`;
+  if (!r) { $('health').innerHTML = `<div class="sv-h"><h2 class="disp">Body</h2></div>` + emptyState('No health data', 'Fed by the Garmin sync (health_daily).'); return; }
+  const cell = (k, v) => `<div><div class="k mono">${k}</div><div class="v">${v}</div></div>`;
   const sleep = r.sleep_minutes != null ? `${Math.floor(r.sleep_minutes / 60)}h ${r.sleep_minutes % 60}m` : '—';
-  $('health').innerHTML = `<div class="sv-h" style="margin-bottom:.2rem"><h2>Body</h2><a href="/admin/health/dashboard.html">Health insights</a></div>
+  $('health').innerHTML = `<div class="sv-h" style="margin-bottom:.2rem"><h2 class="disp">Body</h2><a href="/admin/health/dashboard.html">Health insights</a></div>
     <div class="health-grid">
       ${cell('Sleep', sleep)}${cell('Sleep score', r.sleep_score ?? '—')}${cell('Steps', fmtNum(r.steps))}
       ${cell('Resting HR', r.resting_hr ?? '—')}${cell('HRV', r.hrv_ms != null ? r.hrv_ms + ' ms' : '—')}${cell('Body battery', r.body_battery_high ?? '—')}
@@ -126,15 +379,4 @@ async function health() {
     <div class="sv-meta">Garmin · day ${esc(fmtDay(r.day, { weekday: 'short', month: 'short', day: 'numeric' }))} · synced ${esc(ago(r.garmin_synced_at || r.day))} ${staleChip(r.garmin_synced_at || r.day)}</div>`;
 }
 
-// ---------- Overnight ----------
-async function overnight() {
-  const since = new Date(Date.now() - 18 * 3.6e6).toISOString();
-  const { data, error } = await sb.from('task_run_log').select('task,ran_at,status,note').gte('ran_at', since).order('ran_at', { ascending: false });
-  if (error) throw error;
-  const rows = data || [];
-  const bad = rows.filter(r => r.status === 'failed').length;
-  $('overnight').innerHTML = `<div class="sv-h" style="margin-bottom:.2rem"><h2>While you were out</h2><a href="/admin/rituals/">Rituals</a></div>
-    <div class="sv-label">${rows.length} runs in the last 18 hours ${bad ? `<span class="chip fail">${bad} failed</span>` : '<span class="chip ok">no failures</span>'}</div>
-    <div class="rows" style="margin-top:.4rem">${rows.slice(0, 7).map(r => `<a class="row" href="/admin/rituals/#${encodeURIComponent(r.task)}"><div class="grow"><div class="t">${esc(r.task)}</div><div class="s">${esc((r.note || '').slice(0, 110))}</div></div><span class="sv-muted" style="font-size:.76rem;white-space:nowrap">${esc(ago(r.ran_at))}</span>${statusChip(r.status)}</a>`).join('')
-      || emptyState('No runs logged overnight', 'Fed by task_run_log. Every scheduled task writes one row per run.')}</div>`;
-}
+void statusChip; void REDUCED;

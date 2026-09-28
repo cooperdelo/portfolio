@@ -267,15 +267,30 @@ function mountPalette(role) {
   window.__openPalette = openP;
 }
 
-export async function mountShell({ title } = {}) {
+/**
+ * Localhost-only design preview (?demo on http://localhost / 127.0.0.1).
+ * Lets the layout render from a local, gitignored snapshot file for
+ * screenshots. On any other host this is always false, so production and
+ * Vercel previews always go through the normal auth gate below. No data is
+ * read from Supabase in demo mode.
+ */
+export function isLocalDemo() {
+  const local = location.protocol === 'http:' && (location.hostname === 'localhost' || location.hostname === '127.0.0.1');
+  return local && new URLSearchParams(location.search).has('demo');
+}
+
+export async function mountShell({ title, demo = false } = {}) {
+  const demoMode = demo && isLocalDemo();
   // 1) Gate the page on auth (membership in admin_allowlist, any role)
-  const ok = await requireAdminOrRedirect();
-  if (!ok) return null;
+  if (!demoMode) {
+    const ok = await requireAdminOrRedirect();
+    if (!ok) return null;
+  }
 
   // 2) Resolve role + email
-  const session = await getSession();
-  const email = session?.user?.email || '';
-  const role  = (await getAdminRole()) || 'full';
+  const session = demoMode ? null : await getSession();
+  const email = demoMode ? 'demo · localhost only' : (session?.user?.email || '');
+  const role  = demoMode ? 'full' : ((await getAdminRole()) || 'full');
 
   // 3) Wrap existing main content
   const main = document.querySelector('main');
@@ -332,7 +347,7 @@ export async function mountShell({ title } = {}) {
   wrap.querySelectorAll('[data-openpalette]').forEach(b => b.addEventListener('click', () => window.__openPalette && window.__openPalette()));
   pushRecent(normalizePath(location.pathname));
 
-  return { session, email, role };
+  return { session, email, role, demo: demoMode };
 }
 
 // ---------- Toast ----------

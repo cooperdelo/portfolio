@@ -672,54 +672,67 @@ body::after { filter: blur(28px) saturate(115%); opacity: .8; }
    Pages with hard-coded light-on-dark art (carousels, broll) pin
    data-theme="dark" on <html>.
    ===================================================================== */
+/* 2026-09-28 signature pass: Cooper's personal-brand palette.
+   ink #0C0B0A, bone #F4F1EA, silver #A8A29E, RED accent.
+   Orange #FF6B35 is PlugVerse-only (--pv). Dark mode is first-class. */
+@font-face { font-family: "CD Wide"; src: local("Druk Wide Bold"), local("DrukWide-Bold"), local("Druk Wide"); font-weight: 600 900; font-display: swap; }
 :root {
-  --canvas: #F7F7FB; --surface: #FFFFFF; --surface-2: #FAFAFD; --surface-3: #F2F2F8;
-  --border: #EEEEF4; --border-2: #E2E2EC;
-  --text: #16161D; --text-2: #4B4B5C; --text-3: #8A8A9C;
-  --accent: #8B7CF6; --accent-ink: #5B4BD6; --accent-tint: #EFEBFF; --accent-tint-2: #E2DCFF;
-  --pos: #16A34A; --pos-tint: #E8F7EE; --neg: #DC2626; --neg-tint: #FDECEC;
-  --amber: #B45309; --amber-tint: #FEF3C7;
-  --shadow: 0 1px 2px rgba(22,22,40,.04), 0 10px 30px -18px rgba(22,22,40,.12);
-  --shadow-lift: 0 2px 4px rgba(22,22,40,.05), 0 18px 40px -20px rgba(22,22,40,.18);
-  --radius: 16px;
+  --canvas: #F4F1EA; --surface: #FBFAF6; --surface-2: #F7F4EE; --surface-3: #ECE8DF;
+  --border: #E3DED3; --border-2: #D3CDC0;
+  --text: #0C0B0A; --text-2: #46423C; --text-3: #7D776F; --silver: #A8A29E;
+  --accent: #E0321F; --accent-ink: #B4230F; --accent-tint: rgba(224,50,31,.09); --accent-tint-2: rgba(224,50,31,.17);
+  --pv: #FF6B35; --pv-tint: rgba(255,107,53,.12);
+  --pos: #2E7D4C; --pos-tint: rgba(46,125,76,.11); --neg: #C42A1C; --neg-tint: rgba(196,42,28,.10);
+  --amber: #9A5B06; --amber-tint: rgba(186,120,20,.13);
+  --hero: #0C0B0A; --hero-2: #161412; --hero-text: #F4F1EA; --hero-3: #A8A29E; --hero-line: rgba(244,241,234,.10);
+  --shadow: 0 1px 1px rgba(12,11,10,.03), 0 12px 32px -22px rgba(12,11,10,.22);
+  --shadow-lift: 0 2px 3px rgba(12,11,10,.05), 0 26px 50px -26px rgba(12,11,10,.34);
+  --radius: 14px;
+  --f-ui: "Geist", "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  --f-display: "Space Grotesk", "Geist", sans-serif;
+  --f-wide: "CD Wide", "Archivo", "Space Grotesk", sans-serif;
+  --f-mono: "Geist Mono", ui-monospace, monospace;
+  --ease-out: cubic-bezier(.16,1,.3,1); --ease-io: cubic-bezier(.65,0,.35,1);
   /* legacy token remap so old pages inherit the new look */
   --bg: var(--canvas); --ink: var(--text); --ink-2: var(--text-2); --muted: var(--text-3);
   --rust: var(--accent); --good: var(--pos); --warn: var(--neg); --neutral: var(--text-2);
   --line: var(--border); --card-bg: var(--surface); --card-border: var(--border);
   --card-border-hover: var(--border-2); --rail-bg: var(--surface);
-  --pastel-lavender: #7C6AF0; --pastel-cyan: #0E8F8A; --pastel-pink: #C0487A; --cream: #6B6B7B; --sage: #4D7A3A;
+  --pastel-lavender: #8A5A4E; --pastel-cyan: #2F6F6A; --pastel-pink: #A8433A; --cream: #6B655D; --sage: #4D7A3A;
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --canvas: #0E0E13; --surface: #16161E; --surface-2: #1B1B25; --surface-3: #22222D;
-    --border: #25252F; --border-2: #30303C;
-    --text: #F3F3F8; --text-2: #B9B9C9; --text-3: #7D7D90;
-    --accent: #9D90F8; --accent-ink: #C4BBFF; --accent-tint: rgba(139,124,246,.16); --accent-tint-2: rgba(139,124,246,.26);
-    --pos: #34D399; --pos-tint: rgba(52,211,153,.12); --neg: #F87171; --neg-tint: rgba(248,113,113,.12);
-    --amber: #FBBF24; --amber-tint: rgba(251,191,36,.14);
-    --shadow: 0 1px 0 rgba(255,255,255,.03) inset, 0 12px 30px -18px rgba(0,0,0,.6);
-    --shadow-lift: 0 1px 0 rgba(255,255,255,.04) inset, 0 20px 40px -18px rgba(0,0,0,.7);
-    --pastel-lavender: #C9BEE6; --pastel-cyan: #B2E3E1; --pastel-pink: #F2C1D1; --cream: #F2EDE4; --sage: #9DB08E;
+    --canvas: #0C0B0A; --surface: #141311; --surface-2: #191715; --surface-3: #221F1C;
+    --border: #25221E; --border-2: #36322C;
+    --text: #F4F1EA; --text-2: #C8C2B8; --text-3: #8F8983; --silver: #A8A29E;
+    --accent: #FF4632; --accent-ink: #FF7E6C; --accent-tint: rgba(255,70,50,.13); --accent-tint-2: rgba(255,70,50,.24);
+    --pos: #5FCB8A; --pos-tint: rgba(95,203,138,.12); --neg: #FF6B5A; --neg-tint: rgba(255,107,90,.12);
+    --amber: #E8B04A; --amber-tint: rgba(232,176,74,.14);
+    --hero: #11100E; --hero-2: #1A1815; --hero-line: rgba(244,241,234,.08);
+    --shadow: 0 1px 0 rgba(244,241,234,.03) inset, 0 14px 34px -20px rgba(0,0,0,.7);
+    --shadow-lift: 0 1px 0 rgba(244,241,234,.05) inset, 0 26px 50px -22px rgba(0,0,0,.85);
+    --pastel-lavender: #D9B7AE; --pastel-cyan: #A9D6D2; --pastel-pink: #F2B8AE; --cream: #F4F1EA; --sage: #9DB08E;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --canvas: #0E0E13; --surface: #16161E; --surface-2: #1B1B25; --surface-3: #22222D;
-  --border: #25252F; --border-2: #30303C;
-  --text: #F3F3F8; --text-2: #B9B9C9; --text-3: #7D7D90;
-  --accent: #9D90F8; --accent-ink: #C4BBFF; --accent-tint: rgba(139,124,246,.16); --accent-tint-2: rgba(139,124,246,.26);
-  --pos: #34D399; --pos-tint: rgba(52,211,153,.12); --neg: #F87171; --neg-tint: rgba(248,113,113,.12);
-  --amber: #FBBF24; --amber-tint: rgba(251,191,36,.14);
-  --shadow: 0 1px 0 rgba(255,255,255,.03) inset, 0 12px 30px -18px rgba(0,0,0,.6);
-  --shadow-lift: 0 1px 0 rgba(255,255,255,.04) inset, 0 20px 40px -18px rgba(0,0,0,.7);
-  --pastel-lavender: #C9BEE6; --pastel-cyan: #B2E3E1; --pastel-pink: #F2C1D1; --cream: #F2EDE4; --sage: #9DB08E;
+  --canvas: #0C0B0A; --surface: #141311; --surface-2: #191715; --surface-3: #221F1C;
+  --border: #25221E; --border-2: #36322C;
+  --text: #F4F1EA; --text-2: #C8C2B8; --text-3: #8F8983; --silver: #A8A29E;
+  --accent: #FF4632; --accent-ink: #FF7E6C; --accent-tint: rgba(255,70,50,.13); --accent-tint-2: rgba(255,70,50,.24);
+  --pos: #5FCB8A; --pos-tint: rgba(95,203,138,.12); --neg: #FF6B5A; --neg-tint: rgba(255,107,90,.12);
+  --amber: #E8B04A; --amber-tint: rgba(232,176,74,.14);
+  --hero: #11100E; --hero-2: #1A1815; --hero-line: rgba(244,241,234,.08);
+  --shadow: 0 1px 0 rgba(244,241,234,.03) inset, 0 14px 34px -20px rgba(0,0,0,.7);
+  --shadow-lift: 0 1px 0 rgba(244,241,234,.05) inset, 0 26px 50px -22px rgba(0,0,0,.85);
+  --pastel-lavender: #D9B7AE; --pastel-cyan: #A9D6D2; --pastel-pink: #F2B8AE; --cream: #F4F1EA; --sage: #9DB08E;
   color-scheme: dark;
 }
 
 /* ---- ground ---- */
 html, body { background: var(--canvas); }
-body { color: var(--text); font-family: "Geist", "Inter", -apple-system, BlinkMacSystemFont, sans-serif; font-size: 15px; }
+body { color: var(--text); font-family: var(--f-ui); font-size: 15px; }
 body::before, body::after { display: none !important; content: none !important; }
 ::selection { background: var(--accent-tint-2); color: var(--text); }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
@@ -736,7 +749,7 @@ body::before, body::after { display: none !important; content: none !important; 
 }
 .rail .brand { font-family: "Geist", sans-serif; text-transform: none; font-weight: 650; font-size: 1.02rem; letter-spacing: -.01em; padding: .2rem .5rem .6rem; align-items: center; }
 .rail .brand .dot { display: none; }
-.rail .brand .logo { width: 28px; height: 28px; border-radius: 9px; background: var(--accent); color: #fff; display: inline-grid; place-items: center; font-size: .66rem; font-weight: 700; letter-spacing: .02em; flex: 0 0 auto; }
+.rail .brand .logo { width: 28px; height: 28px; border-radius: 7px; background: var(--text); color: var(--canvas); font-family: var(--f-wide); font-stretch: 125%; display: inline-grid; place-items: center; font-size: .66rem; font-weight: 700; letter-spacing: .02em; flex: 0 0 auto; }
 .rail .brand small { font-family: "Geist", sans-serif; text-transform: none; letter-spacing: 0; font-size: .72rem; color: var(--text-3); font-weight: 500; }
 .rail .brand small.role-badge { background: var(--accent-tint); color: var(--accent-ink); }
 .rail-search { border: 1px solid var(--border); background: var(--surface-2); font-family: "Geist", sans-serif; letter-spacing: 0; text-transform: none; font-size: .84rem; color: var(--text-3); border-radius: 10px; margin-bottom: .3rem; }
@@ -796,8 +809,8 @@ a.card:hover { transform: translateY(-1px); }
   background: var(--surface); color: var(--text); backdrop-filter: none; -webkit-backdrop-filter: none; box-shadow: 0 1px 2px rgba(22,22,40,.04);
 }
 .btn:hover { background: var(--surface-3); border-color: var(--border-2); transform: none; }
-.btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); box-shadow: 0 1px 2px rgba(91,75,214,.25); }
-.btn.primary:hover { background: var(--accent-ink); border-color: var(--accent-ink); transform: none; box-shadow: 0 1px 2px rgba(91,75,214,.3); }
+.btn.primary { background: var(--text); color: var(--canvas); border-color: var(--text); box-shadow: none; }
+.btn.primary:hover { background: var(--accent); border-color: var(--accent); color: #fff; transform: none; box-shadow: none; }
 .btn.ghost { background: transparent; border-color: transparent; box-shadow: none; }
 .btn.ghost:hover { background: var(--surface-3); }
 .btn.small { padding: .35rem .65rem; font-size: .78rem; }
@@ -1013,3 +1026,31 @@ table.data .right { font-variant-numeric: tabular-nums; }
 .main { min-width: 0; }
 .produced a, .produced span { display: block; }
 .note, .sv-meta, .sv-text { overflow-wrap: anywhere; }
+
+/* =====================================================================
+   Signature layer (2026-09-28): brand type + page transitions + depth.
+   ===================================================================== */
+/* Let the window scroll (not <body>): overflow clip instead of hidden keeps
+   the no-horizontal-scroll guard without turning body into a scroller. */
+html, body { overflow-x: clip; }
+body { height: auto; min-height: 100%; }
+/* Cross-page transitions (Chromium MPA view transitions). */
+@view-transition { navigation: auto; }
+::view-transition-old(root) { animation: cd-vt-out .2s cubic-bezier(.65,0,.35,1) both; }
+::view-transition-new(root) { animation: cd-vt-in .45s cubic-bezier(.16,1,.3,1) both; }
+@keyframes cd-vt-out { to { opacity: 0; transform: translateY(-6px); } }
+@keyframes cd-vt-in { from { opacity: 0; transform: translateY(12px); } }
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root), ::view-transition-new(root) { animation: none; }
+}
+/* Headlines in Space Grotesk, UI stays Geist. */
+.page-head h1, .sv-h h2 { font-family: var(--f-display); font-weight: 700; letter-spacing: -.03em; }
+.sv-num { font-family: var(--f-display); font-weight: 700; }
+.rail a.nav-item.active { background: var(--text); color: var(--canvas); }
+.rail a.nav-item.active .pulse { background: var(--accent); }
+.rail .brand small.role-badge { background: var(--pv-tint); color: var(--pv); }
+.tabbar a.active { color: var(--canvas); background: var(--text); }
+/* Hover depth on every clickable card across the admin. */
+a.sv-card { transition: transform .45s cubic-bezier(.16,1,.3,1), box-shadow .45s cubic-bezier(.16,1,.3,1), border-color .3s; }
+a.sv-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lift); border-color: var(--border-2); }
+@media (prefers-reduced-motion: reduce) { a.sv-card { transition: none; } a.sv-card:hover { transform: none; } }

@@ -66,7 +66,7 @@ export function deltaChip(cur, prev, { pct = true } = {}) {
   const d = cur - prev;
   if (d === 0) return `<span class="chip">0</span>`;
   const p = prev ? ` · ${Math.abs(d / prev * 100).toFixed(1)}%` : '';
-  return `<span class="chip ${d > 0 ? 'up' : 'down'}">${d > 0 ? '+' : '−'}${fmtNum(Math.abs(d))}${pct ? p : ''}</span>`;
+  return `<span class="chip delta ${d > 0 ? 'up' : 'down'}"><i aria-hidden="true">${d > 0 ? '&#9650;' : '&#9660;'}</i>${d > 0 ? '+' : '−'}${fmtNum(Math.abs(d))}${pct ? p : ''}</span>`;
 }
 
 const PLAT = { linkedin: ['in', 'LinkedIn'], instagram: ['IG', 'Instagram'], tiktok: ['TT', 'TikTok'], youtube: ['YT', 'YouTube'], x: ['X', 'X'], spotify: ['SP', 'Spotify'] };
@@ -89,7 +89,8 @@ export function sparkline(values, { w = 220, h = 40 } = {}) {
   const min = Math.min(...v), max = Math.max(...v), span = max - min || 1;
   const pts = v.map((y, i) => [i / (v.length - 1) * w, h - 4 - (y - min) / span * (h - 8)]);
   const line = pts.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' ');
-  return `<svg class="spark" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" aria-hidden="true"><path class="a" d="${line} L${w} ${h} L0 ${h} Z"/><path class="l" d="${line}"/></svg>`;
+  const [ex, ey] = pts[pts.length - 1];
+  return `<svg class="spark" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" aria-hidden="true"><path class="a" data-fade d="${line} L${w} ${h} L0 ${h} Z"/><path class="l" data-draw pathLength="1" vector-effect="non-scaling-stroke" d="${line}"/><circle class="end" data-fade cx="${ex.toFixed(1)}" cy="${ey.toFixed(1)}" r="2.6" vector-effect="non-scaling-stroke"/></svg>`;
 }
 
 // GitHub-style year heatmap. `byDay` maps 'YYYY-MM-DD' -> number.
