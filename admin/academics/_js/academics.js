@@ -107,7 +107,7 @@ const days = Math.max(0, Math.ceil((new Date(DATA.abroad.deadline)-new Date())/8
 root.appendChild(el(`
 <div class="card sa-card">
   <div>
-    <div style="font-family:'Anton',sans-serif;font-size:1.3rem;">${DATA.abroad.pick}</div>
+    <div style="font-family:var(--f-display);font-size:1.3rem;">${DATA.abroad.pick}</div>
     <p style="font-size:0.82rem;color:var(--ink-2);margin-top:0.5rem;line-height:1.5;max-width:52ch;">
       Best mix of career brand, SE-Asia travel hub, and safest healthcare/food while on Tremfya. Apply NUS first, SMU backup — Singapore either way. Full comparison in the vault.</p>
   </div>

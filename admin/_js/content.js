@@ -1,6 +1,6 @@
 // /admin/_js/content.js — content calendar + queue.
 // Reads: social_posts (what went out), content_queue (what's planned).
-// Writes: content_queue (add, move status, register a LinkedIn link).
+// Writes: content_queue (add, move status). LinkedIn posts arrive via social_posts (automatic), never pasted.
 import { sb } from '/admin/_shell/supabase.js';
 import { mountShell, toast } from '/admin/_shell/admin-shell.js';
 import { requireFullAdminOrRedirect } from '/admin/_shell/supabase.js';
@@ -14,17 +14,11 @@ const STATUSES = ['idea', 'scripted', 'filmed', 'edited', 'scheduled', 'posted']
 
 app.innerHTML = pageHead('Grow', 'Content calendar') + `
   <section class="sv-grid split">
-    <div class="sv-card pad-lg">
+    <div class="sv-card pad-lg" style="grid-column:1/-1">
       <div class="sv-h"><h2 id="mlabel"></h2><div class="seg"><button id="prev">Prev</button><button id="now">Today</button><button id="next">Next</button></div></div>
       <div id="cal"></div>
-      <div class="sv-meta">Filled dots are posts that went out (social_posts). Outlined are planned items (content_queue).</div>
     </div>
     <div style="display:flex;flex-direction:column;gap:1rem">
-      <div class="sv-card">
-        <h3>Register a LinkedIn post</h3>
-        <div class="sv-meta" style="margin:.1rem 0 .6rem">Paste the link after you post. It lands in the queue as posted, so the next analytics pull can match it.</div>
-        <form id="li" style="display:flex;gap:.5rem;flex-wrap:wrap"><div class="field" style="flex:1 1 220px"><input name="url" type="url" required placeholder="https://www.linkedin.com/posts/..."></div><div class="field" style="flex:1 1 220px"><input name="first" placeholder="First line (optional)"></div><button class="btn primary">Add</button></form>
-      </div>
       <div class="sv-card">
         <h3>Add to the queue</h3>
         <form id="add" class="form-grid" style="margin-top:.6rem">
@@ -37,7 +31,7 @@ app.innerHTML = pageHead('Grow', 'Content calendar') + `
       </div>
     </div>
   </section>
-  <section class="sv-section"><div class="sv-h"><h2>Queue</h2><span class="sv-sub">Click a stage to move an item</span></div><div class="sv-grid c3" id="queue"></div></section>`;
+  <section class="sv-section"><div class="sv-h"><h2>Queue</h2></div><div class="sv-grid c3" id="queue"></div></section>`;
 
 const cursor = toDate(todayET()); cursor.setDate(1);
 let posts = [], queue = [];
@@ -80,7 +74,7 @@ function drawQueue() {
         <div class="grow"><div class="t">${esc(q.title)}</div><div class="s">${q.scheduled_for ? esc(fmtDay(q.scheduled_for)) + ' · ' : ''}${esc(q.status)}${q.post_url ? ` · <a href="${esc(q.post_url)}" target="_blank" rel="noopener" style="color:var(--accent-ink)">link</a>` : ''}</div></div>
         ${platMark(q.platform)}
         <div class="seg" style="width:100%">${STATUSES.map(s => `<button class="${s === q.status ? 'on' : ''}" data-id="${q.id}" data-s="${s}">${s}</button>`).join('')}</div>
-      </div>`).join('') || `<div class="sv-meta">Nothing here. Add items above; ideas you approve can live here.</div>`}</div></div>`;
+      </div>`).join('') || `<div class="sv-meta">Nothing here.</div>`}</div></div>`;
   }).join('');
   document.querySelectorAll('#queue [data-s]').forEach(b => b.onclick = async () => {
     const { error } = await sb.from('content_queue').update({ status: b.dataset.s, updated_at: new Date().toISOString() }).eq('id', b.dataset.id);
@@ -95,11 +89,5 @@ document.getElementById('add').onsubmit = async (e) => {
   e.preventDefault(); const f = Object.fromEntries(new FormData(e.target));
   const { error } = await sb.from('content_queue').insert({ title: f.title, platform: f.platform, status: f.status, scheduled_for: f.date ? new Date(f.date + 'T12:00:00').toISOString() : null, source: 'admin' });
   if (error) return toast(error.message, 'err'); e.target.reset(); toast('Added', 'ok'); load();
-};
-document.getElementById('li').onsubmit = async (e) => {
-  e.preventDefault(); const f = Object.fromEntries(new FormData(e.target));
-  if (!/linkedin\.com\//i.test(f.url)) return toast('That is not a LinkedIn link', 'err');
-  const { error } = await sb.from('content_queue').insert({ title: f.first || 'LinkedIn post (link registered)', platform: 'linkedin', status: 'posted', post_url: f.url, scheduled_for: new Date().toISOString(), source: 'admin: pasted link' });
-  if (error) return toast(error.message, 'err'); e.target.reset(); toast('Registered', 'ok'); load();
 };
 load();

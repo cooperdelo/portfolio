@@ -28,12 +28,9 @@ function paintClock() {
   const h = Number(now.toLocaleString('en-US', { hour: 'numeric', hour12: false, timeZone: 'America/New_York' }));
   const part = h < 5 ? 'Up late' : h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
   $('greet').textContent = `${part}, Cooper`;
-  const d = now.toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'America/New_York' });
-  const t = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', timeZone: 'America/New_York' });
-  $('today').textContent = `${d}, ${t}`;
 }
 paintClock(); setInterval(paintClock, 30000);
-reveal(document.querySelectorAll('#mast .kicker, #mast h1, #mast .quick'), { stagger: 90, y: 22 });
+reveal(document.querySelectorAll('#mast h1, #mast .quick'), { stagger: 90, y: 22 });
 spotlight(document);
 
 if (DEMO) {
@@ -43,13 +40,6 @@ if (DEMO) {
     ? `<b>Demo</b> · snapshot from ${esc(fmtDay(SNAP.captured_at, { month: 'short', day: 'numeric' }))}, ${esc(new Date(SNAP.captured_at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', timeZone: 'America/New_York' }))}`
     : '<b>Demo</b> · snapshot file not found';
   document.querySelector('main').prepend(flag);
-  // Font trial (demo only): ?font=a|b|c. Default stays unchanged until Cooper picks.
-  const f = new URLSearchParams(location.search).get('font');
-  const GF = { a: 'Inter+Tight:wght@400..800', c: 'Instrument+Sans:wdth,wght@100,400..700' };
-  if (f && /^[abc]$/.test(f)) {
-    document.documentElement.dataset.font = f;
-    if (GF[f]) { const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = `https://fonts.googleapis.com/css2?family=${GF[f]}&display=swap`; document.head.append(l); }
-  }
 }
 // "as of Sep 27, 4:00 PM" -> "As of Sep 27, 4:00 PM"
 const asOfCap = (x) => asOf(x).replace('<span>as of', '<span>As of');
@@ -97,6 +87,7 @@ if (ctx?.role === 'full') {
   if (DEMO) { $('mustdos').innerHTML = privateCard("Today's must-dos"); $('health').innerHTML = privateCard('Body'); }
   else { mustDos().catch(e => fail('mustdos', 'must-dos', e)); health().catch(e => fail('health', 'health', e)); }
   decide(pOpen).catch(e => fail('decide', 'decisions', e));
+  vaultCard(pRuns).catch(e => fail('vaultCard', 'vault sync', e));
   document.querySelectorAll('main > .sv-section').forEach(s => onVisible(s, () => reveal(s.querySelectorAll(':scope > .sv-h, :scope > .sv-card, :scope > .sv-grid > *, :scope > .sv-card'), { stagger: 80 })));
 }
 
@@ -258,7 +249,6 @@ async function system(pRuns) {
           <span><i class="c quiet"></i>${c.quiet} quiet</span><span><i class="c failed"></i>${c.failed} failed</span>
         </div>
         <div class="sys-last">
-          <div class="eyebrow">Latest</div>
           ${runs.slice(0, 5).map(r => `<div class="lr"><i class="c ${esc(r.status)}"></i><span class="t code">${esc(r.task)}</span><span class="a" data-ago="${esc(r.ran_at)}">${esc(ago(r.ran_at))}</span></div>`).join('')}
         </div>
       </div>
@@ -382,6 +372,25 @@ async function health() {
       ${cell('Resting HR', r.resting_hr ?? '—')}${cell('HRV', r.hrv_ms != null ? r.hrv_ms + ' ms' : '—')}${cell('Body battery', r.body_battery_high ?? '—')}
     </div>
     <div class="sv-meta">Garmin · day ${esc(fmtDay(r.day, { weekday: 'short', month: 'short', day: 'numeric' }))} · synced ${esc(ago(r.garmin_synced_at || r.day))} ${staleChip(r.garmin_synced_at || r.day)}</div>`;
+}
+
+// ---------- Vault sync (freshness of the vault mirror in Supabase) ----------
+async function vaultCard(pRuns) {
+  let docs;
+  if (DEMO) docs = (SNAP?.vault?.docs || []).map(([path, updated_at, owner_task]) => ({ path, updated_at, owner_task }));
+  else {
+    const { data, error } = await sb.from('vault_documents').select('path,updated_at,owner_task').order('updated_at', { ascending: false }).limit(1000);
+    if (error) throw error; docs = data || [];
+  }
+  const runs = await pRuns.catch(() => []);
+  const sync = runs.find(r => /vault-sync|supabase-vault-sync/.test(r.task));
+  const last = docs[0]?.updated_at;
+  const day = docs.filter(d => Date.now() - new Date(d.updated_at) < 864e5).length;
+  const total = DEMO && SNAP?.vault?.docs_total ? SNAP.vault.docs_total : docs.length; // demo slice is partial
+  $('vaultCard').innerHTML = `<div class="sv-h" style="margin-bottom:.2rem"><h2 class="disp">Vault</h2><a href="/admin/vault/">Open</a></div>
+    <div class="dec-num"><span class="hc-num md" data-count="${total}">0</span><span class="mono">files mirrored · ${day} changed in 24h</span></div>
+    <div class="sv-meta">Last change ${last ? esc(ago(last)) : 'never'} ${last ? staleChip(last, 6) : ''}${sync ? ` · sync ran ${esc(ago(sync.ran_at))}` : ''}</div>`;
+  onVisible($('vaultCard'), () => countUp($('vaultCard').querySelector('[data-count]'), total, { dur: 900 }));
 }
 
 void statusChip; void REDUCED;

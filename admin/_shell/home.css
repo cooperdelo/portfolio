@@ -200,28 +200,6 @@ a.mx-row:hover .mx-name { color: var(--text); }
   .home a.sv-card:hover { transform: none; }
 }
 
-/* =====================================================================
-   FONT TRIAL (2026-09-28) — demo only, via /admin/?demo&font=a|b|c.
-   home.js sets <html data-font="…"> only when ?demo is on. Default (no
-   data-font) is unchanged: Geist UI, Space Grotesk headings, "CD Wide" numbers
-   (local Druk Wide Bold where the browser can see it, else Google Archivo 125%).
-   ===================================================================== */
-/* local() first; the url() copies live in admin/_dev/fonts (gitignored, localhost demo only,
-   licensed fonts are never deployed). Headless/other browsers can't see per-user installed fonts. */
-@font-face { font-family: "Opt Monument"; src: local("Monument Extended Regular"), local("MonumentExtended-Regular"), url("/admin/_dev/fonts/MonumentExtended-Regular.otf") format("opentype"); font-weight: 100 900; font-display: swap; }
-@font-face { font-family: "Opt ArchivoXW"; src: local("Archivo XWide Bold"), local("ArchivoXWide-Bold"), url("/admin/_dev/fonts/ArchivoXWideBold.ttf") format("truetype"); font-weight: 600 900; font-display: swap; }
-/* A: Inter Tight UI + headings, Monument Extended numbers */
-:root[data-font="a"] { --f-ui: "Inter Tight", "Inter", sans-serif; --f-display: "Inter Tight", "Inter", sans-serif; --f-wide: "Opt Monument", "Archivo", sans-serif; }
-:root[data-font="a"] .hc-num { font-weight: 400; letter-spacing: 0; }
-:root[data-font="a"] .mast h1 { font-weight: 650; letter-spacing: -.045em; }
-/* B: Geist everywhere, Space Grotesk numbers */
-:root[data-font="b"] { --f-ui: "Geist", sans-serif; --f-display: "Geist", sans-serif; --f-wide: "Space Grotesk", sans-serif; }
-:root[data-font="b"] .hc-num { font-stretch: 100%; font-weight: 700; letter-spacing: -.04em; }
-:root[data-font="b"] .mast h1 { font-weight: 600; letter-spacing: -.05em; }
-/* C: Instrument Sans UI + headings, Archivo XWide numbers */
-:root[data-font="c"] { --f-ui: "Instrument Sans", sans-serif; --f-display: "Instrument Sans", sans-serif; --f-wide: "Opt ArchivoXW", "Archivo", sans-serif; }
-:root[data-font="c"] .hc-num { font-weight: 700; }
-:root[data-font="c"] .mast h1 { font-weight: 600; letter-spacing: -.04em; }
-/* the rail and buttons hard-code Geist in admin-shell.css; follow the trial font */
-:root[data-font] .rail .brand, :root[data-font] .rail a.nav-item, :root[data-font] .rail-section .eyebrow,
-:root[data-font] .rail-search, :root[data-font] .rail-foot, :root[data-font] .btn, :root[data-font] body { font-family: var(--f-ui); }
+/* v4 declutter */
+.mast .quick .btn:not(.ghost) { display: none; }
+.hero .eyebrow { display: none; }

@@ -1,6 +1,6 @@
 // /admin/_js/people.js — People in orbit.
 // Reads/writes: engagers (new). Ongoing feed: LinkedIn notification emails,
-// parsed by a separate agent. Manual add is here so nothing is blocked on it.
+// parsed by a separate agent. No manual add (Cooper 2026-09-28: nothing manual).
 import { sb } from '/admin/_shell/supabase.js';
 import { mountShell, toast } from '/admin/_shell/admin-shell.js';
 import { requireFullAdminOrRedirect } from '/admin/_shell/supabase.js';
@@ -10,32 +10,12 @@ if (!(await requireFullAdminOrRedirect())) throw new Error('not full admin');
 await mountShell({ title: 'People in orbit' });
 const app = document.getElementById('app');
 
-app.innerHTML = pageHead('Grow', 'People in orbit', '<button class="btn primary" id="add-btn">Add a person</button>') + `
-  <div class="sv-card" id="add" style="display:none;margin-bottom:1rem">
-    <form class="form-grid" id="add-form">
-      <div class="field"><label>Name</label><input name="name" required placeholder="First name is enough"></div>
-      <div class="field"><label>Headline</label><input name="headline" placeholder="e.g. Founder at ..."></div>
-      <div class="field"><label>Platform</label><select name="platform"><option>linkedin</option><option>instagram</option><option>tiktok</option><option>youtube</option><option>x</option></select></div>
-      <div class="field"><label>Handle or profile link</label><input name="handle" placeholder="optional"></div>
-      <div class="field"><label>What they did</label><input name="last_interaction" placeholder="commented on the launch post"></div>
-      <div class="field" style="justify-content:flex-end"><button class="btn primary" type="submit">Save</button></div>
-    </form>
-  </div>
+app.innerHTML = pageHead('Grow', 'People in orbit') + `
   <div class="filters"><div class="seg" id="seg"></div><input type="search" id="q" placeholder="Search names and headlines"></div>
   <div class="sv-grid c3" id="stats" style="margin-bottom:1rem"></div>
   <div class="sv-card"><div class="rows" id="list"><div class="shimmer" style="height:80px"></div></div></div>`;
 
 let rows = [], plat = 'all';
-document.getElementById('add-btn').onclick = () => { const a = document.getElementById('add'); a.style.display = a.style.display === 'none' ? 'block' : 'none'; };
-document.getElementById('add-form').onsubmit = async (e) => {
-  e.preventDefault();
-  const f = Object.fromEntries(new FormData(e.target));
-  const isUrl = /^https?:\/\//.test(f.handle || '');
-  const rec = { name: f.name.trim(), headline: f.headline || null, platform: f.platform, handle: isUrl ? '' : (f.handle || '').replace(/^@/, ''), profile_url: isUrl ? f.handle : null, last_interaction: f.last_interaction || null, source: 'manual (admin)' };
-  const { error } = await sb.from('engagers').insert(rec);
-  if (error) return toast(error.message, 'err');
-  e.target.reset(); toast('Saved', 'ok'); load();
-};
 document.getElementById('q').oninput = render;
 
 async function load() {
@@ -52,7 +32,7 @@ function render() {
   const week = rows.filter(r => r.last_seen && (Date.now() - new Date(r.last_seen)) < 7 * 864e5).length;
   const repeat = rows.filter(r => r.interactions > 1).length;
   document.getElementById('stats').innerHTML = [['People tracked', rows.length], ['Seen this week', week], ['Came back more than once', repeat]]
-    .map(([k, v]) => `<div class="sv-card"><div class="sv-label">${k}</div><div class="sv-num md">${v}</div><div class="sv-meta">engagers table</div></div>`).join('');
+    .map(([k, v]) => `<div class="sv-card"><div class="sv-label">${k}</div><div class="sv-num md">${v}</div></div>`).join('');
   document.getElementById('list').innerHTML = vis.map(r => `<div class="row">
       ${r.avatar_url ? `<img class="avatar" src="${esc(r.avatar_url)}" alt="" onerror="this.outerHTML='<span class=&quot;avatar&quot;>${esc(initials(r.name))}</span>'">` : `<span class="avatar">${esc(initials(r.name))}</span>`}
       <div class="grow"><div class="t">${esc(r.name)}</div><div class="s">${esc(r.headline || r.last_interaction || '')}</div></div>

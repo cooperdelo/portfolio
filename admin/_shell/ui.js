@@ -76,8 +76,10 @@ export function platMark(p, handle) {
   return `<span class="plat"><span class="pm ${PLAT[p] ? esc(p) : 'other'}">${esc(m)}</span>${esc(name)}${handle ? `<span class="sv-muted" style="font-weight:500">@${esc(handle)}</span>` : ''}</span>`;
 }
 
+// Title only. The second line is kept only for load errors (so a failure says why).
 export function emptyState(title, feeds) {
-  return `<div class="sv-empty"><div class="e1">${esc(title)}</div><div class="e2">${feeds}</div></div>`;
+  const err = /^couldn't|^could not|error/i.test(String(title));
+  return `<div class="sv-empty"><div class="e1">${esc(title)}</div>${err && feeds ? `<div class="e2">${feeds}</div>` : ''}</div>`;
 }
 export function initials(name) {
   return String(name || '?').trim().split(/\s+/).slice(0, 2).map(w => w[0] || '').join('').toUpperCase() || '?';
@@ -179,8 +181,8 @@ export function statusChip(s) {
   return `<span class="chip ${k}">${esc(s || 'no runs')}</span>`;
 }
 
-export function pageHead(eyebrow, title, right = '') {
-  return `<header class="page-head"><div><div class="eyebrow">${esc(eyebrow)}</div><h1>${title}</h1></div><div class="actions">${right}</div></header>`;
+export function pageHead(_eyebrow, title, right = '') {
+  return `<header class="page-head"><div><h1>${title}</h1></div><div class="actions">${right}</div></header>`;
 }
 
 export function modal(html) {

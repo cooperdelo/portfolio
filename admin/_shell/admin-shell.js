@@ -24,6 +24,7 @@ window.__cv = (name, fallback) => getComputedStyle(document.documentElement).get
 const NAV = [
   { section: 'Today', items: [
     { href: '/admin/',                          label: 'Home' },
+    { href: '/admin/vault/',                    label: 'Vault', roles: ['full'] },
     { href: '/admin/decisions/',                label: 'Decisions', roles: ['full'] },
     { href: '/admin/rituals/',                  label: 'Rituals', roles: ['full'] },
   ]},
@@ -74,7 +75,7 @@ const NAV = [
 
 // Mobile bottom tabs (max 4 + Menu). Text only, per DESIGN.md (no icons).
 const TABS = {
-  full:      [['/admin/', 'Home'], ['/admin/insights/', 'Insights'], ['/admin/content/', 'Content'], ['/admin/rituals/', 'Rituals']],
+  full:      [['/admin/', 'Home'], ['/admin/vault/', 'Vault'], ['/admin/insights/', 'Insights'], ['/admin/content/', 'Content']],
   plugverse: [['/admin/', 'Home'], ['/admin/plugverse/', 'KPIs'], ['/admin/plugverse/ops.html', 'Ops'], ['/admin/finance/plugverse.html', 'P&L']],
 };
 
@@ -87,6 +88,12 @@ function applyTheme(t) {
   if (root.dataset.themePinned) return;
   if (t === 'light' || t === 'dark') root.dataset.theme = t; else delete root.dataset.theme;
 }
+// Brand fonts: PlugVerse pages use the PlugVerse type (Geist + Inter), everything
+// else uses Cooper's personal kit (Space Grotesk + Hanken Grotesk). See admin-shell.css v4.
+(function initBrand() {
+  const p = location.pathname.toLowerCase();
+  if (p.startsWith('/admin/plugverse/') || p === '/admin/finance/plugverse.html') document.documentElement.dataset.brand = 'plugverse';
+})();
 (function initTheme() {
   const root = document.documentElement;
   if (root.dataset.theme) { root.dataset.themePinned = '1'; return; }
