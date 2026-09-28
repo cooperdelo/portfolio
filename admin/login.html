@@ -92,7 +92,7 @@
     <a href="/" class="home-link">← Back to site</a>
     <div class="eyebrow">Admin · Restricted</div>
     <h1>SIGN <span class="accent">in</span></h1>
-    <p class="lede">Enter your admin email and password.</p>
+    <p class="lede">Enter your admin email. Use your password, or get a one-click sign-in link by email.</p>
     <form id="login-form" autocomplete="off">
       <div class="field">
         <label for="email">Admin email</label>
@@ -100,9 +100,10 @@
       </div>
       <div class="field">
         <label for="password">Password</label>
-        <input id="password" name="password" type="password" required autocomplete="current-password" placeholder="••••••••" />
+        <input id="password" name="password" type="password" autocomplete="current-password" placeholder="••••••••" />
       </div>
       <button class="btn primary" type="submit" id="submit-btn">Sign in</button>
+      <button class="btn" type="button" id="link-btn" style="margin-top:10px;width:100%">Email me a sign-in link instead</button>
     </form>
     <div class="ok-msg" id="ok-msg">
       Signed in — redirecting…
@@ -134,6 +135,19 @@
     const btn  = document.getElementById('submit-btn');
     const ok   = document.getElementById('ok-msg');
     const err  = document.getElementById('err-msg');
+
+    document.getElementById('link-btn').addEventListener('click', async () => {
+      err.classList.remove('show'); ok.classList.remove('show');
+      const email = emailInput.value.trim().toLowerCase();
+      if (!email) { emailInput.focus(); return; }
+      const lb = document.getElementById('link-btn');
+      lb.disabled = true; lb.textContent = 'Sending...';
+      const { error } = await sb.auth.signInWithOtp({ email, options: { shouldCreateUser: false, emailRedirectTo: location.origin + (params.get('next') || '/admin/') } });
+      lb.disabled = false;
+      if (error) { lb.textContent = 'Email me a sign-in link instead'; err.textContent = 'Could not send the link: ' + error.message; err.classList.add('show'); return; }
+      lb.textContent = 'Link sent. Check ' + email;
+      ok.textContent = 'Open the email on this device and click the link.'; ok.classList.add('show');
+    });
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();

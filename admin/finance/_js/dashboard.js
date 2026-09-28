@@ -3,15 +3,46 @@
 // =====================================================================
 import { sb, fmtUSD, fmtUSDCompact, fmtMonth, subscribeTransactions } from '/admin/_shell/supabase.js';
 import { mountShell, toast, monthsBack, monthKey } from '/admin/_shell/admin-shell.js';
+import { balances } from '/admin/_shell/live-data.js';
+import { reveal, countUp } from '/admin/_shell/motion.js';
 
-await mountShell({ title: 'Finance · Overview' });
+const ctx = await mountShell({ title: 'Finance · Overview', demo: true });
+const DEMO = !!ctx?.demo;
+
+// ---------------- Balances (Mercury auto + money-watch email alerts) ----------------
+const ACCT = { wells_fargo_checking: 'Wells Fargo checking', roth_ira: 'Roth IRA', coinbase_crypto: 'Coinbase' };
+const acctName = (a) => ACCT[a] || String(a || '').replace(/_/g, ' ').replace(/^./, c => c.toUpperCase());
+const dayLbl = (d) => new Date(String(d).length === 10 ? d + 'T12:00:00' : d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'America/New_York' });
+const hrsOld = (d) => (Date.now() - new Date(String(d).length === 10 ? d + 'T23:59:00' : d).getTime()) / 3.6e6;
+async function renderBalances() {
+  const el = document.getElementById('balances');
+  let b;
+  try { b = await balances(); } catch (e) { el.innerHTML = `<div class="sv-empty"><div class="e1">Couldn't load balances</div><div class="e2">${escapeHtml(e?.message || e)}</div></div>`; return; }
+  const group = (title, rows, name, cls, src, staleH) => {
+    if (!rows.length) return `<div class="bal-group ${cls}"><h3>${title}</h3><div class="sv-empty"><div class="e1">No balance yet</div></div></div>`;
+    const tot = rows.reduce((a, r) => a + Number(r.balance || 0), 0);
+    const asof = rows.map(r => r.as_of).sort().pop();
+    const stale = hrsOld(asof) > staleH;
+    return `<div class="bal-group ${cls}"><h3>${title}</h3>
+      <div class="bal-tot"><span class="v" data-usd="${tot}">${fmtUSD(tot)}</span></div>
+      ${rows.map(r => `<div class="bal-row"><span class="n">${escapeHtml(name(r))}</span><span class="v">${fmtUSD(r.balance)}</span></div>`).join('')}
+      <div class="bal-meta">${src} · as of ${dayLbl(asof)}${stale ? ' <span class="chip stale red">stale</span>' : ''}</div></div>`;
+  };
+  el.innerHTML = `<div class="bal-grid">
+    ${group('PlugVerse · Mercury', b.business, r => r.account_label + (r.balance_kind && r.balance_kind !== 'available' ? ` (${r.balance_kind})` : ''), 'pv', 'Mercury, available', 48)}
+    ${group('Personal', b.personal, r => acctName(r.account), '', 'Balance alert emails', 24 * 7)}
+  </div>`;
+  reveal(el.querySelectorAll('.bal-group'), { stagger: 80 });
+  el.querySelectorAll('[data-usd]').forEach((n, i) => countUp(n, Number(n.dataset.usd), { delay: 120 + i * 80, format: (v) => fmtUSD(v) }));
+}
+renderBalances();
 
 // Brand palette (matches shell.css)
 const C = {
-  ink:     '#F4EFE6',
-  ink2:    '#DDD4C5',
-  muted:   '#6F6A60',
-  rust:    '#FF4D2E',
+  ink:     __cv('--text','#F4EFE6'),
+  ink2:    __cv('--text-2','#DDD4C5'),
+  muted:   __cv('--text-3','#6F6A60'),
+  rust:    __cv('--accent','#FF4D2E'),
   crimson: '#C8102E',
   stage:   '#6B3FA0',
   pink:    '#F2C1D1',
@@ -25,12 +56,12 @@ const C = {
 Chart.defaults.color = C.ink2;
 Chart.defaults.font.family = '"Geist Mono", ui-monospace, monospace';
 Chart.defaults.font.size = 11;
-Chart.defaults.borderColor = 'rgba(244,239,230,0.10)';
+Chart.defaults.borderColor = __cv('--border','rgba(244,239,230,0.10)');
 Chart.defaults.plugins.legend.labels.color = C.ink2;
-Chart.defaults.plugins.tooltip.backgroundColor = 'rgba(20,17,15,0.95)';
+Chart.defaults.plugins.tooltip.backgroundColor = __cv('--surface','rgba(20,17,15,0.95)');
 Chart.defaults.plugins.tooltip.titleColor = C.ink;
 Chart.defaults.plugins.tooltip.bodyColor = C.ink2;
-Chart.defaults.plugins.tooltip.borderColor = 'rgba(244,239,230,0.18)';
+Chart.defaults.plugins.tooltip.borderColor = __cv('--border-2','rgba(244,239,230,0.18)');
 Chart.defaults.plugins.tooltip.borderWidth = 1;
 Chart.defaults.plugins.tooltip.padding = 10;
 Chart.defaults.plugins.tooltip.cornerRadius = 8;
@@ -238,9 +269,9 @@ function chartOpts({ grid = false, money = false, time = false } = {}) {
     },
     scales: {
       x: time
-        ? { type: 'time', time: { unit: 'month', tooltipFormat: 'MMM yyyy' }, grid: { color: 'rgba(244,239,230,0.05)' } }
-        : { grid: { color: 'rgba(244,239,230,0.05)' }, ticks: { autoSkip: true, maxRotation: 0 } },
-      y: { grid: grid ? { color: 'rgba(244,239,230,0.05)' } : { display: false }, ticks: { callback: (v) => money ? fmtUSDCompact(v) : v } },
+        ? { type: 'time', time: { unit: 'month', tooltipFormat: 'MMM yyyy' }, grid: { color: __cv('--border','rgba(244,239,230,0.05)') } }
+        : { grid: { color: __cv('--border','rgba(244,239,230,0.05)') }, ticks: { autoSkip: true, maxRotation: 0 } },
+      y: { grid: grid ? { color: __cv('--border','rgba(244,239,230,0.05)') } : { display: false }, ticks: { callback: (v) => money ? fmtUSDCompact(v) : v } },
     },
   };
 }
@@ -285,10 +316,15 @@ function escapeHtml(s) { return String(s || '').replace(/[&<>"']/g, c => ({ '&':
 // ---------------- Realtime ----------------
 
 const indicator = document.getElementById('live-indicator');
-subscribeTransactions((payload) => {
-  indicator.textContent = 'Live · updated';
-  loadAll().then(() => setTimeout(() => { indicator.textContent = 'Live · syncing'; }, 1800));
-});
-
-await loadAll();
-indicator.textContent = 'Live · syncing';
+if (DEMO) {
+  // Localhost demo: balances only (transactions are not in the demo snapshot).
+  indicator.textContent = 'Demo';
+  document.getElementById('recent-tbody').innerHTML = `<tr><td colspan="6" class="empty">Private. Shows when you sign in.</td></tr>`;
+} else {
+  subscribeTransactions((payload) => {
+    indicator.textContent = 'Live · updated';
+    loadAll().then(() => setTimeout(() => { indicator.textContent = 'Live · syncing'; }, 1800));
+  });
+  await loadAll();
+  indicator.textContent = 'Live · syncing';
+}

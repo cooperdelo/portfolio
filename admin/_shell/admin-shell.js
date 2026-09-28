@@ -9,21 +9,35 @@
 
 import { requireAdminOrRedirect, signOut, getSession, getAdminRole } from './supabase.js';
 
+// Read a theme token at runtime (legacy Chart.js pages use this so their
+// axes and tooltips follow light/dark instead of hard-coded cream).
+window.__cv = (name, fallback) => getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback;
+
 // `roles` declares which admin_role values can see each nav item.
 // Default is both. Items not listed in `roles` are visible to everyone signed in.
 // Consolidated into 5 life domains (2026-07 redesign). Each domain groups the
 // pages that actually get used; deep/rarely-used reports live inside their
 // dashboard rather than as top-level rail items. Life pages are read-only and
 // auto-synced by the nightly/weekly agent.
+// 2026-09-27 Stanley-style redesign: Today / Grow / System sections added on
+// top; every existing page is kept under its old section.
 const NAV = [
-  { section: 'Overview', items: [
+  { section: 'Today', items: [
     { href: '/admin/',                          label: 'Home' },
+    { href: '/admin/vault/',                    label: 'Vault', roles: ['full'] },
+    { href: '/admin/decisions/',                label: 'Decisions', roles: ['full'] },
+    { href: '/admin/rituals/',                  label: 'Rituals', roles: ['full'] },
+  ]},
+  { section: 'Grow', items: [
+    { href: '/admin/insights/',                 label: 'Insights', roles: ['full'] },
+    { href: '/admin/people/',                   label: 'People in orbit', roles: ['full'] },
+    { href: '/admin/content/',                  label: 'Content', roles: ['full'] },
+    { href: '/admin/earn/',                     label: 'Earn', roles: ['full'] },
   ]},
   { section: 'Money', items: [
     { href: '/admin/finance/',                  label: 'Finance Dashboard' },
     { href: '/admin/finance/networth.html',     label: 'Net Worth', roles: ['full'] },
     { href: '/admin/finance/transactions.html', label: 'Transactions' },
-    { href: '/admin/finance/entry.html',        label: 'Quick Add' },
     { href: '/admin/finance/investments.html',  label: 'Investments', roles: ['full'] },
     { href: '/admin/finance/funding.html',      label: 'Funding Sources' },
     { href: '/admin/finance/tax.html',          label: 'Tax Prep', roles: ['full'] },
@@ -46,13 +60,49 @@ const NAV = [
     { href: '/admin/academics/',                label: 'Academics', roles: ['full'] },
   ]},
   { section: 'Brand', items: [
-    { href: '/admin/social/',                   label: 'Content' },
+    { href: '/admin/social/',                   label: 'Social dashboard' },
     { href: '/admin/carousels/',                label: 'Carousel Studio', roles: ['full'] },
+    { href: '/admin/brain/',                    label: 'Brain', roles: ['full'] },
     { href: '/admin/playbook/',                 label: 'Playbook' },
     { href: '/admin/contacts/',                 label: 'Contacts' },
     { href: '/admin/merch/',                    label: 'Merch Tracker', roles: ['full'] },
   ]},
+  { section: 'System', items: [
+    { href: '/admin/integrations/',             label: 'Integrations', roles: ['full'] },
+  ]},
 ];
+
+// Mobile bottom tabs (max 4 + Menu). Text only, per DESIGN.md (no icons).
+const TABS = {
+  full:      [['/admin/', 'Home'], ['/admin/vault/', 'Vault'], ['/admin/insights/', 'Insights'], ['/admin/content/', 'Content']],
+  plugverse: [['/admin/', 'Home'], ['/admin/plugverse/', 'KPIs'], ['/admin/plugverse/ops.html', 'Ops'], ['/admin/finance/plugverse.html', 'P&L']],
+};
+
+// Theme: 'light' | 'dark' | null (follow system). Pages that pin a theme in
+// their own <html data-theme> (carousels, broll) are left alone.
+const THEME_KEY = 'cd-theme';
+function storedTheme() { try { return localStorage.getItem(THEME_KEY); } catch { return null; } }
+function applyTheme(t) {
+  const root = document.documentElement;
+  if (root.dataset.themePinned) return;
+  if (t === 'light' || t === 'dark') root.dataset.theme = t; else delete root.dataset.theme;
+}
+// Brand fonts: PlugVerse pages use the PlugVerse type (Geist + Inter), everything
+// else uses Cooper's personal kit (Space Grotesk + Hanken Grotesk). See admin-shell.css v4.
+(function initBrand() {
+  const p = location.pathname.toLowerCase();
+  if (p.startsWith('/admin/plugverse/') || p === '/admin/finance/plugverse.html') document.documentElement.dataset.brand = 'plugverse';
+})();
+(function initTheme() {
+  const root = document.documentElement;
+  if (root.dataset.theme) { root.dataset.themePinned = '1'; return; }
+  applyTheme(storedTheme());
+})();
+function currentTheme() {
+  const t = document.documentElement.dataset.theme;
+  if (t) return t;
+  return matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+}
 
 function visibleForRole(item, role) {
   if (!item.roles) return true;
@@ -80,16 +130,24 @@ function railHTML(activePath, email, role) {
 
   return `
     <aside class="rail">
-      <div class="brand"><span class="dot"></span>CD <small>Admin</small>${roleBadge}</div>
+      <div class="brand"><span class="logo">CD</span>Cooper Delo <small>Admin</small>${roleBadge}</div>
       <button class="rail-search" data-openpalette><span class="rs-mag">⌕</span><span>Search…</span><kbd>⌘K</kbd></button>
       <button class="rail-toggle" data-railtoggle aria-label="Menu" aria-expanded="false">&#9776;</button>
       ${sections}
       <div class="rail-foot">
         <span>Signed in as</span>
         <span class="who">${email || ''}</span>
+        <button class="theme-toggle signout" data-themetoggle type="button"></button>
         <button class="signout" data-signout>Sign out</button>
       </div>
     </aside>`;
+}
+
+function tabbarHTML(activePath, role) {
+  const tabs = TABS[role] || TABS.full;
+  const links = tabs.map(([href, label]) =>
+    `<a href="${href}" class="${normalizePath(href) === normalizePath(activePath) ? 'active' : ''}">${label}</a>`).join('');
+  return `<nav class="tabbar" aria-label="Primary">${links}<a href="#" data-tabmenu>Menu</a></nav>`;
 }
 
 function normalizePath(p) {
@@ -158,7 +216,7 @@ function mountPalette(role) {
   let items = [], active = 0, open = false;
 
   const rowHTML = (it, i) => `<button class="cmdk-item" data-i="${i}">
-      <span class="ci-ic">${it.act ? '⚡' : '↳'}</span>
+      <span class="ci-ic">${it.act ? '+' : '&rarr;'}</span>
       <span class="ci-label">${it.label}</span>
       <span class="ci-hint">${it.act ? 'action' : (it.group || '')}</span></button>`;
 
@@ -215,15 +273,30 @@ function mountPalette(role) {
   window.__openPalette = openP;
 }
 
-export async function mountShell({ title } = {}) {
+/**
+ * Localhost-only design preview (?demo on http://localhost / 127.0.0.1).
+ * Lets the layout render from a local, gitignored snapshot file for
+ * screenshots. On any other host this is always false, so production and
+ * Vercel previews always go through the normal auth gate below. No data is
+ * read from Supabase in demo mode.
+ */
+export function isLocalDemo() {
+  const local = location.protocol === 'http:' && (location.hostname === 'localhost' || location.hostname === '127.0.0.1');
+  return local && new URLSearchParams(location.search).has('demo');
+}
+
+export async function mountShell({ title, demo = false } = {}) {
+  const demoMode = demo && isLocalDemo();
   // 1) Gate the page on auth (membership in admin_allowlist, any role)
-  const ok = await requireAdminOrRedirect();
-  if (!ok) return null;
+  if (!demoMode) {
+    const ok = await requireAdminOrRedirect();
+    if (!ok) return null;
+  }
 
   // 2) Resolve role + email
-  const session = await getSession();
-  const email = session?.user?.email || '';
-  const role  = (await getAdminRole()) || 'full';
+  const session = demoMode ? null : await getSession();
+  const email = demoMode ? 'demo · localhost only' : (session?.user?.email || '');
+  const role  = demoMode ? 'full' : ((await getAdminRole()) || 'full');
 
   // 3) Wrap existing main content
   const main = document.querySelector('main');
@@ -255,6 +328,23 @@ export async function mountShell({ title } = {}) {
   toggleBtn?.addEventListener('click', () => setMenu(!railEl.classList.contains('menu-open')));
   railEl.querySelectorAll('a.nav-item').forEach(a => a.addEventListener('click', () => setMenu(false)));
 
+  // 4c) Mobile bottom tabs + theme toggle
+  const tabbar = el(tabbarHTML(location.pathname, role));
+  document.body.appendChild(tabbar);
+  tabbar.querySelector('[data-tabmenu]')?.addEventListener('click', (e) => {
+    e.preventDefault(); setMenu(!railEl.classList.contains('menu-open')); scrollTo({ top: 0 });
+  });
+  const themeBtn = wrap.querySelector('[data-themetoggle]');
+  const paintThemeBtn = () => { if (themeBtn) themeBtn.textContent = currentTheme() === 'dark' ? 'Light mode' : 'Dark mode'; };
+  if (document.documentElement.dataset.themePinned) themeBtn?.remove();
+  themeBtn?.addEventListener('click', () => {
+    const next = currentTheme() === 'dark' ? 'light' : 'dark';
+    try { localStorage.setItem(THEME_KEY, next); } catch {}
+    applyTheme(next); paintThemeBtn();
+    window.dispatchEvent(new CustomEvent('cd-theme', { detail: next }));
+  });
+  paintThemeBtn();
+
   // 5) Tile-level role gating (anything in the DOM with data-role)
   filterTilesByRole(role);
 
@@ -263,7 +353,7 @@ export async function mountShell({ title } = {}) {
   wrap.querySelectorAll('[data-openpalette]').forEach(b => b.addEventListener('click', () => window.__openPalette && window.__openPalette()));
   pushRecent(normalizePath(location.pathname));
 
-  return { session, email, role };
+  return { session, email, role, demo: demoMode };
 }
 
 // ---------- Toast ----------

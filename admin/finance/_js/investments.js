@@ -10,7 +10,7 @@ if (!(await requireFullAdminOrRedirect())) throw new Error('access denied');
 await mountShell({ title: 'Investments · Finance' });
 
 const C = {
-  ink2: '#DDD4C5', rust: '#FF4D2E', crimson: '#C8102E', stage: '#6B3FA0',
+  ink2: __cv('--text-2','#DDD4C5'), rust: __cv('--accent','#FF4D2E'), crimson: '#C8102E', stage: '#6B3FA0',
   pink: '#F2C1D1', cyan: '#B2E3E1', lavender: '#C9BEE6', sage: '#7A8A6E', cream: '#F2EDE4',
 };
 

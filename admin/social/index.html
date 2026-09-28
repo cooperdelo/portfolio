@@ -5,12 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="robots" content="noindex, nofollow, noarchive" />
 <title>Social · CD Admin</title>
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Geist+Mono:wght@300..700&family=Geist:wght@300..700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/admin/_shell/admin-shell.css" />
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
 <style>
   .tabs { display: flex; gap: 0.4rem; margin-bottom: 1.6rem; flex-wrap: wrap; }
   .tab { font-family: "Geist Mono", monospace; font-size: 0.7rem; letter-spacing: 0.22em; text-transform: uppercase; padding: 0.7rem 1.1rem; border-radius: 999px; background: rgba(244,239,230,0.04); border: 1px solid var(--card-border); color: var(--ink-2); cursor: pointer; transition: all 0.2s; }
@@ -20,13 +15,13 @@
   .post-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 0.9rem; margin-bottom: 2rem; }
   .post { padding: 0; border-radius: 14px; overflow: hidden; background: var(--card-bg); border: 1px solid var(--card-border); transition: border-color 0.25s; }
   .post:hover { border-color: var(--card-border-hover); }
-  .post .thumb { aspect-ratio: 1 / 1; background: #14110F center/cover no-repeat; position: relative; }
+  .post .thumb { position: relative; overflow: hidden; aspect-ratio: 1 / 1; background: #14110F center/cover no-repeat; position: relative; }
   .post .thumb .badge { position: absolute; top: 0.6rem; left: 0.6rem; font-family: "Geist Mono", monospace; font-size: 0.55rem; letter-spacing: 0.18em; text-transform: uppercase; padding: 0.25rem 0.5rem; border-radius: 4px; background: rgba(0,0,0,0.6); color: var(--ink); }
   .post .body { padding: 0.85rem 1rem 1rem; }
   .post .cap { font-family: "Geist", sans-serif; font-size: 0.82rem; line-height: 1.4; color: var(--ink-2); margin-bottom: 0.6rem; max-height: 3.4rem; overflow: hidden; }
   .post .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem 0.7rem; font-family: "Geist Mono", monospace; font-size: 0.6rem; letter-spacing: 0.1em; color: var(--muted); }
   .post .stats .stat { display: flex; flex-direction: column; gap: 0.05rem; min-width: 0; }
-  .post .stats .stat .n { font-family: "Anton", Impact, sans-serif; font-size: 1.05rem; color: var(--ink); letter-spacing: 0; line-height: 1; }
+  .post .stats .stat .n { font-family:var(--f-display); font-size: 1.05rem; color: var(--ink); letter-spacing: 0; line-height: 1; }
   .post .stats .stat .n.muted { color: var(--muted); }
   .post .stats .stat .lbl { font-size: 0.55rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--muted); }
   .post .stats .stat .lbl .pct { color: var(--sage); margin-left: 0.25rem; }
@@ -44,28 +39,28 @@
   @media (max-width: 1100px) { .top-row { grid-template-columns: repeat(3, 1fr); } }
   @media (max-width: 760px)  { .top-row { grid-template-columns: repeat(2, 1fr); } }
   .top-card { padding: 0; overflow: hidden; cursor: pointer; }
-  .top-card .rank { position: absolute; top: 0.55rem; left: 0.55rem; font-family: "Anton", Impact, sans-serif; font-size: 1.6rem; color: var(--ink); text-shadow: 0 0 8px rgba(0,0,0,0.7); line-height: 1; }
-  .top-card .thumb { aspect-ratio: 1 / 1; background: #14110F center/cover no-repeat; position: relative; }
+  .top-card .rank { position: absolute; top: 0.55rem; left: 0.55rem; font-family:var(--f-display); font-size: 1.6rem; color: var(--ink); text-shadow: 0 0 8px rgba(0,0,0,0.7); line-height: 1; }
+  .top-card .thumb { overflow: hidden; aspect-ratio: 1 / 1; background: #14110F center/cover no-repeat; position: relative; }
   .top-card .body { padding: 0.7rem 0.85rem; }
-  .top-card .views { font-family: "Anton", Impact, sans-serif; font-size: 1.3rem; color: var(--rust); line-height: 1; margin-bottom: 0.2rem; }
+  .top-card .views { font-family:var(--f-display); font-size: 1.3rem; color: var(--rust); line-height: 1; margin-bottom: 0.2rem; }
   .top-card .lbl  { font-family: "Geist Mono", monospace; font-size: 0.52rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--muted); }
   .top-card .cap  { font-family: "Geist", sans-serif; font-size: 0.74rem; color: var(--ink-2); margin-top: 0.4rem; line-height: 1.35; max-height: 2rem; overflow: hidden; }
 
   /* Hashtag table */
   .ht-tbl { width: 100%; }
   .ht-tag { font-family: "Geist Mono", monospace; font-size: 0.78rem; color: var(--rust); letter-spacing: 0.01em; }
-  .ht-tbl .n { font-family: "Anton", Impact, sans-serif; font-size: 1.05rem; color: var(--ink); letter-spacing: 0; line-height: 1; }
+  .ht-tbl .n { font-family:var(--f-display); font-size: 1.05rem; color: var(--ink); letter-spacing: 0; line-height: 1; }
 
   /* Watch-time leaderboard rows */
   .wt-row { display: grid; grid-template-columns: 2.4rem 4rem 1fr 5rem 5rem; gap: 0.9rem; padding: 0.85rem 1.2rem; align-items: center; border-bottom: 1px solid rgba(244,239,230,0.06); transition: background 0.15s; cursor: pointer; }
   .wt-row:hover { background: rgba(244,239,230,0.025); }
   .wt-row:last-child { border-bottom: 0; }
-  .wt-row .rank { font-family: "Anton", Impact, sans-serif; font-size: 1.3rem; color: var(--ink); }
+  .wt-row .rank { font-family:var(--f-display); font-size: 1.3rem; color: var(--ink); }
   .wt-row .thumb { width: 4rem; height: 4rem; border-radius: 6px; background: #14110F center/cover no-repeat; }
   .wt-row .cap { font-family: "Geist", sans-serif; font-size: 0.85rem; color: var(--ink-2); line-height: 1.4; max-height: 2.8rem; overflow: hidden; }
   .wt-row .meta { font-family: "Geist Mono", monospace; font-size: 0.6rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); margin-top: 0.25rem; }
   .wt-row .stat { text-align: right; }
-  .wt-row .stat .n { font-family: "Anton", Impact, sans-serif; font-size: 1.15rem; color: var(--ink); line-height: 1; }
+  .wt-row .stat .n { font-family:var(--f-display); font-size: 1.15rem; color: var(--ink); line-height: 1; }
   .wt-row .stat .lbl { font-family: "Geist Mono", monospace; font-size: 0.55rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--muted); margin-top: 0.2rem; }
   @media (max-width: 720px) {
     .wt-row { grid-template-columns: 2rem 3.2rem 1fr 4rem; }
@@ -89,7 +84,7 @@
   .sheet .d-stats { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.5rem; margin-bottom: 1.4rem; }
   @media (max-width: 680px) { .sheet .d-stats { grid-template-columns: repeat(3, 1fr); } }
   .sheet .d-stat { padding: 0.7rem 0.8rem; background: rgba(244,239,230,0.03); border: 1px solid rgba(244,239,230,0.07); border-radius: 8px; }
-  .sheet .d-stat .n { font-family: "Anton", Impact, sans-serif; font-size: 1.2rem; color: var(--ink); line-height: 1; }
+  .sheet .d-stat .n { font-family:var(--f-display); font-size: 1.2rem; color: var(--ink); line-height: 1; }
   .sheet .d-stat .n.muted { color: var(--muted); }
   .sheet .d-stat .lbl { font-family: "Geist Mono", monospace; font-size: 0.55rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--muted); margin-top: 0.3rem; }
   .sheet .chart-h { font-family: "Geist", sans-serif; font-weight: 600; font-size: 0.95rem; letter-spacing: -0.005em; color: var(--ink); margin: 0 0 0.6rem; }
@@ -105,36 +100,35 @@
       </div>
       <div class="actions">
         <span class="live-dot" id="live-indicator">Loading</span>
-        <button class="btn" id="refresh-btn">Refresh now</button>
+        <button class="btn" id="refresh-btn" title="Re-reads the database. The data itself is pulled automatically; no token needed here.">Reload</button>
       </div>
     </div>
 
-    <div class="tabs">
+    <div class="tabs" id="plat-tabs">
       <button class="tab active" data-tab="instagram">Instagram</button>
       <button class="tab" data-tab="tiktok">TikTok</button>
       <button class="tab" data-tab="linkedin">LinkedIn</button>
+      <button class="tab" data-tab="youtube">YouTube</button>
     </div>
+    <div class="tabs" id="acct-tabs" style="margin-top:-0.8rem"></div>
 
     <div id="error-slot"></div>
 
     <div class="kpi-grid" id="kpi-slot">
-      <div class="card"><div class="label">Followers</div><div class="value" data-k="followers">—</div><div class="delta flat" data-k="followers_sub">Account size</div></div>
-      <div class="card"><div class="label">Posts total</div><div class="value" data-k="posts_total">—</div><div class="delta flat">Lifetime</div></div>
-      <div class="card"><div class="label">Most-recent post</div><div class="value" data-k="last_post">—</div><div class="delta flat" data-k="last_post_sub">Days since last post</div></div>
-      <div class="card"><div class="label">Total likes</div><div class="value" data-k="total_likes">—</div><div class="delta flat">Across recent fetched</div></div>
+      <div class="card"><div class="label">Followers</div><div class="value" data-k="followers">—</div><div class="delta flat" data-k="followers_sub">—</div></div>
+      <div class="card"><div class="label">Posts total</div><div class="value" data-k="posts_total">—</div><div class="delta flat" data-k="posts_sub">—</div></div>
+      <div class="card"><div class="label">Last post</div><div class="value" data-k="last_post">—</div><div class="delta flat" data-k="last_post_sub">—</div></div>
+      <div class="card"><div class="label" data-k="sum_label">Views, last 30 days</div><div class="value" data-k="sum30">—</div><div class="delta flat" data-k="sum30_sub">—</div></div>
     </div>
 
     <h2 class="section-h">Top 5 · <span class="accent">last 30 days</span></h2>
     <div class="top-row" id="top-row"></div>
 
-    <h2 class="section-h" id="watch-time-h" style="display:none">Reels · <span class="accent">avg watch time</span></h2>
-    <div class="card" id="watch-time-card" style="padding:0;overflow:hidden;margin-bottom:2rem;display:none"></div>
-
     <h2 class="section-h">Hashtag <span class="accent">performance</span></h2>
     <div class="card" id="hashtag-card" style="padding:0;overflow:hidden;margin-bottom:2rem">
       <div class="tbl-wrap">
         <table class="data ht-tbl">
-          <thead><tr><th>Hashtag</th><th class="right">Posts</th><th class="right">Total views</th><th class="right">Avg views</th><th class="right">Total likes</th></tr></thead>
+          <thead><tr><th>Hashtag</th><th class="right">Posts</th><th class="right" data-k="ht_total">Total views</th><th class="right" data-k="ht_avg">Avg views</th><th class="right">vs account avg</th></tr></thead>
           <tbody id="hashtag-tbody"><tr><td colspan="5" class="empty">—</td></tr></tbody>
         </table>
       </div>
@@ -146,424 +140,146 @@
     </div>
   </main>
 
-  <div class="scrim" id="scrim"></div>
-  <div class="sheet" id="sheet">
-    <button class="close" data-action="close">Close</button>
-    <div id="sheet-body"></div>
-  </div>
-
   <script type="module">
+    // 2026-09-28 admin-stale-sweep: this page used to call /api/instagram-sync and
+    // /api/tiktok-sync, which need a hand-registered OAuth token (IG expired Jul 12,
+    // TikTok access Jun 15) and don't exist off-production (the host answered the
+    // plain text "not found", which broke JSON.parse -> "Offline"). It now reads
+    // only the automatic feeds: v_social_posts_latest (posts + newest metrics +
+    // cached thumbnails) and social_account_snapshots (followers / post counts).
+    // "Reload" = re-query. Nothing here needs a token or a manual step.
     import { sb, requireFullAdminOrRedirect } from '/admin/_shell/supabase.js';
-    import { mountShell, toast } from '/admin/_shell/admin-shell.js';
+    import { mountShell } from '/admin/_shell/admin-shell.js';
+    import { socialPostsLatest, accountSnapshotsLatest, FEED_ACCOUNTS, isDemo } from '/admin/_shell/live-data.js';
+    import { esc, fmtNum, fmtCompact, ago, fmtDay, staleChip } from '/admin/_shell/ui.js';
 
-    if (!(await requireFullAdminOrRedirect())) throw new Error('access denied');
-    await mountShell({ title: 'Social · Analytics' });
+    if (!isDemo() && !(await requireFullAdminOrRedirect())) throw new Error('access denied');
+    await mountShell({ title: 'Social · Analytics', demo: true });
 
-    const indicator = document.getElementById('live-indicator');
-    const errSlot   = document.getElementById('error-slot');
-    const refreshBtn = document.getElementById('refresh-btn');
-    let activeTab = 'instagram';
+    const $ = (id) => document.getElementById(id);
+    const setK = (k, html) => { const e = document.querySelector(`[data-k="${k}"]`); if (e) e.innerHTML = html; };
+    const ind = $('live-indicator');
+    const STALE_H = { instagram: 48, tiktok: 48, youtube: 72, linkedin: 48 };
+    const NAME = { instagram: 'Instagram', tiktok: 'TikTok', linkedin: 'LinkedIn', youtube: 'YouTube' };
+    let plat = 'instagram', handle = 'cooperdelo';
+    let POSTS = null, ACCTS = null;
 
-    function setK(k, v){ const e = document.querySelector(`[data-k="${k}"]`); if (e) e.textContent = v; }
-    function fmtN(n){ if (n == null) return '—'; return Number(n).toLocaleString('en-US'); }
-    function fmtCompact(n){ if (n == null) return '—'; const v = Number(n); if (Math.abs(v) >= 1e6) return (v/1e6).toFixed(1) + 'M'; if (Math.abs(v) >= 1e3) return (v/1e3).toFixed(1) + 'k'; return String(v); }
-    function escapeHtml(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c])); }
-    function daysSince(iso){ if (!iso) return '—'; return Math.floor((Date.now() - new Date(iso).getTime()) / 86400000) + 'd ago'; }
+    const metricOf = (p) => p.platform === 'linkedin'
+      ? (p.impressions != null ? { v: Number(p.impressions), l: 'impressions' } : { v: p.likes == null ? null : Number(p.likes), l: 'reactions' })
+      : (p.views != null ? { v: Number(p.views), l: 'views' } : { v: p.likes == null ? null : Number(p.likes), l: 'likes' });
+    const tagsOf = (cap) => [...new Set((String(cap || '').match(/#[\p{L}\p{N}_]+/gu) || []).map(t => t.toLowerCase()))];
+    const handles = (pl) => (FEED_ACCOUNTS[pl] || []).filter(h => h !== 'cooper delo');
+    const sameHandle = (a, b) => String(a || '').toLowerCase().replace(/\s+/g, '') === String(b || '').toLowerCase().replace(/\s+/g, '');
 
-    function renderError(platform, msg) {
-      errSlot.innerHTML = `<div class="err-banner"><strong>${platform}:</strong> ${escapeHtml(msg)}</div>`;
-    }
-    function clearError() { errSlot.innerHTML = ''; }
-
-    // Cache current posts so the detail sheet can look up by id without re-fetching.
-    let currentPosts = [];
-
-    // ---- Top 5 (rolling 30d) ----
-    function renderTop5(platform, posts) {
-      const cutoff = Date.now() - 30 * 86400000;
-      const candidates = (posts || [])
-        .filter(p => p.posted_at && new Date(p.posted_at).getTime() >= cutoff)
-        .filter(p => p.latest?.views != null);
-      candidates.sort((a, b) => (Number(b.latest?.views) || 0) - (Number(a.latest?.views) || 0));
-      const top = candidates.slice(0, 5);
-      const row = document.getElementById('top-row');
-      if (!top.length) {
-        row.innerHTML = `<div class="empty" style="grid-column:1/-1;padding:1.8rem 1rem;">No view data on posts from the last 30 days yet.</div>`;
-        return;
-      }
-      row.innerHTML = top.map((p, i) => {
-        const thumb = p.thumbnail_url || p.media_url || '';
-        const cap = (p.caption || '').slice(0, 60).replace(/\n/g, ' ');
-        return `<div class="card top-card" data-post-id="${escapeHtml(p.id)}">
-          <div class="thumb" style="${thumb ? `background-image:url('${escapeHtml(thumb)}');` : ''}">
-            <span class="rank">${i + 1}</span>
-          </div>
-          <div class="body">
-            <div class="views">${fmtCompact(p.latest.views)}</div>
-            <div class="lbl">Views</div>
-            <div class="cap">${escapeHtml(cap || '(no caption)')}</div>
-          </div>
-        </div>`;
-      }).join('');
-    }
-
-    // ---- Hashtag performance ----
-    function renderHashtags(posts) {
-      const map = new Map();
-      for (const p of (posts || [])) {
-        const m = p.latest || {};
-        const views = Number(m.views || 0);
-        const likes = Number(m.likes || 0);
-        for (const raw of (p.hashtags || [])) {
-          const tag = raw.toLowerCase();
-          const e = map.get(tag) || { tag, posts: 0, views: 0, likes: 0 };
-          e.posts++; e.views += views; e.likes += likes;
-          map.set(tag, e);
-        }
-      }
-      const rows = [...map.values()].sort((a, b) => b.views - a.views).slice(0, 15);
-      const tbody = document.getElementById('hashtag-tbody');
-      if (!rows.length) {
-        tbody.innerHTML = `<tr><td colspan="5" class="empty">No hashtags found across recent posts.</td></tr>`;
-        return;
-      }
-      tbody.innerHTML = rows.map(h => `<tr>
-        <td><span class="ht-tag">${escapeHtml(h.tag)}</span></td>
-        <td class="right mono"><span class="n">${fmtN(h.posts)}</span></td>
-        <td class="right mono"><span class="n">${fmtCompact(h.views)}</span></td>
-        <td class="right mono"><span class="n">${fmtCompact(Math.round(h.views / h.posts))}</span></td>
-        <td class="right mono"><span class="n">${fmtCompact(h.likes)}</span></td>
-      </tr>`).join('');
-    }
-
-    // ---- Reels watch-time leaderboard (IG only) ----
-    function renderWatchTime(platform, posts) {
-      const wrap = document.getElementById('watch-time-card');
-      const hdr  = document.getElementById('watch-time-h');
-      if (platform !== 'instagram') { wrap.style.display = 'none'; hdr.style.display = 'none'; return; }
-      const reels = (posts || [])
-        .filter(p => (p.media_type === 'VIDEO' || p.media_type === 'REELS'))
-        .filter(p => p.latest?.avg_watch_seconds != null && Number(p.latest.avg_watch_seconds) > 0)
-        .sort((a, b) => Number(b.latest.avg_watch_seconds) - Number(a.latest.avg_watch_seconds))
-        .slice(0, 10);
-      if (!reels.length) { wrap.style.display = 'none'; hdr.style.display = 'none'; return; }
-      wrap.style.display = ''; hdr.style.display = '';
-      wrap.innerHTML = reels.map((p, i) => {
-        const thumb = p.thumbnail_url || p.media_url || '';
-        const cap = (p.caption || '').slice(0, 90).replace(/\n/g, ' ');
-        const watch = Number(p.latest.avg_watch_seconds || 0);
-        const views = Number(p.latest.views || 0);
-        return `<div class="wt-row" data-post-id="${escapeHtml(p.id)}">
-          <div class="rank">${i + 1}</div>
-          <div class="thumb" style="${thumb ? `background-image:url('${escapeHtml(thumb)}');` : ''}"></div>
-          <div>
-            <div class="cap">${escapeHtml(cap || '(no caption)')}</div>
-            <div class="meta">${escapeHtml(p.posted_at ? new Date(p.posted_at).toLocaleDateString('en-US',{month:'short',day:'2-digit',year:'numeric'}) : '—')}</div>
-          </div>
-          <div class="stat"><div class="n">${watch}s</div><div class="lbl">avg watch</div></div>
-          <div class="stat"><div class="n">${fmtCompact(views)}</div><div class="lbl">views</div></div>
-        </div>`;
-      }).join('');
-    }
-
-    // ---- Post detail sheet with time-series chart ----
-    const scrimEl = document.getElementById('scrim');
-    const sheetEl = document.getElementById('sheet');
-    const sheetBody = document.getElementById('sheet-body');
-    let chartInstance = null;
-    function openSheet(html) {
-      sheetBody.innerHTML = html;
-      scrimEl.classList.add('on'); sheetEl.classList.add('on');
-      document.body.style.overflow = 'hidden';
-    }
-    function closeSheet() {
-      scrimEl.classList.remove('on'); sheetEl.classList.remove('on');
-      document.body.style.overflow = '';
-      if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
-    }
-    scrimEl.addEventListener('click', closeSheet);
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSheet(); });
-
-    function detailStat(label, value) {
-      const empty = value == null;
-      return `<div class="d-stat"><div class="n ${empty ? 'muted' : ''}">${empty ? '—' : fmtCompact(value)}</div><div class="lbl">${escapeHtml(label)}</div></div>`;
-    }
-
-    async function showPostDetail(postId) {
-      const p = currentPosts.find(x => x.id === postId);
-      if (!p) return;
-      const thumb = p.thumbnail_url || p.media_url || '';
-      const m = p.latest || {};
-      const eng = m.engagement_pct != null ? `${Number(m.engagement_pct).toFixed(1)}%` : null;
-      openSheet(`
-        <h2>${escapeHtml((p.caption || '(no caption)').slice(0, 110).replace(/\n/g, ' '))}</h2>
-        <div class="detail-layout">
-          <div class="d-thumb" style="${thumb ? `background-image:url('${escapeHtml(thumb)}');` : ''}"></div>
-          <div>
-            <div class="d-caption">${escapeHtml(p.caption || '')}</div>
-            <div class="d-meta">
-              <div>${escapeHtml(p.posted_at ? new Date(p.posted_at).toLocaleString('en-US') : '—')}</div>
-              <div>${escapeHtml(p.media_type || '')} · ${escapeHtml(p.platform || '')}</div>
-              ${p.permalink ? `<div><a href="${escapeHtml(p.permalink)}" target="_blank" rel="noreferrer">Open on platform ↗</a></div>` : ''}
-              ${eng ? `<div style="color:var(--sage);margin-top:.35rem">Engagement ${eng}</div>` : ''}
-              ${m.avg_watch_seconds ? `<div>Avg watch · ${m.avg_watch_seconds}s</div>` : ''}
-            </div>
-          </div>
-        </div>
-        <div class="d-stats">
-          ${detailStat('views',    m.views)}
-          ${detailStat('likes',    m.likes)}
-          ${detailStat('comments', m.comments)}
-          ${detailStat('shares',   m.shares)}
-          ${detailStat('saves',    m.saves)}
-          ${detailStat('reach',    m.reach)}
-        </div>
-        <h3 class="chart-h">Metric history</h3>
-        <div class="chart-wrap"><canvas id="post-chart"></canvas></div>
-      `);
-      // Pull time series and render
-      const { data: history, error } = await sb
-        .from('social_post_metrics')
-        .select('captured_at, views, likes, comments, shares, saves, reach')
-        .eq('post_id', postId)
-        .order('captured_at', { ascending: true });
-      if (error || !history?.length) {
-        document.querySelector('.chart-wrap').innerHTML = `<div class="empty" style="padding:2rem 1rem">${error ? escapeHtml(error.message) : 'Only one snapshot so far — come back tomorrow.'}</div>`;
-        return;
-      }
-      const ctx = document.getElementById('post-chart').getContext('2d');
-      const palette = { views:'#FF4D2E', likes:'#F2C1D1', comments:'#B2E3E1', shares:'#C9BEE6', saves:'#7A8A6E', reach:'#DDD4C5' };
-      const datasets = ['views','likes','comments','shares','saves','reach']
-        .filter(k => history.some(h => h[k] != null))
-        .map(k => ({
-          label: k,
-          data: history.map(h => ({ x: h.captured_at, y: h[k] != null ? Number(h[k]) : null })),
-          borderColor: palette[k], backgroundColor: palette[k] + '22',
-          tension: 0.32, borderWidth: 2, pointRadius: 0, pointHoverRadius: 4, spanGaps: true,
-        }));
-      chartInstance = new Chart(ctx, {
-        type: 'line',
-        data: { datasets },
-        options: {
-          maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
-          plugins: { legend: { labels: { color: '#DDD4C5', font: { family: '"Geist Mono", monospace', size: 10 } } },
-                     tooltip: { backgroundColor: 'rgba(20,17,15,0.95)', titleColor: '#F4EFE6', bodyColor: '#DDD4C5', borderColor: 'rgba(244,239,230,0.18)', borderWidth: 1 } },
-          scales: {
-            x: { type: 'time', time: { unit: 'day' }, ticks: { color: '#6F6A60', font: { family: '"Geist Mono", monospace', size: 9 } }, grid: { color: 'rgba(244,239,230,0.05)' } },
-            y: { ticks: { color: '#6F6A60', font: { family: '"Geist Mono", monospace', size: 9 } }, grid: { color: 'rgba(244,239,230,0.05)' } },
-          },
-        },
-      });
-    }
-
-    function renderConnectCTA(platform) {
-      const oauthUrl = platform === 'instagram'
-        ? 'https://www.instagram.com/oauth/authorize?force_reauth=true&client_id=946685798340166&redirect_uri=https://www.cooperdelo.com/api/instagram-oauth&response_type=code&scope=instagram_business_basic%2Cinstagram_business_manage_messages%2Cinstagram_business_manage_comments%2Cinstagram_business_content_publish%2Cinstagram_business_manage_insights'
-        : platform === 'tiktok'
-        ? '/api/tiktok-auth-start'   // server builds the authorize URL from TIKTOK_CLIENT_KEY env
-        : '#';
-      document.getElementById('post-grid').innerHTML = `
-        <div class="card connect-cta" style="grid-column:1/-1;padding:1.6rem 1.7rem;">
-          <div class="text">No ${platform} account connected yet.</div>
-          <a class="btn primary" href="${oauthUrl}">Connect ${platform}</a>
-        </div>`;
-    }
-
-    function stat(label, value, opts = {}) {
-      const empty = value == null || value === undefined;
-      const display = empty ? '—' : fmtCompact(value);
-      const cls = empty ? 'n muted' : 'n';
-      const suffix = opts.suffix ? ` <span class="pct">${opts.suffix}</span>` : '';
-      return `<div class="stat"><span class="${cls}">${display}</span><span class="lbl">${escapeHtml(label)}${suffix}</span></div>`;
-    }
-
-    function renderPosts(platform, posts) {
-      const grid = document.getElementById('post-grid');
-      if (!posts || !posts.length) {
-        grid.innerHTML = `<div class="empty" style="grid-column:1/-1;">No posts synced yet.</div>`;
-        return;
-      }
-      grid.innerHTML = posts.map(p => {
-        const cap = (p.caption || '').slice(0, 120).replace(/\n/g, ' ');
-        const thumb = p.thumbnail_url || p.media_url || '';
-        const m = p.latest || {};
-        const engagement = m.engagement_pct != null ? `${Number(m.engagement_pct).toFixed(1)}%` : null;
-
-        // 6 stats per card: views, likes, comments, shares, saves/reach, engagement.
-        // Layout adapts because not every platform supplies every field.
-        let cells;
-        if (platform === 'tiktok') {
-          // TikTok Display API gives views/likes/comments/shares per video. No reach exposed.
-          const engCell = engagement
-            ? `<div class="stat"><span class="n">${engagement}</span><span class="lbl">engagement</span></div>`
-            : stat('engag.', null);
-          cells = [
-            stat('views',    m.views),
-            stat('likes',    m.likes),
-            stat('comments', m.comments),
-            stat('shares',   m.shares),
-            engCell,
-          ];
-        } else {
-          // Instagram — views may be null on older posts.
-          cells = [
-            stat('views',    m.views),
-            stat('likes',    m.likes),
-            stat('comments', m.comments),
-            stat('saves',    m.saves),
-            stat('shares',   m.shares),
-            stat('reach',    m.reach),
-          ];
-        }
-        const statsHtml = cells.join('');
-
-        return `<div class="post" data-post-id="${escapeHtml(p.id)}" style="cursor:pointer">
-          <div class="thumb" style="${thumb ? `background-image:url('${escapeHtml(thumb)}');` : ''}">
-            <span class="badge">${escapeHtml(p.media_type || platform.toUpperCase())}</span>
-          </div>
-          <div class="body">
-            <div class="cap">${escapeHtml(cap || '(no caption)')}</div>
-            <div class="stats">${statsHtml}</div>
-            <div class="date">${escapeHtml(p.posted_at ? new Date(p.posted_at).toLocaleDateString('en-US',{month:'short',day:'2-digit',year:'numeric'}) : '—')}${m.avg_watch_seconds ? ` · avg watch ${m.avg_watch_seconds}s` : ''}${platform === 'instagram' && engagement ? ` · engag ${engagement}` : ''}</div>
-          </div>
-        </div>`;
-      }).join('');
-    }
-
-    // Delegate clicks on any element with data-post-id (post cards, top cards, watch-time rows)
-    document.addEventListener('click', e => {
-      const el = e.target.closest('[data-post-id]');
-      if (!el) return;
-      if (e.target.closest('a')) return; // let normal anchor clicks through
-      e.preventDefault();
-      showPostDetail(el.dataset.postId);
-    });
-    document.addEventListener('click', e => {
-      const cl = e.target.closest('[data-action="close"]');
-      if (cl) closeSheet();
-    });
-
-    function renderHeader(platform, data) {
-      const followers = data.followers;
-      setK('followers',        fmtN(followers));
-      setK('followers_sub',    data.handle ? `@${data.handle}` : 'Account size');
-      setK('posts_total',      fmtN(data.posts_total));
-      setK('total_likes',      fmtN(data.total_likes ?? (data.posts || []).reduce((a,p)=>a + (Number(p.latest?.likes)||0), 0)));
-      const latest = (data.posts || [])[0];
-      setK('last_post',        latest ? daysSince(latest.posted_at) : '—');
-      setK('last_post_sub',    latest ? `${escapeHtml(latest.media_type || '')}` : 'No posts yet');
-    }
-
-    // ---- Import-backed platforms (LinkedIn + TikTok). No usable live API, so
-    // posts are imported from each platform's official data export into
-    // social_posts. We read them straight from the DB. ----
-    async function loadImported(platform) {
-      const noun = platform === 'linkedin' ? 'LinkedIn' : 'TikTok';
-      indicator.textContent = `Loading ${platform}`;
-      const { data: rows, error } = await sb
-        .from('social_posts')
-        .select('id, caption, posted_at, permalink, media_type, media_url, thumbnail_url, hashtags, platform, account_handle')
-        .eq('platform', platform)
-        .order('posted_at', { ascending: false })
-        .limit(500);
-
-      if (error) { renderError(platform, error.message); indicator.textContent = 'Error'; return; }
-
-      currentPosts = (rows || []).map(p => ({ ...p, latest: {} }));
-
-      if (!currentPosts.length) {
-        document.getElementById('post-grid').innerHTML = `
-          <div class="card connect-cta" style="grid-column:1/-1;padding:1.6rem 1.7rem;">
-            <div class="text">No ${noun} posts imported yet. Run the ${noun} data-export import.</div>
-          </div>`;
-        setK('followers','—'); setK('posts_total','0'); setK('last_post','—'); setK('total_likes','—');
-        document.getElementById('top-row').innerHTML = '';
-        document.getElementById('hashtag-tbody').innerHTML = `<tr><td colspan="5" class="empty">—</td></tr>`;
-        indicator.textContent = 'No imports yet';
-        return;
-      }
-
-      const handle = currentPosts[0].account_handle;
-      setK('followers','—'); setK('followers_sub', handle ? `@${handle}` : noun);
-      setK('posts_total', fmtN(currentPosts.length));
-      setK('total_likes','—');
-      setK('last_post', daysSince(currentPosts[0].posted_at));
-      setK('last_post_sub', 'Imported from export');
-
-      // No view metrics on data-export imports, so the Top-5-by-views row is N/A.
-      document.getElementById('top-row').innerHTML =
-        `<div class="empty" style="grid-column:1/-1;padding:1.4rem 1rem;">${noun} export has captions + dates, no view metrics.</div>`;
-      renderWatchTime(platform, currentPosts);
-      renderHashtags(currentPosts);
-
-      // Caption-first cards (no stat grid).
-      document.getElementById('post-grid').innerHTML = currentPosts.map(p => {
-        const cap = (p.caption || '(no caption)').replace(/\n/g, ' ');
-        const date = p.posted_at ? new Date(p.posted_at).toLocaleDateString('en-US',{month:'short',day:'2-digit',year:'numeric'}) : '—';
-        return `<div class="post" data-post-id="${escapeHtml(p.id)}" style="cursor:pointer">
-          <div class="body" style="padding:1rem 1.1rem;">
-            <div class="cap" style="max-height:7.5rem;">${escapeHtml(cap.slice(0, 280))}</div>
-            <div class="date">${escapeHtml(date)}${p.permalink ? ` · <a href="${escapeHtml(p.permalink)}" target="_blank" rel="noreferrer" style="color:var(--rust)">open ↗</a>` : ''}</div>
-          </div>
-        </div>`;
-      }).join('');
-      indicator.textContent = `Loaded · ${platform} (${currentPosts.length})`;
-    }
-
-    async function syncPlatform(platform) {
-      indicator.textContent = `Syncing ${platform}`;
-      refreshBtn.disabled = true;
-      clearError();
-      if (platform === 'linkedin') {
-        try { await loadImported('linkedin'); } catch (e) { renderError('linkedin', e?.message || String(e)); }
-        refreshBtn.disabled = false;
-        return;
-      }
-      const { data: sessionData } = await sb.auth.getSession();
-      const jwt = sessionData?.session?.access_token;
-      if (!jwt){ toast('Session expired — sign in again', 'err'); indicator.textContent = 'Offline'; refreshBtn.disabled = false; return; }
-
+    async function load() {
+      ind.textContent = 'Loading';
+      $('error-slot').innerHTML = '';
       try {
-        const r = await fetch(`/api/${platform}-sync`, { headers: { Authorization: `Bearer ${jwt}` }, cache: 'no-store' });
-        const j = await r.json();
-        if (!r.ok) {
-          if (String(j.error || '').match(/No (Instagram|TikTok) account connected/i)) {
-            // TikTok runs on data-export imports (no live API), so fall back to the DB.
-            if (platform === 'tiktok') { await loadImported('tiktok'); return; }
-            renderConnectCTA(platform);
-            setK('followers','—'); setK('posts_total','—'); setK('last_post','—'); setK('total_likes','—');
-            indicator.textContent = `Not connected`;
-            return;
-          }
-          renderError(platform, j.error || `HTTP ${r.status}`);
-          indicator.textContent = 'Error';
-          return;
-        }
-        currentPosts = j.posts || [];
-        renderHeader(platform, j);
-        renderTop5(platform, currentPosts);
-        renderWatchTime(platform, currentPosts);
-        renderHashtags(currentPosts);
-        renderPosts(platform, currentPosts);
-        indicator.textContent = `Synced · ${platform}`;
+        [POSTS, ACCTS] = await Promise.all([socialPostsLatest({ limit: 1000 }), accountSnapshotsLatest()]);
+        render();
       } catch (e) {
-        renderError(platform, e?.message || String(e));
-        indicator.textContent = 'Offline';
-      } finally {
-        refreshBtn.disabled = false;
+        $('error-slot').innerHTML = `<div class="err-banner"><strong>Couldn't read the database:</strong> ${esc(e?.message || e)}</div>`;
+        ind.textContent = 'Error';
       }
     }
 
-    document.querySelectorAll('.tab').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.tab').forEach(b => b.classList.toggle('active', b === btn));
-        activeTab = btn.dataset.tab;
-        syncPlatform(activeTab);
-      });
-    });
-    refreshBtn.addEventListener('click', () => syncPlatform(activeTab));
+    function acctTabs() {
+      const hs = handles(plat);
+      if (!hs.includes(handle)) handle = hs[0] || 'cooperdelo';
+      $('acct-tabs').innerHTML = hs.length > 1 ? hs.map(h => `<button class="tab ${h === handle ? 'active' : ''}" data-h="${esc(h)}">@${esc(h)}</button>`).join('') : '';
+    }
 
-    await syncPlatform(activeTab);
+    function render() {
+      acctTabs();
+      // Posts for this platform + handle, deduped (the June TikTok import used the display name).
+      const seen = new Set();
+      const posts = (POSTS || []).filter(p => p.platform === plat && sameHandle(p.account_handle, handle))
+        .filter(p => { const k = (p.posted_at || '').slice(0, 16) + '|' + String(p.caption || '').slice(0, 40); if (seen.has(k)) return false; seen.add(k); return true; })
+        .sort((a, b) => new Date(b.posted_at) - new Date(a.posted_at));
+      const acct = (ACCTS || []).find(a => a.platform === plat && sameHandle(a.handle, handle));
+      const mLabel = plat === 'linkedin' ? (posts.some(p => p.impressions != null) ? 'impressions' : 'reactions') : 'views';
+
+      // KPIs — every number carries its date and source.
+      if (acct) {
+        const prev = acct.history.find(h => h.date !== acct.date && h.followers != null);
+        const delta = prev && acct.followers != null ? acct.followers - prev.followers : null;
+        setK('followers', fmtNum(acct.followers));
+        setK('followers_sub', `@${esc(acct.handle)} · as of ${esc(fmtDay(acct.date))}${delta != null ? ` · ${delta >= 0 ? '+' : '−'}${fmtNum(Math.abs(delta))} since ${esc(fmtDay(prev.date))}` : ''} ${staleChip(acct.captured_at || acct.date, STALE_H[plat])}`);
+        setK('posts_total', acct.posts_total != null ? fmtNum(acct.posts_total) : fmtNum(posts.length));
+        setK('posts_sub', acct.posts_total != null ? `on profile · as of ${esc(fmtDay(acct.date))}` : `posts on file (profile count not reported)`);
+      } else {
+        setK('followers', '—'); setK('followers_sub', `No follower snapshot for @${esc(handle)} yet`);
+        setK('posts_total', fmtNum(posts.length)); setK('posts_sub', 'posts on file');
+      }
+      const last = posts[0];
+      const lastDays = last ? Math.floor((Date.now() - new Date(last.posted_at)) / 864e5) : null;
+      setK('last_post', last ? (lastDays === 0 ? 'Today' : lastDays + 'd ago') : '—');
+      setK('last_post_sub', last ? esc(fmtDay(last.posted_at, { month: 'short', day: 'numeric', year: 'numeric' })) : 'No posts on file');
+      const cut = Date.now() - 30 * 864e5;
+      const recent = posts.filter(p => new Date(p.posted_at).getTime() >= cut);
+      const sum = recent.reduce((a, p) => a + (metricOf(p).v || 0), 0);
+      const asOf = posts.map(p => p.as_of).filter(Boolean).sort().pop();
+      setK('sum_label', `${mLabel[0].toUpperCase() + mLabel.slice(1)}, last 30 days`);
+      setK('sum30', recent.length ? fmtCompact(sum) : '—');
+      setK('sum30_sub', `${recent.length} post${recent.length === 1 ? '' : 's'}${asOf ? ` · metrics as of ${esc(fmtDay(asOf))}` : ''} ${asOf ? staleChip(asOf, STALE_H[plat]) : ''}`);
+
+      // Top 5, last 30 days, by the platform's key metric.
+      const top = recent.filter(p => metricOf(p).v != null).sort((a, b) => metricOf(b).v - metricOf(a).v).slice(0, 5);
+      $('top-row').innerHTML = top.length ? top.map((p, i) => card(p, i + 1, true)).join('')
+        : `<div class="empty" style="grid-column:1/-1;padding:1.6rem 1rem;">${recent.length ? `No ${mLabel} on the last 30 days of posts yet.` : `No posts in the last 30 days.`}</div>`;
+
+      // Hashtag performance, computed from captions.
+      const withM = posts.filter(p => metricOf(p).v != null);
+      const acctAvg = withM.length ? withM.reduce((a, p) => a + metricOf(p).v, 0) / withM.length : 0;
+      const map = new Map();
+      for (const p of withM) for (const t of tagsOf(p.caption)) { const e = map.get(t) || { t, n: 0, sum: 0 }; e.n++; e.sum += metricOf(p).v; map.set(t, e); }
+      const rows = [...map.values()].filter(h => h.n >= 1).sort((a, b) => (b.sum / b.n) - (a.sum / a.n)).slice(0, 15);
+      setK('ht_total', `Total ${mLabel}`); setK('ht_avg', `Avg ${mLabel}`);
+      $('hashtag-tbody').innerHTML = rows.length ? rows.map(h => {
+        const avg = h.sum / h.n, rel = acctAvg ? avg / acctAvg : null;
+        return `<tr><td><span class="ht-tag">${esc(h.t)}</span></td><td class="right mono"><span class="n">${fmtNum(h.n)}</span></td>
+          <td class="right mono"><span class="n">${fmtCompact(h.sum)}</span></td><td class="right mono"><span class="n">${fmtCompact(Math.round(avg))}</span></td>
+          <td class="right mono" style="color:${rel == null ? 'var(--muted)' : rel >= 1 ? 'var(--good,#7A8A6E)' : 'var(--rust)'}">${rel == null ? '—' : rel.toFixed(1) + '×'}</td></tr>`;
+      }).join('') : `<tr><td colspan="5" class="empty">${posts.length ? 'No hashtags in captions that have metrics.' : '—'}</td></tr>`;
+
+      // Recent posts with cached thumbnails.
+      $('post-grid').innerHTML = posts.length ? posts.slice(0, 24).map(p => card(p)).join('')
+        : `<div class="empty" style="grid-column:1/-1;">No ${NAME[plat]} posts on file for @${esc(handle)}.</div>`;
+      ind.textContent = `${NAME[plat]} · ${posts.length} posts${asOf ? ' · as of ' + fmtDay(asOf) : ''}`;
+    }
+
+    function card(p, rank, compact) {
+      const m = metricOf(p);
+      const cap = String(p.caption || '').replace(/\s+/g, ' ').trim();
+      const first = cap.slice(0, compact ? 70 : 130) || '(no caption)';
+      const thumb = p.thumb_url ? `<img src="${esc(p.thumb_url)}" alt="" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" onerror="this.remove()">` : '';
+      // No cached thumbnail: a quiet tint tile with a platform mark (the caption is already below).
+      const fallback = `<div style="position:absolute;inset:0;display:grid;place-items:center;background:radial-gradient(120% 90% at 30% 20%,rgba(255,77,46,.10),transparent 60%),#14110F;font-family:'Geist Mono',monospace;font-size:.6rem;letter-spacing:.22em;text-transform:uppercase;color:var(--muted)">${esc(NAME[p.platform] || '')} · no thumbnail</div>`;
+      const href = p.permalink ? ` href="${esc(p.permalink)}" target="_blank" rel="noopener"` : '';
+      if (compact) return `<a class="card top-card"${href} style="display:block;color:inherit;text-decoration:none">
+        <div class="thumb">${fallback}${thumb}<span class="rank">${rank}</span></div>
+        <div class="body"><div class="views">${m.v == null ? '—' : fmtCompact(m.v)}</div><div class="lbl">${esc(m.l)}</div><div class="cap">${esc(first)}</div></div></a>`;
+      const st = (l, v) => `<div class="stat"><span class="n ${v == null ? 'muted' : ''}">${v == null ? '—' : fmtCompact(v)}</span><span class="lbl">${l}</span></div>`;
+      const cells = p.platform === 'linkedin'
+        ? [st('impr.', p.impressions), st('reactions', p.likes), st('comments', p.comments)]
+        : [st('views', p.views), st('likes', p.likes), st('comments', p.comments)];
+      return `<a class="post"${href} style="display:block;color:inherit;text-decoration:none">
+        <div class="thumb">${fallback}${thumb}<span class="badge">${esc(p.media_type || NAME[p.platform])}</span></div>
+        <div class="body"><div class="cap">${esc(first)}</div><div class="stats">${cells.join('')}</div>
+        <div class="date">${esc(fmtDay(p.posted_at, { month: 'short', day: '2-digit', year: 'numeric' }))}${p.as_of ? ` · metrics ${esc(fmtDay(p.as_of))}` : ' · no metrics yet'}</div></div></a>`;
+    }
+
+    $('plat-tabs').addEventListener('click', e => {
+      const b = e.target.closest('[data-tab]'); if (!b) return;
+      document.querySelectorAll('#plat-tabs .tab').forEach(x => x.classList.toggle('active', x === b));
+      plat = b.dataset.tab; handle = 'cooperdelo'; if (POSTS) render();
+    });
+    $('acct-tabs').addEventListener('click', e => {
+      const b = e.target.closest('[data-h]'); if (!b) return;
+      handle = b.dataset.h; render();
+    });
+    $('refresh-btn').addEventListener('click', load);
+    await load();
   </script>
 </body>
 </html>

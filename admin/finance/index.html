@@ -5,9 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="robots" content="noindex, nofollow, noarchive" />
 <title>Finance · CD Admin</title>
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Geist+Mono:wght@300..700&family=Geist:wght@300..700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/admin/_shell/admin-shell.css" />
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
@@ -16,15 +13,17 @@
   <main>
     <div class="page-head">
       <div>
-        <div class="eyebrow">Single source of truth</div>
         <h1>FINANCIAL <span class="accent">overview</span></h1>
       </div>
       <div class="actions">
         <span class="live-dot" id="live-indicator">Live · syncing</span>
         <a class="btn" href="/admin/finance/transactions.html">View all</a>
-        <a class="btn primary" href="/admin/finance/entry.html">+ Add</a>
+        <a class="btn ghost small" href="/admin/finance/entry.html" title="Mercury and card-alert emails fill transactions automatically">Add missing</a>
       </div>
     </div>
+
+    <!-- Balances: Mercury (auto, connector) + personal (money-watch email alerts). No bank logins. -->
+    <div class="card bal-card" id="balances"><div class="shimmer" style="height:120px"></div></div>
 
     <!-- KPI cards -->
     <div class="kpi-grid" id="kpis">
