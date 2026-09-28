@@ -27,10 +27,10 @@ function paintClock() {
   const now = new Date();
   const h = Number(now.toLocaleString('en-US', { hour: 'numeric', hour12: false, timeZone: 'America/New_York' }));
   const part = h < 5 ? 'Up late' : h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
-  $('greet').innerHTML = `${part}, Cooper<span class="stop">.</span>`;
-  const d = now.toLocaleDateString('en-US', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric', timeZone: 'America/New_York' });
+  $('greet').textContent = `${part}, Cooper`;
+  const d = now.toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'America/New_York' });
   const t = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', timeZone: 'America/New_York' });
-  $('today').textContent = `${d} · ${t} ET · Chapel Hill`;
+  $('today').textContent = `${d}, ${t}`;
 }
 paintClock(); setInterval(paintClock, 30000);
 reveal(document.querySelectorAll('#mast .kicker, #mast h1, #mast .quick'), { stagger: 90, y: 22 });
@@ -38,16 +38,25 @@ spotlight(document);
 
 if (DEMO) {
   const flag = document.createElement('div');
-  flag.className = 'demo-flag mono';
+  flag.className = 'demo-flag';
   flag.innerHTML = SNAP
-    ? `<b>Demo snapshot</b> · localhost only · real aggregates read ${esc(fmtDay(SNAP.captured_at, { month: 'short', day: 'numeric' }))} ${esc(new Date(SNAP.captured_at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', timeZone: 'America/New_York' }))} ET · private panels hidden`
-    : '<b>Demo</b> · admin/_dev/snapshot.local.json not found';
+    ? `<b>Demo</b> · snapshot from ${esc(fmtDay(SNAP.captured_at, { month: 'short', day: 'numeric' }))}, ${esc(new Date(SNAP.captured_at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', timeZone: 'America/New_York' }))}`
+    : '<b>Demo</b> · snapshot file not found';
   document.querySelector('main').prepend(flag);
+  // Font trial (demo only): ?font=a|b|c. Default stays unchanged until Cooper picks.
+  const f = new URLSearchParams(location.search).get('font');
+  const GF = { a: 'Inter+Tight:wght@400..800', c: 'Instrument+Sans:wdth,wght@100,400..700' };
+  if (f && /^[abc]$/.test(f)) {
+    document.documentElement.dataset.font = f;
+    if (GF[f]) { const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = `https://fonts.googleapis.com/css2?family=${GF[f]}&display=swap`; document.head.append(l); }
+  }
 }
+// "as of Sep 27, 4:00 PM" -> "As of Sep 27, 4:00 PM"
+const asOfCap = (x) => asOf(x).replace('<span>as of', '<span>As of');
 
 const fail = (id, what, e) => { console.error(what, e); const el = $(id); if (el) el.innerHTML = emptyState(`Couldn't load ${what}`, esc(e?.message || String(e))); };
 const privateCard = (title) => `<div class="sv-h" style="margin-bottom:.4rem"><h2 class="disp">${esc(title)}</h2></div>
-  ${emptyState('Hidden in the demo snapshot', 'This panel reads private rows (your notes, health or titles). It renders when you are signed in.')}`;
+  ${emptyState('Private. Shows when you sign in.', '')}`;
 
 // ---------- data ----------
 async function loadAccounts() {
@@ -97,46 +106,44 @@ async function hero(pAcc, pOpen) {
   const find = (p) => list.find(s => s.personal && s.platform === p);
   const li = find('linkedin'), ig = find('instagram');
   const acctCell = (s, platform) => {
-    if (!s) return `<div class="hero-cell off"><div class="hc-top"><span class="hc-label mono">${esc(platName(platform))}</span></div>
-      <div class="hc-num dim">—</div><div class="hc-sub">no follower snapshot yet</div><div class="hc-meta mono">Fed by social_account_snapshots</div></div>`;
+    if (!s) return `<div class="hero-cell off"><div class="hc-top"><span class="hc-label">${esc(platName(platform))}</span></div>
+      <div class="hc-num dim">—</div><div class="hc-sub">No follower data yet</div></div>`;
     const L = s.latest;
     return `<a class="hero-cell" href="/admin/insights/">
-      <div class="hc-top"><span class="hc-label mono">${esc(platName(platform))}</span><span class="hc-handle mono">@${esc(s.handle)}</span></div>
+      <div class="hc-top"><span class="hc-label">${esc(platName(platform))}</span><span class="hc-handle mono">@${esc(s.handle)}</span></div>
       <div class="hc-num" data-count="${Number(L.followers)}">0</div>
       <div class="hc-sub">${platform === 'youtube' ? 'subscribers' : 'followers'} ${deltaChip(L.followers, s.prev?.followers)}</div>
-      ${sparkline(s.rows.slice(0, 30).reverse().map(r => r.followers), { w: 220, h: 34 }) || '<div class="hc-flat"><i></i><span class="mono">first data point</span></div>'}
-      <div class="hc-meta mono">${asOf(L.captured_at || L.date)}${s.prev ? ` · vs ${esc(fmtDay(s.prev.date))}` : ''}</div>
+      ${sparkline(s.rows.slice(0, 30).reverse().map(r => r.followers), { w: 220, h: 30 })}
+      <div class="hc-meta">${asOfCap(L.captured_at || L.date)}${s.prev ? ` · vs ${esc(fmtDay(s.prev.date))}` : ''}</div>
     </a>`;
   };
   const booking = `<div class="hero-cell off">
-      <div class="hc-top"><span class="hc-label mono">Booking link</span><span class="tag mono">not tracked yet</span></div>
+      <div class="hc-top"><span class="hc-label">Booking link</span></div>
       <div class="hc-num dim">—</div>
-      <div class="hc-sub">opens</div>
-      <div class="hc-flat"><i></i><span class="mono">no source</span></div>
-      <div class="hc-meta mono">Nothing records booking-link clicks yet. A tracked redirect would feed this.</div>
+      <div class="hc-sub">Not tracked yet</div>
     </div>`;
   let waiting;
-  if (!open) waiting = `<div class="hero-cell off"><div class="hc-top"><span class="hc-label mono">Waiting on you</span></div><div class="hc-num dim">—</div><div class="hc-sub">couldn't read decisions</div></div>`;
+  if (!open) waiting = `<div class="hero-cell off"><div class="hc-top"><span class="hc-label">Waiting on you</span></div><div class="hc-num dim">—</div><div class="hc-sub">Couldn't read decisions</div></div>`;
   else {
     const { decisions: d, opportunities: o } = open.counts, n = d + o;
     waiting = `<a class="hero-cell hot" href="/admin/decisions/">
-      <div class="hc-top"><span class="hc-label mono">Waiting on you</span><span class="hc-handle mono">requests</span></div>
+      <div class="hc-top"><span class="hc-label">Waiting on you</span></div>
       <div class="hc-num" data-count="${n}">0</div>
-      <div class="hc-sub">open items to decide</div>
+      <div class="hc-sub">open items</div>
       <div class="split-bar" aria-hidden="true">${n ? `<i class="d" data-growx style="flex:${d || 0}"></i><i class="o" data-growx style="flex:${o || 0}"></i>` : '<i class="z"></i>'}</div>
-      <div class="hc-meta mono"><span class="k d"></span>${d} decision${d === 1 ? '' : 's'} · <span class="k o"></span>${o} opportunit${o === 1 ? 'y' : 'ies'}</div>
+      <div class="hc-meta"><span class="k d"></span>${d} decision${d === 1 ? '' : 's'} · <span class="k o"></span>${o} opportunit${o === 1 ? 'y' : 'ies'}</div>
     </a>`;
   }
   const grid = $('heroGrid');
   grid.innerHTML = acctCell(li, 'linkedin') + acctCell(ig, 'instagram') + booking + waiting;
   const cells = grid.querySelectorAll('.hero-cell');
-  reveal(cells, { stagger: 110, delay: 150, y: 26 });
+  reveal(cells, { stagger: 60, delay: 100 });
   cells.forEach((c, i) => {
     const num = c.querySelector('[data-count]');
-    if (num) countUp(num, Number(num.dataset.count), { delay: 350 + i * 110 });
-    pop(c.querySelectorAll('.chip, .tag'), { delay: 1300 + i * 110 });
-    drawOn(c, { delay: 700 + i * 110 });
-    growX(c, { delay: 900 + i * 110 });
+    if (num) countUp(num, Number(num.dataset.count), { delay: 200 + i * 60 });
+    pop(c.querySelectorAll('.chip'), { delay: 900 + i * 60 });
+    drawOn(c, { delay: 400 + i * 60, dur: 1000 });
+    growX(c, { delay: 500 + i * 60 });
   });
 }
 
@@ -146,7 +153,7 @@ async function heroChart(pPosts) {
   const host = $('heroChart');
   const end = toDate(todayET()).getTime() + 864e5, start = end - 365 * 864e5;
   const inWin = posts.filter(p => { const t = toDate(p.date).getTime(); return t >= start && t <= end; }).sort((a, b) => toDate(a.date) - toDate(b.date));
-  if (!inWin.length) { host.innerHTML = `<div class="hc-empty mono">No LinkedIn post metrics on file for the last 12 months. Fed by social_post_snapshots.</div>`; return; }
+  if (!inWin.length) { host.innerHTML = `<div class="hc-empty">No LinkedIn post data in the last 12 months.</div>`; return; }
   const max = Math.max(...inWin.map(p => p.value));
   const total = inWin.reduce((a, p) => a + p.value, 0);
   const peak = inWin.find(p => p.value === max);
@@ -165,18 +172,17 @@ async function heroChart(pPosts) {
   const px = X(peak.date);
   host.innerHTML = `
     <div class="hch-head">
-      <div><div class="eyebrow mono">LinkedIn · @cooperdelo · impressions per post</div>
-        <div class="hch-total"><span class="hc-num sm" id="liTotal">0</span><span class="mono">impressions across ${inWin.length} posts on file · last 12 months</span></div></div>
-      <div class="hch-legend mono"><span><i class="lg-bar"></i>one post</span><span><i class="lg-bar peak"></i>best post</span></div>
+      <div><div class="eyebrow">LinkedIn impressions per post, last 12 months</div>
+        <div class="hch-total"><span class="hc-num sm" id="liTotal">0</span><span class="mono">across ${inWin.length} posts</span></div></div>
     </div>
     <div class="hch-plot">
-      <div class="hch-rule" style="bottom:100%"><span class="mono">${fmtCompact(max)}</span></div>
-      <div class="hch-rule" style="bottom:50%"><span class="mono">${fmtCompact(Math.round(max / 2))}</span></div>
+      <div class="hch-rule" style="bottom:100%"><span>${fmtCompact(max)}</span></div>
+      <div class="hch-rule" style="bottom:50%"><span>${fmtCompact(Math.round(max / 2))}</span></div>
       <svg viewBox="0 0 1000 ${H}" preserveAspectRatio="none" role="img" aria-label="LinkedIn impressions per post, last 12 months">${bars}</svg>
-      <div class="hch-peak${px > 82 ? ' r' : px < 10 ? ' l' : ''}" style="left:${px.toFixed(2)}%"><span class="mono">${fmtNum(max)} · ${esc(fmtDay(peak.date, { month: 'short', day: 'numeric' }))}</span></div>
-      <div class="hch-tip mono" hidden></div>
+      <div class="hch-peak${px > 82 ? ' r' : px < 10 ? ' l' : ''}" style="left:${px.toFixed(2)}%"><span>Best: ${fmtNum(max)} <em>· ${esc(fmtDay(peak.date, { month: 'short', day: 'numeric' }))}</em></span></div>
+      <div class="hch-tip" hidden></div>
     </div>
-    <div class="hch-months mono">${months}</div>`;
+    <div class="hch-months">${months}</div>`;
   const svg = host.querySelector('svg'), tip = host.querySelector('.hch-tip'), plot = host.querySelector('.hch-plot');
   svg.querySelectorAll('rect').forEach(r => {
     r.addEventListener('pointerenter', () => {
@@ -189,9 +195,9 @@ async function heroChart(pPosts) {
     r.addEventListener('pointerleave', () => { tip.hidden = true; r.classList.remove('on'); });
   });
   onVisible(host, () => {
-    growBars(svg, { delay: 450, stagger: 22 });
-    countUp($('liTotal'), total, { delay: 450, dur: 1900 });
-    reveal(host.querySelectorAll('.hch-peak'), { delay: 1300, y: 10 });
+    growBars(svg, { delay: 300, stagger: 8 });
+    countUp($('liTotal'), total, { delay: 300, dur: 1200 });
+    reveal(host.querySelectorAll('.hch-peak'), { delay: 900, y: 4 });
   });
 }
 
@@ -210,10 +216,10 @@ async function system(pRuns) {
   const pill = $('pulsePill');
   pill.classList.toggle('bad', c.failed > 0);
   pill.innerHTML = last
-    ? `<i></i><span>${tasks24} agents ran · 24h</span><span class="sep">/</span><span>${c.failed ? `${c.failed} failed` : 'no failures'}</span><span class="sep">/</span><span>last <b data-ago="${esc(last.ran_at)}">${esc(ago(last.ran_at))}</b></span>`
-    : `<i></i><span>No runs logged in 14 days</span>`;
+    ? `<i></i><span>${tasks24} agents ran today</span><span class="sep">·</span><span>${c.failed ? `${c.failed} failed` : 'none failed'}</span><span class="sep">·</span><span>last run <b data-ago="${esc(last.ran_at)}">${esc(ago(last.ran_at))}</b></span>`
+    : `<i></i><span>No runs in 14 days</span>`;
 
-  if (!runs.length) { $('system').innerHTML = emptyState('No runs logged', 'Fed by task_run_log. Every scheduled task writes one row per run.'); return; }
+  if (!runs.length) { $('system').innerHTML = emptyState('No runs in the last 14 days.', ''); return; }
 
   // matrix: 14 days x tasks (most recently run first)
   const days = [];
@@ -233,31 +239,31 @@ async function system(pRuns) {
     .sort((a, b) => (Object.keys(b[1].cells).length - Object.keys(a[1].cells).length) || (new Date(b[1].last.ran_at) - new Date(a[1].last.ran_at)))
     .slice(0, 14);
   const matrix = `<div class="mx" style="--cols:${days.length}">
-      <div class="mx-row mx-head"><span class="mx-name"></span>${days.map((d, i) => `<span class="mx-d mono${i === days.length - 1 ? ' now' : ''}">${i % 2 === (days.length - 1) % 2 ? d.toLocaleDateString('en-US', { day: 'numeric' }) : ''}</span>`).join('')}<span class="mx-last"></span></div>
+      <div class="mx-row mx-head"><span class="mx-name"></span>${days.map((d, i) => `<span class="mx-d${i === days.length - 1 ? ' now' : ''}">${i % 2 === (days.length - 1) % 2 ? d.toLocaleDateString('en-US', { day: 'numeric' }) : ''}</span>`).join('')}<span class="mx-last"></span></div>
       ${taskRows.map(([task, t], ri) => `<a class="mx-row" href="/admin/rituals/#${encodeURIComponent(task)}">
-        <span class="mx-name mono" title="${esc(task)}">${esc(task)}</span>
+        <span class="mx-name code" title="${esc(task)}">${esc(task)}</span>
         ${dayKeys.map((k, ci) => `<i class="c ${t.cells[k] || ''}" style="--d:${ri + ci}" title="${esc(task)} · ${esc(fmtDay(k))}${t.cells[k] ? ' · ' + esc(t.cells[k]) : ' · no run'}"></i>`).join('')}
-        <span class="mx-last mono" data-ago="${esc(t.last.ran_at)}">${esc(ago(t.last.ran_at))}</span></a>`).join('')}
+        <span class="mx-last" data-ago="${esc(t.last.ran_at)}">${esc(ago(t.last.ran_at))}</span></a>`).join('')}
     </div>`;
   const total = day.length || 1;
   const seg = (k) => c[k] ? `<i class="${k}" data-growx style="flex:${c[k]}" title="${c[k]} ${k}"></i>` : '';
   $('system').innerHTML = `<div class="sys-grid">
       <div class="sys-l">
-        <div class="eyebrow mono">Runs in the last 24 hours</div>
+        <div class="eyebrow">Runs in the last 24 hours</div>
         <div class="hc-num sys-num" id="runs24" data-count="${day.length}">0</div>
-        <div class="sys-sub">${tasks24} different agents · ${byTask.size} active in 14 days</div>
+        <div class="sys-sub">${tasks24} agents today · ${byTask.size} in the last 14 days</div>
         <div class="stack" aria-label="Run outcomes, last 24 hours">${day.length ? seg('ok') + seg('partial') + seg('quiet') + seg('failed') : '<i class="z"></i>'}</div>
-        <div class="legend mono">
+        <div class="legend">
           <span><i class="c ok"></i>${c.ok} ok</span><span><i class="c partial"></i>${c.partial} partial</span>
           <span><i class="c quiet"></i>${c.quiet} quiet</span><span><i class="c failed"></i>${c.failed} failed</span>
         </div>
         <div class="sys-last">
-          <div class="eyebrow mono">Latest</div>
-          ${runs.slice(0, 5).map(r => `<div class="lr"><i class="c ${esc(r.status)}"></i><span class="t mono">${esc(r.task)}</span><span class="a mono" data-ago="${esc(r.ran_at)}">${esc(ago(r.ran_at))}</span></div>`).join('')}
+          <div class="eyebrow">Latest</div>
+          ${runs.slice(0, 5).map(r => `<div class="lr"><i class="c ${esc(r.status)}"></i><span class="t code">${esc(r.task)}</span><span class="a" data-ago="${esc(r.ran_at)}">${esc(ago(r.ran_at))}</span></div>`).join('')}
         </div>
       </div>
       <div class="sys-r">
-        <div class="eyebrow mono">Last 14 days · worst outcome per day · red means something broke</div>
+        <div class="eyebrow">Last 14 days</div>
         ${matrix}
       </div>
     </div>`;
@@ -279,14 +285,14 @@ async function audience(pAcc) {
       ${platMark(s.platform, s.handle)}
       <div class="hc-num md" data-count="${Number(s.latest.followers)}">0</div>
       <div class="sv-label">${s.platform === 'youtube' ? 'subscribers' : 'followers'} ${deltaChip(s.latest.followers, s.prev?.followers)}</div>
-      ${sparkline(s.rows.slice(0, 30).reverse().map(r => r.followers)) || '<div class="hc-flat light"><i></i><span class="mono">first data point</span></div>'}
-      <div class="sv-meta mono">${asOf(s.latest.captured_at || s.latest.date)}${s.prev ? ` · vs ${esc(fmtDay(s.prev.date))}` : ''}</div>
+      ${sparkline(s.rows.slice(0, 30).reverse().map(r => r.followers))}
+      <div class="sv-meta">${asOfCap(s.latest.captured_at || s.latest.date)}${s.prev ? ` · vs ${esc(fmtDay(s.prev.date))}` : ''}</div>
     </a>`;
   const animate = (grid) => onVisible(grid, () => grid.querySelectorAll('.aud-card').forEach((c, i) => {
     countUp(c.querySelector('[data-count]'), Number(c.querySelector('[data-count]').dataset.count), { delay: 150 + i * 90 });
     drawOn(c, { delay: 400 + i * 90 }); pop(c.querySelectorAll('.chip'), { delay: 1100 + i * 90 });
   }));
-  $('pulse').innerHTML = mine.length ? mine.map(s => card(s, false)).join('') : emptyState('No follower snapshots', 'Fed by the social-pull task (social_account_snapshots).');
+  $('pulse').innerHTML = mine.length ? mine.map(s => card(s, false)).join('') : emptyState('No follower data yet.', '');
   animate($('pulse'));
   const pv = list.filter(s => /plugverse/i.test(s.handle));
   if (pv.length) { $('pvSec').hidden = false; $('pvGrid').innerHTML = pv.map(s => card(s, true)).join(''); animate($('pvGrid')); }
@@ -297,15 +303,14 @@ async function decide(pOpen) {
   const open = await pOpen;
   const { decisions: d, opportunities: o } = open.counts, n = d + o;
   const list = open.dec == null
-    ? emptyState('Titles hidden in the demo snapshot', `${d} decision${d === 1 ? '' : 's'} and ${o} opportunities are open. Titles render when you are signed in.`)
+    ? emptyState('Titles show when you sign in.', '')
     : `<div class="rows">
-      ${open.dec.slice(0, 3).map(x => `<a class="row" href="/admin/decisions/"><div class="grow"><div class="t">${esc(x.title)}</div><div class="s">Decision · ${esc(x.recommendation || '')}</div></div><span class="chip accent">decide</span></a>`).join('')}
-      ${open.opp.slice(0, 3).map(x => `<a class="row" href="/admin/earn/"><div class="grow"><div class="t">${esc(x.title)}</div><div class="s">${esc(x.id)} · ${esc(x.estimate || '')}</div></div><span class="chip">FIT ${x.fit ?? '—'}</span></a>`).join('')}
-    </div>${n ? '' : emptyState('Nothing waiting', 'Fed by the decisions and opportunities tables (Opportunity Scout).')}`;
+      ${open.dec.slice(0, 3).map(x => `<a class="row" href="/admin/decisions/"><div class="grow"><div class="t">${esc(x.title)}</div><div class="s">Decision${x.recommendation ? ' · ' + esc(x.recommendation) : ''}</div></div></a>`).join('')}
+      ${open.opp.slice(0, 3).map(x => `<a class="row" href="/admin/earn/"><div class="grow"><div class="t">${esc(x.title)}</div><div class="s">Opportunity${x.estimate ? ' · ' + esc(x.estimate) : ''}</div></div>${x.fit != null ? `<span class="sv-muted" style="font-size:.8rem">Fit ${esc(x.fit)}</span>` : ''}</a>`).join('')}
+    </div>${n ? '' : emptyState('Nothing waiting.', '')}`;
   $('decide').innerHTML = `<div class="sv-h" style="margin-bottom:.2rem"><h2 class="disp">Waiting on you</h2><a href="/admin/decisions/">All decisions</a></div>
-    <div class="dec-num"><span class="hc-num md" data-count="${n}">0</span><span class="mono">open · ${d} decision${d === 1 ? '' : 's'} · ${o} opportunities</span></div>
-    ${list}
-    <div class="sv-meta"><a href="/admin/earn/" style="color:var(--accent-ink)">All opportunities</a></div>`;
+    <div class="dec-num"><span class="hc-num md" data-count="${n}">0</span><span class="mono">${d} decision${d === 1 ? '' : 's'}, ${o} opportunit${o === 1 ? 'y' : 'ies'}</span></div>
+    ${list}`;
   onVisible($('decide'), () => countUp($('decide').querySelector('[data-count]'), n, { dur: 900 }));
 }
 
@@ -320,15 +325,15 @@ async function mustDos() {
   const doc = docs?.[0];
   let body = '';
   if (!doc) {
-    body = emptyState('No must-dos yet today', 'Fed by the daily-driver scheduled task, which writes <b>Daily/driver/&lt;date&gt;.md</b> each morning.');
+    body = emptyState('No must-dos yet today.', '');
   } else {
     const lines = doc.content.split('\n').map(s => s.trim()).filter(Boolean).filter(s => !s.startsWith('#'));
     const todos = lines.filter(s => /^\d+\.\s/.test(s)).map(s => s.replace(/^\d+\.\s*/, ''));
     const other = lines.filter(s => !/^\d+\.\s/.test(s));
     const isToday = doc.path.includes(today);
-    body = `${todos.map((t, i) => `<div class="todo"><span class="n mono">${String(i + 1).padStart(2, '0')}</span><div class="x">${esc(t)}</div></div>`).join('') || emptyState('No numbered must-dos in today\'s file', 'The daily-driver file exists but has no numbered list.')}
+    body = `${todos.map((t, i) => `<div class="todo"><span class="n">${i + 1}</span><div class="x">${esc(t)}</div></div>`).join('') || emptyState('No must-dos listed in today\'s file.', '')}
       ${other.length ? `<div class="sv-meta" style="display:block;line-height:1.55">${other.map(esc).join('<br>')}</div>` : ''}
-      <div class="sv-meta">from <b>${esc(doc.path)}</b> · updated ${esc(ago(doc.updated_at))}${isToday ? '' : ' <span class="chip stale">not today\'s file</span>'}</div>`;
+      <div class="sv-meta">Updated ${esc(ago(doc.updated_at))}${isToday ? '' : ' · <span style="color:var(--amber)">from an earlier day</span>'}</div>`;
   }
   $('mustdos').innerHTML = `<div class="sv-h" style="margin-bottom:.4rem"><h2 class="disp">Today's must-dos</h2><a href="/admin/rituals/#daily-driver">Daily driver</a></div>${body}
     <div class="streaks" id="streaks"></div>`;
@@ -352,7 +357,7 @@ function renderStreaks(rows, today) {
     const on = todayRow[k] === true;
     return `<div class="streak"><div><div class="k">${label}</div><div class="v">${n} day streak${rows.length ? ` · last logged ${esc(fmtDay(rows[0].date))}` : ''}</div></div>
       <button data-k="${k}" class="${on ? 'on' : ''}" aria-pressed="${on}">${on ? 'Done today' : 'Mark done'}</button></div>`;
-  }).join('') + (rows.length ? '' : `<div class="sv-meta">Streaks are fed by the daily-driver task (daily_driver table). Nothing logged yet.</div>`);
+  }).join('') + (rows.length ? '' : `<div class="sv-meta">Nothing logged yet.</div>`);
   $('streaks').querySelectorAll('button[data-k]').forEach(b => b.addEventListener('click', async () => {
     const k = b.dataset.k, val = !(todayRow[k] === true);
     const { error } = await sb.from('daily_driver').upsert({ date: today, [k]: val }, { onConflict: 'date' });
@@ -368,8 +373,8 @@ async function health() {
   const { data, error } = await sb.from('health_daily').select('day,sleep_minutes,sleep_score,steps,resting_hr,hrv_ms,body_battery_high,garmin_synced_at').order('day', { ascending: false }).limit(14);
   if (error) throw error;
   const r = (data || []).find(x => x.sleep_minutes != null || x.steps != null || x.resting_hr != null) || data?.[0];
-  if (!r) { $('health').innerHTML = `<div class="sv-h"><h2 class="disp">Body</h2></div>` + emptyState('No health data', 'Fed by the Garmin sync (health_daily).'); return; }
-  const cell = (k, v) => `<div><div class="k mono">${k}</div><div class="v">${v}</div></div>`;
+  if (!r) { $('health').innerHTML = `<div class="sv-h"><h2 class="disp">Body</h2></div>` + emptyState('No Garmin data yet.', ''); return; }
+  const cell = (k, v) => `<div><div class="k">${k}</div><div class="v">${v}</div></div>`;
   const sleep = r.sleep_minutes != null ? `${Math.floor(r.sleep_minutes / 60)}h ${r.sleep_minutes % 60}m` : '—';
   $('health').innerHTML = `<div class="sv-h" style="margin-bottom:.2rem"><h2 class="disp">Body</h2><a href="/admin/health/dashboard.html">Health insights</a></div>
     <div class="health-grid">

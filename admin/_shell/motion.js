@@ -18,17 +18,18 @@ export function onVisible(el, fn, { margin = '0px 0px -8% 0px' } = {}) {
 }
 
 /** Staggered entrance: fade + rise + de-blur. */
-export function reveal(nodes, { y = 18, stagger = 70, delay = 0, dur = 820 } = {}) {
+export function reveal(nodes, { y = 8, stagger = 60, delay = 0, dur = 620 } = {}) {
   const list = [...(nodes instanceof Element ? [nodes] : nodes)];
   if (REDUCED) return;
+  y = Math.min(y, 8); stagger = Math.min(stagger, 60); // 2026-09-28 de-slop: calmer entrances, no blur
   list.forEach((el, i) => el.animate(
-    [{ opacity: 0, transform: `translate3d(0,${y}px,0)`, filter: 'blur(6px)' },
-     { opacity: 1, transform: 'translate3d(0,0,0)', filter: 'blur(0)' }],
+    [{ opacity: 0, transform: `translate3d(0,${y}px,0)` },
+     { opacity: 1, transform: 'translate3d(0,0,0)' }],
     { duration: dur, delay: delay + i * stagger, easing: EASE, fill: 'backwards' }));
 }
 
 /** Count a number up from 0. Keeps width steady via tabular numerals in CSS. */
-export function countUp(el, to, { dur = 1600, delay = 0, format = (n) => Math.round(n).toLocaleString('en-US') } = {}) {
+export function countUp(el, to, { dur = 1100, delay = 0, format = (n) => Math.round(n).toLocaleString('en-US') } = {}) {
   if (!el) return;
   if (to == null || isNaN(to)) { el.textContent = '—'; return; }
   if (REDUCED) { el.textContent = format(to); return; }
@@ -60,7 +61,7 @@ export function growBars(root, { delay = 0, stagger = 14, dur = 900 } = {}) {
   if (!root || REDUCED) return;
   root.querySelectorAll('[data-grow]').forEach((b, i) => b.animate(
     [{ transform: 'scaleY(0)' }, { transform: 'scaleY(1)' }],
-    { duration: dur, delay: delay + i * stagger, easing: EASE, fill: 'backwards' }));
+    { duration: Math.min(dur, 700), delay: delay + i * Math.min(stagger, 10), easing: EASE, fill: 'backwards' }));
 }
 
 /** Horizontal fills (status bar, progress). */
@@ -68,15 +69,15 @@ export function growX(root, { delay = 0, stagger = 60 } = {}) {
   if (!root || REDUCED) return;
   root.querySelectorAll('[data-growx]').forEach((b, i) => b.animate(
     [{ transform: 'scaleX(0)' }, { transform: 'scaleX(1)' }],
-    { duration: 1000, delay: delay + i * stagger, easing: EASE, fill: 'backwards' }));
+    { duration: 750, delay: delay + i * stagger, easing: EASE, fill: 'backwards' }));
 }
 
 /** Pop in small things (delta chips, dots) with a soft overshoot. */
 export function pop(nodes, { delay = 0, stagger = 40 } = {}) {
   if (REDUCED) return;
   [...nodes].forEach((el, i) => el.animate(
-    [{ opacity: 0, transform: 'translateY(4px) scale(.86)' }, { opacity: 1, transform: 'none' }],
-    { duration: 620, delay: delay + i * stagger, easing: 'cubic-bezier(.34,1.56,.64,1)', fill: 'backwards' }));
+    [{ opacity: 0 }, { opacity: 1 }],
+    { duration: 400, delay: delay + i * stagger, easing: EASE, fill: 'backwards' }));
 }
 
 /** Cursor spotlight + depth on cards: sets --mx/--my, CSS does the rest. */
