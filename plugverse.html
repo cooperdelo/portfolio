@@ -61,7 +61,7 @@
     <source src="videos/hero_plugverse_product.mov" type="video/quicktime" />
   </video>
   <div class="inner">
-    <span class="eyebrow">Project / Dec 2025 to now</span>
+    <span class="eyebrow">Project / Nov 2025 to now</span>
     <h1 class="poster reveal in" style="margin-top: 1.5rem;">Plug<span class="accent">verse.</span></h1>
     <p class="lede reveal" style="margin-top: 2.4rem; max-width: 60rem;">The marketplace for local artists, venues, and organizers.</p>
     <div class="reveal" style="margin-top: 2.2rem; display: flex; gap: 1rem; flex-wrap: wrap;">
@@ -145,7 +145,7 @@
   <div class="grid" style="margin-top: 2.4rem;">
     <div class="col-12 reveal">
       <div class="stats">
-        <div class="stat-card glass"><span class="label">Founded</span><span class="value">Dec 2025</span></div>
+        <div class="stat-card glass"><span class="label">Founded</span><span class="value">Nov 2025</span></div>
         <div class="stat-card glass"><span class="label">Form</span><span class="value">NC LLC</span></div>
         <div class="stat-card glass"><span class="label">Built by</span><span class="value">Cooper, solo</span></div>
         <div class="stat-card glass"><span class="label">Stack</span><span class="value">Next · Supabase · Stripe</span></div>
@@ -327,11 +327,11 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" defer></script>
 <script src="shell.js" defer></script>
 <script>
-  // Founding day counter — shows months/days since Dec 1, 2025
+  // Founding day counter — shows months/days since Nov 10, 2025 (first PlugVerse commit)
   (function plugverseSinceCounter() {
     const el = document.getElementById('pv-since-days');
     if (!el) return;
-    const founded = new Date(2025, 11, 1); // Dec 1, 2025 (months are 0-indexed)
+    const founded = new Date(2025, 10, 10); // Nov 10, 2025 (months are 0-indexed)
     const now = new Date();
     const diffDays = Math.max(0, Math.floor((now - founded) / 86400000));
     const months = Math.floor(diffDays / 30.44);
