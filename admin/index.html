@@ -24,7 +24,14 @@
     </div>
   </header>
 
-  <div id="fresh" data-role="full" aria-label="Data feed status"></div>
+  <section class="today" id="today" data-role="full" aria-label="Today">
+    <div class="td-status" id="tdStatus"><span class="td-dot"></span><span>Checking systems…</span></div>
+    <div class="td-grid">
+      <div class="sv-card pad-lg td-do" id="tdDo"><div class="shimmer" style="height:160px"></div></div>
+      <div class="td-decide" id="tdDecide"><div class="shimmer" style="height:160px"></div></div>
+    </div>
+    <div class="sv-card pad-lg td-ladder" id="tdLadder"><div class="shimmer" style="height:140px"></div></div>
+  </section>
 
   <section class="hero" id="hero" aria-label="Today at a glance">
     <div class="hero-top">
@@ -35,11 +42,6 @@
       <div class="hero-cell sk"></div><div class="hero-cell sk"></div><div class="hero-cell sk"></div><div class="hero-cell sk"></div>
     </div>
     <div class="hero-chart" id="heroChart"></div>
-  </section>
-
-  <section class="sv-section sv-grid split" data-role="full">
-    <div class="sv-card pad-lg" id="mustdos"><div class="shimmer" style="height:120px"></div></div>
-    <div class="sv-card pad-lg" id="decide"><div class="shimmer" style="height:120px"></div></div>
   </section>
 
   <section class="sv-section" data-role="full">

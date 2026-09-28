@@ -118,3 +118,66 @@ export async function balances() {
   const latest = (rows, key) => Object.values((rows || []).reduce((acc, r) => (acc[r[key]] ??= r, acc), {}));
   return { business: latest(m.data, 'account_label'), personal: latest(p.data, 'account') };
 }
+
+// =====================================================================
+// TODAY / command center (2026-09-28). Agents write asks, decisions and status
+// into public.command_center and the week's posting ladder into public.content_plan
+// (view v_content_ladder). Cooper only taps: a checkbox (done) or an option
+// (answer + answered_at). Agents poll answered rows and act, then set done.
+// Rule for agents: C:\Users\coope\Desktop\Claude\Context\COMMAND-CENTER.md
+// =====================================================================
+const _demoWrites = new Map();
+
+/** Open + recently-closed command_center rows, not expired. */
+export async function commandCenter() {
+  let rows;
+  if (isDemo()) { await snap(); rows = (_full?.today?.cc || []).map(r => ({ ...r, ...(_demoWrites.get('cc' + r.id) || {}) })); }
+  else {
+    const { data, error } = await sb.from('command_center')
+      .select('id,kind,title,body,options,answer,answered_at,source_task,source_path,priority,due,created_at,updated_at,expires_at,done')
+      .order('priority', { ascending: true }).limit(200);
+    if (error) throw error;
+    rows = data || [];
+  }
+  const now = Date.now();
+  return rows.filter(r => !r.expires_at || new Date(r.expires_at).getTime() > now);
+}
+
+/** One tap: write fields on a command_center row (answer/answered_at/done only). */
+export async function updateCommand(id, patch) {
+  if (isDemo()) { _demoWrites.set('cc' + id, { ...(_demoWrites.get('cc' + id) || {}), ...patch }); return; }
+  const { error } = await sb.from('command_center').update(patch).eq('id', id);
+  if (error) throw error;
+}
+
+/** This week's posting ladder (v_content_ladder). */
+export async function contentLadder() {
+  if (isDemo()) { await snap(); return (_full?.today?.ladder || []).map(r => ({ ...r, ...(_demoWrites.get('cp' + r.id) || {}) })); }
+  const { data, error } = await sb.from('v_content_ladder').select('*');
+  if (error) throw error;
+  return data || [];
+}
+export async function answerLadder(id, patch) {
+  if (isDemo()) { _demoWrites.set('cp' + id, { ...(_demoWrites.get('cp' + id) || {}), ...patch }); return; }
+  const { error } = await sb.from('content_plan').update(patch).eq('id', id);
+  if (error) throw error;
+}
+
+/** Broken things only: stale/empty feeds + tasks whose latest run in 24h failed or was partial. */
+export async function systemBroken() {
+  const fresh = await dataFreshness();
+  let runs;
+  if (isDemo()) { await snap(); runs = (_full?.runs || []).map(([task, ran_at, status, note]) => ({ task, ran_at, status, note })); }
+  else {
+    const since = new Date(Date.now() - 864e5).toISOString();
+    const { data, error } = await sb.from('task_run_log').select('task,ran_at,status,note').gte('ran_at', since).order('ran_at', { ascending: false }).limit(1000);
+    if (error) throw error;
+    runs = data || [];
+  }
+  const day = runs.filter(r => Date.now() - new Date(r.ran_at).getTime() < 864e5);
+  const latest = new Map();
+  for (const r of day) if (!latest.has(r.task)) latest.set(r.task, r);
+  const tasks = [...latest.values()].filter(r => r.status === 'failed' || r.status === 'partial');
+  const feeds = fresh.filter(f => f.status !== 'fresh');
+  return { feeds, tasks, feedsTotal: fresh.length, tasksTotal: latest.size };
+}

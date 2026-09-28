@@ -13,6 +13,7 @@ import { esc, fmtNum, fmtCompact, fmtDay, ago, deltaChip, platMark, platName, em
 import { accountSeries, groupAccounts, postsWithMetrics } from '/admin/_shell/data.js';
 import { dataFreshness } from '/admin/_shell/live-data.js';
 import { freshStrip } from '/admin/_shell/ui.js';
+import { mountToday } from '/admin/_js/today.js';
 import { REDUCED, reveal, countUp, drawOn, growBars, growX, pop, spotlight, onVisible, liveAgo } from '/admin/_shell/motion.js';
 
 const ctx = await mountShell({ title: 'Home', demo: true });
@@ -82,14 +83,14 @@ if (ctx?.role === 'full') {
   const pAcc = loadAccounts();
   const pOpen = loadOpen();
   const pRuns = loadRuns();
-  freshness().catch(e => fail('fresh', 'feed status', e));
+  mountToday().catch(e => fail('tdDo', 'today', e));
   hero(pAcc, pOpen).catch(e => fail('heroGrid', 'today numbers', e));
   heroChart(loadLinkedInPosts()).catch(e => fail('heroChart', 'LinkedIn posts', e));
   system(pRuns).catch(e => fail('system', 'task runs', e));
   audience(pAcc).catch(e => fail('pulse', 'followers', e));
-  if (DEMO) { $('mustdos').innerHTML = privateCard("Today's must-dos"); $('health').innerHTML = privateCard('Body'); }
-  else { mustDos().catch(e => fail('mustdos', 'must-dos', e)); health().catch(e => fail('health', 'health', e)); }
-  decide(pOpen).catch(e => fail('decide', 'decisions', e));
+  // TODAY (command_center) replaced the must-dos + "waiting on you" cards and the feed strip.
+  if (DEMO) { $('health').innerHTML = privateCard('Body'); }
+  else { health().catch(e => fail('health', 'health', e)); }
   vaultCard(pRuns).catch(e => fail('vaultCard', 'vault sync', e));
   document.querySelectorAll('main > .sv-section').forEach(s => onVisible(s, () => reveal(s.querySelectorAll(':scope > .sv-h, :scope > .sv-card, :scope > .sv-grid > *, :scope > .sv-card'), { stagger: 80 })));
 }
@@ -407,4 +408,4 @@ async function vaultCard(pRuns) {
   onVisible($('vaultCard'), () => countUp($('vaultCard').querySelector('[data-count]'), total, { dur: 900 }));
 }
 
-void statusChip; void REDUCED;
+void statusChip; void REDUCED; void freshness; void mustDos; void decide;
