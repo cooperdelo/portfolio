@@ -19,12 +19,12 @@ WORK = [
        stills=[("launch-film-1", "full", "48 hours before"), ("launch-film-2", "l7", ""), ("launch-film-3", "r5", ""), ("launch-film-4", "mid", "")]),
   dict(slug="time-to-change-my-life", no="02", title="Time to change my life fr", disc="Short film", year="2026",
        video="afraid-to-start", ar="16/9", fit="cover",
-       say="I am terrified of starting.", say_src=("Opening line of the film", None),
+       say="I am terrified of starting.", say_src=None, grid="two",
        credits=[("Role", "Director, editor"), ("Year", "2026. Released 20 Sep"), ("Tools", "DaVinci Resolve Studio"),
                 ("Link", [("Instagram @cooperdelo", "https://www.instagram.com/p/Ddg7Hn2RAHP/"), ("TikTok @cooperdelo", "https://www.tiktok.com/@cooperdelo/video/7687644625829498143")])],
        stats=[("7,024", "Views", "Instagram @cooperdelo"), ("2,446", "Views", "TikTok @cooperdelo"), ("234", "Likes", "Instagram @cooperdelo"), ("221", "Likes", "TikTok @cooperdelo")],
        watch=[("Watch on Instagram", "https://www.instagram.com/p/Ddg7Hn2RAHP/"), ("Watch on TikTok", "https://www.tiktok.com/@cooperdelo/video/7687644625829498143")],
-       stills=[("afraid-to-start-2", "full", "A film by Cooper Delo"), ("afraid-to-start-4", "l7", ""), ("afraid-to-start-3", "r5", "Rubber Band, Chapel Hill"), ("afraid-to-start-1", "mid", "")]),
+       stills=[("afraid-s1", "c6", ""), ("afraid-s2", "c6", ""), ("afraid-s3", "c6", ""), ("afraid-s4", "c6", "")]),
   dict(slug="plugverse-teaser", no="03", title="PlugVerse teaser", disc="Teaser, vertical", year="2026",
        video="teaser", ar="9/16", fit="contain",
        say="9/23. 1 PM EST.", say_src=("Caption, Instagram @plugverse.app, 23 Sep 2026", "https://www.instagram.com/p/DdnEQgqTlEv/"),
@@ -35,23 +35,35 @@ WORK = [
        stills=[("teaser-1", "c4", ""), ("teaser-2", "c4", ""), ("teaser-3", "c4", "Live 9/23")]),
   dict(slug="bioswap", no="04", title="Bioswap", disc="Motion graphics", year="2026",
        video="bioswap", ar="1/1", fit="contain",
-       say="What's your rate?", say_src=("First line on screen", None),
+       say="What's your rate?", say_src=None,
        credits=[("Role", "Motion design"), ("Year", "2026"), ("Tools", "Remotion, React"),
                 ("Link", "Not posted yet, as of " + AS_OF.title())],
        stats=[], watch=[],
        stills=[("bioswap-1", "c6", ""), ("bioswap-2", "c6", ""), ("bioswap-3", "c6", ""), ("bioswap-4", "c6", "")]),
   dict(slug="plugverse-product", no="05", title="PlugVerse product", disc="UI/UX, full stack", year="2025/26",
-       video="plugverse-product", ar="1512/982", fit="cover",
+       video="plugverse-product", ar="1512/897", fit="cover",
        say="Every show. One link.", say_src=("Landing page, plugverse.app", "https://plugverse.app"),
        credits=[("Role", "Founder. Design, front end, back end"), ("Year", "Nov 2025 to now. Live 23 Sep 2026"),
                 ("Tools", "Next.js, React, Supabase, Stripe Connect, Claude Code"),
-                ("Link", [("plugverse.app", "https://plugverse.app"), ("Founder story", "/plugverse")])],
-       stats=[("$21,850", "Raised, no equity", "$20K Luby Pitch + $1,850 1789 Venture Lab"), ("0%", "Equity given", "Sole member, PlugVerse LLC")],
-       watch=[("Open plugverse.app", "https://plugverse.app")],
+                ("Link", [("plugverse.app", "https://plugverse.app"), ("The company", "/plugverse")])],
+       stats=[], watch=[("Open plugverse.app", "https://plugverse.app")],
        stills=[("pv-landing", "full", "Landing"), ("pv-tonight", "l7", "Tonight"), ("pv-native-dashboard", "r5", "Dashboard, iOS"),
                ("pv-public-rubberband", "full", "Rubber Band's booking page"), ("pv-search", "l7", "Discover"),
                ("pv-native-contracts", "r5", "Contracts, iOS"), ("pv-pricing", "full", "Pricing")]),
 ]
+
+COMPANY = dict(slug="plugverse", path="/plugverse", no="", title="PlugVerse", disc="Company", year="2025/26",
+       img="pv-pitch", fit="cover",
+       say="I built PlugVerse solo so a band can get booked from one link.", say_src=None, grid="two",
+       credits=[("Role", "Founder, sole member. Design and engineering"), ("Year", "Nov 2025 to now. Live 23 Sep 2026"),
+                ("Tools", "Next.js, React, Supabase, Stripe Connect, Claude Code"),
+                ("Link", [("plugverse.app", "https://plugverse.app"), ("Product case study", "/work/plugverse-product"), ("Launch film", "/work/plugverse-launch-film")])],
+       stats=[("$20,000", "Luby Pitch prize, won", "Admin funding ledger, active 31 Jul 2026"),
+              ("$1,850", "1789 Venture Fund grant", "Admin funding ledger, received 26 Mar 2026"),
+              ("0%", "Equity given", "Sole member, NC SOS record 15 Apr 2026")],
+       watch=[("Open plugverse.app", "https://plugverse.app")],
+       stills=[("pv-luby", "c6", "Luby Pitch Competition"), ("pv-merch", "c6", "Merch"),
+               ("pv-landing", "c6", "plugverse.app"), ("pv-tonight", "c6", "Tonight")])
 
 HEAD_JS = "(function(d){var r=d.documentElement;try{if(sessionStorage.getItem('cd-intro'))r.classList.add('seen')}catch(e){}if(matchMedia('(prefers-reduced-motion: reduce)').matches)r.classList.add('rm')})(document)"
 
@@ -113,10 +125,14 @@ def lines(text):
     return "".join(f'<span class="line"><span>{E(w)}</span></span>' for w in text)
 
 def case(w, nxt):
-    vid = f"/videos/work/{w['video']}.mp4"
-    poster = f"/videos/work/{w['video']}.jpg"
-    if w["fit"] == "contain":
-        media = f"""<div class="media contain" style="--ar:{w['ar'].replace('/', ' / ')}">
+    vid = f"/videos/work/{w.get('video')}.mp4"
+    poster = f"/videos/work/{w.get('video')}.jpg"
+    if w.get("img"):
+        media = f"""<div class="media"><div class="zoom"><img src="/photos/work/{w['img']}.jpg" alt="{E(w['title'])}" fetchpriority="high" /></div></div>"""
+        poster = f"/photos/work/{w['img']}.jpg"
+    elif w["fit"] == "contain":
+        a, b = (int(x) for x in w["ar"].split("/"))
+        media = f"""<div class="media contain" style="--ar:{w['ar'].replace('/', ' / ')}; --arn:{a / b:.4f}">
       <div class="back"><img src="{poster}" alt="" /></div>
       <div class="front"><div class="zoom"><video src="{vid}" poster="{poster}" autoplay muted loop playsinline preload="auto" aria-label="{E(w['title'])}, loop"></video></div></div>
     </div>"""
@@ -129,14 +145,17 @@ def case(w, nxt):
         else:
             cell = E(v)
         rows.append(f"<tr><th scope=\"row\">{E(k)}</th><td>{cell}</td></tr>")
-    src_t, src_u = w["say_src"]
-    src = f'<a href="{src_u}" target="_blank" rel="noreferrer">{E(src_t)}</a>' if src_u else E(src_t)
+    src = ""
+    if w.get("say_src"):
+        src_t, src_u = w["say_src"]
+        inner = f'<a href="{src_u}" target="_blank" rel="noreferrer">{E(src_t)}</a>' if src_u else E(src_t)
+        src = f'<span class="label dim src">{inner}</span>'
     stats = ""
     if w["stats"]:
         cells = "".join(f"""<div class="stat" data-rv><div class="v" data-odo="{E(v)}">{E(v)}</div><p class="label k">{E(k)}</p><p class="label s">{E(s)}</p></div>""" for v, k, s in w["stats"])
         stats = f"""<section class="stats" aria-label="Numbers">
-  <div class="grid" style="--cols:{min(len(w['stats']), 4)}">{cells}</div>
-  <p class="label note">As of {AS_OF}.</p>
+  <div class="grid" style="--cols:{min(len(w['stats']), 4)}; --n:{max(len(x[0]) for x in w['stats'])}">{cells}</div>
+  <p class="label note">{E(w.get('note', 'As of ' + AS_OF + '.'))}</p>
 </section>"""
     watch = ""
     if w["watch"]:
@@ -147,7 +166,7 @@ def case(w, nxt):
         capt = f'<figcaption class="label">{E(cap)}</figcaption>' if cap else ""
         figs.append(f'<figure class="{cls}" data-rv><div class="clip {fl}"><img src="/photos/work/{img}.jpg" alt="{E(w["title"])}, still {i+1}" loading="lazy" decoding="async" /></div>{capt}</figure>')
     desc = f"{w['title']}. {w['disc']}, {w['year']}. By Cooper Delo."
-    return f"""{head(w['title'] + ' / Cooper Delo', desc, 'https://cooperdelo.com/work/' + w['slug'], 'https://cooperdelo.com' + poster)}
+    return f"""{head(w['title'] + ' / Cooper Delo', desc, 'https://cooperdelo.com' + w.get('path', '/work/' + w['slug']), 'https://cooperdelo.com' + poster)}
 <body class="case">
 {NAV}
 <main>
@@ -155,13 +174,13 @@ def case(w, nxt):
     {media}
     <div class="shade"></div>
     <div class="title" data-hero>
-      <span class="label no">{w['no']}</span>
+      <span class="label no">{w['no'] or '&nbsp;'}</span>
       <h1>{lines([w['title']])}</h1>
     </div>
   </section>
 
   <section class="case-body">
-    <p class="say" data-rv>{lines([w['say']])}<span class="label dim src">{src}</span></p>
+    <p class="say" data-rv>{lines([w['say']])}{src}</p>
     <table class="credits" data-rv>
       <caption class="sr">Credits</caption>
       {''.join(rows)}
@@ -171,7 +190,7 @@ def case(w, nxt):
   {stats}
   {watch}
 
-  <section class="stills" aria-label="Stills">
+  <section class="stills{' two' if w.get('grid') == 'two' else ''}" aria-label="Stills">
     {''.join(figs)}
   </section>
 
@@ -217,6 +236,7 @@ def index_rows():
 if __name__ == "__main__":
     for i, w in enumerate(WORK):
         (ROOT / "work" / f"{w['slug']}.html").write_text(case(w, WORK[(i + 1) % len(WORK)]), encoding="utf-8")
+    (ROOT / "plugverse.html").write_text(case(COMPANY, WORK[4]), encoding="utf-8")
     tpl = (ROOT / "scripts" / "index.template.html").read_text(encoding="utf-8")
     page = (tpl.replace("{{HEAD}}", head("Cooper Delo", "Founder of PlugVerse. Films, motion and product UI. CS and Business at UNC Chapel Hill.", "https://cooperdelo.com"))
                .replace("{{NAV}}", NAV).replace("{{ROWS}}", index_rows()).replace("{{COUNT}}", f"{len(WORK) + 1:02d}")

@@ -100,7 +100,18 @@
     document.body.appendChild(pv);
     const box = pv.querySelector(".box");
     const layers = new Map();
-    let x = innerWidth / 2, y = innerHeight / 2, tx = x, ty = y, w = 0, tw = 0, active = null, running = false;
+    let x = innerWidth / 2, y = innerHeight / 2, tx = x, ty = y, w = 0, tw = 0, ratio = 16 / 9, active = null, running = false, mx = x, my = y;
+    const GAP = 28;
+    function place() {
+      if (!active) return;
+      const r = active.getBoundingClientRect();
+      const h = tw / ratio;
+      let left = mx + GAP;
+      if (left + tw > innerWidth - 16) left = mx - GAP - tw;
+      let top = r.bottom + 10;
+      if (top + h > innerHeight - 16) top = r.top - 10 - h;
+      tx = left; ty = Math.max(16, top);
+    }
 
     function layer(row) {
       if (layers.has(row)) return layers.get(row);
@@ -118,12 +129,13 @@
     }
     function frame() {
       x = lerp(x, tx, 0.12); y = lerp(y, ty, 0.12); w = lerp(w, tw, 0.1);
-      pv.style.transform = `translate3d(${x}px, ${y}px, 0) translate(-50%, -50%)`;
+      pv.style.transform = `translate3d(${x}px, ${y}px, 0)`;
       if (Math.abs(w - tw) > 0.2) pv.style.width = w + "px";
       if (active || Math.abs(x - tx) > 0.3 || Math.abs(y - ty) > 0.3) requestAnimationFrame(frame); else running = false;
     }
     const go = () => { if (!running) { running = true; requestAnimationFrame(frame); } };
-    addEventListener("pointermove", (e) => { tx = e.clientX; ty = e.clientY; if (active) go(); }, { passive: true });
+    addEventListener("pointermove", (e) => { mx = e.clientX; my = e.clientY; if (active) { place(); go(); } }, { passive: true });
+    addEventListener("scroll", () => { if (active) { place(); go(); } }, { passive: true });
 
     rows.forEach((row) => {
       row.addEventListener("mouseenter", () => {
@@ -134,10 +146,12 @@
         const ar = row.dataset.ar || "16/9";
         const [a, b] = ar.split("/").map(Number);
         const want = Math.min(innerWidth * (a / b < 1 ? 0.15 : a / b === 1 ? 0.2 : 0.26), innerHeight * 0.5 * (a / b));
-        tw = want; if (!w) { w = want; pv.style.width = w + "px"; }
+        tw = want; ratio = a / b; if (!w) { w = want; pv.style.width = w + "px"; }
         pv.style.aspectRatio = ar.replace("/", " / ");
-        if (!active) { x = tx; y = ty; }
-        active = row; pv.classList.add("on"); go();
+        const first = !active;
+        active = row; place();
+        if (first) { x = tx; y = ty; }
+        pv.classList.add("on"); go();
       });
       row.addEventListener("mouseleave", () => { active = null; pv.classList.remove("on"); });
       row.querySelector("a").addEventListener("click", () => { box.style.viewTransitionName = "case-media"; });

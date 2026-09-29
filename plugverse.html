@@ -1,335 +1,78 @@
-<!DOCTYPE html>
-<html lang="en" class="v2">
+<!doctype html>
+<html lang="en">
 <head>
-<meta charset="UTF-8" />
-<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-<link rel="alternate icon" type="image/png" href="/favicon-32.png" sizes="32x32" />
-<link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>PlugVerse / Cooper Delo</title>
+<meta name="description" content="PlugVerse. Company, 2025/26. By Cooper Delo." />
+<meta name="theme-color" content="#0A0A0A" />
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 <link rel="manifest" href="/site.webmanifest" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Plugverse / Cooper Delo</title>
-<meta name="description" content="Plugverse, the booking layer for local music. Built solo, live at plugverse.app." />
-<meta property="og:type" content="website" />
-<meta property="og:title" content="Plugverse / Cooper Delo" />
-<meta property="og:description" content="The booking layer for local music. Built solo." />
-<meta property="og:image" content="https://cooperdelo.com/photos/og-cover.png" />
-<meta property="og:image:width" content="1200" />
-<meta property="og:image:height" content="1200" />
+<meta property="og:title" content="PlugVerse / Cooper Delo" />
+<meta property="og:description" content="PlugVerse. Company, 2025/26. By Cooper Delo." />
+<meta property="og:image" content="https://cooperdelo.com/photos/work/pv-pitch.jpg" />
 <meta property="og:url" content="https://cooperdelo.com/plugverse" />
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="Plugverse / Cooper Delo" />
-<meta name="twitter:description" content="The booking layer for local music. Built solo." />
-<meta name="twitter:image" content="https://cooperdelo.com/photos/og-cover.png" />
-<link rel="stylesheet" href="shell.css" />
-<link rel="stylesheet" href="/assets/chrome.css" />
+<link rel="preload" href="/fonts/DrukWideBold.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="preload" href="/fonts/NimbusSans-Bold.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="stylesheet" href="/assets/site.css" />
+<script>(function(d){var r=d.documentElement;try{if(sessionStorage.getItem('cd-intro'))r.classList.add('seen')}catch(e){}if(matchMedia('(prefers-reduced-motion: reduce)').matches)r.classList.add('rm')})(document)</script>
 </head>
-<body class="grain">
-
-<div class="loader" id="loader">
-  <div class="label">Plugverse / Founder Story</div>
-  <div class="name">Plug<br/>verse.</div>
-  <div class="progress"></div>
-</div>
-<div class="transition-veil out" id="veil"><span class="label"></span></div>
-<canvas class="scene-canvas" id="scene-canvas"></canvas>
-<div class="cursor" id="cursor"></div>
-
-<header class="v2nav">
+<body class="case">
+<header class="nav label">
   <a class="mark" href="/" aria-label="Cooper Delo, home"><span class="roll"><span>Cooper Delo</span><span aria-hidden="true">Cooper Delo</span></span></a>
-  <span class="where">Chapel Hill, NC</span>
+  <span class="where">Chapel Hill, NC&nbsp;&nbsp;<span data-clock>--:--</span> ET</span>
   <nav class="links" aria-label="Primary"><a href="/#index"><span class="roll"><span>Index</span><span aria-hidden="true">Index</span></span></a><a href="/#about"><span class="roll"><span>About</span><span aria-hidden="true">About</span></span></a><a href="/#contact"><span class="roll"><span>Contact</span><span aria-hidden="true">Contact</span></span></a></nav>
 </header>
-<div class="nav-progress-track"><div class="nav-progress" id="navProgress"></div></div>
-
 <main>
-
-<header class="page-head world-plugverse video-cover-wrap">
-  <video class="video-cover" autoplay muted loop playsinline preload="metadata" poster="photos/Plugverse_picture.jpeg">
-    <source src="videos/hero_plugverse_product.mov" type="video/mp4" />
-    <source src="videos/hero_plugverse_product.mov" type="video/quicktime" />
-  </video>
-  <div class="inner">
-    <span class="eyebrow">Project / Nov 2025 to now</span>
-    <h1 class="poster reveal in" style="margin-top: 1.5rem;">Plug<span class="accent">verse.</span></h1>
-    <p class="lede reveal" style="margin-top: 2.4rem; max-width: 60rem;">The marketplace for local artists, venues, and organizers.</p>
-    <div class="reveal" style="margin-top: 2.2rem; display: flex; gap: 1rem; flex-wrap: wrap;">
-      <span class="stat-card glass" style="padding: 0.85rem 1.1rem;"><span class="label">Built in</span><span class="value" id="pv-since-days">…</span></span>
-      <span class="stat-card glass" style="padding: 0.85rem 1.1rem;"><span class="label">Raised</span><span class="value">$21,850</span></span>
-      <span class="stat-card glass" style="padding: 0.85rem 1.1rem;"><span class="label">Equity given</span><span class="value">0%</span></span>
+  <section class="case-hero">
+    <div class="media"><div class="zoom"><img src="/photos/work/pv-pitch.jpg" alt="PlugVerse" fetchpriority="high" /></div></div>
+    <div class="shade"></div>
+    <div class="title" data-hero>
+      <span class="label no">&nbsp;</span>
+      <h1><span class="line"><span>PlugVerse</span></span></h1>
     </div>
-  </div>
-</header>
+  </section>
 
-<div class="marquee-band">
-  <div class="marquee-track">
-    <span>Marketplace for local music</span><span>Artists · Venues · Organizers</span><span>Built solo with Claude Code</span><span>$20K Luby Pitch</span><span>plugverse.app</span>
-    <span>Marketplace for local music</span><span>Artists · Venues · Organizers</span><span>Built solo with Claude Code</span><span>$20K Luby Pitch</span><span>plugverse.app</span>
-  </div>
-</div>
+  <section class="case-body">
+    <p class="say" data-rv><span class="line"><span>I built PlugVerse solo so a band can get booked from one link.</span></span></p>
+    <table class="credits" data-rv>
+      <caption class="sr">Credits</caption>
+      <tr><th scope="row">Role</th><td>Founder, sole member. Design and engineering</td></tr><tr><th scope="row">Year</th><td>Nov 2025 to now. Live 23 Sep 2026</td></tr><tr><th scope="row">Tools</th><td>Next.js, React, Supabase, Stripe Connect, Claude Code</td></tr><tr><th scope="row">Link</th><td><a href="https://plugverse.app" target="_blank" rel="noreferrer">plugverse.app</a><br /><a href="/work/plugverse-product">Product case study</a><br /><a href="/work/plugverse-launch-film">Launch film</a></td></tr>
+    </table>
+  </section>
 
-<!-- The problem — tight -->
-<section class="block has-bg">
-  <div class="section-bg">
-    <img src="photos/gig_rubber_big_stage_1.jpg" alt="" loading="lazy" />
-  </div>
-  <div class="grid">
-    <div class="col-4"><span class="eyebrow">The problem</span></div>
-    <div class="col-8">
-      <p class="lede reveal">Every gig starts from scratch. Bio rewritten. Setlist re-attached. Rate re-explained. Contract copy-pasted from a Google Doc. There's no LinkedIn for local music. No Airbnb listing for "here's who I am, what I charge, when I'm free."</p>
-    </div>
-  </div>
+  <section class="stats" aria-label="Numbers">
+  <div class="grid" style="--cols:3; --n:7"><div class="stat" data-rv><div class="v" data-odo="$20,000">$20,000</div><p class="label k">Luby Pitch prize, won</p><p class="label s">Admin funding ledger, active 31 Jul 2026</p></div><div class="stat" data-rv><div class="v" data-odo="$1,850">$1,850</div><p class="label k">1789 Venture Fund grant</p><p class="label s">Admin funding ledger, received 26 Mar 2026</p></div><div class="stat" data-rv><div class="v" data-odo="0%">0%</div><p class="label k">Equity given</p><p class="label s">Sole member, NC SOS record 15 Apr 2026</p></div></div>
+  <p class="label note">As of 29 SEP 2026.</p>
 </section>
+  <div class="watch"><a class="pill" href="https://plugverse.app" target="_blank" rel="noreferrer">Open plugverse.app &#8599;</a></div>
 
-<!-- The analogy — Airbnb for local music -->
-<section class="block has-bg">
-  <div class="section-bg">
-    <img src="photos/landscape_house_view_2.jpg" alt="" loading="lazy" style="filter: brightness(0.45) saturate(0.85) contrast(1.05) sepia(0.1);" />
-  </div>
-  <div class="grid">
-    <div class="col-12" style="text-align: center;">
-      <div class="reveal" style="max-width: 1100px; margin: 0 auto;">
-        <span class="eyebrow">The analogy</span>
-        <h2 class="section-poster" style="margin-top: 0.6rem;">Airbnb<span class="accent">.</span></h2>
-        <p class="lede" style="margin-top: 1.4rem; max-width: 48rem; margin-left: auto; margin-right: auto;">Rooms existed before Airbnb. Bookings existed before Airbnb. What didn't exist was the layer that made it standard. Listings, identity, payments, reviews.</p>
-        <p class="body-prose" style="margin-top: 1rem; max-width: 48rem; margin-left: auto; margin-right: auto;">Local music has the same gap. <span class="accent">Plugverse is the layer.</span></p>
-      </div>
-    </div>
-  </div>
-</section>
+  <section class="stills two" aria-label="Stills">
+    <figure class="c6" data-rv><div class="clip float"><img src="/photos/work/pv-luby.jpg" alt="PlugVerse, still 1" loading="lazy" decoding="async" /></div><figcaption class="label">Luby Pitch Competition</figcaption></figure><figure class="c6" data-rv><div class="clip float b"><img src="/photos/work/pv-merch.jpg" alt="PlugVerse, still 2" loading="lazy" decoding="async" /></div><figcaption class="label">Merch</figcaption></figure><figure class="c6" data-rv><div class="clip float c"><img src="/photos/work/pv-landing.jpg" alt="PlugVerse, still 3" loading="lazy" decoding="async" /></div><figcaption class="label">plugverse.app</figcaption></figure><figure class="c6" data-rv><div class="clip float"><img src="/photos/work/pv-tonight.jpg" alt="PlugVerse, still 4" loading="lazy" decoding="async" /></div><figcaption class="label">Tonight</figcaption></figure>
+  </section>
 
-<!-- What it is — three-sided marketplace -->
-<section class="block world-plugverse has-bg">
-  <div class="section-bg">
-    <img src="photos/gig_rubber_big_stage_3.jpg" alt="" loading="lazy" />
-  </div>
-  <div class="grid">
-    <div class="col-12 reveal">
-      <span class="eyebrow">What it is</span>
-      <h2 class="section-poster" style="margin-top: 0.6rem;">A three-sided<br/><span class="accent">marketplace.</span></h2>
-      <p class="lede" style="margin-top: 1.6rem; max-width: 60rem;">Artists list their availability and rate. Venues post their stages and dates. Organizers find the right act and book it in one flow. Contract auto-generated. Payment in escrow until the show is done.</p>
-    </div>
-  </div>
-  <div class="grid" style="margin-top: 2.4rem;">
-    <div class="col-12 reveal">
-      <div class="role-grid">
-        <div class="role-card">
-          <div class="role-tag">Artists</div>
-          <h4>One profile, every gig</h4>
-          <p>Bio, setlist, rate, samples, dates available. Send the link instead of the twenty-minute pitch.</p>
-        </div>
-        <div class="role-card">
-          <div class="role-tag">Venues</div>
-          <h4>Fill the calendar</h4>
-          <p>Post the room, the date, the budget. Discoverable to every artist on the platform.</p>
-        </div>
-        <div class="role-card">
-          <div class="role-tag">Organizers</div>
-          <h4>Book the show end-to-end</h4>
-          <p>Search, offer, sign, pay. One flow. Free to use. Contract and escrow handled for you.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="grid" style="margin-top: 2.4rem;">
-    <div class="col-12 reveal">
-      <div class="stats">
-        <div class="stat-card glass"><span class="label">Founded</span><span class="value">Nov 2025</span></div>
-        <div class="stat-card glass"><span class="label">Form</span><span class="value">NC LLC</span></div>
-        <div class="stat-card glass"><span class="label">Built by</span><span class="value">Cooper, solo</span></div>
-        <div class="stat-card glass"><span class="label">Stack</span><span class="value">Next · Supabase · Stripe</span></div>
-        <div class="stat-card glass"><span class="label">Funding</span><span class="value">$21,850</span></div>
-        <div class="stat-card glass"><span class="label">Equity given</span><span class="value">0%</span></div>
-        <div class="stat-card glass"><span class="label">Status</span><span class="value">Live</span></div>
-        <a href="https://plugverse.app" target="_blank" rel="noreferrer" data-cursor="VISIT" data-no-transition onclick="window.open(this.href,'_blank');return false;" class="stat-card glass" style="text-decoration: none;"><span class="label">Live at</span><span class="value" style="color: var(--rust);">plugverse.app ↗</span></a>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- The artist profile — what an artist's page looks like -->
-<section class="block">
-  <div class="grid">
-    <div class="col-5">
-      <div class="reveal">
-        <span class="eyebrow">The artist profile</span>
-        <h2 class="section-poster" style="margin-top: 0.6rem;">Send a link.<br/><span class="accent">Get booked.</span></h2>
-        <p class="body-prose" style="margin-top: 1.8rem; font-size: clamp(1.15rem, 1.55vw, 1.5rem); line-height: 1.55;">Every artist gets a public profile at plugverse.app/their-name. Bio, samples, setlists, rates, calendar, instant book. Copy the URL into a venue's DM and the conversation is already half done.</p>
-      </div>
-    </div>
-    <div class="col-7">
-      <div class="reveal">
-        <div class="mockup-card">
-          <div class="mockup-bar">
-            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
-            <span class="url">plugverse.app/cooper-delo</span>
-          </div>
-          <div class="mockup-body">
-            <img src="photos/plugverse_profile.jpg" alt="What a Plugverse artist profile looks like" loading="lazy" style="width: 100%; height: auto; display: block;" />
-          </div>
-        </div>
-        <div class="caption-shard glass-light" style="position: relative; left: 0; bottom: 0; margin-top: 1rem; transform: rotate(-1deg);">Artist profile / live</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- How a booking happens — the UI demo video -->
-<section class="block world-plugverse">
-  <div class="grid">
-    <div class="col-5">
-      <div class="reveal">
-        <span class="eyebrow">How a booking happens</span>
-        <h2 class="section-poster" style="margin-top: 0.6rem;">Organizer <span class="accent">side.</span></h2>
-        <p class="body-prose" style="margin-top: 1.8rem; font-size: clamp(1.15rem, 1.55vw, 1.5rem); line-height: 1.55;">Recording from the live UI. An organizer drafts a direct offer to an artist with performance time, arrival time, lineup role, and budget. The contract auto-fills from the artist's profile. Sign, hold the payment in escrow, done.</p>
-        <ul class="body-prose" style="margin-top: 1.8rem; padding-left: 1.2rem; font-size: clamp(1.05rem, 1.4vw, 1.35rem); line-height: 1.9;">
-          <li>One offer flow for any gig type</li>
-          <li>Auto-generated contract from artist + venue defaults</li>
-          <li>Payment held in escrow until the show is performed</li>
-        </ul>
-      </div>
-    </div>
-    <div class="col-7">
-      <div class="reveal">
-        <div class="mockup-card">
-          <div class="mockup-bar">
-            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
-            <span class="url">plugverse.app/dashboard</span>
-          </div>
-          <div class="mockup-body">
-            <video autoplay muted loop playsinline preload="metadata" poster="photos/Plugverse_picture.jpeg">
-              <source src="videos/plugverse_ui.mp4" type="video/mp4" />
-            </video>
-          </div>
-        </div>
-        <div class="caption-shard glass-light" style="position: relative; left: 0; bottom: 0; margin-top: 1rem; transform: rotate(1.4deg);">Live UI / 2026</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- The biggest moment — Luby Pitch -->
-<section class="block world-plugverse">
-  <div class="grid">
-    <div class="col-12 reveal">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-        <span class="plate glass"><span class="num">04</span><span class="eyebrow" style="margin:0;">The biggest win</span></span>
-        <span class="eyebrow">April 2026</span>
-      </div>
-      <h2 class="section-poster">Twenty <span class="accent">grand.</span></h2>
-    </div>
-  </div>
-  <div class="grid" style="margin-top: 3rem;">
-    <div class="col-7">
-      <div class="reveal"><div class="photo-frame">
-        <div class="photo has-media landscape" data-world="plugverse">
-          <img src="photos/luby_pic_with_check.jpg" alt="Cooper accepting the Luby Pitch $20,000 check for Plugverse at Innovate Carolina Junction" loading="lazy" />
-        </div>
-        <div class="caption-shard glass-light">Luby Pitch Competition / Innovate Carolina Junction / Apr 2026</div>
-      </div></div>
-    </div>
-    <div class="col-5">
-      <div class="reveal">
-        <p class="lede">Won the Luby Pitch Competition: $20,000, zero equity given. Hosted by Innovate Carolina at the Junction. Plugverse's biggest achievement so far, four months after founding.</p>
-        <ul class="wins-list" style="margin-top: 1.6rem;">
-          <li>
-            <span class="amount">$20K</span>
-            <span class="title">Luby Pitch · Innovate Carolina</span>
-            <span class="when">Apr 2026</span>
-          </li>
-          <li>
-            <span class="amount">$1.85K</span>
-            <span class="title">1789 Student Venture Fund</span>
-            <span class="when">2025</span>
-          </li>
-          <li>
-            <span class="amount">LLC</span>
-            <span class="title">Plugverse LLC · NC</span>
-            <span class="when">Mar 2026</span>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="block world-plugverse has-bg" style="min-height: 90vh; display: flex; align-items: center; justify-content: center; text-align: center;">
-  <div class="section-bg">
-    <img src="photos/gig_rubber_big_stage_3.jpg" alt="" loading="lazy" />
-  </div>
-  <div class="grid" style="width: 100%;">
-    <div class="col-12 reveal" style="max-width: 920px; margin: 0 auto; text-align: center;">
-      <span class="eyebrow" style="display: block;">Why I am the one building it</span>
-      <p class="lede" style="margin-top: 1.4rem;">I play in a band. I plan events for my fraternity. I am a CS and business student building the product myself with Claude Code. I am not guessing at the problem. I live on all three sides of the marketplace.</p>
-      <a href="https://plugverse.app" target="_blank" rel="noreferrer" data-no-transition onclick="window.open(this.href,'_blank');return false;" class="under" data-cursor="VISIT" style="display: inline-block; margin-top: 2.5rem; font-family: 'Geist Mono', monospace; text-transform: uppercase; letter-spacing: 0.22em; font-size: 0.78rem; color: var(--rust);">plugverse.app</a>
-    </div>
-  </div>
-</section>
-
+  <a class="next" href="/work/plugverse-product">
+    <span class="label"><span>Next</span><span>05</span></span>
+    <span class="t">PlugVerse product</span>
+  </a>
 </main>
-
-<footer class="site">
-  <div style="max-width: 1600px; margin: 0 auto; display: grid; gap: 2.5rem; position: relative;">
-    <div class="footer-continue">
-      <span class="eyebrow">Continue reading</span>
-      <div class="pills">
-        <a href="rubber-band.html" data-cursor="NEXT" data-transition="MUSIC" class="stat-card glass" style="padding: 1rem 1.4rem; font-family: 'Geist Mono', monospace; text-transform: uppercase; letter-spacing: 0.22em; font-size: 0.78rem;">Rubber Band & music</a>
-        <a href="now.html" data-cursor="NEXT" data-transition="NOW" class="stat-card glass" style="padding: 1rem 1.4rem; font-family: 'Geist Mono', monospace; text-transform: uppercase; letter-spacing: 0.22em; font-size: 0.78rem;">What I am working on now</a>
-      </div>
-    </div>
-    <div>
-      <span class="eyebrow">Get in touch</span>
-      <button class="under" data-contact data-cursor="OPEN" style="display: block; margin-top: 1rem; text-align: left; font-family: 'Anton', Impact, sans-serif; font-size: clamp(2.6rem, 7vw, 6rem); line-height: 0.95; text-transform: uppercase; color: var(--ink);">cooperdelo6@gmail.com</button>
-    </div>
-    <div class="massive">cooperdelo</div>
-    <div style="display: flex; justify-content: space-between; font-family: 'Geist Mono', monospace; text-transform: uppercase; letter-spacing: 0.22em; font-size: 0.72rem; opacity: 0.7;">
-      <span>Chapel Hill, NC</span><span>2026</span>
-    </div>
+<footer class="contact" id="contact">
+  <p class="label say">Say hi</p>
+  <a class="mail" href="mailto:cooperdelo6@gmail.com" data-rv><span class="line"><span data-fit>cooperdelo6@gmail.com</span></span></a>
+  <div class="base label">
+    <span>&copy; 2026 Cooper Delo</span>
+    <nav aria-label="Elsewhere">
+      <a href="/resume">Resume</a>
+      <a href="https://www.linkedin.com/in/cooperdelo/" target="_blank" rel="noreferrer">LinkedIn</a>
+      <a href="https://instagram.com/cooperdelo" target="_blank" rel="noreferrer">Instagram</a>
+      <a href="https://tiktok.com/@cooperdelo" target="_blank" rel="noreferrer">TikTok</a>
+      <a href="/privacy">Privacy</a>
+      <a href="/terms">Terms</a>
+    </nav>
   </div>
 </footer>
-
-<div class="modal-backdrop" id="modal">
-  <div class="modal">
-    <h3>Get in touch.</h3>
-    <p style="font-family: 'Geist Mono', monospace; text-transform: uppercase; letter-spacing: 0.22em; font-size: 0.7rem; color: var(--muted); margin-bottom: 1.4rem;">Book a time or send an email</p>
-    <!-- BOOK A TIME: live Cal.com scheduling page -->
-    <a href="https://cal.com/cooper-delo1" target="_blank" rel="noreferrer" data-cursor="OPEN" data-no-transition onclick="window.open(this.href, '_blank'); return false;" style="display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:0.9rem 1.2rem; margin-bottom:1.2rem; border-radius:10px; background:var(--rust); color:var(--bg); font-family:'Geist Mono', monospace; text-transform:uppercase; letter-spacing:0.18em; font-size:0.78rem; font-weight:600;">
-      <span>Book a time</span>
-      <span aria-hidden="true">&rarr;</span>
-    </a>
-    <div class="email-row">
-      <span>cooperdelo6@gmail.com</span>
-      <button class="copy-btn" data-cursor="COPY" id="copyBtn">Copy</button>
-    </div>
-    <div class="options">
-      <a href="https://mail.google.com/mail/?view=cm&fs=1&to=cooperdelo6@gmail.com" target="_blank" rel="noreferrer" data-no-transition data-cursor="OPEN" onclick="window.open(this.href, '_blank'); return false;">Gmail</a>
-      <a href="https://www.linkedin.com/in/cooperdelo/" target="_blank" rel="noreferrer" data-no-transition data-cursor="OPEN" onclick="window.open(this.href, '_blank'); return false;">LinkedIn</a>
-      <a href="https://instagram.com/cooperdelo" target="_blank" rel="noreferrer" data-no-transition data-cursor="OPEN" onclick="window.open(this.href, '_blank'); return false;">Instagram</a>
-    </div>
-    <div style="display: flex; justify-content: flex-end; align-items: center; padding-top: 0.6rem;">
-      <button class="close under" data-cursor="CLOSE" id="closeModal">Close</button>
-    </div>
-  </div>
-</div>
-<div class="toast" id="toast">Copied to clipboard</div>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" defer></script>
-<script src="shell.js" defer></script>
-<script>
-  // Founding day counter — shows months/days since Nov 10, 2025 (first PlugVerse commit)
-  (function plugverseSinceCounter() {
-    const el = document.getElementById('pv-since-days');
-    if (!el) return;
-    const founded = new Date(2025, 10, 10); // Nov 10, 2025 (months are 0-indexed)
-    const now = new Date();
-    const diffDays = Math.max(0, Math.floor((now - founded) / 86400000));
-    const months = Math.floor(diffDays / 30.44);
-    const remDays = Math.round(diffDays - months * 30.44);
-    if (months >= 1) {
-      el.textContent = months + ' mo · ' + remDays + ' d';
-    } else {
-      el.textContent = diffDays + ' days';
-    }
-  })();
-</script>
+<script src="/assets/lenis.min.js" defer></script>
+<script src="/assets/site.js" defer></script>
 </body>
 </html>
