@@ -1,8 +1,4 @@
 User-agent: *
-Disallow: /admin/
-Disallow: /admin
-
-# Public site is fully crawlable
 Allow: /
 
 Sitemap: https://cooperdelo.com/sitemap.xml
