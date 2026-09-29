@@ -116,6 +116,16 @@ async function upsertCredentials(row) {
   if (!r.ok) throw new Error(`db upsert: ${r.status} ${await r.text()}`);
 }
 
+async function logRun(status, note) {
+  const svc = process.env.SUPABASE_ADMIN_SERVICE_ROLE_KEY;
+  if (!svc) return;
+  await fetch(`${ADMIN_URL}/rest/v1/task_run_log`, {
+    method: 'POST',
+    headers: { apikey: svc, Authorization: `Bearer ${svc}`, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+    body: JSON.stringify({ task: 'instagram-oauth', ran_at: new Date().toISOString(), status, note }),
+  });
+}
+
 // ---- Handler ----
 
 export default async function handler(req, res) {
@@ -129,6 +139,13 @@ export default async function handler(req, res) {
       'Authorization cancelled',
       `Instagram returned: ${String(errReason)} — ${String(req.query.error_description || '').replace(/</g,'&lt;')}`
     ));
+  }
+
+  // CSRF: when the flow started at /api/instagram-auth-start, the state must match its cookie.
+  const cookieState = /(?:^|;\s*)ig_oauth_state=([^;]+)/.exec(req.headers.cookie || '')?.[1];
+  if (cookieState && req.query.state !== cookieState) {
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    return res.status(400).send(pageError('Link expired', 'Press Connect Instagram again on the Integrations page.'));
   }
 
   const code = req.query.code;
@@ -168,11 +185,18 @@ export default async function handler(req, res) {
       token_type:    longTok.token_type || 'long_lived',
       expires_at:    expiresAt,
       connected_email: null,
+      connected_at:  new Date().toISOString(),
       refreshed_at:  new Date().toISOString(),
     });
 
-    res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    return res.status(200).send(pageSuccess(username || 'instagram', igUserId));
+    // Log it. Postgres takes it from here: social_api_catchup() runs the first
+    // per-post pull within 10 minutes, ig_token_refresh() keeps the token alive.
+    await logRun('ok', `Connected @${username || igUserId}. Token stored server-side, expires ${expiresAt.slice(0, 10)}, auto-refresh on.`).catch(() => {});
+
+    res.setHeader('Set-Cookie', 'ig_oauth_state=; Path=/api; Max-Age=0; HttpOnly; Secure; SameSite=Lax');
+    res.statusCode = 302;
+    res.setHeader('Location', `/admin/integrations/?connected=instagram&handle=${encodeURIComponent(username || '')}`);
+    return res.end();
   } catch (e) {
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     return res.status(500).send(pageError('Token exchange failed', String(e?.message || e).replace(/</g,'&lt;')));

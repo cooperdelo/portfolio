@@ -4,6 +4,9 @@
 // number is rendered the same way: value, platform, handle, as-of, stale.
 // =====================================================================
 
+import { icon, platIcon } from './icons.js';
+export { icon };
+
 export const STALE_HOURS = 36;
 
 export function esc(s) {
@@ -66,14 +69,19 @@ export function deltaChip(cur, prev, { pct = true } = {}) {
   const d = cur - prev;
   if (d === 0) return `<span class="chip">0</span>`;
   const p = prev ? ` · ${Math.abs(d / prev * 100).toFixed(1)}%` : '';
-  return `<span class="chip delta ${d > 0 ? 'up' : 'down'}"><i aria-hidden="true">${d > 0 ? '&#9650;' : '&#9660;'}</i>${d > 0 ? '+' : '−'}${fmtNum(Math.abs(d))}${pct ? p : ''}</span>`;
+  return `<span class="chip delta ${d > 0 ? 'up' : 'down'}">${icon(d > 0 ? 'arrow-up' : 'arrow-down', { size: 11 })}${fmtNum(Math.abs(d))}${pct ? p : ''}</span>`;
 }
 
 const PLAT = { linkedin: ['in', 'LinkedIn'], instagram: ['IG', 'Instagram'], tiktok: ['TT', 'TikTok'], youtube: ['YT', 'YouTube'], x: ['X', 'X'], spotify: ['SP', 'Spotify'] };
 export const platName = (p) => (PLAT[p] || [null, p])[1];
+// Monochrome platform mark (inline SVG). Falls back to the old letter mark for unknown platforms.
+export function pmIcon(p, size = 13) {
+  const ic = platIcon(p);
+  return ic ? icon(ic, { size }) : esc((PLAT[p] || ['·'])[0]);
+}
 export function platMark(p, handle) {
-  const [m, name] = PLAT[p] || ['·', p];
-  return `<span class="plat"><span class="pm ${PLAT[p] ? esc(p) : 'other'}">${esc(m)}</span>${esc(name)}${handle ? `<span class="sv-muted" style="font-weight:500">@${esc(handle)}</span>` : ''}</span>`;
+  const name = (PLAT[p] || [null, p])[1];
+  return `<span class="plat"><span class="pm ${PLAT[p] ? esc(p) : 'other'}" title="${esc(name)}">${pmIcon(p)}</span>${esc(name)}${handle ? `<span class="sv-muted" style="font-weight:500">@${esc(handle)}</span>` : ''}</span>`;
 }
 
 // Title only. The second line is kept only for load errors (so a failure says why).

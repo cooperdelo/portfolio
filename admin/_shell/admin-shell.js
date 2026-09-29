@@ -8,6 +8,7 @@
 // =====================================================================
 
 import { requireAdminOrRedirect, signOut, getSession, getAdminRole } from './supabase.js';
+import { icon } from './icons.js';
 
 // Read a theme token at runtime (legacy Chart.js pages use this so their
 // axes and tooltips follow light/dark instead of hard-coded cream).
@@ -23,60 +24,60 @@ window.__cv = (name, fallback) => getComputedStyle(document.documentElement).get
 // top; every existing page is kept under its old section.
 const NAV = [
   { section: 'Today', items: [
-    { href: '/admin/',                          label: 'Home' },
-    { href: '/admin/schedule/',                 label: 'Schedule', roles: ['full'] },
-    { href: '/admin/vault/',                    label: 'Vault', roles: ['full'] },
-    { href: '/admin/decisions/',                label: 'Decisions', roles: ['full'] },
-    { href: '/admin/rituals/',                  label: 'Rituals', roles: ['full'] },
+    { href: '/admin/',                          label: 'Home', ic: 'home' },
+    { href: '/admin/schedule/',                 label: 'Schedule', ic: 'calendar', roles: ['full'] },
+    { href: '/admin/decisions/',                label: 'Decisions', ic: 'square-check', roles: ['full'] },
+    { href: '/admin/vault/',                    label: 'Vault', ic: 'archive', roles: ['full'] },
+    { href: '/admin/rituals/',                  label: 'Rituals', ic: 'repeat', roles: ['full'] },
   ]},
   { section: 'Grow', items: [
-    { href: '/admin/insights/',                 label: 'Insights', roles: ['full'] },
-    { href: '/admin/people/',                   label: 'People in orbit', roles: ['full'] },
-    { href: '/admin/content/',                  label: 'Content', roles: ['full'] },
-    { href: '/admin/earn/',                     label: 'Earn', roles: ['full'] },
+    { href: '/admin/content/',                  label: 'Content', ic: 'film', roles: ['full'] },
+    { href: '/admin/people/',                   label: 'People in orbit', ic: 'users', roles: ['full'] },
+    { href: '/admin/insights/',                 label: 'Insights', ic: 'chart-line', roles: ['full'] },
+    { href: '/admin/earn/',                     label: 'Earn', ic: 'coins', roles: ['full'] },
   ]},
   { section: 'Money', items: [
-    { href: '/admin/finance/',                  label: 'Finance Dashboard' },
-    { href: '/admin/finance/networth.html',     label: 'Net Worth', roles: ['full'] },
-    { href: '/admin/finance/transactions.html', label: 'Transactions' },
-    { href: '/admin/finance/investments.html',  label: 'Investments', roles: ['full'] },
-    { href: '/admin/finance/funding.html',      label: 'Funding Sources' },
-    { href: '/admin/finance/tax.html',          label: 'Tax Prep', roles: ['full'] },
-    { href: '/admin/finance/export.html',       label: 'Export XLSX', roles: ['full'] },
+    { href: '/admin/finance/',                  label: 'Overview', ic: 'dashboard' },
+    { href: '/admin/finance/networth.html',     label: 'Net worth', ic: 'wallet', roles: ['full'] },
+    { href: '/admin/finance/transactions.html', label: 'Transactions', ic: 'arrow-left-right' },
+    { href: '/admin/finance/investments.html',  label: 'Investments', ic: 'trending-up', roles: ['full'] },
+    { href: '/admin/finance/funding.html',      label: 'Funding', ic: 'landmark' },
+    { href: '/admin/finance/tax.html',          label: 'Tax prep', ic: 'receipt', roles: ['full'] },
+    { href: '/admin/finance/export.html',       label: 'Export', ic: 'download', roles: ['full'] },
   ]},
-  { section: 'Health & Body', items: [
-    { href: '/admin/health/log.html',           label: 'Daily Log', roles: ['full'] },
-    { href: '/admin/health/dashboard.html',     label: 'Insights', roles: ['full'] },
+  { section: 'Health', items: [
+    { href: '/admin/health/dashboard.html',     label: 'Health', ic: 'activity', roles: ['full'] },
+    { href: '/admin/health/log.html',           label: 'Daily log', ic: 'clipboard', roles: ['full'] },
   ]},
-  { section: 'Build · Plugverse', items: [
-    { href: '/admin/plugverse/',                label: 'KPIs' },
-    { href: '/admin/plugverse/ops.html',        label: 'Ops · pipeline · team · QA' },
-    { href: '/admin/finance/plugverse.html',    label: 'P&L' },
-    { href: '/admin/finance/fund.html',         label: '1789 Fund' },
+  { section: 'PlugVerse', items: [
+    { href: '/admin/plugverse/',                label: 'KPIs', ic: 'gauge' },
+    { href: '/admin/plugverse/ops.html',        label: 'Ops', ic: 'workflow' },
+    { href: '/admin/finance/plugverse.html',    label: 'P&L', ic: 'chart-column' },
+    { href: '/admin/finance/fund.html',         label: '1789 Fund', ic: 'briefcase' },
   ]},
-  { section: 'Life · auto-synced', items: [
-    { href: '/admin/life/',                     label: 'Review', roles: ['full'] },
-    { href: '/admin/life/relationships.html',   label: 'Relationships', roles: ['full'] },
-    { href: '/admin/life/music.html',           label: 'Music', roles: ['full'] },
-    { href: '/admin/academics/',                label: 'Academics', roles: ['full'] },
+  { section: 'Life', items: [
+    { href: '/admin/life/',                     label: 'Weekly review', ic: 'compass', roles: ['full'] },
+    { href: '/admin/life/relationships.html',   label: 'Relationships', ic: 'heart', roles: ['full'] },
+    { href: '/admin/life/music.html',           label: 'Music', ic: 'music', roles: ['full'] },
+    { href: '/admin/academics/',                label: 'Academics', ic: 'graduation-cap', roles: ['full'] },
   ]},
   { section: 'Brand', items: [
-    { href: '/admin/social/',                   label: 'Social dashboard' },
-    { href: '/admin/carousels/',                label: 'Carousel Studio', roles: ['full'] },
-    { href: '/admin/brain/',                    label: 'Brain', roles: ['full'] },
-    { href: '/admin/playbook/',                 label: 'Playbook' },
-    { href: '/admin/contacts/',                 label: 'Contacts' },
-    { href: '/admin/merch/',                    label: 'Merch Tracker', roles: ['full'] },
+    { href: '/admin/social/',                   label: 'Social', ic: 'chart-bar' },
+    { href: '/admin/carousels/',                label: 'Carousels', ic: 'gallery', roles: ['full'] },
+    { href: '/admin/brain/',                    label: 'Brain', ic: 'lightbulb', roles: ['full'] },
+    { href: '/admin/playbook/',                 label: 'Playbook', ic: 'book-open' },
+    { href: '/admin/contacts/',                 label: 'Contacts', ic: 'contact' },
+    { href: '/admin/merch/',                    label: 'Merch', ic: 'shirt', roles: ['full'] },
   ]},
   { section: 'System', items: [
-    { href: '/admin/integrations/',             label: 'Integrations', roles: ['full'] },
+    { href: '/admin/integrations/',             label: 'Integrations', ic: 'plug', roles: ['full'] },
   ]},
 ];
 
-// Mobile bottom tabs (max 4 + Menu). Text only, per DESIGN.md (no icons).
+// Mobile bottom tabs (max 4 + Menu). Icon + label, same Lucide set as the rail.
 const TABS = {
-  full:      [['/admin/', 'Home'], ['/admin/schedule/', 'Schedule'], ['/admin/vault/', 'Vault'], ['/admin/content/', 'Content']],
-  plugverse: [['/admin/', 'Home'], ['/admin/plugverse/', 'KPIs'], ['/admin/plugverse/ops.html', 'Ops'], ['/admin/finance/plugverse.html', 'P&L']],
+  full:      [['/admin/', 'Home', 'home'], ['/admin/schedule/', 'Schedule', 'calendar'], ['/admin/vault/', 'Vault', 'archive'], ['/admin/content/', 'Content', 'film']],
+  plugverse: [['/admin/', 'Home', 'home'], ['/admin/plugverse/', 'KPIs', 'gauge'], ['/admin/plugverse/ops.html', 'Ops', 'workflow'], ['/admin/finance/plugverse.html', 'P&L', 'chart-column']],
 };
 
 // Theme: 'light' | 'dark' | null (follow system). Pages that pin a theme in
@@ -116,9 +117,7 @@ function railHTML(activePath, email, role) {
       .filter(it => visibleForRole(it, role))
       .map(it => {
         const isActive = normalizePath(it.href) === normalizePath(activePath);
-        return `<a class="nav-item ${isActive ? 'active' : ''}" href="${it.href}">
-                  <span class="pulse"></span><span>${it.label}</span>
-                </a>`;
+        return `<a class="nav-item ${isActive ? 'active' : ''}" href="${it.href}"${isActive ? ' aria-current="page"' : ''}>${icon(it.ic, { size: 16, cls: 'ni' })}<span>${it.label}</span></a>`;
       }).join('');
     if (!items) return ''; // hide whole section if every item is gated out
     return `<div class="rail-section">
@@ -131,24 +130,25 @@ function railHTML(activePath, email, role) {
 
   return `
     <aside class="rail">
-      <div class="brand"><span class="logo">CD</span>Cooper Delo <small>Admin</small>${roleBadge}</div>
-      <button class="rail-search" data-openpalette><span class="rs-mag">⌕</span><span>Search…</span><kbd>⌘K</kbd></button>
-      <button class="rail-toggle" data-railtoggle aria-label="Menu" aria-expanded="false">&#9776;</button>
+      <div class="brand"><span class="logo">CD</span>Cooper Delo${roleBadge}</div>
+      <button class="rail-search" data-openpalette aria-label="Search">${icon('search', { size: 15, cls: 'rs-mag' })}<span>Search</span><kbd>Ctrl K</kbd></button>
+      <button class="rail-toggle" data-railtoggle aria-label="Menu" aria-expanded="false">${icon('menu', { size: 18 })}</button>
       ${sections}
       <div class="rail-foot">
-        <span>Signed in as</span>
-        <span class="who">${email || ''}</span>
-        <button class="theme-toggle signout" data-themetoggle type="button"></button>
-        <button class="signout" data-signout>Sign out</button>
+        <span class="who" title="Signed in">${email || ''}</span>
+        <div class="rf-btns">
+          <button class="theme-toggle signout" data-themetoggle type="button"></button>
+          <button class="signout" data-signout>${icon('log-out', { size: 14 })}<span>Sign out</span></button>
+        </div>
       </div>
     </aside>`;
 }
 
 function tabbarHTML(activePath, role) {
   const tabs = TABS[role] || TABS.full;
-  const links = tabs.map(([href, label]) =>
-    `<a href="${href}" class="${normalizePath(href) === normalizePath(activePath) ? 'active' : ''}">${label}</a>`).join('');
-  return `<nav class="tabbar" aria-label="Primary">${links}<a href="#" data-tabmenu>Menu</a></nav>`;
+  const links = tabs.map(([href, label, ic]) =>
+    `<a href="${href}" class="${normalizePath(href) === normalizePath(activePath) ? 'active' : ''}">${icon(ic, { size: 19, cls: 'ti' })}<span>${label}</span></a>`).join('');
+  return `<nav class="tabbar" aria-label="Primary">${links}<a href="#" data-tabmenu>${icon('ellipsis', { size: 19, cls: 'ti' })}<span>More</span></a></nav>`;
 }
 
 function normalizePath(p) {
@@ -201,13 +201,13 @@ function recentHrefs() { try { return JSON.parse(localStorage.getItem('cd_recent
 function pushRecent(href) { try { const r = recentHrefs().filter(h => h !== href); r.unshift(href); localStorage.setItem('cd_recent', JSON.stringify(r.slice(0, 5))); } catch {} }
 
 function mountPalette(role) {
-  const pages = NAV.flatMap(sec => sec.items.filter(it => visibleForRole(it, role)).map(it => ({ label: it.label, href: it.href, group: sec.section })));
+  const pages = NAV.flatMap(sec => sec.items.filter(it => visibleForRole(it, role)).map(it => ({ label: it.label, href: it.href, ic: it.ic, group: sec.section })));
   const actions = QUICK_ACTIONS.filter(a => visibleForRole(a, role));
   const byHref = (h) => pages.find(p => normalizePath(p.href) === normalizePath(h));
 
   const overlay = el(`<div class="cmdk" aria-hidden="true">
     <div class="cmdk-box" role="dialog" aria-modal="true" aria-label="Command palette">
-      <div class="cmdk-inwrap"><span class="cmdk-mag">⌕</span><input class="cmdk-input" placeholder="Search pages & actions…" autocomplete="off" spellcheck="false" /></div>
+      <div class="cmdk-inwrap">${icon('search', { size: 17, cls: 'cmdk-mag' })}<input class="cmdk-input" placeholder="Search pages and actions" autocomplete="off" spellcheck="false" /></div>
       <div class="cmdk-list"></div>
       <div class="cmdk-foot"><span><kbd>↑</kbd><kbd>↓</kbd> move</span><span><kbd>↵</kbd> open</span><span><kbd>esc</kbd> close</span></div>
     </div></div>`);
@@ -217,7 +217,7 @@ function mountPalette(role) {
   let items = [], active = 0, open = false;
 
   const rowHTML = (it, i) => `<button class="cmdk-item" data-i="${i}">
-      <span class="ci-ic">${it.act ? '+' : '&rarr;'}</span>
+      <span class="ci-ic">${icon(it.signout ? 'log-out' : it.act ? 'plus' : (it.ic || 'arrow-right'), { size: 15 })}</span>
       <span class="ci-label">${it.label}</span>
       <span class="ci-hint">${it.act ? 'action' : (it.group || '')}</span></button>`;
 
@@ -324,7 +324,7 @@ export async function mountShell({ title, demo = false } = {}) {
   const setMenu = (open) => {
     railEl.classList.toggle('menu-open', open);
     toggleBtn?.setAttribute('aria-expanded', String(open));
-    if (toggleBtn) toggleBtn.innerHTML = open ? '&times;' : '&#9776;';
+    if (toggleBtn) toggleBtn.innerHTML = icon(open ? 'x' : 'menu', { size: 18 });
   };
   toggleBtn?.addEventListener('click', () => setMenu(!railEl.classList.contains('menu-open')));
   railEl.querySelectorAll('a.nav-item').forEach(a => a.addEventListener('click', () => setMenu(false)));
@@ -336,7 +336,12 @@ export async function mountShell({ title, demo = false } = {}) {
     e.preventDefault(); setMenu(!railEl.classList.contains('menu-open')); scrollTo({ top: 0 });
   });
   const themeBtn = wrap.querySelector('[data-themetoggle]');
-  const paintThemeBtn = () => { if (themeBtn) themeBtn.textContent = currentTheme() === 'dark' ? 'Light mode' : 'Dark mode'; };
+  const paintThemeBtn = () => {
+    if (!themeBtn) return;
+    const dark = currentTheme() === 'dark';
+    themeBtn.innerHTML = `${icon(dark ? 'sun' : 'moon', { size: 14 })}<span>${dark ? 'Light' : 'Dark'}</span>`;
+    themeBtn.setAttribute('aria-label', dark ? 'Switch to light mode' : 'Switch to dark mode');
+  };
   if (document.documentElement.dataset.themePinned) themeBtn?.remove();
   themeBtn?.addEventListener('click', () => {
     const next = currentTheme() === 'dark' ? 'light' : 'dark';

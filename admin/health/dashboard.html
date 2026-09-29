@@ -9,58 +9,67 @@
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="apple-mobile-web-app-title" content="Health" />
-<meta name="theme-color" content="#FF4D2E" />
+<meta name="theme-color" content="#0C0B0A" />
 <title>Health Insights · CD Admin</title>
 <link rel="stylesheet" href="/admin/_shell/admin-shell.css" />
 <style>
-  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:.8rem;margin-bottom:1.2rem;}
-  .kpi{border:1px solid #262626;border-radius:14px;padding:.9rem 1rem;}
-  .kpi .n{font-size:1.7rem;font-weight:700;font-family:'Geist Mono',monospace;}
-  .kpi .n.good{color:#7bd88f;} .kpi .n.warn{color:#ffd24d;} .kpi .n.bad{color:#ff6b4d;}
-  .kpi .l{font-size:.75rem;opacity:.65;margin-top:.2rem;}
-  table{width:100%;border-collapse:collapse;font-size:.82rem;}
-  th,td{padding:.45rem .5rem;text-align:left;border-bottom:1px solid #222;white-space:nowrap;}
-  th{opacity:.6;font-weight:600;font-size:.72rem;text-transform:uppercase;letter-spacing:.04em;}
-  .sev{display:inline-block;min-width:22px;text-align:center;border-radius:6px;padding:.05rem .3rem;}
-  .flarerow td{background:rgba(255,107,77,.08);}
-  .muted{opacity:.4;}
-  .hint{font-size:.82rem;opacity:.8;line-height:1.5;}
+  .kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:.75rem;margin-bottom:1.5rem;}
+  .kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:.95rem 1.05rem;min-width:0;}
+  @media (max-width:560px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr));gap:.5rem;}.kpi .n{font-size:1.45rem;}}
+  .kpi .n{font-family:var(--f-display);font-size:1.7rem;font-weight:700;letter-spacing:-.03em;font-variant-numeric:tabular-nums;color:var(--text);line-height:1.1;}
+  .kpi .n.good{color:var(--pos);} .kpi .n.warn{color:var(--accent-ink);} .kpi .n.bad{color:var(--neg);}
+  .kpi .l{font-size:.78rem;color:var(--text-3);margin-top:.3rem;}
+  .hx h2{font-family:var(--f-display);font-size:1.05rem;font-weight:700;letter-spacing:-.015em;margin:0 0 .7rem;color:var(--text);}
+  .hx{margin-bottom:1.2rem;}
+  table{width:100%;border-collapse:collapse;font-size:.84rem;font-variant-numeric:tabular-nums;}
+  th,td{padding:.55rem .6rem;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap;color:var(--text-2);}
+  th{color:var(--text-3);font-weight:550;font-size:.76rem;}
+  tr:last-child td{border-bottom:0;}
+  .sev{display:inline-block;min-width:24px;text-align:center;border-radius:6px;padding:.05rem .35rem;}
+  .flarerow td{background:var(--accent-tint);}
+  .muted{color:var(--text-3);}
+  .hbody{font-size:.88rem;color:var(--text-2);line-height:1.55;}
+  .sig{display:flex;gap:.65rem;align-items:flex-start;padding:.55rem 0;border-top:1px solid var(--border);}
+  .sig:first-child{border-top:0;padding-top:0;}
+  .sig .ic{color:var(--text-3);margin-top:.2rem;}
+  .foot{color:var(--text-3);font-size:.76rem;line-height:1.5;margin-top:.8rem;}
+  .wk{display:flex;justify-content:space-between;gap:.8rem;padding:.55rem 0;border-top:1px solid var(--border);}
+  .wk:first-child{border-top:0;padding-top:0;}
+  .wk span:last-child{color:var(--text-3);font-variant-numeric:tabular-nums;white-space:nowrap;}
+  .flag{display:inline-flex;align-items:center;gap:.25rem;color:var(--accent-ink);}
 </style>
 </head>
 <body>
   <main>
     <div class="page-head">
-      <div>
-        <div class="eyebrow">Crohn's tracker</div>
-        <h1>HEALTH <span class="accent">insights</span></h1>
-      </div>
+      <div><h1>Health</h1></div>
       <div class="actions">
-        <a class="btn primary" href="/admin/health/log.html">+ Daily log</a>
         <a class="btn ghost" href="/admin/health/food.html">Food</a>
+        <a class="btn primary" href="/admin/health/log.html" id="logBtn">Daily log</a>
       </div>
     </div>
 
     <div class="kpis" id="kpis"></div>
 
-    <div class="card" style="margin-bottom:1.2rem;">
-      <h2 style="font-size:1.05rem;margin:.1rem 0 .6rem;">Trigger signal <span style="font-size:.72rem;opacity:.6;">(24–48h lag — hypotheses, not proof)</span></h2>
-      <div class="hint" id="signal">Gathering data…</div>
+    <div class="card hx">
+      <h2>Trigger signal</h2>
+      <div class="hbody" id="signal">Gathering data</div>
     </div>
 
-    <div class="card" style="margin-bottom:1.2rem;">
-      <h2 style="font-size:1.05rem;margin:.1rem 0 .6rem;">Recent workouts <span style="font-size:.72rem;opacity:.6;">(auto-synced from Garmin)</span></h2>
-      <div id="workouts" class="hint"></div>
+    <div class="card hx">
+      <h2>Recent workouts</h2>
+      <div id="workouts" class="hbody"></div>
     </div>
 
-    <div class="card">
-      <h2 style="font-size:1.05rem;margin:.1rem 0 .8rem;">Last 30 days</h2>
+    <div class="card hx">
+      <h2>Last 30 days</h2>
       <div style="overflow-x:auto;">
         <table>
           <thead><tr>
-            <th>Date</th><th>Sleep</th><th>Stress<br>(Garmin)</th><th>Mood</th>
-            <th>Symptom</th><th>BMs</th><th>HBI<br>proxy</th><th>Blood</th><th>Irritants</th>
+            <th>Date</th><th>Sleep</th><th>Stress</th><th>Mood</th>
+            <th>Symptom</th><th>BMs</th><th>HBI proxy</th><th>Blood</th><th>Irritants</th>
           </tr></thead>
-          <tbody id="rows"><tr><td colspan="9" class="muted">Loading…</td></tr></tbody>
+          <tbody id="rows"><tr><td colspan="9" class="muted">Loading</td></tr></tbody>
         </table>
       </div>
     </div>

@@ -5,12 +5,14 @@
 // =====================================================================
 import { sb } from '/admin/_shell/supabase.js';
 import { mountShell } from '/admin/_shell/admin-shell.js';
+import { icon } from '/admin/_shell/icons.js';
 
-await mountShell({ title: 'Insights · Health' });
+await mountShell({ title: 'Health', demo: true });
+document.getElementById('logBtn')?.insertAdjacentHTML('afterbegin', icon('plus', { size: 14 }));
 
 const fmtSleep = (m) => (m == null ? '—' : `${Math.floor(m / 60)}h${String(m % 60).padStart(2, '0')}`);
 const sevColor = (s) => s == null ? 'transparent'
-  : s >= 7 ? 'rgba(255,77,77,.35)' : s >= 4 ? 'rgba(255,180,60,.30)' : 'rgba(120,200,80,.25)';
+  : s >= 7 ? 'var(--neg-tint)' : s >= 4 ? 'var(--accent-tint-2)' : 'var(--pos-tint)';
 const avg = (a) => { const v = a.filter(x => x != null); return v.length ? v.reduce((x, y) => x + y, 0) / v.length : null; };
 
 // ---- pull data ----
@@ -30,14 +32,14 @@ const workoutsEl = document.getElementById('workouts');
 {
   const wk = wko.data || [];
   if (!wk.length) {
-    workoutsEl.innerHTML = 'No workouts synced yet — once garmin-sync picks up an activity it shows here.';
+    workoutsEl.innerHTML = '<span class="muted">No workouts synced yet.</span>';
   } else {
     workoutsEl.innerHTML = wk.map(w => {
       const d = new Date(w.start_time || `${w.day}T12:00:00`).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
       const dur = w.duration_min ? (w.duration_min >= 60 ? `${Math.floor(w.duration_min / 60)}h${String(Math.round(w.duration_min % 60)).padStart(2, '0')}` : `${Math.round(w.duration_min)}min`) : '—';
-      return `<div style="display:flex;justify-content:space-between;gap:.6rem;padding:.35rem 0;border-bottom:1px solid #222;">
-        <span>${d} · ${(w.activity_type || 'workout').replace(/_/g, ' ')}${w.name ? ' — ' + w.name : ''}</span>
-        <span style="opacity:.7;">${dur}${w.calories ? ' · ' + w.calories + ' cal' : ''}${w.avg_hr ? ' · ' + w.avg_hr + 'bpm avg' : ''}</span>
+      return `<div class="wk">
+        <span>${d} · ${(w.activity_type || 'workout').replace(/_/g, ' ')}${w.name ? ', ' + w.name : ''}</span>
+        <span>${dur}${w.calories ? ' · ' + w.calories + ' cal' : ''}${w.avg_hr ? ' · ' + w.avg_hr + ' bpm avg' : ''}</span>
       </div>`;
     }).join('');
   }
@@ -100,25 +102,25 @@ function render() {
   }
   if (bad.length >= 2) {
     const bs = avg(bad.map(x => x.prevSleep)), cs = avg(calm.map(x => x.prevSleep));
-    if (bs != null && cs != null && bs < cs - 20) insights.push(['🛌', `Bad days follow short sleep — ${fmtSleep(Math.round(bs))} the night before vs ${fmtSleep(Math.round(cs))} before calm days. Protecting sleep looks like your #1 lever.`]);
+    if (bs != null && cs != null && bs < cs - 20) insights.push(['moon', `Bad days follow short sleep: ${fmtSleep(Math.round(bs))} the night before vs ${fmtSleep(Math.round(cs))} before calm days. Protecting sleep looks like your #1 lever.`]);
     const bi = avg(bad.map(x => x.prevIrr)), ci = avg(calm.map(x => x.prevIrr));
-    if (bi != null && ci != null && bi > ci + 0.3) insights.push(['🚩', `Irritants (alcohol / smoked THC) the day before are higher on bad days (${bi.toFixed(1)} vs ${ci.toFixed(1)}). Worth an elimination test.`]);
+    if (bi != null && ci != null && bi > ci + 0.3) insights.push(['alert-triangle', `Irritants (alcohol / smoked THC) the day before are higher on bad days (${bi.toFixed(1)} vs ${ci.toFixed(1)}). Worth an elimination test.`]);
     const bst = avg(bad.map(x => x.prevStress)), cst = avg(calm.map(x => x.prevStress));
-    if (bst != null && cst != null && bst > cst + 5) insights.push(['🧠', `Higher Garmin stress precedes flare days (${Math.round(bst)} vs ${Math.round(cst)}). Stress management is showing up in your gut.`]);
+    if (bst != null && cst != null && bst > cst + 5) insights.push(['activity', `Higher Garmin stress precedes flare days (${Math.round(bst)} vs ${Math.round(cst)}). Stress management is showing up in your gut.`]);
   }
-  if (bloodDays > 0) insights.push(['🩸', `${bloodDays} day(s) with blood in the last 30 — log these and mention frequency to Dr. Khanna; rising rectal bleeding is a flare signal.`]);
+  if (bloodDays > 0) insights.push(['droplet', `${bloodDays} day(s) with blood in the last 30. Log these and mention frequency to Dr. Khanna; rising rectal bleeding is a flare signal.`]);
   // HBI trend
   const hbiPrev7 = avg(rows.slice(7, 14).map(hbi));
   if (hbi7 != null && hbiPrev7 != null) {
     const d = hbi7 - hbiPrev7;
-    if (d >= 1.5) insights.push(['📈', `Your HBI proxy rose ${d.toFixed(1)} vs the prior week (${hbiPrev7.toFixed(1)} → ${hbi7.toFixed(1)}) — trending toward more activity. If it keeps climbing, flag it.`]);
-    else if (d <= -1.5) insights.push(['📉', `HBI proxy dropped ${Math.abs(d).toFixed(1)} vs last week — the meds/changes are trending the right way.`]);
+    if (d >= 1.5) insights.push(['trending-up', `Your HBI proxy rose ${d.toFixed(1)} vs the prior week (${hbiPrev7.toFixed(1)} to ${hbi7.toFixed(1)}), trending toward more activity. If it keeps climbing, flag it.`]);
+    else if (d <= -1.5) insights.push(['trending-down', `HBI proxy dropped ${Math.abs(d).toFixed(1)} vs last week. The meds/changes are trending the right way.`]);
   }
   // med adherence
   const missedBud = rows.slice(0, 14).filter(r => r.mood != null); // proxy: days logged
-  if (!insights.length) signal.innerHTML = 'Keep logging — actionable patterns (sleep, irritants, stress, HBI trend) unlock after ~1–2 weeks of data. The weekly task also emails a ranked trigger report.';
-  else signal.innerHTML = insights.map(([i, t]) => `<div style="display:flex;gap:.6rem;padding:.4rem 0;"><span>${i}</span><span>${t}</span></div>`).join('')
-    + `<div style="opacity:.5;font-size:.72rem;margin-top:.5rem;">HBI proxy = wellbeing + abdominal pain + liquid stools/day (mass & complications not tracked → lower bound). Trend it; bring the real HBI to your GI. "Food − active cal" is a rough directional signal (photo-logged food calories vs. Garmin exercise calories) — it excludes resting metabolic burn, so it's not a true calorie balance; use the trend, not the absolute number. Not medical advice.</div>`;
+  if (!insights.length) signal.innerHTML = '<span class="muted">No patterns yet. They show after about two weeks of logs.</span>';
+  else signal.innerHTML = insights.map(([i, t]) => `<div class="sig">${icon(i, { size: 16 })}<span>${t}</span></div>`).join('')
+    + `<div class="foot">HBI proxy is wellbeing + pain + liquid stools per day, a lower bound. Food minus active cal leaves out resting burn, so read the trend. Not medical advice.</div>`;
 
   // ---- table ----
   tbody.innerHTML = rows.slice(0, 30).map(r => {
@@ -131,18 +133,18 @@ function render() {
       <td>${r.mood ?? '<span class=muted>—</span>'}</td>
       <td><span class="sev" style="background:${sevColor(r.symptom_severity)}">${r.symptom_severity ?? '—'}</span></td>
       <td>${r.bm_count || 0}</td>
-      <td>${h == null ? '<span class=muted>—</span>' : `${h} <span style="opacity:.5;font-size:.7em">${hb}</span>`}</td>
-      <td>${r.any_blood ? '🩸' : ''}</td>
-      <td>${r.irritant_count ? '⚠ ' + r.irritant_count : ''}</td>
+      <td>${h == null ? '<span class=muted>—</span>' : `${h} <span class="muted" style="font-size:.78em">${hb}</span>`}</td>
+      <td>${r.any_blood ? `<span class="flag" title="Blood">${icon('droplet', { size: 14, label: 'Blood' })}</span>` : ''}</td>
+      <td>${r.irritant_count ? `<span class="flag">${icon('alert-triangle', { size: 13 })}${r.irritant_count}</span>` : ''}</td>
     </tr>`;
   }).join('');
 }
 
 // ---- gate: render only after all declarations above are initialized ----
-if (tl.error) { tbody.innerHTML = `<tr><td colspan="9" class="muted">Load error: ${tl.error.message}. (Schema applied?)</td></tr>`; }
+if (tl.error) { tbody.innerHTML = `<tr><td colspan="9" class="muted">Couldn't load: ${tl.error.message}</td></tr>`; }
 else if (!rows.length) {
-  kpis.innerHTML = card('—', 'Start logging');
-  signal.textContent = 'No data yet — log a few days on the Daily Log page and insights appear here automatically.';
+  kpis.innerHTML = card('—', 'No logs yet');
+  signal.innerHTML = '<span class="muted">No data yet.</span>';
   tbody.innerHTML = `<tr><td colspan="9" class="muted">No data yet.</td></tr>`;
 } else {
   render();

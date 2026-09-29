@@ -3,7 +3,7 @@
 // content_plan; this page only shows them and takes one-tap answers.
 // No file paths on screen: a row's source shows only as a hover title on "source".
 import { toast } from '/admin/_shell/admin-shell.js';
-import { esc, ago } from '/admin/_shell/ui.js';
+import { esc, ago, icon } from '/admin/_shell/ui.js';
 import { commandCenter, updateCommand, contentLadder, answerLadder, systemBroken, todayList, checkToday, setFeeling } from '/admin/_shell/live-data.js';
 import { reveal } from '/admin/_shell/motion.js';
 
@@ -33,7 +33,8 @@ async function status() {
   const n = feeds.length + tasks.length + ccStatus.length;
   if (!n) {
     el.className = 'td-status ok';
-    el.innerHTML = `<span class="td-dot"></span><span>All systems fine. ${feedsTotal} feeds fresh, ${tasksTotal} agents ran clean in the last 24h.</span>`;
+    el.innerHTML = `<span class="td-dot"></span><span>All systems fine</span>`;
+    el.title = `${feedsTotal} feeds fresh, ${tasksTotal} agents ran clean in the last 24h`;
     return;
   }
   const line = (t, s) => `<li><span class="td-dot bad"></span><b>${esc(t)}</b><span>${esc(s)}</span></li>`;
@@ -100,29 +101,105 @@ async function refreshList() {
 }
 
 // ---------- Decide ----------
+// Each card opens a side drawer with the full context (what it is, why it matters, cost,
+// recommendation), every option's detail and preview, and the source file's full path.
+// "Already done" / "Not needed" close a row without picking an option.
+const CLOSE = { 'already done': 'Already done', 'not needed': 'Not needed' };
+const VAULT = 'C:\\Users\\coope\\Desktop\\Claude\\';
+const noDash = (s) => String(s ?? '').replace(/\s*[\u2014\u2013]\s*/g, ', ');
+const pickLabel = (r) => CLOSE[r.answer] || optLabel(r.options, r.answer);
+const isRecent = (iso) => iso && Date.now() - new Date(iso).getTime() < 864e5;
 function paintDecide() {
-  const rows = CC.filter(r => r.kind === 'decide' && !r.done);
-  const waiting = rows.filter(r => !r.answer).sort((a, b) => a.priority - b.priority);
-  const sent = rows.filter(r => r.answer);
-  const card = (r) => `<article class="sv-card td-card" data-id="${r.id}">
-      <div class="td-t">${esc(r.title)}</div>
-      ${r.body ? `<p class="td-b">${esc(r.body)}</p>` : ''}
+  const open = CC.filter(r => r.kind === 'decide' && !r.done);
+  const waiting = open.filter(r => !r.answer).sort((a, b) => a.priority - b.priority);
+  const sent = [...open.filter(r => r.answer), ...CC.filter(r => r.kind === 'decide' && r.done && CLOSE[r.answer] && isRecent(r.answered_at))];
+  const card = (r) => `<article class="sv-card td-card is-click" data-id="${r.id}" tabindex="0" role="button" aria-label="More about: ${esc(r.title)}">
+      <div class="td-t">${esc(noDash(r.title))}</div>
+      ${r.body ? `<p class="td-b">${esc(noDash(r.body))}</p>` : ''}
       <div class="td-opts">${(r.options || []).map(o => `<button class="td-opt${o.rec ? ' rec' : ''}" data-v="${esc(o.v)}"${o.rec ? ' title="Claude\'s pick"' : ''}>${esc(o.label)}</button>`).join('')}</div>
-      ${src(r)}
+      <div class="td-card-foot"><button class="td-more">Details</button><button class="td-close" data-close="already done">Already done</button></div>
     </article>`;
-  const sentRow = (r) => `<li data-id="${r.id}"><span class="td-t">${esc(r.title)}</span><span class="td-pick">${esc(optLabel(r.options, r.answer))}</span><button class="td-undo" aria-label="Undo">Undo</button></li>`;
+  const sentRow = (r) => `<li data-id="${r.id}"><span class="td-t">${esc(noDash(r.title))}</span><span class="td-pick">${esc(pickLabel(r))}</span><button class="td-undo" aria-label="Undo">Undo</button></li>`;
   $('tdDecide').innerHTML = `<div class="sv-h"><h2 class="disp">Decide</h2><span class="td-count">${waiting.length ? `${waiting.length} waiting` : 'Nothing waiting'}</span></div>
     ${waiting.length ? `<div class="td-cards">${waiting.map(card).join('')}</div>` : ''}
     ${sent.length ? `<ul class="td-sent">${sent.map(sentRow).join('')}</ul>` : ''}`;
-  $('tdDecide').querySelectorAll('.td-opt').forEach(b => b.addEventListener('click', () => answer(+b.closest('[data-id]').dataset.id, b.dataset.v)));
-  $('tdDecide').querySelectorAll('.td-undo').forEach(b => b.addEventListener('click', () => answer(+b.closest('[data-id]').dataset.id, null)));
+  const root = $('tdDecide');
+  root.querySelectorAll('.td-opt').forEach(b => b.addEventListener('click', (e) => { e.stopPropagation(); answer(+b.closest('[data-id]').dataset.id, b.dataset.v); }));
+  root.querySelectorAll('.td-close').forEach(b => b.addEventListener('click', (e) => { e.stopPropagation(); closeRow(+b.closest('[data-id]').dataset.id, b.dataset.close); }));
+  root.querySelectorAll('.td-undo').forEach(b => b.addEventListener('click', () => undo(+b.closest('[data-id]').dataset.id)));
+  root.querySelectorAll('.td-card.is-click').forEach(c => {
+    c.addEventListener('click', () => openDrawer(+c.dataset.id));
+    c.addEventListener('keydown', (e) => { if ((e.key === 'Enter' || e.key === ' ') && e.target === c) { e.preventDefault(); openDrawer(+c.dataset.id); } });
+  });
 }
-async function answer(id, v) {
-  const r = CC.find(x => x.id === id), prev = { answer: r.answer, answered_at: r.answered_at };
-  r.answer = v; r.answered_at = v ? new Date().toISOString() : null;
-  paintDecide();
-  try { await updateCommand(id, { answer: r.answer, answered_at: r.answered_at }); if (v) toast(`Sent: ${optLabel(r.options, v)}`, 'ok'); }
+async function save(id, patch, msg) {
+  const r = CC.find(x => x.id === id), prev = { answer: r.answer, answered_at: r.answered_at, done: r.done };
+  Object.assign(r, patch); paintDecide();
+  try { await updateCommand(id, patch); if (msg) toast(msg, 'ok'); }
   catch (e) { Object.assign(r, prev); paintDecide(); toast(e.message || 'Save failed', 'err'); }
+}
+function answer(id, v) {
+  const r = CC.find(x => x.id === id);
+  return save(id, { answer: v, answered_at: v ? new Date().toISOString() : null }, v ? `Sent: ${optLabel(r.options, v)}` : '');
+}
+function closeRow(id, how) { closeDrawer(); return save(id, { answer: how, answered_at: new Date().toISOString(), done: true }, `Closed: ${CLOSE[how]}`); }
+function undo(id) { return save(id, { answer: null, answered_at: null, done: false }, ''); }
+
+// ---------- Decide drawer ----------
+const srcHtml = (p) => {
+  if (!p) return '';
+  if (/^https?:\/\//.test(p)) return `<a href="${esc(p)}" target="_blank" rel="noopener">${esc(p)} ${icon('external-link', { size: 12 })}</a>`;
+  if (/^content_plan#/.test(p)) return `<a href="/admin/schedule/">This week's schedule</a>`;
+  const full = VAULT + p.replace(/\//g, '\\');
+  return `<code class="dr-path">${esc(full)}</code><button class="dr-copy" data-copy="${esc(full)}">${icon('copy', { size: 13 })}<span>Copy path</span></button>`;
+};
+const previewHtml = (o) => {
+  const u = o.preview_url;
+  if (!u) return '';
+  if (/\.(png|jpe?g|webp|gif|avif)(\?|$)/i.test(u)) return `<a class="dr-prev" href="${esc(u)}" target="_blank" rel="noopener"><img src="${esc(u)}" alt="Preview of ${esc(o.label)}" loading="lazy"></a>`;
+  if (/\.(webm|mp4|mov)(\?|$)/i.test(u)) return `<video class="dr-prev" src="${esc(u)}" controls muted loop playsinline preload="metadata"></video>`;
+  return `<a class="dr-link" href="${esc(u)}" target="_blank" rel="noopener">Open preview ${icon('external-link', { size: 13 })}</a>`;
+};
+let DRAWER = null, LAST_FOCUS = null;
+function ensureDrawer() {
+  if (DRAWER) return DRAWER;
+  DRAWER = document.createElement('div');
+  DRAWER.className = 'dr-wrap'; DRAWER.hidden = true;
+  DRAWER.innerHTML = `<div class="dr-scrim" data-x></div><aside class="dr" role="dialog" aria-modal="true" aria-labelledby="drTitle" tabindex="-1"></aside>`;
+  document.body.appendChild(DRAWER);
+  DRAWER.addEventListener('click', (e) => { if (e.target.closest('[data-x]')) closeDrawer(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && DRAWER && !DRAWER.hidden) closeDrawer(); });
+  return DRAWER;
+}
+function openDrawer(id) {
+  const r = CC.find(x => x.id === id); if (!r) return;
+  const w = ensureDrawer(), el = w.querySelector('.dr');
+  LAST_FOCUS = document.activeElement;
+  const opts = r.options || [];
+  el.innerHTML = `<header class="dr-h"><div class="eyebrow">Decide</div><button class="dr-x" data-x aria-label="Close">${icon('x', { size: 18 })}</button></header>
+    <h2 id="drTitle" class="dr-t">${esc(noDash(r.title))}</h2>
+    ${r.context ? `<p class="dr-ctx">${esc(noDash(r.context))}</p>` : r.body ? `<p class="dr-ctx">${esc(noDash(r.body))}</p><p class="dr-miss">No extra context was written for this one yet.</p>` : `<p class="dr-miss">No context was written for this one yet.</p>`}
+    ${opts.length ? `<div class="eyebrow dr-sub">Options</div><ol class="dr-opts">${opts.map(o => `<li class="dr-opt${o.rec ? ' rec' : ''}${r.answer === o.v ? ' on' : ''}">
+        <div class="dr-oh"><b>${esc(o.label)}</b>${o.rec ? '<span class="dr-rec">Claude\'s pick</span>' : ''}${r.answer === o.v ? '<span class="dr-rec on">Your pick</span>' : ''}</div>
+        ${o.detail ? `<p>${esc(noDash(o.detail))}</p>` : ''}
+        ${previewHtml(o)}
+        ${o.file ? `<div class="dr-file">File: ${srcHtml(o.file)}</div>` : ''}
+        <button class="td-opt${o.rec ? ' rec' : ''}" data-v="${esc(o.v)}">Pick ${esc(o.label)}</button></li>`).join('')}</ol>` : ''}
+    ${r.source_path ? `<div class="eyebrow dr-sub">Source</div><div class="dr-src">${srcHtml(r.source_path)}</div>` : ''}
+    <footer class="dr-f"><button class="btn ghost" data-close="already done">Already done</button><button class="btn ghost" data-close="not needed">Not needed</button></footer>`;
+  el.querySelectorAll('.td-opt').forEach(b => b.addEventListener('click', () => { answer(id, b.dataset.v); closeDrawer(); }));
+  el.querySelectorAll('[data-close]').forEach(b => b.addEventListener('click', () => closeRow(id, b.dataset.close)));
+  el.querySelectorAll('.dr-copy').forEach(b => b.addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText(b.dataset.copy); toast('Path copied', 'ok'); } catch { toast('Copy failed', 'err'); }
+  }));
+  w.hidden = false; document.documentElement.classList.add('dr-open');
+  requestAnimationFrame(() => { w.classList.add('in'); el.focus(); });
+}
+function closeDrawer() {
+  if (!DRAWER || DRAWER.hidden) return;
+  DRAWER.classList.remove('in'); document.documentElement.classList.remove('dr-open');
+  setTimeout(() => { DRAWER.hidden = true; }, 180);
+  if (LAST_FOCUS && document.contains(LAST_FOCUS)) LAST_FOCUS.focus();
 }
 
 // ---------- This week's content ladder ----------

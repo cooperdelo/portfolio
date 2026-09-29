@@ -8,13 +8,12 @@
 // same layout from admin/_dev/snapshot.local.json (gitignored, never deployed).
 // On any other host ?demo is ignored and the normal auth gate applies.
 import { sb } from '/admin/_shell/supabase.js';
-import { mountShell, toast } from '/admin/_shell/admin-shell.js';
-import { esc, fmtNum, fmtCompact, fmtDay, ago, deltaChip, platMark, platName, emptyState, sparkline, statusChip, todayET, toDate, staleChip, asOf } from '/admin/_shell/ui.js';
+import { mountShell } from '/admin/_shell/admin-shell.js';
+import { esc, fmtNum, fmtCompact, fmtDay, ago, deltaChip, platMark, emptyState, sparkline, todayET, toDate, staleChip, asOf, icon } from '/admin/_shell/ui.js';
 import { accountSeries, groupAccounts, postsWithMetrics } from '/admin/_shell/data.js';
-import { dataFreshness } from '/admin/_shell/live-data.js';
-import { freshStrip } from '/admin/_shell/ui.js';
+import { homeRecommendations } from '/admin/_shell/live-data.js';
 import { mountToday } from '/admin/_js/today.js';
-import { REDUCED, reveal, countUp, drawOn, growBars, growX, pop, spotlight, onVisible, liveAgo } from '/admin/_shell/motion.js';
+import { reveal, countUp, drawOn, growBars, growX, pop, spotlight, onVisible, liveAgo } from '/admin/_shell/motion.js';
 
 const ctx = await mountShell({ title: 'Home', demo: true });
 const $ = (id) => document.getElementById(id);
@@ -33,7 +32,7 @@ function paintClock() {
   $('greet').textContent = `${part}, Cooper`;
 }
 paintClock(); setInterval(paintClock, 30000);
-reveal(document.querySelectorAll('#mast h1, #mast .quick'), { stagger: 90, y: 22 });
+reveal(document.querySelectorAll('#mast h1'), { y: 8 });
 spotlight(document);
 
 if (DEMO) {
@@ -69,84 +68,47 @@ async function loadRuns() {
   if (error) throw error;
   return data || [];
 }
-async function loadOpen() {
-  if (DEMO) return { counts: SNAP?.open || { decisions: 0, opportunities: 0 }, dec: null, opp: null };
-  const [{ data: dec, error: e1 }, { data: opp, error: e2 }] = await Promise.all([
-    sb.from('decisions').select('id,title,recommendation,created_at').eq('status', 'open').order('created_at', { ascending: false }),
-    sb.from('opportunities').select('id,title,fit,time_hours,proof,estimate').eq('status', 'open').order('rank'),
-  ]);
-  if (e1) throw e1; if (e2) throw e2;
-  return { counts: { decisions: dec?.length || 0, opportunities: opp?.length || 0 }, dec: dec || [], opp: opp || [] };
-}
-
 if (ctx?.role === 'full') {
   const pAcc = loadAccounts();
-  const pOpen = loadOpen();
   const pRuns = loadRuns();
   mountToday().catch(e => fail('tdDo', 'today', e));
-  hero(pAcc, pOpen).catch(e => fail('heroGrid', 'today numbers', e));
+  improve().catch(e => fail('improve', 'recommendations', e));
   heroChart(loadLinkedInPosts()).catch(e => fail('heroChart', 'LinkedIn posts', e));
   system(pRuns).catch(e => fail('system', 'task runs', e));
   audience(pAcc).catch(e => fail('pulse', 'followers', e));
-  // TODAY (command_center) replaced the must-dos + "waiting on you" cards and the feed strip.
+  // 2026-09-28 design audit: the hero follower cells (duplicated Audience), the "Booking link"
+  // placeholder, the "Waiting on you" count (duplicated Decide) and the runs pill (duplicated
+  // System pulse) were removed. Each number now has one home on this page.
   if (DEMO) { $('health').innerHTML = privateCard('Body'); }
   else { health().catch(e => fail('health', 'health', e)); }
   vaultCard(pRuns).catch(e => fail('vaultCard', 'vault sync', e));
   document.querySelectorAll('main > .sv-section').forEach(s => onVisible(s, () => reveal(s.querySelectorAll(':scope > .sv-h, :scope > .sv-card, :scope > .sv-grid > *, :scope > .sv-card'), { stagger: 80 })));
 }
 
-// ---------- Feed status strip (v_admin_data_freshness_status) ----------
-async function freshness() {
-  const el = $('fresh');
-  el.innerHTML = freshStrip(await dataFreshness(), { link: '/admin/vault/' });
-  reveal(el.querySelectorAll('.fs-line'), { stagger: 50, y: 6 });
-}
-
-// ---------- HERO: four big numbers ----------
-async function hero(pAcc, pOpen) {
-  const [list, open] = await Promise.all([pAcc, pOpen.catch(() => null)]);
-  const find = (p) => list.find(s => s.personal && s.platform === p);
-  const li = find('linkedin'), ig = find('instagram');
-  const acctCell = (s, platform) => {
-    if (!s) return `<div class="hero-cell off"><div class="hc-top"><span class="hc-label">${esc(platName(platform))}</span></div>
-      <div class="hc-num dim">—</div><div class="hc-sub">No follower data yet</div></div>`;
-    const L = s.latest;
-    return `<a class="hero-cell" href="/admin/insights/">
-      <div class="hc-top"><span class="hc-label">${esc(platName(platform))}</span><span class="hc-handle mono">@${esc(s.handle)}</span></div>
-      <div class="hc-num" data-count="${Number(L.followers)}">0</div>
-      <div class="hc-sub">${platform === 'youtube' ? 'subscribers' : 'followers'} ${deltaChip(L.followers, s.prev?.followers)}</div>
-      ${sparkline(s.rows.slice(0, 30).reverse().map(r => r.followers), { w: 220, h: 30 })}
-      <div class="hc-meta">${asOfCap(L.captured_at || L.date)}${s.prev ? ` · vs ${esc(fmtDay(s.prev.date))}` : ''}</div>
-    </a>`;
-  };
-  const booking = `<div class="hero-cell off">
-      <div class="hc-top"><span class="hc-label">Booking link</span></div>
-      <div class="hc-num dim">—</div>
-      <div class="hc-sub">Not tracked yet</div>
-    </div>`;
-  let waiting;
-  if (!open) waiting = `<div class="hero-cell off"><div class="hc-top"><span class="hc-label">Waiting on you</span></div><div class="hc-num dim">—</div><div class="hc-sub">Couldn't read decisions</div></div>`;
-  else {
-    const { decisions: d, opportunities: o } = open.counts, n = d + o;
-    waiting = `<a class="hero-cell hot" href="/admin/decisions/">
-      <div class="hc-top"><span class="hc-label">Waiting on you</span></div>
-      <div class="hc-num" data-count="${n}">0</div>
-      <div class="hc-sub">open items</div>
-      <div class="split-bar" aria-hidden="true">${n ? `<i class="d" data-growx style="flex:${d || 0}"></i><i class="o" data-growx style="flex:${o || 0}"></i>` : '<i class="z"></i>'}</div>
-      <div class="hc-meta"><span class="k d"></span>${d} decision${d === 1 ? '' : 's'} · <span class="k o"></span>${o} opportunit${o === 1 ? 'y' : 'ies'}</div>
-    </a>`;
-  }
-  const grid = $('heroGrid');
-  grid.innerHTML = acctCell(li, 'linkedin') + acctCell(ig, 'instagram') + booking + waiting;
-  const cells = grid.querySelectorAll('.hero-cell');
-  reveal(cells, { stagger: 60, delay: 100 });
-  cells.forEach((c, i) => {
-    const num = c.querySelector('[data-count]');
-    if (num) countUp(num, Number(num.dataset.count), { delay: 200 + i * 60 });
-    pop(c.querySelectorAll('.chip'), { delay: 900 + i * 60 });
-    drawOn(c, { delay: 400 + i * 60, dur: 1000 });
-    growX(c, { delay: 500 + i * 60 });
-  });
+// ---------- What to improve (v_home_recommendations) ----------
+// Rules live in SQL so every number is computed from the same rows the rest of the admin
+// reads. Tap a row to see the detail; the action goes to the page where you fix it.
+async function improve() {
+  const AREA = { posting: 'Posting', content: 'Content', people: 'People', acquisition: 'Artists' };
+  const SEVL = ['On goal', 'Worth a look', 'Behind', 'Far behind'];
+  const rows = await homeRecommendations();
+  const el = $('improve');
+  const clean = (s) => esc(String(s ?? '').replace(/\s*[—–]\s*/g, ', '));
+  const item = (r, i) => `<li class="imp-i sev${Number(r.severity) || 0}">
+      <details${i === 0 ? ' open' : ''}>
+        <summary>
+          <span class="imp-area">${esc(AREA[r.area] || r.area)}</span>
+          <span class="imp-txt"><span class="imp-h">${clean(r.headline)}</span><span class="imp-ev">${clean(r.evidence)}</span></span>
+          <span class="imp-sev" title="${esc(SEVL[r.severity] || '')}"><i></i>${esc(SEVL[r.severity] || '')}</span>
+        </summary>
+        <div class="imp-body">
+          ${r.detail ? `<p>${clean(r.detail)}</p>` : ''}
+          <a class="imp-act" href="${esc(r.link || '/admin/')}">${clean(r.action)} ${icon('arrow-right', { size: 14 })}</a>
+        </div>
+      </details></li>`;
+  el.innerHTML = `<div class="sv-h"><h2 class="disp">What to improve</h2></div>
+    ${rows.length ? `<ol class="imp-list">${rows.map(item).join('')}</ol>` : emptyState('Nothing to flag right now.', '')}`;
+  reveal(el.querySelectorAll('.imp-i'), { stagger: 50, y: 8 });
 }
 
 // ---------- HERO: LinkedIn impressions per post, last 12 months ----------
@@ -169,7 +131,7 @@ async function heroChart(pPosts) {
   for (let m = 0; m < 12; m++) {
     const d = new Date(end - 365 * 864e5); d.setDate(1); d.setMonth(d.getMonth() + m + 1);
     if (d.getTime() > end) break;
-    months += `<span style="left:${X(d).toFixed(2)}%">${d.toLocaleDateString('en-US', { month: 'short' })}</span>`;
+    months += `<span class="${m % 2 ? 'odd' : ''}" style="left:${X(d).toFixed(2)}%">${d.toLocaleDateString('en-US', { month: 'short' })}</span>`;
   }
   const px = X(peak.date);
   host.innerHTML = `
@@ -199,7 +161,8 @@ async function heroChart(pPosts) {
   onVisible(host, () => {
     growBars(svg, { delay: 300, stagger: 8 });
     countUp($('liTotal'), total, { delay: 300, dur: 1200 });
-    reveal(host.querySelectorAll('.hch-peak'), { delay: 900, y: 4 });
+    // animate the label, not .hch-peak itself: its CSS transform keeps it inside the card
+    reveal(host.querySelectorAll('.hch-peak span'), { delay: 900, y: 4 });
   });
 }
 
@@ -214,12 +177,6 @@ async function system(pRuns) {
   const last = runs[0];
   const tasks24 = new Set(day.map(r => r.task)).size;
 
-  // hero pill
-  const pill = $('pulsePill');
-  pill.classList.toggle('bad', c.failed > 0);
-  pill.innerHTML = last
-    ? `<i></i><span>${tasks24} agents ran today</span><span class="sep">·</span><span>${c.failed ? `${c.failed} failed` : 'none failed'}</span><span class="sep">·</span><span>last run <b data-ago="${esc(last.ran_at)}">${esc(ago(last.ran_at))}</b></span>`
-    : `<i></i><span>No runs in 14 days</span>`;
 
   if (!runs.length) { $('system').innerHTML = emptyState('No runs in the last 14 days.', ''); return; }
 
@@ -253,7 +210,7 @@ async function system(pRuns) {
       <div class="sys-l">
         <div class="eyebrow">Runs in the last 24 hours</div>
         <div class="hc-num sys-num" id="runs24" data-count="${day.length}">0</div>
-        <div class="sys-sub">${tasks24} agents today · ${byTask.size} in the last 14 days</div>
+        <div class="sys-sub">${tasks24} agents today · ${byTask.size} in 14 days${last ? ` · last run <span data-ago="${esc(last.ran_at)}">${esc(ago(last.ran_at))}</span>` : ''}</div>
         <div class="stack" aria-label="Run outcomes, last 24 hours">${day.length ? seg('ok') + seg('partial') + seg('quiet') + seg('failed') : '<i class="z"></i>'}</div>
         <div class="legend">
           <span><i class="c ok"></i>${c.ok} ok</span><span><i class="c partial"></i>${c.partial} partial</span>
@@ -299,80 +256,6 @@ async function audience(pAcc) {
   if (pv.length) { $('pvSec').hidden = false; $('pvGrid').innerHTML = pv.map(s => card(s, true)).join(''); animate($('pvGrid')); }
 }
 
-// ---------- Waiting on you ----------
-async function decide(pOpen) {
-  const open = await pOpen;
-  const { decisions: d, opportunities: o } = open.counts, n = d + o;
-  const list = open.dec == null
-    ? emptyState('Titles show when you sign in.', '')
-    : `<div class="rows">
-      ${open.dec.slice(0, 3).map(x => `<a class="row" href="/admin/decisions/"><div class="grow"><div class="t">${esc(x.title)}</div><div class="s">Decision${x.recommendation ? ' · ' + esc(x.recommendation) : ''}</div></div></a>`).join('')}
-      ${open.opp.slice(0, 3).map(x => `<a class="row" href="/admin/earn/"><div class="grow"><div class="t">${esc(x.title)}</div><div class="s">Opportunity${x.estimate ? ' · ' + esc(x.estimate) : ''}</div></div>${x.fit != null ? `<span class="sv-muted" style="font-size:.8rem">Fit ${esc(x.fit)}</span>` : ''}</a>`).join('')}
-    </div>${n ? '' : emptyState('Nothing waiting.', '')}`;
-  $('decide').innerHTML = `<div class="sv-h" style="margin-bottom:.2rem"><h2 class="disp">Waiting on you</h2><a href="/admin/decisions/">All decisions</a></div>
-    <div class="dec-num"><span class="hc-num md" data-count="${n}">0</span><span class="mono">${d} decision${d === 1 ? '' : 's'}, ${o} opportunit${o === 1 ? 'y' : 'ies'}</span></div>
-    ${list}`;
-  onVisible($('decide'), () => countUp($('decide').querySelector('[data-count]'), n, { dur: 900 }));
-}
-
-// ---------- Must-dos + streaks (signed in only) ----------
-async function mustDos() {
-  const today = todayET();
-  const [{ data: docs, error }, { data: dd, error: e2 }] = await Promise.all([
-    sb.from('vault_documents').select('path,content,updated_at').like('path', 'Daily/driver/%').order('path', { ascending: false }).limit(1),
-    sb.from('daily_driver').select('*').order('date', { ascending: false }).limit(120),
-  ]);
-  if (error) throw error; if (e2) throw e2;
-  const doc = docs?.[0];
-  let body = '';
-  // Staleness rule (2026-09-28): an earlier day's driver is never shown as today's list.
-  const docDay = doc?.path.match(/\d{4}-\d{2}-\d{2}/)?.[0];
-  if (!doc) {
-    body = emptyState('No must-dos yet today.', '');
-  } else if (docDay && docDay !== today) {
-    body = `${emptyState("Today's driver hasn't been written yet.", '')}<div class="sv-meta">Last one was ${esc(fmtDay(docDay, { weekday: 'short', month: 'short', day: 'numeric' }))}, hidden because it's not today's.</div>`;
-  } else {
-    const lines = doc.content.split('\n').map(s => s.trim()).filter(Boolean).filter(s => !s.startsWith('#'));
-    const todos = lines.filter(s => /^\d+\.\s/.test(s)).map(s => s.replace(/^\d+\.\s*/, ''));
-    const other = lines.filter(s => !/^\d+\.\s/.test(s));
-    const isToday = doc.path.includes(today);
-    body = `${todos.map((t, i) => `<div class="todo"><span class="n">${i + 1}</span><div class="x">${esc(t)}</div></div>`).join('') || emptyState('No must-dos listed in today\'s file.', '')}
-      ${other.length ? `<div class="sv-meta" style="display:block;line-height:1.55">${other.map(esc).join('<br>')}</div>` : ''}
-      <div class="sv-meta">Updated ${esc(ago(doc.updated_at))}${isToday ? '' : ' · <span style="color:var(--amber)">from an earlier day</span>'}</div>`;
-  }
-  $('mustdos').innerHTML = `<div class="sv-h" style="margin-bottom:.4rem"><h2 class="disp">Today's must-dos</h2><a href="/admin/rituals/#daily-driver">Daily driver</a></div>${body}
-    <div class="streaks" id="streaks"></div>`;
-  renderStreaks(dd || [], today);
-  reveal($('mustdos').querySelectorAll('.todo'), { stagger: 60, delay: 100, y: 10 });
-}
-function streakFor(rows, key) {
-  let n = 0, last = null;
-  for (const r of rows) {
-    if (last) { const gap = (toDate(last) - toDate(r.date)) / 864e5; if (gap > 1.5) break; }
-    last = r.date;
-    if (r[key] === true) n++; else if (r[key] === false) break;
-  }
-  return n;
-}
-function renderStreaks(rows, today) {
-  const todayRow = rows.find(r => r.date === today) || {};
-  const defs = [['gym', 'Gym'], ['content', 'Content'], ['sleep_ok', 'Sleep']];
-  $('streaks').innerHTML = defs.map(([k, label]) => {
-    const n = streakFor(rows, k);
-    const on = todayRow[k] === true;
-    return `<div class="streak"><div><div class="k">${label}</div><div class="v">${n} day streak${rows.length ? ` · last logged ${esc(fmtDay(rows[0].date))}` : ''}</div></div>
-      <button data-k="${k}" class="${on ? 'on' : ''}" aria-pressed="${on}">${on ? 'Done today' : 'Mark done'}</button></div>`;
-  }).join('') + (rows.length ? '' : `<div class="sv-meta">Nothing logged yet.</div>`);
-  $('streaks').querySelectorAll('button[data-k]').forEach(b => b.addEventListener('click', async () => {
-    const k = b.dataset.k, val = !(todayRow[k] === true);
-    const { error } = await sb.from('daily_driver').upsert({ date: today, [k]: val }, { onConflict: 'date' });
-    if (error) return toast(error.message, 'err');
-    const idx = rows.findIndex(r => r.date === today);
-    if (idx >= 0) rows[idx] = { ...rows[idx], [k]: val }; else rows.unshift({ date: today, [k]: val });
-    toast(val ? 'Logged for today' : 'Cleared', 'ok'); renderStreaks(rows, today);
-  }));
-}
-
 // ---------- Body (signed in only) ----------
 async function health() {
   const { data, error } = await sb.from('health_daily').select('day,sleep_minutes,sleep_score,steps,resting_hr,hrv_ms,body_battery_high,garmin_synced_at').order('day', { ascending: false }).limit(14);
@@ -408,4 +291,3 @@ async function vaultCard(pRuns) {
   onVisible($('vaultCard'), () => countUp($('vaultCard').querySelector('[data-count]'), total, { dur: 900 }));
 }
 
-void statusChip; void REDUCED; void freshness; void mustDos; void decide;

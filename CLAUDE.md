@@ -272,6 +272,14 @@ Every serverless function uses these — kept in one canonical table here so nam
 | `POSTHOG_HOST` (optional) | plugverse-kpi | Override if EU/self-hosted. Defaults `https://us.posthog.com` |
 | `POSTHOG_PROJECT` (optional) | plugverse-kpi | Override if project ID changes. Defaults `331986` |
 
+### Private social analytics (after Stanley, 2026-09-28)
+
+- **Instagram API** (per-post reach, views, saves, shares, avg watch time): connect via `/api/instagram-auth-start` -> Meta -> `/api/instagram-oauth` (stores long-lived token in `instagram_credentials`, one row per account). From then on Postgres owns it: pg_cron `ig-token-refresh` -> `public.ig_token_refresh()` (refreshes any token 6+ days old, forever), pg_cron `social-api-pull` -> `public.instagram_api_pull()` writes `social_post_snapshots` source `instagram-api`. `social_api_catchup()` (every 10 min) runs the first pull right after a new connection.
+- **YouTube Analytics** (views, watch minutes, avg view duration per video): Supabase edge function `youtube-oauth` (verify_jwt off, checks is_full_admin itself). Google client id/secret live in `automation_secrets` (`google_oauth_client_id/_secret`), set from the Integrations page via `set_google_oauth_client(json)`. Refresh token in `youtube_credentials` (service role only). Pull: `public.youtube_analytics_pull()` in the same cron, source `youtube-analytics`, watch minutes in `social_post_snapshots.watch_minutes`.
+- Token columns are not selectable by `authenticated`; the page reads `integration_sources_status()` only. Trigger `snapshot_keep_private_metrics` stops a later public pull from nulling private metrics on the same day.
+- All pull functions log to `task_run_log` and write `social_pipeline_health` rows with handle `<handle> (api)`; with no token they log `quiet` and do nothing.
+- `/api/cron-social-sync` no longer calls `/api/instagram-sync` (it created duplicate social_posts rows).
+
 NOTE on the two Supabase service-role keys: there are TWO separate Supabase projects in this repo's orbit. `SUPABASE_SERVICE_ROLE_KEY` (no prefix) = the **PlugVerse** project. `SUPABASE_ADMIN_SERVICE_ROLE_KEY` (explicit) = the **admin** project. Don't mix them — they're different secrets that grant access to different databases.
 
 If any required var is missing, the affected source returns an error message in the response payload — the page renders the other KPIs and shows the error banner.

@@ -8,7 +8,7 @@
 // from this page; content_queue was empty and should be fed from CONTENT-STATUS.md.
 import { mountShell } from '/admin/_shell/admin-shell.js';
 import { requireFullAdminOrRedirect } from '/admin/_shell/supabase.js';
-import { esc, fmtDay, fmtNum, fmtCompact, emptyState, pageHead, ymd, toDate, todayET, platName } from '/admin/_shell/ui.js';
+import { esc, fmtDay, fmtNum, fmtCompact, emptyState, pageHead, ymd, toDate, todayET, platName, pmIcon } from '/admin/_shell/ui.js';
 import { socialPostsLatest, FEED_ACCOUNTS, isPlugverseHandle, isDemo } from '/admin/_shell/live-data.js';
 import { reveal, onVisible, pop, spotlight } from '/admin/_shell/motion.js';
 
@@ -16,7 +16,6 @@ if (!isDemo() && !(await requireFullAdminOrRedirect())) throw new Error('not ful
 await mountShell({ title: 'Content', demo: true });
 const app = document.getElementById('app');
 const PLATS = ['linkedin', 'instagram', 'tiktok', 'youtube'];
-const MARK = { linkedin: 'in', instagram: 'IG', tiktok: 'TT', youtube: 'YT' };
 const PAGE = 24;
 
 app.innerHTML = pageHead('Grow', 'Content') + `
@@ -27,7 +26,7 @@ app.innerHTML = pageHead('Grow', 'Content') + `
   </section>
   <section class="sv-section">
     <div class="sv-card pad-lg">
-      <div class="sv-h"><h2 id="mlabel"></h2><div class="seg"><button id="prev">Prev</button><button id="now">Today</button><button id="next">Next</button></div></div>
+      <div class="sv-h"><h2 id="mlabel"></h2><div class="seg"><button id="prev" aria-label="Previous month">Prev</button><button id="now">Today</button><button id="next" aria-label="Next month">Next</button></div></div>
       <div id="cal"></div>
     </div>
   </section>`;
@@ -72,8 +71,8 @@ function card(p) {
   const cap = firstLine(p.caption);
   const val = p.reach;
   const th = p.thumb_url
-    ? `<img alt="" loading="lazy" decoding="async" src="${esc(p.thumb_url)}"><span class="tag"><span class="pm ${esc(p.platform)}">${MARK[p.platform]}</span></span>`
-    : `<div class="none"><span class="pm ${esc(p.platform)}">${MARK[p.platform]}</span></div>`;
+    ? `<img alt="" loading="lazy" decoding="async" src="${esc(p.thumb_url)}"><span class="tag"><span class="pm ${esc(p.platform)}" title="${esc(platName(p.platform))}">${pmIcon(p.platform, 14)}</span></span>`
+    : `<div class="none"><span class="pm ${esc(p.platform)}" title="${esc(platName(p.platform))}">${pmIcon(p.platform, 20)}</span></div>`;
   return `<a class="pcard${pv ? ' pv' : ''}" href="${esc(p.permalink)}" target="_blank" rel="noopener" title="${esc(cap)}">
     <div class="th">${th}</div>
     <div class="bd">
@@ -113,7 +112,7 @@ function drawCal() {
     const k = ymd(d), items = byDay[k] || [], inMonth = d.getMonth() === cursor.getMonth();
     html += `<div style="min-height:74px;border-radius:10px;padding:.35rem;background:${k === today ? 'var(--accent-tint)' : 'var(--surface-2)'};border:1px solid var(--border);opacity:${inMonth ? 1 : .45};min-width:0">
       <div style="font-size:.72rem;font-weight:600;color:${k === today ? 'var(--accent-ink)' : 'var(--text-3)'}">${d.getDate()}</div>
-      ${items.slice(0, 3).map(p => `<a href="${esc(p.permalink)}" target="_blank" rel="noopener" title="${esc(firstLine(p.caption))}${p.reach != null ? ' · ' + fmtNum(p.reach) + ' ' + p.reachLabel : ''}" style="display:block;font-size:.68rem;margin-top:3px;padding:2px 5px;border-radius:6px;background:var(--text);color:var(--canvas);overflow:hidden;white-space:nowrap;text-overflow:ellipsis">${esc(MARK[p.platform] || p.platform)} ${esc(firstLine(p.caption).slice(0, 24))}</a>`).join('')}
+      ${items.slice(0, 3).map(p => `<a href="${esc(p.permalink)}" target="_blank" rel="noopener" title="${esc(firstLine(p.caption))}${p.reach != null ? ' · ' + fmtNum(p.reach) + ' ' + p.reachLabel : ''}" style="display:block;font-size:.68rem;margin-top:3px;padding:2px 5px;border-radius:6px;background:var(--text);color:var(--canvas);overflow:hidden;white-space:nowrap;text-overflow:ellipsis"><span class="cal-pm">${pmIcon(p.platform, 10)}</span> ${esc(firstLine(p.caption).slice(0, 24))}</a>`).join('')}
       ${items.length > 3 ? `<div class="sv-muted" style="font-size:.66rem">+${items.length - 3} more</div>` : ''}
     </div>`;
   }
