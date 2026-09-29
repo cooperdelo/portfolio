@@ -263,14 +263,45 @@ async function health() {
   const r = (data || []).find(x => x.sleep_minutes != null || x.steps != null || x.resting_hr != null) || data?.[0];
   if (!r) { $('health').innerHTML = `<div class="sv-h"><h2 class="disp">Body</h2></div>` + emptyState('No Garmin data yet.', ''); return; }
   const cell = (k, v) => `<div><div class="k">${k}</div><div class="v">${v}</div></div>`;
+  const [wq, fq] = await Promise.all([
+    sb.from('health_daily').select('day,weight_lb').not('weight_lb', 'is', null).order('day', { ascending: false }).limit(30),
+    sb.from('health_food_log').select('calories').eq('day', todayET())
+  ]);
+  const wts = wq.data || [];
+  const w0 = wts[0], w1 = wts[1];
+  const kcal = (fq.data || []).reduce((a, x) => a + (x.calories || 0), 0);
+  const wDelta = w0 && w1 ? w0.weight_lb - w1.weight_lb : null;
+  const weightBlock = `<div class="health-grid" style="margin-top:.6rem">
+      ${cell('Weight', w0 ? Number(w0.weight_lb).toFixed(1) + ' lb' : '—')}
+      ${cell('Since last', wDelta == null ? '—' : (wDelta > 0 ? '+' : '') + wDelta.toFixed(1) + ' lb')}
+      ${cell('Food today', kcal ? fmtNum(kcal) + ' kcal' : '—')}
+    </div>
+    <form id="weighForm" style="display:flex;gap:.5rem;margin:.6rem 0 .2rem">
+      <input id="weighIn" type="number" step="0.1" min="50" max="400" inputmode="decimal" placeholder="Weigh-in (lb)" required style="flex:1;min-width:0;padding:.5rem .7rem;border-radius:10px;border:1px solid var(--line,#3334);background:transparent;color:inherit;font:inherit">
+      <button type="submit" style="padding:.5rem .9rem;border-radius:10px;border:1px solid var(--line,#3334);background:transparent;color:inherit;font:inherit;font-weight:600;cursor:pointer">Log</button>
+    </form>
+    <div class="sv-meta">${w0 ? 'Last weigh-in ' + esc(fmtDay(w0.day, { weekday: 'short', month: 'short', day: 'numeric' })) : 'No weigh-ins yet'}</div>`;
   const sleep = r.sleep_minutes != null ? `${Math.floor(r.sleep_minutes / 60)}h ${r.sleep_minutes % 60}m` : '—';
   $('health').innerHTML = `<div class="sv-h" style="margin-bottom:.2rem"><h2 class="disp">Body</h2><a href="/admin/health/dashboard.html">Health insights</a></div>
     <div class="health-grid">
       ${cell('Sleep', sleep)}${cell('Sleep score', r.sleep_score ?? '—')}${cell('Steps', fmtNum(r.steps))}
       ${cell('Resting HR', r.resting_hr ?? '—')}${cell('HRV', r.hrv_ms != null ? r.hrv_ms + ' ms' : '—')}${cell('Body battery', r.body_battery_high ?? '—')}
     </div>
+    ${weightBlock}
     <div class="sv-meta">Garmin · day ${esc(fmtDay(r.day, { weekday: 'short', month: 'short', day: 'numeric' }))} · synced ${esc(ago(r.garmin_synced_at || r.day))} ${staleChip(r.garmin_synced_at || r.day)}</div>`;
 }
+
+// One-tap weigh-in: upserts only weight columns so Garmin/self-report columns on that day are untouched.
+document.addEventListener('submit', async (e) => {
+  if (e.target.id !== 'weighForm') return;
+  e.preventDefault();
+  const v = parseFloat(document.getElementById('weighIn').value);
+  if (!(v >= 50 && v <= 400)) { toast('Enter weight in lb', 'err'); return; }
+  const { error } = await sb.from('health_daily').upsert({ day: todayET(), weight_lb: v, weight_source: 'manual' }, { onConflict: 'day' });
+  if (error) { toast('Save failed: ' + error.message, 'err'); return; }
+  toast('Weigh-in logged', 'ok');
+  health().catch(() => {});
+});
 
 // ---------- Vault sync (freshness of the vault mirror in Supabase) ----------
 async function vaultCard(pRuns) {
