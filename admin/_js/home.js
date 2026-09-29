@@ -380,24 +380,38 @@ async function health() {
   const r = (data || []).find(x => x.sleep_minutes != null || x.steps != null || x.resting_hr != null) || data?.[0];
   if (!r) { $('health').innerHTML = `<div class="sv-h"><h2 class="disp">Body</h2></div>` + emptyState('No Garmin data yet.', ''); return; }
   const cell = (k, v) => `<div><div class="k">${k}</div><div class="v">${v}</div></div>`;
-  const [wq, fq] = await Promise.all([
+  const [wq, fq, gq, pq] = await Promise.all([
     sb.from('health_daily').select('day,weight_lb').not('weight_lb', 'is', null).order('day', { ascending: false }).limit(30),
-    sb.from('health_food_log').select('calories').eq('day', todayET())
+    sb.from('health_food_log').select('calories').eq('day', todayET()),
+    sb.from('health_goals').select('target_weight_lb').eq('id', 1).maybeSingle(),
+    sb.from('health_progress_photo').select('taken_on,photo_path').order('taken_on', { ascending: false }).order('id', { ascending: false }).limit(4)
   ]);
   const wts = wq.data || [];
   const w0 = wts[0], w1 = wts[1];
   const kcal = (fq.data || []).reduce((a, x) => a + (x.calories || 0), 0);
   const wDelta = w0 && w1 ? w0.weight_lb - w1.weight_lb : null;
+  const target = gq.data?.target_weight_lb != null ? Number(gq.data.target_weight_lb) : null;
+  const toGoal = w0 && target != null ? Number(w0.weight_lb) - target : null;
+  const photos = pq.data || [];
+  const thumbs = (await Promise.all(photos.map(async p => {
+    const { data: s } = await sb.storage.from('health-progress-photos').createSignedUrl(p.photo_path, 3600);
+    return s?.signedUrl ? `<figure style="margin:0;flex:1;min-width:0"><img src="${esc(s.signedUrl)}" alt="" style="width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:10px"><figcaption class="sv-meta" style="margin-top:.2rem">${esc(fmtDay(p.taken_on, { month: 'short', day: 'numeric' }))}</figcaption></figure>` : '';
+  }))).join('');
   const weightBlock = `<div class="health-grid" style="margin-top:.6rem">
       ${cell('Weight', w0 ? Number(w0.weight_lb).toFixed(1) + ' lb' : '—')}
-      ${cell('Since last', wDelta == null ? '—' : (wDelta > 0 ? '+' : '') + wDelta.toFixed(1) + ' lb')}
+      ${cell(target != null ? 'To ' + target + ' lb' : 'Goal', toGoal == null ? '—' : (toGoal > 0 ? toGoal.toFixed(1) + ' lb to go' : 'Reached'))}
       ${cell('Food today', kcal ? fmtNum(kcal) + ' kcal' : '—')}
     </div>
+    <form id="photoForm" style="display:flex;gap:.5rem;align-items:center;margin:.6rem 0 .2rem">
+      <input id="photoIn" type="file" accept="image/*" capture="user" required style="flex:1;min-width:0;font:inherit;font-size:.8rem">
+      <button type="submit" style="padding:.5rem .9rem;border-radius:10px;border:1px solid var(--line,#3334);background:transparent;color:inherit;font:inherit;font-weight:600;cursor:pointer">Add weekly photo</button>
+    </form>
+    ${thumbs ? `<div style="display:flex;gap:.5rem;margin:.4rem 0">${thumbs}</div>` : ''}
     <form id="weighForm" style="display:flex;gap:.5rem;margin:.6rem 0 .2rem">
       <input id="weighIn" type="number" step="0.1" min="50" max="400" inputmode="decimal" placeholder="Weigh-in (lb)" required style="flex:1;min-width:0;padding:.5rem .7rem;border-radius:10px;border:1px solid var(--line,#3334);background:transparent;color:inherit;font:inherit">
       <button type="submit" style="padding:.5rem .9rem;border-radius:10px;border:1px solid var(--line,#3334);background:transparent;color:inherit;font:inherit;font-weight:600;cursor:pointer">Log</button>
     </form>
-    <div class="sv-meta">${w0 ? 'Last weigh-in ' + esc(fmtDay(w0.day, { weekday: 'short', month: 'short', day: 'numeric' })) : 'No weigh-ins yet'}</div>`;
+    <div class="sv-meta">${w0 ? 'Last weigh-in ' + esc(fmtDay(w0.day, { weekday: 'short', month: 'short', day: 'numeric' })) + (wDelta != null ? ' · ' + (wDelta > 0 ? '+' : '') + wDelta.toFixed(1) + ' lb vs previous' : '') : 'No weigh-ins yet'}${photos[0] ? ' · last photo ' + esc(fmtDay(photos[0].taken_on, { month: 'short', day: 'numeric' })) : ' · no photos yet'}</div>`;
   const sleep = r.sleep_minutes != null ? `${Math.floor(r.sleep_minutes / 60)}h ${r.sleep_minutes % 60}m` : '—';
   $('health').innerHTML = `<div class="sv-h" style="margin-bottom:.2rem"><h2 class="disp">Body</h2><a href="/admin/health/dashboard.html">Health insights</a></div>
     <div class="health-grid">
@@ -410,6 +424,21 @@ async function health() {
 
 // One-tap weigh-in: upserts only weight columns so Garmin/self-report columns on that day are untouched.
 document.addEventListener('submit', async (e) => {
+  if (e.target.id === 'photoForm') {
+    e.preventDefault();
+    const f = document.getElementById('photoIn').files[0];
+    if (!f) { toast('Pick a photo first', 'err'); return; }
+    const day = todayET();
+    const ext = (f.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '') || 'jpg';
+    const path = `${day}/${Date.now()}.${ext}`;
+    const up = await sb.storage.from('health-progress-photos').upload(path, f, { contentType: f.type || 'image/jpeg' });
+    if (up.error) { toast('Upload failed: ' + up.error.message, 'err'); return; }
+    const ins = await sb.from('health_progress_photo').insert({ taken_on: day, photo_path: path, kind: 'face' });
+    if (ins.error) { toast('Save failed: ' + ins.error.message, 'err'); return; }
+    toast('Photo saved', 'ok');
+    health().catch(() => {});
+    return;
+  }
   if (e.target.id !== 'weighForm') return;
   e.preventDefault();
   const v = parseFloat(document.getElementById('weighIn').value);
