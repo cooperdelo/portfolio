@@ -179,8 +179,16 @@
     setTimeout(next, 250);
   }
 
+  /* nav colour follows the section under it: bone over footage, ink over paper */
+  function navTone() {
+    const nav = document.querySelector(".nav"); if (!nav) return;
+    const lights = [...document.querySelectorAll(".light")];
+    const check = () => { const y = 36; const on = lights.some((s) => { const r = s.getBoundingClientRect(); return r.top <= y && r.bottom >= y; }); nav.classList.toggle("on-light", on); };
+    check(); addEventListener("scroll", check, { passive: true }); addEventListener("resize", check);
+  }
+
   function boot() {
-    grain(); fit();
+    grain(); fit(); navTone();
     if (document.fonts) { document.fonts.ready.then(fit); document.fonts.load('700 100px "Druk Wide"').then(fit).catch(() => {}); }
     addEventListener("load", fit);
     let rt; addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(fit, 120); });
