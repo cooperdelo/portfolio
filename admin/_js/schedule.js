@@ -8,7 +8,7 @@
 import { mountShell, toast } from '/admin/_shell/admin-shell.js';
 import { requireFullAdminOrRedirect } from '/admin/_shell/supabase.js';
 import { esc, pageHead } from '/admin/_shell/ui.js';
-import { contentSchedule, scheduleSync, markPosted, answerLadder, isDemo } from '/admin/_shell/live-data.js';
+import { contentSchedule, contentPillars, scheduleSync, markPosted, answerLadder, isDemo } from '/admin/_shell/live-data.js';
 import { reveal } from '/admin/_shell/motion.js';
 
 if (!isDemo() && !(await requireFullAdminOrRedirect())) throw new Error('not full admin');
@@ -42,6 +42,8 @@ const STATUS = {
 };
 
 let ALL = [];
+let PILLARS = [];      // content_pillars: personal-brand topic mix, weekly targets
+let BRAND = {};        // content_brand: why_follow, throughline
 let WEEK = null;        // the Monday being shown
 const OPEN = new Map(); // row id -> option id whose reference is expanded
 const norm = (rows) => rows.map(r => (r.status === 'needs-confirm' && r.answer ? { ...r, status: 'ready' } : r));
@@ -49,11 +51,13 @@ const today = todayKey();
 const rowsOfWeek = () => ALL.filter(r => weekKey(r) === WEEK);
 
 app.innerHTML = pageHead('', 'Schedule', `<span class="sc-week" id="scWeek"></span><span class="sc-wk-tabs" id="scTabs"></span>`) + `
+  <section class="sc-brand" id="scBrand" aria-label="What the personal account is for"></section>
   <section class="sc-streaks" id="scStreaks" aria-label="Posted this week"></section>
   <section class="sc-grid" id="scGrid" aria-label="Posting schedule"><div class="shimmer" style="height:320px;grid-column:1/-1"></div></section>`;
 
 async function load() {
   await scheduleSync().catch(e => console.warn('schedule sync', e));
+  try { ({ pillars: PILLARS, brand: BRAND } = await contentPillars()); } catch (e) { console.warn('pillars', e); }
   try { ALL = norm(await contentSchedule()); }
   catch (e) { console.error(e); document.getElementById('scGrid').innerHTML = `<p class="sc-empty">Couldn't read the schedule. ${esc(e?.message || '')}</p>`; return; }
   const weeks = [...new Set(ALL.map(weekKey))].sort();
@@ -72,6 +76,7 @@ function paint(first) {
   tabs.innerHTML = cur && next ? [[cur, 'This week'], [next, 'Next week']].map(([w, l]) =>
     `<button class="sc-wk${w === WEEK ? ' on' : ''}" data-week="${w}">${l}</button>`).join('') : '';
   tabs.querySelectorAll('[data-week]').forEach(b => b.addEventListener('click', () => { WEEK = b.dataset.week; paint(true); }));
+  paintBrand();
   paintStreaks();
   paintGrid(days);
   if (first) {
@@ -79,6 +84,27 @@ function paint(first) {
     const t = document.querySelector('.sc-day.today');
     if (t && innerWidth <= 1100 && t.previousElementSibling?.classList.contains('sc-day')) setTimeout(() => t.scrollIntoView({ block: 'start', behavior: 'smooth' }), 350);
   }
+}
+
+// Why-follow + throughline + the personal pillar mix for the week shown (planned vs target).
+function paintBrand() {
+  const el = document.getElementById('scBrand');
+  if (!PILLARS.length) { el.hidden = true; return; }
+  el.hidden = false;
+  const rows = rowsOfWeek().filter(r => r.lane === 'personal' && r.status !== 'skipped');
+  const chips = PILLARS.map(p => {
+    const mine = rows.filter(r => r.pillar === p.key);
+    const n = mine.length, done = mine.filter(r => r.status === 'posted').length, t = p.weekly_target;
+    const cls = t === 0 ? (n ? 'hit' : 'rot') : n === 0 ? 'gap' : n > t ? 'over' : n === t ? 'hit' : 'under';
+    const tip = `${p.what}. ${p.format_ref || ''}`.trim();
+    return `<span class="sc-pil ${cls}" title="${esc(tip)}"><b>${esc(p.label)}</b><span>${n}${t ? '/' + t : ''}${done ? ` · ${done} posted` : ''}</span></span>`;
+  }).join('');
+  const untagged = rows.filter(r => !r.pillar).length;
+  el.innerHTML = `
+    ${BRAND.why_follow ? `<p class="sc-why"><span class="sc-why-k">Why they follow</span>${esc(BRAND.why_follow)}</p>` : ''}
+    ${BRAND.throughline ? `<p class="sc-thru">${esc(BRAND.throughline)}</p>` : ''}
+    <div class="sc-pils" aria-label="Personal pillars this week, planned of target">${chips}${untagged ? `<span class="sc-pil none"><b>No pillar</b><span>${untagged}</span></span>` : ''}</div>
+    ${BRAND.rules ? `<p class="sc-rules">${esc(BRAND.rules)}</p>` : ''}`;
 }
 
 function paintStreaks() {
@@ -121,6 +147,12 @@ function refPanel(r, o, canPick) {
   </div>`;
 }
 
+const pillarTag = (r) => {
+  if (r.lane !== 'personal' || !r.pillar) return '';
+  const p = PILLARS.find(x => x.key === r.pillar);
+  return `<span class="sc-ptag">${esc(p?.label || r.pillar)}</span>`;
+};
+
 function piece(r) {
   const isPv = r.lane === 'plugverse';
   const openRow = isPv || r.flag === 'tonight' || /pick one|fastest/i.test(r.piece);
@@ -157,7 +189,7 @@ function piece(r) {
   return `<article class="sc-piece st-${esc(st)} ln-${esc(r.lane)}${r.flag === 'tonight' ? ' is-tonight' : ''}" data-id="${r.id}">
     <div class="sc-p-top"><span class="sc-pill st-${esc(st)}"${st === 'posted' && r.posted_via === 'auto' ? ' title="Matched automatically from your feed"' : ''}>${esc(STATUS[st] || st)}</span>${tonight}${time ? `<span class="sc-time">${esc(time)}</span>` : ''}</div>
     <div class="sc-p-t">${esc(title)}</div>
-    ${r.format ? `<div class="sc-p-meta"><span class="sc-fmt">${esc(r.format)}</span><span class="sc-p-plats">${marks}</span></div>` : `<div class="sc-p-plats">${marks}</div>`}
+    ${r.format ? `<div class="sc-p-meta">${pillarTag(r)}<span class="sc-fmt">${esc(r.format)}</span><span class="sc-p-plats">${marks}</span></div>` : `<div class="sc-p-plats">${marks}</div>`}
     ${r.note && needsPick ? `<div class="sc-note">${esc(r.note)}</div>` : ''}
     ${opts}${pickedLine}
     <div class="sc-p-act">${actions}</div>

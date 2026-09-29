@@ -201,6 +201,17 @@ export async function contentSchedule() {
   if (error) throw error;
   return data || [];
 }
+/** Personal-brand pillars (weekly targets) + the brand lines (why someone follows, throughline). */
+export async function contentPillars() {
+  if (isDemo()) { await snap(); return { pillars: _full?.pillars || [], brand: _full?.brand || {} }; }
+  const [p, b] = await Promise.all([
+    sb.from('content_pillars').select('key,label,weekly_target,what,format_ref,sort').order('sort'),
+    sb.from('content_brand').select('key,value'),
+  ]);
+  if (p.error) throw p.error;
+  const brand = Object.fromEntries((b.data || []).map(r => [r.key, r.value]));
+  return { pillars: p.data || [], brand };
+}
 /** Persist auto-posted matches + keep today's "do" rows in step (also runs every 20 min via pg_cron). */
 export async function scheduleSync() {
   if (isDemo()) return null;

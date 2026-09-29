@@ -22,7 +22,7 @@
 .sc-bar i.on { background: var(--text); }
 .sc-bar i.miss { background: var(--neg); }
 .sc-bar i.now { background: transparent; box-shadow: inset 0 0 0 1.5px var(--accent); }
-.sc-bar i.empty { background: transparent; box-shadow: inset 0 0 0 1px var(--border-2); }
+.sc-bar i.empty { background: transparent; box-shadow: inset 0 0 0 1px var(--border-2); padding: 0; margin: 0; border: 0; min-height: 0; height: 8px; display: block; }
 .sc-st-foot { display: flex; flex-wrap: wrap; gap: .8rem; margin-top: .6rem; font-size: .78rem; color: var(--text-3); min-height: 1em; }
 .sc-st-foot .miss { color: var(--neg); font-weight: 600; }
 .sc-st-foot .pick { color: var(--accent-ink); font-weight: 600; }
@@ -149,3 +149,22 @@
   .sc-wk-tabs { display: flex; margin: .5rem 0 0; }
 }
 @media (prefers-reduced-motion: reduce) { .sc-piece, .sc-opt { transition: none; } .sc-ref { animation: none; } }
+
+/* Personal-brand pillars (2026-09-29): why they follow, throughline, weekly topic mix */
+.sc-brand { margin: 0 0 1.1rem; padding: 1rem 1.15rem; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); }
+.sc-brand[hidden] { display: none; }
+.sc-why { margin: 0; font-size: .9rem; line-height: 1.45; color: var(--text); }
+.sc-why-k { display: inline-block; margin-right: .55rem; font-family: var(--f-mono); font-size: .6rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--accent-ink); }
+.sc-thru { margin: .35rem 0 .8rem; font-size: .82rem; color: var(--text-3); font-style: italic; }
+.sc-pils { display: flex; flex-wrap: wrap; gap: .4rem; }
+.sc-pil { display: inline-flex; align-items: baseline; gap: .4rem; padding: .32rem .6rem; border-radius: 999px; border: 1px solid var(--border-2); font-size: .78rem; color: var(--text-2); font-variant-numeric: tabular-nums; }
+.sc-pil b { font-weight: 700; color: var(--text); }
+.sc-pil.hit { background: var(--text); border-color: var(--text); }
+.sc-pil.hit, .sc-pil.hit b { color: var(--surface); }
+.sc-pil.gap { border-style: dashed; color: var(--text-3); }
+.sc-pil.gap b { color: var(--text-3); }
+.sc-pil.over { border-color: var(--accent); background: var(--accent-tint); }
+.sc-pil.rot { opacity: .6; }
+.sc-pil.none { border-style: dotted; }
+.sc-rules { margin: .7rem 0 0; font-family: var(--f-mono); font-size: .66rem; letter-spacing: .03em; color: var(--text-3); }
+.sc-ptag { font-size: .62rem; font-weight: 700; padding: .06rem .38rem; border-radius: 4px; background: var(--surface-3); color: var(--text-2); }
