@@ -64,7 +64,7 @@ WORK = [
   dict(slug="bioswap", title="Bioswap", disc="Motion design", year="2026", video="bioswap-final", ar="1/1",
        full="bioswap-final-full", full_ar="1/1", runtime="0:19", webm=True,  # motion_final.mov, 2026-09-30
        say="What's your rate?",
-       credits=[("Role", "Motion design"), ("Year", "2026"), ("Tools", "Remotion, React"), ("Link", [("plugverse.app", "https://plugverse.app")])],
+       credits=[("Role", "Motion design"), ("Year", "2026"), ("Tools", "Remotion, React, DaVinci Resolve"), ("Link", [("plugverse.app", "https://plugverse.app")])],
        stills=[("work-bioswap-still-1", ""), ("work-bioswap-still-2", "drop"), ("work-bioswap-still-3", ""), ("work-bioswap-still-4", "drop")], still_ar="1/1"),
   dict(slug="plugverse-product", title="PlugVerse product", disc="Product design, full stack", year="2025/26", video="pv-turntable", ar="1/1",
        say="Every show. One link.", product=True, hero_img="work-plugverse-product-hero",
