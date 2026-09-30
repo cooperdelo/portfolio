@@ -10,3 +10,9 @@ _preview.html
 
 # localhost-only admin demo snapshot (never commit)
 admin/_dev/
+
+# Blender render masters (web sizes are built into /img by scripts/images.py)
+renders/
+
+# python bytecode from scripts/
+__pycache__/

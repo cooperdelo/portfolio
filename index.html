@@ -1,588 +1,172 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Cooper Delo. Builder, guitarist, founder of Plugverse.</title>
-  <meta name="description" content="Cooper Delo builds Plugverse, plays guitar in Rubber Band, and ships things from Chapel Hill. Book a call, read the resume, or follow along." />
-  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-  <link rel="manifest" href="/site.webmanifest" />
-  <meta property="og:title" content="Cooper Delo" />
-  <meta property="og:description" content="Founder of Plugverse. Guitarist in Rubber Band. Builds and ships from Chapel Hill." />
-  <meta property="og:image" content="https://cooperdelo.com/photos/og-cover.png" />
-  <meta property="og:url" content="https://cooperdelo.com" />
-
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Spectral:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="preload" as="image" href="photos/gig_rubber_big_stage_1.jpg" />
-
-  <style>
-    :root {
-      --bg: #0b0a09;
-      --ink: #f3efe8;
-      --dim: rgba(243, 239, 232, 0.62);
-      --faint: rgba(243, 239, 232, 0.38);
-      --rust: #c4553a;
-      --glass: rgba(16, 14, 12, 0.42);
-      --glass-strong: rgba(14, 12, 10, 0.62);
-      --edge: rgba(243, 239, 232, 0.14);
-      --edge-hover: rgba(243, 239, 232, 0.34);
-      --radius: 20px;
-      --mono: "Geist Mono", ui-monospace, monospace;
-      --serif: "Spectral", Georgia, serif;
-      --display: "Anton", Impact, sans-serif;
-    }
-
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
-
-    body {
-      background: var(--bg);
-      color: var(--ink);
-      font-family: var(--serif);
-      font-weight: 300;
-      line-height: 1.6;
-      -webkit-font-smoothing: antialiased;
-      overflow-x: hidden;
-    }
-
-    ::selection { background: var(--rust); color: var(--ink); }
-
-    /* ---------- primitives ---------- */
-
-    .mono {
-      font-family: var(--mono);
-      font-size: 0.68rem;
-      text-transform: uppercase;
-      letter-spacing: 0.22em;
-    }
-
-    .glass {
-      background: var(--glass);
-      -webkit-backdrop-filter: blur(18px) saturate(140%);
-      backdrop-filter: blur(18px) saturate(140%);
-      border: 1px solid var(--edge);
-      border-radius: var(--radius);
-    }
-
-    .wrap { max-width: 1280px; margin: 0 auto; padding: 0 clamp(1.2rem, 4vw, 3rem); }
-
-    a { color: inherit; text-decoration: none; }
-
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.7em;
-      padding: 0.95rem 1.5rem;
-      font-family: var(--mono);
-      font-size: 0.72rem;
-      text-transform: uppercase;
-      letter-spacing: 0.2em;
-      color: var(--ink);
-      background: var(--glass);
-      -webkit-backdrop-filter: blur(18px) saturate(140%);
-      backdrop-filter: blur(18px) saturate(140%);
-      border: 1px solid var(--edge);
-      border-radius: 999px;
-      transition: border-color 0.25s ease, background 0.25s ease, transform 0.25s ease;
-      white-space: nowrap;
-    }
-    .btn:hover { border-color: var(--edge-hover); transform: translateY(-2px); }
-    .btn .arr { font-family: var(--serif); font-size: 1rem; line-height: 1; transition: transform 0.25s ease; }
-    .btn:hover .arr { transform: translate(2px, -2px); }
-    .btn.primary { background: var(--rust); border-color: var(--rust); }
-    .btn.primary:hover { background: #d2603f; border-color: #d2603f; }
-
-    /* ---------- reveal ---------- */
-
-    .reveal { opacity: 0; transform: translateY(26px); transition: opacity 0.8s ease, transform 0.8s ease; }
-    .reveal.in { opacity: 1; transform: none; }
-
-    @media (prefers-reduced-motion: reduce) {
-      .reveal { opacity: 1; transform: none; transition: none; }
-      html { scroll-behavior: auto; }
-    }
-
-    /* ---------- photo scenes ---------- */
-
-    .scene {
-      position: relative;
-      isolation: isolate;
-    }
-    .scene::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      z-index: -2;
-      background-size: cover;
-      background-position: center;
-    }
-    .scene::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      z-index: -1;
-      background:
-        linear-gradient(to bottom, rgba(11,10,9,0.92) 0%, rgba(11,10,9,0.55) 22%, rgba(11,10,9,0.55) 78%, rgba(11,10,9,0.96) 100%);
-    }
-    /* deep scrim for content-heavy sections: photo texture, still readable */
-    .scene.dim::after {
-      background:
-        linear-gradient(to bottom, rgba(11,10,9,0.97) 0%, rgba(11,10,9,0.86) 30%, rgba(11,10,9,0.86) 70%, rgba(11,10,9,0.97) 100%);
-    }
-    .work-scene::before { background-image: url("photos/plugverse-background.jpg"); }
-    .about-scene::before { background-image: url("photos/studio_recording_session.jpg"); }
-    .signals-scene::before { background-image: url("photos/gig_rubber_big_stage_2.jpg"); }
-    .footer-scene::before { background-image: url("photos/concert_rhcp_bofa_stadium.jpg"); }
-
-    /* ---------- photo strip ---------- */
-
-    .strip-wrap { overflow: hidden; padding: 0.6rem 0; }
-    .strip { display: flex; gap: 0.8rem; width: max-content; animation: drift 55s linear infinite; }
-    .strip img {
-      height: clamp(160px, 24vh, 240px);
-      width: auto;
-      border-radius: 14px;
-      border: 1px solid var(--edge);
-      display: block;
-    }
-    @keyframes drift { from { transform: translateX(0); } to { transform: translateX(-50%); } }
-    @media (prefers-reduced-motion: reduce) { .strip { animation: none; flex-wrap: wrap; width: auto; } }
-
-    /* ---------- nav ---------- */
-
-    nav {
-      position: fixed;
-      top: 1rem;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 50;
-      display: flex;
-      align-items: center;
-      gap: 1.6rem;
-      padding: 0.7rem 1.4rem;
-      border-radius: 999px;
-      width: max-content;
-      max-width: calc(100vw - 2rem);
-    }
-    nav .name { font-family: var(--display); font-size: 0.95rem; letter-spacing: 0.06em; text-transform: uppercase; }
-    nav a.mono { color: var(--dim); transition: color 0.2s ease; }
-    nav a.mono:hover { color: var(--ink); }
-
-    /* ---------- hero ---------- */
-
-    .hero {
-      min-height: 100svh;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      padding-top: 7rem;
-      padding-bottom: clamp(2.5rem, 6vh, 5rem);
-    }
-    .hero::before { background-image: url("photos/gig_rubber_big_stage_1.jpg"); }
-
-    .hero h1 {
-      font-family: var(--display);
-      font-weight: 400;
-      font-size: clamp(4.2rem, 14.5vw, 13.5rem);
-      line-height: 0.92;
-      letter-spacing: 0.01em;
-      text-transform: uppercase;
-      margin-bottom: 1.6rem;
-    }
-    .hero .lede {
-      font-size: clamp(1.15rem, 2vw, 1.5rem);
-      max-width: 34em;
-      color: var(--dim);
-      margin-bottom: 2.4rem;
-    }
-    .hero .lede b { color: var(--ink); font-weight: 500; }
-
-    .actions { display: flex; flex-wrap: wrap; gap: 0.8rem; }
-
-    .hero .meta-row {
-      display: flex;
-      justify-content: space-between;
-      gap: 1rem;
-      margin-top: 3rem;
-      color: var(--faint);
-      flex-wrap: wrap;
-    }
-
-    /* ---------- sections ---------- */
-
-    section { padding: clamp(5rem, 12vh, 9rem) 0; scroll-margin-top: 4.5rem; }
-
-    .kicker {
-      display: inline-block;
-      padding: 0.5rem 1rem;
-      border-radius: 999px;
-      color: var(--dim);
-      margin-bottom: 2.2rem;
-    }
-
-    h2 {
-      font-family: var(--display);
-      font-weight: 400;
-      text-transform: uppercase;
-      font-size: clamp(2.6rem, 6.5vw, 5.5rem);
-      line-height: 0.95;
-      letter-spacing: 0.01em;
-      margin-bottom: clamp(2rem, 5vh, 3.5rem);
-    }
-    h2 .thin { color: var(--faint); }
-
-    /* ---------- work ---------- */
-
-    .feature {
-      display: grid;
-      grid-template-columns: 1.15fr 1fr;
-      overflow: hidden;
-      margin-bottom: 1.2rem;
-    }
-    .feature .txt { padding: clamp(1.8rem, 4vw, 3.2rem); display: flex; flex-direction: column; }
-    .feature h3 {
-      font-family: var(--display);
-      font-weight: 400;
-      text-transform: uppercase;
-      font-size: clamp(2rem, 4vw, 3.2rem);
-      line-height: 1;
-      margin: 0.9rem 0 1.1rem;
-    }
-    .feature p { color: var(--dim); max-width: 46ch; }
-    .feature .img { position: relative; min-height: 320px; }
-    .feature .img img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-    .feature .img::after {
-      content: "";
-      position: absolute; inset: 0;
-      background: linear-gradient(to right, rgba(14,12,10,0.55), rgba(14,12,10,0) 45%);
-    }
-
-    .stats { display: flex; flex-wrap: wrap; gap: 0.6rem; margin: 1.6rem 0 2rem; }
-    .stat {
-      padding: 0.55rem 0.95rem;
-      border: 1px solid var(--edge);
-      border-radius: 12px;
-      font-family: var(--mono);
-      font-size: 0.66rem;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: var(--dim);
-    }
-    .stat b { color: var(--ink); font-weight: 500; }
-
-    .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.2rem; }
-    .card {
-      padding: clamp(1.6rem, 3vw, 2.2rem);
-      display: flex;
-      flex-direction: column;
-      gap: 0.9rem;
-      transition: border-color 0.25s ease, transform 0.25s ease;
-    }
-    a.card:hover { border-color: var(--edge-hover); transform: translateY(-4px); }
-    .card h3 {
-      font-family: var(--display);
-      font-weight: 400;
-      text-transform: uppercase;
-      font-size: 1.45rem;
-      line-height: 1.05;
-      letter-spacing: 0.02em;
-    }
-    .card p { color: var(--dim); font-size: 1rem; flex: 1; }
-    .card .go { color: var(--ink); }
-
-    /* ---------- band ---------- */
-
-    .band::before { background-image: url("photos/gig_rubber_big_stage_3.jpg"); }
-    .band-panel {
-      background: var(--glass-strong);
-      -webkit-backdrop-filter: blur(22px) saturate(140%);
-      backdrop-filter: blur(22px) saturate(140%);
-      border: 1px solid var(--edge);
-      border-radius: var(--radius);
-      padding: clamp(2rem, 4.5vw, 3.5rem);
-      max-width: 720px;
-    }
-    .band-panel p.big { font-size: clamp(1.1rem, 1.8vw, 1.35rem); color: var(--dim); margin-bottom: 1.6rem; }
-    .band-panel p.big b { color: var(--ink); font-weight: 500; }
-
-    /* ---------- about ---------- */
-
-    .about-grid { display: grid; grid-template-columns: 1.3fr 1fr; gap: clamp(2rem, 5vw, 4rem); align-items: center; }
-    .about-grid .portrait { overflow: hidden; border-radius: var(--radius); border: 1px solid var(--edge); }
-    .about-grid .portrait img { width: 100%; height: 100%; object-fit: cover; display: block; aspect-ratio: 4 / 3; }
-    .about p { font-size: clamp(1.1rem, 1.7vw, 1.3rem); color: var(--dim); margin-bottom: 1.2rem; max-width: 54ch; }
-    .about p b { color: var(--ink); font-weight: 500; }
-
-    /* ---------- signals ---------- */
-
-    .rows { display: flex; flex-direction: column; }
-    .row {
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-      gap: 1.5rem;
-      padding: 1.4rem 0.4rem;
-      border-top: 1px solid var(--edge);
-      transition: background 0.2s ease, padding-left 0.25s ease;
-    }
-    .row:last-child { border-bottom: 1px solid var(--edge); }
-    .row:hover { background: rgba(243,239,232,0.04); padding-left: 1rem; }
-    .row .label { font-family: var(--display); text-transform: uppercase; font-size: clamp(1.3rem, 3vw, 2.1rem); letter-spacing: 0.02em; }
-    .row .sub { color: var(--faint); font-size: 0.95rem; flex: 1; }
-    .row .mono { color: var(--dim); }
-
-    /* ---------- footer ---------- */
-
-    footer { padding: clamp(4rem, 10vh, 7rem) 0 2.5rem; text-align: center; }
-    footer .email {
-      font-family: var(--display);
-      text-transform: uppercase;
-      font-size: clamp(1.6rem, 5vw, 3.6rem);
-      letter-spacing: 0.02em;
-      transition: color 0.25s ease;
-    }
-    footer .email:hover { color: var(--rust); }
-    footer .fine { margin-top: 2.2rem; color: var(--faint); display: flex; justify-content: center; gap: 2rem; flex-wrap: wrap; }
-
-
-    /* ---------- paths (who are you) ---------- */
-    .paths { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.2rem; }
-    .path { padding: clamp(1.6rem, 3vw, 2.2rem); display: flex; flex-direction: column; gap: 0.9rem; }
-    .path h3 { font-family: var(--display); font-weight: 400; text-transform: uppercase; font-size: 1.6rem; line-height: 1.05; letter-spacing: 0.02em; }
-    .path p { color: var(--dim); font-size: 1rem; flex: 1; }
-    .path .links { display: flex; flex-wrap: wrap; gap: 0.6rem; }
-    .path .btn { padding: 0.75rem 1.1rem; font-size: 0.64rem; }
-    .cards.two { grid-template-columns: repeat(2, 1fr); }
-    .band { padding: clamp(3.5rem, 8vh, 5.5rem) 0; }
-    @media (max-width: 900px) { .paths, .cards.two { grid-template-columns: 1fr; } }
-
-    /* ---------- responsive ---------- */
-
-    @media (max-width: 900px) {
-      .feature { grid-template-columns: 1fr; }
-      .feature .img { min-height: 260px; order: -1; }
-      .feature .img::after { background: linear-gradient(to top, rgba(14,12,10,0.55), rgba(14,12,10,0) 45%); }
-      .cards { grid-template-columns: 1fr; }
-      .about-grid { grid-template-columns: 1fr; }
-      nav .hide-m { display: none; }
-      .scene::before { background-attachment: scroll; }
-    }
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Cooper Delo</title>
+<meta name="description" content="Founder of PlugVerse. Films, motion and product. CS and Business at UNC Chapel Hill." />
+<meta name="theme-color" content="#16130F" />
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+<link rel="manifest" href="/site.webmanifest" />
+<meta property="og:title" content="Cooper Delo" />
+<meta property="og:description" content="Founder of PlugVerse. Films, motion and product. CS and Business at UNC Chapel Hill." />
+<meta property="og:image" content="https://cooperdelo.com/img/poster-montage-1920-3a4824-1280.jpg" />
+<meta property="og:url" content="https://cooperdelo.com" />
+<meta name="twitter:card" content="summary_large_image" />
+<link rel="preload" href="/fonts/DrukWideBold.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="preload" href="/fonts/NimbusSans-Bold.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="preload" as="image" type="image/avif" media="(min-width: 701px)" imagesrcset="/img/poster-montage-1920-3a4824-1280.avif 1280w, /img/poster-montage-1920-3a4824-1920.avif 1920w" imagesizes="100vw" fetchpriority="high" />
+<link rel="preload" as="image" type="image/avif" media="(max-width: 700px)" href="/img/poster-montage-720-2adb49-720.avif" fetchpriority="high" />
+<link rel="stylesheet" href="/assets/site.css" />
+<script>(function(d){var r=d.documentElement;try{if(sessionStorage.getItem('cd-intro'))r.classList.add('seen')}catch(e){}if(matchMedia('(prefers-reduced-motion: reduce)').matches)r.classList.add('rm')})(document)</script>
 </head>
-<body>
-
-  <nav class="glass">
-    <span class="name">Cooper Delo</span>
-    <a class="mono hide-m" href="#work">Work</a>
-    <a class="mono hide-m" href="#about">About</a>
-    <a class="mono hide-m" href="#band">Band</a>
-    <a class="mono" href="https://cal.com/cooper-delo1" target="_blank" rel="noreferrer">Book a call</a>
-  </nav>
-
-  <!-- HERO -->
-  <header class="hero scene">
-    <div class="wrap">
-      <p class="mono reveal" style="color: var(--dim); margin-bottom: 1.2rem;">Chapel Hill, NC. 35.913N / 79.056W</p>
-      <h1 class="reveal">Cooper<br />Delo</h1>
-      <p class="lede reveal">I build things, play guitar, and film all of it. Founder of <b>Plugverse</b>. Guitarist in <b>Rubber Band</b>.</p>
-      <div class="actions reveal">
-        <a class="btn primary" href="https://cal.com/cooper-delo1" target="_blank" rel="noreferrer">Book a call <span class="arr">&#8599;</span></a>
-        <a class="btn" href="https://instagram.com/cooperdelo" target="_blank" rel="noreferrer">Follow @cooperdelo <span class="arr">&#8599;</span></a>
-        <a class="btn" href="resume.html">Resume</a>
-        <a class="btn" href="https://www.linkedin.com/in/cooperdelo/" target="_blank" rel="noreferrer">LinkedIn <span class="arr">&#8599;</span></a>
-      </div>
-      <div class="meta-row mono reveal">
-        <span>UNC Chapel Hill. CS + Business. Music minor.</span>
-        <span>Founder. Guitarist. Builder.</span>
-      </div>
+<body class="home">
+<div class="intro" aria-hidden="true">
+  <div class="row label"><span>Cooper Delo</span><span>Loading frames</span></div>
+  <div class="row"><div class="count">000</div><span class="label">Chapel Hill, NC</span></div>
+</div>
+<header class="nav label">
+  <a class="mark" href="/" aria-label="Cooper Delo, home"><span class="roll"><span>Cooper Delo</span><span aria-hidden="true">Cooper Delo</span></span></a>
+  <span class="where">Chapel Hill, NC&nbsp;&nbsp;<span data-clock>--:--</span> ET</span>
+  <nav class="links" aria-label="Primary"><a href="/#work"><span class="roll"><span>Work</span><span aria-hidden="true">Work</span></span></a><a href="/#about"><span class="roll"><span>About</span><span aria-hidden="true">About</span></span></a><a href="/#contact"><span class="roll"><span>Contact</span><span aria-hidden="true">Contact</span></span></a></nav>
+</header>
+<main>
+  <section class="title">
+    <div class="bg">
+      <picture><source media="(max-width: 700px)" type="image/avif" srcset="/img/poster-montage-720-2adb49-720.avif" /><source media="(max-width: 700px)" srcset="/img/poster-montage-720-2adb49-720.jpg" /><source type="image/avif" srcset="/img/poster-montage-1920-3a4824-1280.avif 1280w, /img/poster-montage-1920-3a4824-1920.avif 1920w" sizes="100vw" /><img src="/img/poster-montage-1920-3a4824-1920.jpg" srcset="/img/poster-montage-1920-3a4824-1280.jpg 1280w, /img/poster-montage-1920-3a4824-1920.jpg 1920w" sizes="100vw" width="1920" height="1080" alt="Cooper Delo in Chapel Hill" fetchpriority="high" decoding="async" /></picture>
+      <video class="hero-vid" muted loop playsinline autoplay preload="auto" data-d="/videos/hero/hero-montage-1920" data-m="/videos/hero/hero-montage-720x1280" aria-hidden="true"></video>
     </div>
-  </header>
-
-  <!-- PATHS -->
-  <section id="start" class="scene dim signals-scene">
-    <div class="wrap">
-      <span class="kicker mono glass reveal">Start here</span>
-      <h2 class="reveal">What brought<br /><span class="thin">you here?</span></h2>
-      <div class="paths">
-        <div class="path glass reveal">
-          <span class="mono" style="color: var(--faint);">Connect</span>
-          <h3>Want to talk?</h3>
-          <p>Grab a time on my calendar or reach out on LinkedIn.</p>
-          <div class="links">
-            <a class="btn primary" href="https://cal.com/cooper-delo1" target="_blank" rel="noreferrer">Book a call <span class="arr">&#8599;</span></a>
-            <a class="btn" href="https://www.linkedin.com/in/cooperdelo/" target="_blank" rel="noreferrer">LinkedIn <span class="arr">&#8599;</span></a>
-          </div>
-        </div>
-        <div class="path glass reveal">
-          <span class="mono" style="color: var(--faint);">The work</span>
-          <h3>See what I'm building</h3>
-          <p>Plugverse is live. The resume has the rest.</p>
-          <div class="links">
-            <a class="btn primary" href="https://plugverse.app" target="_blank" rel="noreferrer">plugverse.app <span class="arr">&#8599;</span></a>
-            <a class="btn" href="resume.html">Resume</a>
-          </div>
-        </div>
-        <div class="path glass reveal">
-          <span class="mono" style="color: var(--faint);">Just curious</span>
-          <h3>Follow along</h3>
-          <p>I post the building, the gigs, and everything in between.</p>
-          <div class="links">
-            <a class="btn primary" href="https://instagram.com/cooperdelo" target="_blank" rel="noreferrer">Instagram <span class="arr">&#8599;</span></a>
-            <a class="btn" href="https://tiktok.com/@cooperdelo" target="_blank" rel="noreferrer">TikTok <span class="arr">&#8599;</span></a>
-          </div>
-        </div>
-      </div>
+    <div class="copy">
+      <h1 data-hero><span class="line"><span>Founder of PlugVerse.</span></span><span class="line"><span>I make films, motion</span></span><span class="line"><span>and product.</span></span><span class="line"><span>CS + Business, UNC.</span></span></h1>
+      <div class="meta"><a class="pill" href="#work">See the work <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1 8h13M9 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></a><a class="pill" href="https://cal.com/cooper-delo1" target="_blank" rel="noreferrer">Book a call</a></div>
+    </div>
+    <div class="foot">
+      <div class="bar label"><span>35.913N 79.056W</span><span>Chapel Hill, NC</span></div>
+      <p class="wordmark" data-hero aria-label="Cooper Delo">
+        <span class="d line"><span data-fit>Cooper Delo</span></span>
+        <span class="m line"><span data-fit="m">Cooper</span></span><span class="m line"><span data-fit="m">Delo</span></span>
+      </p>
     </div>
   </section>
 
-  <!-- WORK -->
-  <section id="work" class="scene dim work-scene">
-    <div class="wrap">
-      <span class="kicker mono glass reveal">The work</span>
-      <h2 class="reveal">Things you can<br /><span class="thin">actually use.</span></h2>
+  <section class="index light" id="work" aria-label="Work">
+    <div class="top" data-rv><h2><span class="line"><span>Selected work</span></span></h2><span class="label">(06)</span></div>
+    <div class="head label"><span>No.</span><span>Title</span><span>Discipline</span><span class="r">Year</span><span></span></div>
+    <div class="rule" data-rv></div>
+    <ol class="rows" data-index>
+      <li class="row" data-rv data-src="/videos/work/chapter-one.mp4" data-poster="/videos/work/chapter-one.jpg" data-ar="16/9">
+        <a href="/work/chapter-one" data-handoff data-cursor="View">
+          <span class="label no">01</span>
+          <span class="t">Chapter One</span>
+          <span class="poster film"><picture><source type="image/avif" srcset="/img/p-chapter-one-640.avif 640w, /img/p-chapter-one-960.avif 960w" sizes="(max-width: 900px) 100vw, 1px" /><source type="image/webp" srcset="/img/p-chapter-one-640.webp 640w, /img/p-chapter-one-960.webp 960w" sizes="(max-width: 900px) 100vw, 1px" /><img src="/img/p-chapter-one-960.jpg" srcset="/img/p-chapter-one-640.jpg 640w, /img/p-chapter-one-960.jpg 960w" sizes="(max-width: 900px) 100vw, 1px" width="960" height="540" alt="" loading="lazy" decoding="async" /></picture></span>
+          <span class="meta-m"><span class="d">Short film</span><span class="yr">2026</span></span>
+          <span class="go"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1 8h13M9 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1 8h13M9 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></span>
+        </a>
+        <div class="rule"></div>
+      </li>
+      <li class="row" data-rv data-src="/videos/work/launch-film.mp4" data-poster="/videos/work/launch-film.jpg" data-ar="16/9">
+        <a href="/work/plugverse-launch-film" data-handoff data-cursor="View">
+          <span class="label no">02</span>
+          <span class="t">PlugVerse launch film</span>
+          <span class="poster film"><picture><source type="image/avif" srcset="/img/p-launch-film-640.avif 640w, /img/p-launch-film-960.avif 960w" sizes="(max-width: 900px) 100vw, 1px" /><source type="image/webp" srcset="/img/p-launch-film-640.webp 640w, /img/p-launch-film-960.webp 960w" sizes="(max-width: 900px) 100vw, 1px" /><img src="/img/p-launch-film-960.jpg" srcset="/img/p-launch-film-640.jpg 640w, /img/p-launch-film-960.jpg 960w" sizes="(max-width: 900px) 100vw, 1px" width="960" height="540" alt="" loading="lazy" decoding="async" /></picture></span>
+          <span class="meta-m"><span class="d">Short film</span><span class="yr">2026</span></span>
+          <span class="go"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1 8h13M9 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1 8h13M9 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></span>
+        </a>
+        <div class="rule"></div>
+      </li>
+      <li class="row" data-rv data-src="/videos/work/the-start.mp4" data-poster="/videos/work/the-start.jpg" data-ar="16/9">
+        <a href="/work/the-start" data-handoff data-cursor="View">
+          <span class="label no">03</span>
+          <span class="t">The Start</span>
+          <span class="poster film"><picture><source type="image/avif" srcset="/img/p-the-start-640.avif 640w, /img/p-the-start-960.avif 960w" sizes="(max-width: 900px) 100vw, 1px" /><source type="image/webp" srcset="/img/p-the-start-640.webp 640w, /img/p-the-start-960.webp 960w" sizes="(max-width: 900px) 100vw, 1px" /><img src="/img/p-the-start-960.jpg" srcset="/img/p-the-start-640.jpg 640w, /img/p-the-start-960.jpg 960w" sizes="(max-width: 900px) 100vw, 1px" width="960" height="540" alt="" loading="lazy" decoding="async" /></picture></span>
+          <span class="meta-m"><span class="d">Short film, opening</span><span class="yr">2026</span></span>
+          <span class="go"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1 8h13M9 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1 8h13M9 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></span>
+        </a>
+        <div class="rule"></div>
+      </li>
+      <li class="row" data-rv data-src="/videos/work/bioswap-final.mp4" data-poster="/videos/work/bioswap-final.jpg" data-webm="/videos/work/bioswap-final.webm" data-ar="1/1">
+        <a href="/work/bioswap" data-handoff data-cursor="View">
+          <span class="label no">04</span>
+          <span class="t">Bioswap</span>
+          <span class="poster film"><picture><source type="image/avif" srcset="/img/bioswap-final-8cae30-640.avif 640w, /img/bioswap-final-8cae30-960.avif 960w" sizes="(max-width: 900px) 100vw, 1px" /><source type="image/webp" srcset="/img/bioswap-final-8cae30-640.webp 640w, /img/bioswap-final-8cae30-960.webp 960w" sizes="(max-width: 900px) 100vw, 1px" /><img src="/img/bioswap-final-8cae30-960.jpg" srcset="/img/bioswap-final-8cae30-640.jpg 640w, /img/bioswap-final-8cae30-960.jpg 960w" sizes="(max-width: 900px) 100vw, 1px" width="960" height="960" alt="" loading="lazy" decoding="async" /></picture></span>
+          <span class="meta-m"><span class="d">Motion design</span><span class="yr">2026</span></span>
+          <span class="go"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1 8h13M9 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1 8h13M9 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></span>
+        </a>
+        <div class="rule"></div>
+      </li>
+      <li class="row" data-rv data-src="/videos/work/pv-turntable.mp4" data-poster="/videos/work/pv-turntable.jpg" data-ar="1/1">
+        <a href="/work/plugverse-product" data-handoff data-cursor="View">
+          <span class="label no">05</span>
+          <span class="t">PlugVerse product</span>
+          <span class="poster film"><picture><source type="image/avif" srcset="/img/p-pv-turntable-640.avif 640w, /img/p-pv-turntable-1080.avif 1080w" sizes="(max-width: 900px) 100vw, 1px" /><source type="image/webp" srcset="/img/p-pv-turntable-640.webp 640w, /img/p-pv-turntable-1080.webp 1080w" sizes="(max-width: 900px) 100vw, 1px" /><img src="/img/p-pv-turntable-1080.jpg" srcset="/img/p-pv-turntable-640.jpg 640w, /img/p-pv-turntable-1080.jpg 1080w" sizes="(max-width: 900px) 100vw, 1px" width="1080" height="1080" alt="" loading="lazy" decoding="async" /></picture></span>
+          <span class="meta-m"><span class="d">Product design, full stack</span><span class="yr">2025/26</span></span>
+          <span class="go"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1 8h13M9 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1 8h13M9 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></span>
+        </a>
+        <div class="rule"></div>
+      </li>
+      <li class="row" data-rv data-src="/videos/work/rubber-band.mp4" data-poster="/videos/work/rubber-band.jpg" data-ar="16/9">
+        <a href="/work/rubber-band" data-handoff data-cursor="View">
+          <span class="label no">06</span>
+          <span class="t">Rubber Band</span>
+          <span class="poster film"><picture><source type="image/avif" srcset="/img/p-rubber-band-640.avif 640w, /img/p-rubber-band-960.avif 960w" sizes="(max-width: 900px) 100vw, 1px" /><source type="image/webp" srcset="/img/p-rubber-band-640.webp 640w, /img/p-rubber-band-960.webp 960w" sizes="(max-width: 900px) 100vw, 1px" /><img src="/img/p-rubber-band-960.jpg" srcset="/img/p-rubber-band-640.jpg 640w, /img/p-rubber-band-960.jpg 960w" sizes="(max-width: 900px) 100vw, 1px" width="960" height="540" alt="" loading="lazy" decoding="async" /></picture></span>
+          <span class="meta-m"><span class="d">Live, guitar</span><span class="yr">2025</span></span>
+          <span class="go"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1 8h13M9 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1 8h13M9 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></span>
+        </a>
+        <div class="rule"></div>
+      </li>
+    </ol>
+  </section>
 
-      <a class="feature glass reveal" href="https://plugverse.app" target="_blank" rel="noreferrer">
-        <div class="txt">
-          <span class="mono" style="color: var(--faint);">Flagship</span>
-          <h3>Plugverse</h3>
-          <p>Booking tools for bands that book themselves. Every show, one link. Started because my own band ran on DMs, Google Docs and Venmo.</p>
-          <div class="stats">
-            <span class="stat">Started <b>Nov 2025</b></span>
-            <span class="stat">Raised <b>$21,850</b> non-dilutive</span>
-          </div>
-          <span class="mono go">Open plugverse.app &#8599;</span>
-        </div>
-        <div class="img"><img src="photos/hero.jpg" alt="Cooper pitching Plugverse at Innovate Carolina" loading="lazy" /></div>
-      </a>
+  <section class="frames dark" aria-label="Chapel Hill, in frames">
+    <p class="big" data-rv><span class="line"><span>Chapel Hill,</span></span><span class="line"><span>in frames</span></span></p>
+    <div class="grid"><figure class="f1" data-speed="0.10" data-rv><div class="film clip"><picture><source type="image/avif" srcset="/img/cand-027-3b4f1e-640.avif 640w, /img/cand-027-3b4f1e-1280.avif 1280w, /img/cand-027-3b4f1e-1920.avif 1920w" sizes="(max-width: 800px) 70vw, 45vw" /><source type="image/webp" srcset="/img/cand-027-3b4f1e-640.webp 640w, /img/cand-027-3b4f1e-1280.webp 1280w, /img/cand-027-3b4f1e-1920.webp 1920w" sizes="(max-width: 800px) 70vw, 45vw" /><img style="object-position:48% 40%" src="/img/cand-027-3b4f1e-1280.jpg" srcset="/img/cand-027-3b4f1e-640.jpg 640w, /img/cand-027-3b4f1e-1280.jpg 1280w, /img/cand-027-3b4f1e-1920.jpg 1920w" sizes="(max-width: 800px) 70vw, 45vw" width="1920" height="1080" alt="At the laptop" loading="lazy" decoding="async" /></picture></div><figcaption class="label"><span>At the laptop</span><span>Chapel Hill</span></figcaption></figure><figure class="f2" data-speed="-0.06" data-rv><div class="film clip"><picture><source type="image/avif" srcset="/img/home-collage-2-band-porch-1cde07-c46a56e-640.avif 640w, /img/home-collage-2-band-porch-1cde07-c46a56e-1280.avif 1280w, /img/home-collage-2-band-porch-1cde07-c46a56e-1920.avif 1920w, /img/home-collage-2-band-porch-1cde07-c46a56e-2400.avif 2400w" sizes="(max-width: 800px) 70vw, 45vw" /><source type="image/webp" srcset="/img/home-collage-2-band-porch-1cde07-c46a56e-640.webp 640w, /img/home-collage-2-band-porch-1cde07-c46a56e-1280.webp 1280w, /img/home-collage-2-band-porch-1cde07-c46a56e-1920.webp 1920w, /img/home-collage-2-band-porch-1cde07-c46a56e-2400.webp 2400w" sizes="(max-width: 800px) 70vw, 45vw" /><img style="object-position:50% 40%" src="/img/home-collage-2-band-porch-1cde07-c46a56e-1280.jpg" srcset="/img/home-collage-2-band-porch-1cde07-c46a56e-640.jpg 640w, /img/home-collage-2-band-porch-1cde07-c46a56e-1280.jpg 1280w, /img/home-collage-2-band-porch-1cde07-c46a56e-1920.jpg 1920w, /img/home-collage-2-band-porch-1cde07-c46a56e-2400.jpg 2400w" sizes="(max-width: 800px) 70vw, 45vw" width="3072" height="2160" alt="Porch show, Rubber Band" loading="lazy" decoding="async" /></picture></div><figcaption class="label"><span>Porch show, Rubber Band</span><span>Chapel Hill</span></figcaption></figure><figure class="f3" data-speed="0.14" data-rv><div class="film clip"><picture><source type="image/avif" srcset="/img/cand-033-ccf393-640.avif 640w, /img/cand-033-ccf393-1280.avif 1280w, /img/cand-033-ccf393-1920.avif 1920w" sizes="(max-width: 800px) 70vw, 45vw" /><source type="image/webp" srcset="/img/cand-033-ccf393-640.webp 640w, /img/cand-033-ccf393-1280.webp 1280w, /img/cand-033-ccf393-1920.webp 1920w" sizes="(max-width: 800px) 70vw, 45vw" /><img style="object-position:18% 45%" src="/img/cand-033-ccf393-1280.jpg" srcset="/img/cand-033-ccf393-640.jpg 640w, /img/cand-033-ccf393-1280.jpg 1280w, /img/cand-033-ccf393-1920.jpg 1920w" sizes="(max-width: 800px) 70vw, 45vw" width="1920" height="1080" alt="Pi Kapp poolhouse" loading="lazy" decoding="async" /></picture></div><figcaption class="label"><span>Pi Kapp poolhouse</span><span>Chapel Hill</span></figcaption></figure><figure class="f4" data-speed="-0.10" data-rv><div class="film clip"><picture><source type="image/avif" srcset="/img/belltower-640.avif 640w, /img/belltower-1280.avif 1280w, /img/belltower-1600.avif 1600w" sizes="(max-width: 800px) 70vw, 45vw" /><source type="image/webp" srcset="/img/belltower-640.webp 640w, /img/belltower-1280.webp 1280w, /img/belltower-1600.webp 1600w" sizes="(max-width: 800px) 70vw, 45vw" /><img src="/img/belltower-1280.jpg" srcset="/img/belltower-640.jpg 640w, /img/belltower-1280.jpg 1280w, /img/belltower-1600.jpg 1600w" sizes="(max-width: 800px) 70vw, 45vw" width="1600" height="900" alt="The bell tower" loading="lazy" decoding="async" /></picture></div><figcaption class="label"><span>The bell tower</span><span>Chapel Hill</span></figcaption></figure><figure class="f5" data-speed="0.06" data-rv><div class="film clip"><picture><source type="image/avif" srcset="/img/bar-gig-640.avif 640w, /img/bar-gig-1280.avif 1280w, /img/bar-gig-1600.avif 1600w" sizes="(max-width: 800px) 70vw, 45vw" /><source type="image/webp" srcset="/img/bar-gig-640.webp 640w, /img/bar-gig-1280.webp 1280w, /img/bar-gig-1600.webp 1600w" sizes="(max-width: 800px) 70vw, 45vw" /><img src="/img/bar-gig-1280.jpg" srcset="/img/bar-gig-640.jpg 640w, /img/bar-gig-1280.jpg 1280w, /img/bar-gig-1600.jpg 1600w" sizes="(max-width: 800px) 70vw, 45vw" width="1600" height="900" alt="Might As Well" loading="lazy" decoding="async" /></picture></div><figcaption class="label"><span>Might As Well</span><span>Chapel Hill</span></figcaption></figure><figure class="f6" data-speed="-0.14" data-rv><div class="film clip"><picture><source type="image/avif" srcset="/img/home-collage-6-gig2-wide-crowd-090-331b3e-c03e237-640.avif 640w, /img/home-collage-6-gig2-wide-crowd-090-331b3e-c03e237-1280.avif 1280w, /img/home-collage-6-gig2-wide-crowd-090-331b3e-c03e237-1728.avif 1728w" sizes="(max-width: 800px) 70vw, 45vw" /><source type="image/webp" srcset="/img/home-collage-6-gig2-wide-crowd-090-331b3e-c03e237-640.webp 640w, /img/home-collage-6-gig2-wide-crowd-090-331b3e-c03e237-1280.webp 1280w, /img/home-collage-6-gig2-wide-crowd-090-331b3e-c03e237-1728.webp 1728w" sizes="(max-width: 800px) 70vw, 45vw" /><img style="object-position:50% 45%" src="/img/home-collage-6-gig2-wide-crowd-090-331b3e-c03e237-1280.jpg" srcset="/img/home-collage-6-gig2-wide-crowd-090-331b3e-c03e237-640.jpg 640w, /img/home-collage-6-gig2-wide-crowd-090-331b3e-c03e237-1280.jpg 1280w, /img/home-collage-6-gig2-wide-crowd-090-331b3e-c03e237-1728.jpg 1728w" sizes="(max-width: 800px) 70vw, 45vw" width="1728" height="1663" alt="Setting up" loading="lazy" decoding="async" /></picture></div><figcaption class="label"><span>Setting up</span><span>Chapel Hill</span></figcaption></figure><figure class="f7" data-speed="0.08" data-rv><div class="film clip"><picture><source type="image/avif" srcset="/img/cand-003-175b1a-640.avif 640w, /img/cand-003-175b1a-1280.avif 1280w, /img/cand-003-175b1a-1920.avif 1920w" sizes="(max-width: 800px) 70vw, 45vw" /><source type="image/webp" srcset="/img/cand-003-175b1a-640.webp 640w, /img/cand-003-175b1a-1280.webp 1280w, /img/cand-003-175b1a-1920.webp 1920w" sizes="(max-width: 800px) 70vw, 45vw" /><img style="object-position:45% 50%" src="/img/cand-003-175b1a-1280.jpg" srcset="/img/cand-003-175b1a-640.jpg 640w, /img/cand-003-175b1a-1280.jpg 1280w, /img/cand-003-175b1a-1920.jpg 1920w" sizes="(max-width: 800px) 70vw, 45vw" width="1920" height="1080" alt="Franklin St." loading="lazy" decoding="async" /></picture></div><figcaption class="label"><span>Franklin St.</span><span>Chapel Hill</span></figcaption></figure></div>
+  </section>
 
-      <div class="cards two">
-        <div class="card glass reveal">
-          <span class="mono" style="color: var(--faint);">2026 / Claude + Supabase</span>
-          <h3>Personal AI Operating System</h3>
-          <p>A vault of agents that runs my schedule, my money, and half of this site.</p>
-        </div>
-        <div class="card glass reveal">
-          <span class="mono" style="color: var(--faint);">Summers 2025 + 2026</span>
-          <h3>Truist &amp; CleverCX</h3>
-          <p>Enterprise tech at Truist. AI product work at CleverCX before that.</p>
-        </div>
+  <section class="about light" id="about" aria-label="About">
+    <div class="pic" data-rv><div class="film clip float b"><picture><source type="image/avif" srcset="/img/lawn-640.avif 640w, /img/lawn-1280.avif 1280w, /img/lawn-1920.avif 1920w" sizes="(max-width: 900px) 100vw, 40vw" /><source type="image/webp" srcset="/img/lawn-640.webp 640w, /img/lawn-1280.webp 1280w, /img/lawn-1920.webp 1920w" sizes="(max-width: 900px) 100vw, 40vw" /><img src="/img/lawn-1280.jpg" srcset="/img/lawn-640.jpg 640w, /img/lawn-1280.jpg 1280w, /img/lawn-1920.jpg 1920w" sizes="(max-width: 900px) 100vw, 40vw" width="1920" height="1080" alt="Cooper Delo on the lawn at dusk" loading="lazy" decoding="async" /></picture></div></div>
+    <div class="txt">
+      <div class="intro-t" data-rv>
+        <p class="label">About</p>
+        <h2 class="about-h"><span class="line"><span>I'm Cooper.</span></span></h2>
+        <p class="lede">Junior at UNC Chapel Hill, studying CS and Business. I built PlugVerse on my own, play guitar in Rubber Band and shoot and cut my own films.</p>
+      </div>
+      <ul class="facts" data-rv>
+        <li><span class="label">01</span><span>Built PlugVerse solo. Live since 23 Sep 2026.</span></li>
+        <li><span class="label">02</span><span>Guitar in Rubber Band. I run the bookings too.</span></li>
+        <li><span class="label">03</span><span>I shoot and cut my own films in DaVinci Resolve.</span></li>
+        <li><span class="label">04</span><span>UNC Chapel Hill, class of 2028. CS and Business.</span></li>
+      </ul>
+      <div class="out">
+        <a class="pill" href="/resume">Resume</a>
+        <a class="pill" href="https://cal.com/cooper-delo1" target="_blank" rel="noreferrer">Book a call</a>
+        <a class="pill" href="https://www.linkedin.com/in/cooperdelo/" target="_blank" rel="noreferrer">LinkedIn</a>
+        <a class="pill" href="https://instagram.com/cooperdelo" target="_blank" rel="noreferrer">Instagram</a>
+        <a class="pill" href="https://tiktok.com/@cooperdelo" target="_blank" rel="noreferrer">TikTok</a>
       </div>
     </div>
   </section>
-
-  <!-- ABOUT -->
-  <section id="about" class="about scene dim about-scene">
-    <div class="wrap">
-      <span class="kicker mono glass reveal">Background</span>
-      <div class="about-grid">
-        <div class="reveal">
-          <h2>Who is<br /><span class="thin">doing this.</span></h2>
-          <p>Junior at UNC. Computer science and business, music minor. I run a company, play guitar in a cover band, and put out my own music on the side. My EP <b>Flicker of Time</b> passed 34,000 streams.</p>
-          <p><b>Build, ship, learn what hit, run it back.</b></p>
-          <div class="actions" style="margin-top: 1.8rem;">
-            <a class="btn primary" href="https://cal.com/cooper-delo1" target="_blank" rel="noreferrer">Talk to me <span class="arr">&#8599;</span></a>
-            <a class="btn" href="resume.html">Read the resume</a>
-          </div>
-        </div>
-        <div class="portrait reveal">
-          <img src="photos/cooper_park_portrait.jpg" alt="Cooper Delo" loading="lazy" />
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- STRIP -->
-  <div class="strip-wrap" aria-hidden="true">
-    <div class="strip">
-      <img src="photos/cooper_with_guitar_outdoor.jpg" alt="" loading="lazy" />
-      <img src="photos/obx_sunset_portrait.jpg" alt="" loading="lazy" />
-      <img src="photos/hole_in_one_par_4.JPG" alt="" loading="lazy" />
-      <img src="photos/flicker_of_time_ep_cover.jpg" alt="" loading="lazy" />
-      <img src="photos/thailand_trip_wat_arun.jpg" alt="" loading="lazy" />
-      <img src="photos/workspace_studio_desk.jpg" alt="" loading="lazy" />
-      <img src="photos/concert_coldplay.jpg" alt="" loading="lazy" />
-      <img src="photos/golf_swing_finish.jpg" alt="" loading="lazy" />
-      <img src="photos/cooper_with_guitar_outdoor.jpg" alt="" loading="lazy" />
-      <img src="photos/obx_sunset_portrait.jpg" alt="" loading="lazy" />
-      <img src="photos/hole_in_one_par_4.JPG" alt="" loading="lazy" />
-      <img src="photos/flicker_of_time_ep_cover.jpg" alt="" loading="lazy" />
-      <img src="photos/thailand_trip_wat_arun.jpg" alt="" loading="lazy" />
-      <img src="photos/workspace_studio_desk.jpg" alt="" loading="lazy" />
-      <img src="photos/concert_coldplay.jpg" alt="" loading="lazy" />
-      <img src="photos/golf_swing_finish.jpg" alt="" loading="lazy" />
-    </div>
+</main>
+<footer class="contact" id="contact">
+  <div class="bg"><picture><source type="image/avif" srcset="/img/chiphi-porch-640.avif 640w, /img/chiphi-porch-1280.avif 1280w, /img/chiphi-porch-1920.avif 1920w" sizes="100vw" /><source type="image/webp" srcset="/img/chiphi-porch-640.webp 640w, /img/chiphi-porch-1280.webp 1280w, /img/chiphi-porch-1920.webp 1920w" sizes="100vw" /><img src="/img/chiphi-porch-1280.jpg" srcset="/img/chiphi-porch-640.jpg 640w, /img/chiphi-porch-1280.jpg 1280w, /img/chiphi-porch-1920.jpg 1920w" sizes="100vw" width="1920" height="1080" alt="" loading="lazy" decoding="async" /></picture></div>
+  <p class="label say">Say hi</p>
+  <a class="mail" href="mailto:cooper@plugverse.app" data-rv><span class="line"><span data-fit>cooper@plugverse.app</span></span></a>
+  <div class="cta">
+    <a class="pill solid" href="https://cal.com/cooper-delo1" target="_blank" rel="noreferrer">Book a call <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1 8h13M9 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></a>
+    <a class="pill" href="mailto:cooper@plugverse.app">Email</a>
+    <a class="pill" href="https://www.linkedin.com/in/cooperdelo/" target="_blank" rel="noreferrer">LinkedIn</a>
   </div>
-
-  <!-- SIGNALS -->
-  <section id="signals" class="scene dim signals-scene">
-    <div class="wrap">
-      <span class="kicker mono glass reveal">Follow along</span>
-      <div class="rows reveal">
-        <a class="row" href="https://instagram.com/cooperdelo" target="_blank" rel="noreferrer">
-          <span class="label">Instagram</span>
-          <span class="sub"></span>
-          <span class="mono">@cooperdelo &#8599;</span>
-        </a>
-        <a class="row" href="https://tiktok.com/@cooperdelo" target="_blank" rel="noreferrer">
-          <span class="label">TikTok</span>
-          <span class="sub"></span>
-          <span class="mono">@cooperdelo &#8599;</span>
-        </a>
-        <a class="row" href="https://www.linkedin.com/in/cooperdelo/" target="_blank" rel="noreferrer">
-          <span class="label">LinkedIn</span>
-          <span class="sub"></span>
-          <span class="mono">/in/cooperdelo &#8599;</span>
-        </a>
-        <a class="row" href="https://open.spotify.com/artist/5ADdu7EYmsFlIUPrH5azhc" target="_blank" rel="noreferrer">
-          <span class="label">Spotify</span>
-          <span class="sub">34,000+ streams</span>
-          <span class="mono">Cooper Delo &#8599;</span>
-        </a>
-        <a class="row" href="https://music.apple.com/artist/cooper-delo" target="_blank" rel="noreferrer">
-          <span class="label">Apple Music</span>
-          <span class="sub"></span>
-          <span class="mono">Cooper Delo &#8599;</span>
-        </a>
-      </div>
-    </div>
-  </section>
-
-  <!-- BAND -->
-  <section id="band" class="band scene">
-    <div class="wrap">
-      <div class="band-panel reveal">
-        <span class="mono" style="color: var(--faint);">On the side</span>
-        <h2 style="margin: 1rem 0 1.4rem;">Rubber Band.</h2>
-        <p class="big">Five-piece cover band out of UNC. I play guitar. <b>We bring the room.</b></p>
-        <div class="actions">
-          <a class="btn" href="https://plugverse.app/a/2499f269-dff2-4025-85a6-cf1ff8991382?ref=9CRDUTEJ&utm_source=profile-share&utm_medium=link&utm_campaign=profile-share" target="_blank" rel="noreferrer">Book the band <span class="arr">&#8599;</span></a>
-          <a class="btn" href="rubber-band.html">Band page</a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <footer class="scene dim footer-scene">
-    <div class="wrap">
-      <p class="mono reveal" style="color: var(--faint); margin-bottom: 1rem;">One email away</p>
-      <a class="email reveal" href="https://mail.google.com/mail/?view=cm&fs=1&to=cooperdelo6@gmail.com" target="_blank" rel="noreferrer">cooperdelo6@gmail.com</a>
-      <div class="fine mono reveal">
-        <span>Chapel Hill, NC</span>
-        <span>&copy; 2026 Cooper Delo</span>
-        <a href="privacy.html" style="color: var(--faint);">Privacy</a>
-      </div>
-    </div>
-  </footer>
-
-  <script>
-    const io = new IntersectionObserver(
-      (entries) => entries.forEach((e) => e.isIntersecting && e.target.classList.add("in")),
-      { threshold: 0.12 }
-    );
-    document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
-  </script>
+  <div class="base label">
+    <span>&copy; 2026 Cooper Delo</span>
+    <nav aria-label="Elsewhere">
+      <a href="/resume">Resume</a>
+      <a href="https://instagram.com/cooperdelo" target="_blank" rel="noreferrer">Instagram</a>
+      <a href="https://tiktok.com/@cooperdelo" target="_blank" rel="noreferrer">TikTok</a>
+      <a href="/privacy">Privacy</a>
+      <a href="/terms">Terms</a>
+    </nav>
+  </div>
+</footer>
+<script src="/assets/lenis.min.js" defer></script>
+<script src="/assets/site.js" defer></script>
 </body>
 </html>

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="v2">
 <head>
 <meta charset="utf-8" />
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -8,11 +8,9 @@
 <link rel="manifest" href="/site.webmanifest" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>Privacy / Cooper Delo</title>
-<meta name="description" content="Privacy policy for cooperdelo.com and Cooper Delo's personal admin tools." />
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Geist+Mono:wght@300..700&family=Geist:wght@300..700&display=swap" rel="stylesheet" />
+<meta name="description" content="Privacy policy for cooperdelo.com and Cooper Delo's private tools." />
 <link rel="stylesheet" href="shell.css" />
+<link rel="stylesheet" href="/assets/chrome.css" />
 <style>
   .privacy { max-width: 760px; margin: 0 auto; padding: 6rem 2rem 6rem; }
   .privacy .eyebrow { font-family: "Geist Mono", monospace; font-size: 0.7rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--muted); margin-bottom: 1rem; }
@@ -32,25 +30,30 @@
 </style>
 </head>
 <body class="grain">
+<header class="v2nav">
+  <a class="mark" href="/" aria-label="Cooper Delo, home"><span class="roll"><span>Cooper Delo</span><span aria-hidden="true">Cooper Delo</span></span></a>
+  <span class="where">Chapel Hill, NC</span>
+  <nav class="links" aria-label="Primary"><a href="/#work"><span class="roll"><span>Work</span><span aria-hidden="true">Work</span></span></a><a href="/#about"><span class="roll"><span>About</span><span aria-hidden="true">About</span></span></a><a href="/#contact"><span class="roll"><span>Contact</span><span aria-hidden="true">Contact</span></span></a></nav>
+</header>
 <main>
   <article class="privacy">
     <a class="home-link" href="/">← Back to cooperdelo.com</a>
     <div class="eyebrow">Privacy Policy</div>
     <h1>What I <span class="accent">collect</span></h1>
 
-    <p>This page is the privacy policy for <strong>cooperdelo.com</strong> and the private admin tools at <strong>cooperdelo.com/admin</strong>. It also covers third-party API integrations (Instagram, TikTok, YouTube, Spotify, Strava, etc.) that connect those services to my personal admin dashboard.</p>
+    <p>This page is the privacy policy for <strong>cooperdelo.com</strong> and the private, sign-in-only tools I run on it. It also covers third-party API integrations (Instagram, TikTok, YouTube, Spotify, Strava, etc.) that connect those services to my private dashboard.</p>
     <p>I'm Cooper Delo, a solo creator. I built and personally operate everything on this domain. No company. No team. No third-party analytics vendor selling your data.</p>
 
     <h2>What this site collects <span class="accent">from visitors</span></h2>
     <p>The public pages of cooperdelo.com (Home, Music, Athletic, Lens, Plugverse, Now) are <strong>static HTML</strong>. They do not run analytics scripts, do not set cookies, and do not log visitor IP addresses anywhere I control.</p>
-    <p>The site is hosted on Vercel. Vercel may collect standard server logs (IP address, request URL, user agent) for the purpose of delivering the site and protecting against abuse. Vercel's own privacy policy governs that data — see <a href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noreferrer">vercel.com/legal/privacy-policy</a>.</p>
+    <p>The site is hosted on Vercel. Vercel may collect standard server logs (IP address, request URL, user agent) for the purpose of delivering the site and protecting against abuse. Vercel's own privacy policy governs that data. See <a href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noreferrer">vercel.com/legal/privacy-policy</a>.</p>
 
-    <h2>What the admin area at <span class="accent">/admin</span> collects</h2>
-    <p>The admin area is private and gated by magic-link authentication. Only my email address is on the allowlist. No one else can sign in or see any data inside it.</p>
-    <p>Inside the admin, I store data about my own life and projects in a private Supabase database I control: financial transactions, merchandise inventory, investment positions, and analytics snapshots pulled from the third-party APIs I authorize (see below). I do not collect, store, or process data about other people through the admin area, except where another person's name appears in a transaction record that I personally entered (e.g., merch sale to "Jake").</p>
+    <h2>What my private tools collect</h2>
+    <p>Those tools are private and gated by magic-link authentication. Only my email address is on the allowlist. No one else can sign in or see any data inside it.</p>
+    <p>Inside them, I store data about my own life and projects in a private Supabase database I control: financial transactions, merchandise inventory, investment positions, and analytics snapshots pulled from the third-party APIs I authorize (see below). I do not collect, store, or process data about other people through those tools, except where another person's name appears in a transaction record that I personally entered (e.g., merch sale to "Jake").</p>
 
     <h2>Third-party API <span class="accent">integrations</span></h2>
-    <p>The admin dashboard connects to several third-party APIs to pull <em>my own</em> data from those services into one place. When I authorize an app I created with one of these providers, the resulting access token is stored encrypted in my private database and is used only to read my own account data.</p>
+    <p>My private dashboard connects to several third-party APIs to pull <em>my own</em> data from those services into one place. When I authorize an app I created with one of these providers, the resulting access token is stored encrypted in my private database and is used only to read my own account data.</p>
     <ul>
       <li><strong>Instagram / Meta:</strong> reads my Instagram posts, view counts, reach, and engagement metrics. Subject to <a href="https://privacycenter.instagram.com/policy" target="_blank" rel="noreferrer">Instagram's privacy policy</a> and <a href="https://www.facebook.com/privacy/policy" target="_blank" rel="noreferrer">Meta's privacy policy</a>.</li>
       <li><strong>TikTok:</strong> reads my own posted videos and their per-video metrics (views, likes, comments, shares). Subject to <a href="https://www.tiktok.com/legal/page/us/privacy-policy/en" target="_blank" rel="noreferrer">TikTok's privacy policy</a>.</li>
@@ -60,13 +63,13 @@
       <li><strong>Stripe:</strong> reads payments and payouts for businesses I operate. Subject to <a href="https://stripe.com/privacy" target="_blank" rel="noreferrer">Stripe's privacy policy</a>.</li>
       <li><strong>Supabase:</strong> hosts my private databases. Subject to <a href="https://supabase.com/privacy" target="_blank" rel="noreferrer">Supabase's privacy policy</a>.</li>
     </ul>
-    <p>None of this data leaves my admin database. I do not share it with anyone. I do not sell it. I do not use it to advertise anything to anyone.</p>
+    <p>None of this data leaves my private database. I do not share it with anyone. I do not sell it. I do not use it to advertise anything to anyone.</p>
 
     <h2>Cookies, ads, and <span class="accent">trackers</span></h2>
-    <p>I do not run advertising. I do not embed third-party tracking pixels (no Google Analytics, no Meta Pixel, no Hotjar, none). The only cookies set anywhere on this domain are the session cookie used by the admin login, and that cookie is only ever set in <em>my own</em> browser.</p>
+    <p>I do not run advertising. I do not embed third-party tracking pixels (no Google Analytics, no Meta Pixel, no Hotjar, none). The only cookies set anywhere on this domain are the session cookie used by my private sign-in, and that cookie is only ever set in <em>my own</em> browser.</p>
 
     <h2>How long I keep <span class="accent">data</span></h2>
-    <p>I keep API-synced data and personal records indefinitely while I'm actively using the admin tools. If I delete an integration or shut down a feature, the corresponding data is removed within 30 days.</p>
+    <p>I keep API-synced data and personal records indefinitely while I'm actively using those tools. If I delete an integration or shut down a feature, the corresponding data is removed within 30 days.</p>
 
     <h2>Your rights</h2>
     <p>If you appear in a personal record I keep (e.g., a contact, a merch buyer, a person owed money), you can email me to ask what I have, request a copy, or ask me to delete it. I will respond within 14 days.</p>

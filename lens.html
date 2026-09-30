@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="v2">
 <head>
 <meta charset="UTF-8" />
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -20,11 +20,9 @@
 <meta name="twitter:title" content="Lens / Cooper Delo" />
 <meta name="twitter:description" content="Travel, gear, and the reel." />
 <meta name="twitter:image" content="https://cooperdelo.com/photos/og-cover.png" />
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link rel="preload" as="image" href="photos/cooper_tux_with_canon.jpg" fetchpriority="high" />
-<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&family=Geist+Mono:wght@400;500&family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="shell.css" />
+<link rel="stylesheet" href="/assets/chrome.css" />
 <style>
   /* Lighter tint on the "Through the frame" hero video so the landscape reads */
   .page-head.video-cover-wrap .video-cover {
@@ -46,28 +44,18 @@
 <canvas class="scene-canvas" id="scene-canvas"></canvas>
 <div class="cursor" id="cursor"></div>
 
-<nav class="top" id="topnav">
-  <a href="index.html" class="nav-logo" data-cursor="HOME" data-transition="HOME">Cooper Delo</a>
-  <div class="nav-pill">
-    <div class="nav-links" id="navLinks">
-      <span class="nav-indicator" id="navIndicator"></span>
-      <a href="index.html" class="nav-link" data-cursor="VIEW" data-transition="HOME">Home</a>
-      <a href="plugverse.html" class="nav-link" data-cursor="VIEW" data-transition="PLUGVERSE">Plugverse</a>
-      <a href="rubber-band.html" class="nav-link" data-cursor="VIEW" data-transition="MUSIC">Music</a>
-      <a href="athletic.html" class="nav-link" data-cursor="VIEW" data-transition="ATHLETIC">Athletic</a>
-      <a href="lens.html" class="nav-link active" data-cursor="VIEW" data-no-transition>Lens</a>
-      <a href="now.html" class="nav-link" data-cursor="VIEW" data-transition="NOW">Now</a>
-    </div>
-  </div>
-  <button class="nav-cta" data-cursor="OPEN" data-contact>Get in touch</button>
-</nav>
+<header class="v2nav">
+  <a class="mark" href="/" aria-label="Cooper Delo, home"><span class="roll"><span>Cooper Delo</span><span aria-hidden="true">Cooper Delo</span></span></a>
+  <span class="where">Chapel Hill, NC</span>
+  <nav class="links" aria-label="Primary"><a href="/#work"><span class="roll"><span>Work</span><span aria-hidden="true">Work</span></span></a><a href="/#about"><span class="roll"><span>About</span><span aria-hidden="true">About</span></span></a><a href="/#contact"><span class="roll"><span>Contact</span><span aria-hidden="true">Contact</span></span></a></nav>
+</header>
 <div class="nav-progress-track"><div class="nav-progress" id="navProgress"></div></div>
 
 <main>
 
 <!-- Hero -->
 <header class="page-head world-cooper video-cover-wrap">
-  <video class="video-cover" autoplay muted loop playsinline preload="metadata" poster="photos/cooper_tux_with_canon.jpg">
+  <video class="video-cover" autoplay muted loop playsinline preload="none" poster="photos/cooper_tux_with_canon.jpg">
     <source src="videos/landscape_ambient_loop.mov" type="video/mp4" />
     <source src="videos/landscape_ambient_loop.mov" type="video/quicktime" />
   </video>
@@ -297,28 +285,28 @@
     <div class="col-12 reveal">
       <div class="reel-grid">
         <div class="reel-card">
-          <video autoplay muted loop playsinline preload="metadata" poster="photos/gig_rubber_big_stage_2.jpg">
+          <video autoplay muted loop playsinline preload="none" poster="photos/gig_rubber_big_stage_2.jpg">
             <source src="videos/cat_cradle_performance.mov" type="video/quicktime" />
             <source src="videos/cat_cradle_performance.mov" type="video/mp4" />
           </video>
           <span class="reel-platform">LIVE</span>
         </div>
         <div class="reel-card">
-          <video autoplay muted loop playsinline preload="metadata" poster="photos/concert_coldplay.jpg">
+          <video autoplay muted loop playsinline preload="none" poster="photos/concert_coldplay.jpg">
             <source src="videos/coldplay_crowd.mov" type="video/quicktime" />
             <source src="videos/coldplay_crowd.mov" type="video/mp4" />
           </video>
           <span class="reel-platform">CROWD</span>
         </div>
         <div class="reel-card">
-          <video autoplay muted loop playsinline preload="metadata" poster="photos/golf_portrait.jpg">
+          <video autoplay muted loop playsinline preload="none" poster="photos/golf_portrait.jpg">
             <source src="videos/golf_swing_iron.mov" type="video/quicktime" />
             <source src="videos/golf_swing_iron.mov" type="video/mp4" />
           </video>
           <span class="reel-platform">SWING</span>
         </div>
         <div class="reel-card">
-          <video autoplay muted loop playsinline preload="metadata" poster="photos/recording_studio.jpg">
+          <video autoplay muted loop playsinline preload="none" poster="photos/recording_studio.jpg">
             <source src="videos/studio_overview.mov" type="video/quicktime" />
             <source src="videos/studio_overview.mov" type="video/mp4" />
           </video>
