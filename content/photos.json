@@ -58,7 +58,7 @@
 
   {"slot_id": "resume-hero", "page": "/resume", "src": "C:/Users/coope/Desktop/Claude/Projects/design-references/proofs/portfolio/_work/cands/chiphi-solo-b_000.78.jpg", "alt": "Cooper Delo playing guitar at Chi Phi"},
   {"slot_id": "resume-strip-1", "page": "/resume", "src": "photos/gig_rubber_tent_purple.jpg", "alt": "Cooper playing under a lit tent", "focus": "62% 40%"},
-  {"slot_id": "resume-strip-2", "page": "/resume", "src": "C:/Users/coope/Desktop/Claude/Projects/design-references/review-board/candidates/full/cand-028.jpg", "alt": "Cooper in a glass office doorway", "focus": "54% 40%"},
+  {"slot_id": "resume-strip-2", "page": "/resume", "src": "photos/golf_portrait.jpg", "alt": "Cooper at the top of his golf backswing", "focus": "42% 50%"},
   {"slot_id": "resume-strip-3", "page": "/resume", "src": "photos/work/pv-luby.jpg", "alt": "Luby Pitch Competition"}
  ]
 }

@@ -753,6 +753,23 @@
    "crop": null
   }
  },
+ "golf-portrait-c09017": {
+  "w": [
+   640,
+   1280,
+   1600
+  ],
+  "ar": [
+   1600,
+   1066
+  ],
+  "stamp": {
+   "src": "photos/golf_portrait.jpg",
+   "size": 491727,
+   "mtime": 1790718981,
+   "crop": null
+  }
+ },
  "cand-028-586f9a": {
   "w": [
    640,

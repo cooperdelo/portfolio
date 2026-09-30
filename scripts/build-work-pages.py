@@ -337,28 +337,30 @@ INDEX = """{HEAD}
 
 
 # ---------------- resume (facts: vault Projects/portfolio-website/resume.md + Cooper_Delo_Resume_2026.pdf) ----------------
+# 2026-09-30 (Cooper's rulings, vault Context/achievements.md): experience ordered by strength, Truist filled from his
+# LinkedIn title, PlugVerse bookings $70K+ (supersedes older booking figures), Music minor added, GCA moved to Projects.
 RESUME_ROLES = [
-  ("Truist Financial", "Technology and Innovation Intern, Leadership Development Program", "Charlotte, NC", "Summer 2026", [
-      "Selected for Truist's 2026 T&I LDP.",
-      "Shipping product improvements in collaboration with senior engineers and PMs."], None),
   ("PlugVerse", "Founder and CEO", "Chapel Hill, NC", "Nov 2025 to now", [
-      "Founded PlugVerse LLC. Sole developer of a full-stack artist and venue booking marketplace.",
+      "Founded PlugVerse LLC. Sole developer of a full-stack artist and venue booking marketplace. $70K+ in bookings.",
       "Built on Next.js, React, Supabase and Stripe Connect. 8 user roles, 48-suite QA pipeline.",
       "Won the $20K Luby Pitch Competition and a $1,850 1789 grant. Managing a 4-person intern team."], "/work/plugverse-product"),
+  ("Truist Financial", "Systems Engineering Intern (Collaboration & A/V), Technology & Innovation Track", "Charlotte, NC", "May 2026 to Aug 2026", [
+      "Built a Copilot brand kit with Truist's Brand and Copilot teams.",
+      "Presented the Copilot rollout to 400+ people."], None),
   ("UNC Kenan-Flagler Business School", "AI Research and Product Assistant", "Chapel Hill, NC", "Jul 2025 to Dec 2025", [
       "Built an AI resume generator deployed to all incoming Kenan-Flagler students. Demoed to the Associate Dean."], None),
   ("CleverCX", "Product Management Intern, early-stage fintech startup", "Charlotte, NC", "May 2025 to Aug 2025", [
       "Reported 300+ Jira issues, improving QA coverage across 4 user roles.",
       "Tracked 500+ support cases in an Excel dashboard. Worked with 10+ engineers and PMs."], None),
-  ("Global Career Accelerator", "Data Analyst Trainee", "Chapel Hill, NC", "May 2025 to Jul 2025", [
-      "Analyzed a 600K+ row Intel dataset in Python and SQL. Completed 20+ analytics assignments."], None),
 ]
 RESUME_PROJECTS = [
   ("Rubber Band", "Guitarist and business manager", "Chapel Hill, NC", "Jul 2025 to now", [
       "Guitar and vocals for UNC's top event cover band.",
-      "Manage all contracts, venue negotiations and pricing. $50K+ in cumulative bookings."], "/work/rubber-band"),
+      "Manage all contracts, venue negotiations and pricing."], "/work/rubber-band"),
   ("Carolina Data Challenge 2025", "Data Analyst", "Chapel Hill, NC", "Sep 2025", [
       "Modeled risk for the $500B space economy. Presented an investment matrix to industry judges."], None),
+  ("Global Career Accelerator", "Data Analyst Trainee", "Chapel Hill, NC", "May 2025 to Jul 2025", [
+      "Analyzed a 600K+ row Intel dataset in Python and SQL. Completed 20+ analytics assignments."], None),
 ]
 
 def resume_rows(items, start):
@@ -376,6 +378,7 @@ def resume_rows(items, start):
 def resume_page():
     table = [("School", "UNC Chapel Hill, Kenan-Flagler Business School"),
              ("Degrees", "BSBA, Business Administration. BA, Computer Science, second major"),
+             ("Minor", "Music"),
              ("Class", "May 2028"), ("GPA", "3.867. Dean's List, Fall 2024 and Spring 2025")]
     skills = [("Code", "JavaScript, TypeScript, React, Next.js, Node.js, Python, SQL, Java"),
               ("Stack", "Supabase, PostgreSQL, Stripe API, Vercel, GitHub, PostHog, Azure, Claude AI and API"),
@@ -407,7 +410,7 @@ def resume_page():
   </section>
   <section class="r-strip dark" aria-label="Photos">
     <figure class="film">{spic("resume-strip-1", "Cooper at his desk with a guitar", "(max-width: 700px) 100vw, 33vw")}</figure>
-    <figure class="film">{spic("resume-strip-2", "Cooper at Might As Well", "(max-width: 700px) 100vw, 33vw")}</figure>
+    <figure class="film">{spic("resume-strip-2", "Cooper golfing", "(max-width: 700px) 100vw, 33vw")}</figure>
     <figure class="film">{spic("resume-strip-3", "Luby Pitch Competition", "(max-width: 700px) 100vw, 33vw")}</figure>
   </section>
   <section class="r-list light" aria-label="Projects and leadership">
