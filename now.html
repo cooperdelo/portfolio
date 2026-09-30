@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="v2">
 <head>
 <meta charset="UTF-8" />
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -20,10 +20,8 @@
 <meta name="twitter:title" content="Now / Cooper Delo" />
 <meta name="twitter:description" content="What I'm working on right now." />
 <meta name="twitter:image" content="https://cooperdelo.com/photos/og-cover.png" />
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&family=Geist+Mono:wght@400;500&family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="shell.css" />
+<link rel="stylesheet" href="/assets/chrome.css" />
 </head>
 <body class="grain">
 
@@ -36,21 +34,11 @@
 <canvas class="scene-canvas" id="scene-canvas"></canvas>
 <div class="cursor" id="cursor"></div>
 
-<nav class="top" id="topnav">
-  <a href="index.html" class="nav-logo" data-cursor="HOME" data-transition="HOME">Cooper Delo</a>
-  <div class="nav-pill">
-    <div class="nav-links" id="navLinks">
-      <span class="nav-indicator" id="navIndicator"></span>
-      <a href="index.html" class="nav-link" data-cursor="VIEW" data-transition="HOME">Home</a>
-      <a href="plugverse.html" class="nav-link" data-cursor="VIEW" data-transition="PLUGVERSE">Plugverse</a>
-      <a href="rubber-band.html" class="nav-link" data-cursor="VIEW" data-transition="MUSIC">Music</a>
-      <a href="athletic.html" class="nav-link" data-cursor="VIEW" data-transition="ATHLETIC">Athletic</a>
-      <a href="lens.html" class="nav-link" data-cursor="VIEW" data-transition="LENS">Lens</a>
-      <a href="now.html" class="nav-link active" data-cursor="VIEW" data-no-transition>Now</a>
-    </div>
-  </div>
-  <button class="nav-cta" data-cursor="OPEN" data-contact>Get in touch</button>
-</nav>
+<header class="v2nav">
+  <a class="mark" href="/" aria-label="Cooper Delo, home"><span class="roll"><span>Cooper Delo</span><span aria-hidden="true">Cooper Delo</span></span></a>
+  <span class="where">Chapel Hill, NC</span>
+  <nav class="links" aria-label="Primary"><a href="/#work"><span class="roll"><span>Work</span><span aria-hidden="true">Work</span></span></a><a href="/#about"><span class="roll"><span>About</span><span aria-hidden="true">About</span></span></a><a href="/#contact"><span class="roll"><span>Contact</span><span aria-hidden="true">Contact</span></span></a></nav>
+</header>
 <div class="nav-progress-track"><div class="nav-progress" id="navProgress"></div></div>
 
 <main>

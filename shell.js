@@ -14,12 +14,14 @@
    =========================================================== */
 
 /* ── 1. Smart loader (with debug logs) ───────────────────── */
-const DEBUG = true;
+const DEBUG = false;
+const V2 = document.documentElement.classList.contains("v2");
 const dlog = (...args) => { if (DEBUG) console.log("[shell]", ...args); };
 (function () {
   const t0 = performance.now();
   dlog("loader: script executed at", t0.toFixed(0) + "ms", "readyState=" + document.readyState);
   const loader = document.getElementById("loader");
+  if (loader && V2) { loader.remove(); return; }
   if (!loader) { dlog("loader: no #loader element on this page"); return; }
   let dismissed = false;
   function dismiss(reason) {
@@ -70,7 +72,7 @@ const dlog = (...args) => { if (DEBUG) console.log("[shell]", ...args); };
 /* ── 2. Custom cursor ────────────────────────────────────── */
 (function () {
   const cursor = document.getElementById("cursor");
-  if (!cursor) return;
+  if (!cursor || V2) return;
   document.addEventListener("mousemove", (e) => {
     cursor.style.transform = "translate(" + e.clientX + "px," + e.clientY + "px) translate(-50%,-50%)";
   });
@@ -619,7 +621,7 @@ const dlog = (...args) => { if (DEBUG) console.log("[shell]", ...args); };
 
 /* ── 12. Page transition veil — matches loader for seamless handoff ── */
 (function () {
-  const veil = document.getElementById("veil"); if (!veil) return;
+  const veil = document.getElementById("veil"); if (!veil || V2) return;
   const label = veil.querySelector(".label");
   const internal = (href) => /^[a-z0-9\-]+\.html(\#.*)?$/i.test(href) || href === "/" || href.startsWith("./");
 

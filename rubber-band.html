@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="v2">
 <head>
 <meta charset="UTF-8" />
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -20,11 +20,9 @@
 <meta name="twitter:title" content="Rubber Band & Cooper Delo" />
 <meta name="twitter:description" content="Guitar in a UNC cover band. Solo project: 34,000+ streams." />
 <meta name="twitter:image" content="https://cooperdelo.com/photos/og-cover.png" />
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link rel="preload" as="image" href="photos/gig_rubber_big_stage_1.jpg" fetchpriority="high" />
-<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&family=Geist+Mono:wght@400;500&family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="shell.css" />
+<link rel="stylesheet" href="/assets/chrome.css" />
 <style>
   /* Full-viewport rubber band header on desktop. Mobile keeps the shorter
      50-56vh from shell.css so the hero isn't a whole phone screen. */
@@ -44,27 +42,17 @@
 <canvas class="scene-canvas" id="scene-canvas"></canvas>
 <div class="cursor" id="cursor"></div>
 
-<nav class="top" id="topnav">
-  <a href="index.html" class="nav-logo" data-cursor="HOME" data-transition="HOME">Cooper Delo</a>
-  <div class="nav-pill">
-    <div class="nav-links" id="navLinks">
-      <span class="nav-indicator" id="navIndicator"></span>
-      <a href="index.html" class="nav-link" data-cursor="VIEW" data-transition="HOME">Home</a>
-      <a href="plugverse.html" class="nav-link" data-cursor="VIEW" data-transition="PLUGVERSE">Plugverse</a>
-      <a href="rubber-band.html" class="nav-link active" data-cursor="VIEW" data-no-transition>Music</a>
-      <a href="athletic.html" class="nav-link" data-cursor="VIEW" data-transition="ATHLETIC">Athletic</a>
-      <a href="lens.html" class="nav-link" data-cursor="VIEW" data-transition="LENS">Lens</a>
-      <a href="now.html" class="nav-link" data-cursor="VIEW" data-transition="NOW">Now</a>
-    </div>
-  </div>
-  <button class="nav-cta" data-cursor="OPEN" data-contact>Get in touch</button>
-</nav>
+<header class="v2nav">
+  <a class="mark" href="/" aria-label="Cooper Delo, home"><span class="roll"><span>Cooper Delo</span><span aria-hidden="true">Cooper Delo</span></span></a>
+  <span class="where">Chapel Hill, NC</span>
+  <nav class="links" aria-label="Primary"><a href="/#work"><span class="roll"><span>Work</span><span aria-hidden="true">Work</span></span></a><a href="/#about"><span class="roll"><span>About</span><span aria-hidden="true">About</span></span></a><a href="/#contact"><span class="roll"><span>Contact</span><span aria-hidden="true">Contact</span></span></a></nav>
+</header>
 <div class="nav-progress-track"><div class="nav-progress" id="navProgress"></div></div>
 
 <main>
 
 <header class="page-head world-rubber video-cover-wrap">
-  <video class="video-cover" autoplay muted loop playsinline preload="metadata" poster="photos/gig_rubber_big_stage_1.jpg">
+  <video class="video-cover" autoplay muted loop playsinline preload="none" poster="photos/gig_rubber_big_stage_1.jpg">
     <source src="videos/whole%20band%20rubber%20vid.MOV" type="video/mp4" />
     <source src="videos/whole%20band%20rubber%20vid.MOV" type="video/quicktime" />
   </video>
@@ -105,7 +93,7 @@
 <!-- Full-bleed banner photo -->
 <!-- Banner: full-bleed live video with The Lineup overlaid -->
 <section class="lineup-banner">
-  <video class="lineup-video" autoplay muted loop playsinline preload="metadata" poster="photos/gig_rubber_big_stage_2.jpg">
+  <video class="lineup-video" autoplay muted loop playsinline preload="none" poster="photos/gig_rubber_big_stage_2.jpg">
     <source src="videos/cat_cradle_performance.mov" type="video/mp4" />
     <source src="videos/cat_cradle_performance.mov" type="video/quicktime" />
   </video>
