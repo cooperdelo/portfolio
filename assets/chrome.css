@@ -62,3 +62,7 @@ html.v2 h1, html.v2 h2 { text-wrap: balance; }
 @keyframes v2-out { to { transform: translateY(-9vh) scale(.97); } }
 @keyframes v2-in { from { clip-path: inset(100% 0 0 0); transform: translateY(14vh); } to { clip-path: inset(0 0 0 0); transform: none; } }
 @media (prefers-reduced-motion: reduce) { @view-transition { navigation: none; } .v2nav .roll > span { transition: none; } }
+
+/* one static grain texture only: the old per-page and per-photo noise layers are off */
+html.v2 .grain::before, html.v2 .photo-grain, html.v2 .card-grain { display: none !important; }
+html.v2 body::after { content: ""; position: fixed; inset: 0; z-index: 95; pointer-events: none; opacity: .09; mix-blend-mode: overlay; background: url("/assets/grain.png") repeat; background-size: 256px 256px; }

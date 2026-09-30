@@ -5,16 +5,10 @@
   const FINE = matchMedia("(hover: hover) and (pointer: fine)").matches;
   const lerp = (a, b, t) => a + (b - a) * t;
 
-  /* ---------- film grain: one noise tile drawn once, jittered by CSS ---------- */
+  /* ---------- film grain: one static noise tile, no animation ---------- */
   function grain() {
     const g = document.createElement("div"); g.className = "grain"; g.setAttribute("aria-hidden", "true");
     const v = document.createElement("div"); v.className = "vignette"; v.setAttribute("aria-hidden", "true");
-    try {
-      const c = document.createElement("canvas"); c.width = c.height = 220;
-      const x = c.getContext("2d"); const d = x.createImageData(220, 220);
-      for (let i = 0; i < d.data.length; i += 4) { const n = Math.random() * 255; d.data[i] = d.data[i + 1] = d.data[i + 2] = n; d.data[i + 3] = 255; }
-      x.putImageData(d, 0, 0); g.style.backgroundImage = `url(${c.toDataURL("image/png")})`;
-    } catch (e) {}
     document.body.append(g, v);
   }
 
@@ -23,9 +17,13 @@
     const groups = {};
     document.querySelectorAll("[data-fit]").forEach((el) => {
       if (!el.offsetParent) return;
+      // measure the real ink box at 100px, then scale to the container with a small safety margin
+      // so the last glyph (the final O of the wordmark) never touches or crosses the edge
       const box = el.parentElement.clientWidth;
       el.style.fontSize = "100px";
-      const size = Math.floor((box / (el.scrollWidth || 1)) * 100 * 100) / 100;
+      const w = Math.max(el.getBoundingClientRect().width, el.scrollWidth) || 1;
+      const safe = el.closest(".wordmark") ? 0.98 : 0.995;
+      const size = Math.floor((box * safe / w) * 100 * 100) / 100;
       const g = el.dataset.fit;
       if (g) (groups[g] = groups[g] || []).push([el, size]); else el.style.fontSize = size + "px";
     });
@@ -187,12 +185,21 @@
     check(); addEventListener("scroll", check, { passive: true }); addEventListener("resize", check);
   }
 
+  /* ---------- hero loop: same first frame as the poster, so first paint is identical ---------- */
+  function heroVideo() {
+    const v = document.querySelector(".hero-vid"); if (!v || RM) { if (v) v.remove(); return; }
+    const base = matchMedia("(max-width: 700px)").matches ? v.dataset.m : v.dataset.d;
+    const webm = document.createElement("source"); webm.src = base + ".webm"; webm.type = 'video/webm; codecs="av01.0.08M.08"';
+    const mp4 = document.createElement("source"); mp4.src = base + ".mp4"; mp4.type = "video/mp4";
+    v.append(webm, mp4); v.load(); v.play().catch(() => {});
+  }
+
   function boot() {
     grain(); fit(); navTone();
     if (document.fonts) { document.fonts.ready.then(fit); document.fonts.load('700 100px "Druk Wide"').then(fit).catch(() => {}); }
     addEventListener("load", fit);
     let rt; addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(fit, 120); });
-    clock(); smooth(); cursor(); preview(); posterHandoff(); players(); drift();
+    heroVideo(); clock(); smooth(); cursor(); preview(); posterHandoff(); players(); drift();
     intro(() => {
       document.querySelectorAll("[data-hero]").forEach((el, i) => setTimeout(() => el.classList.add("in"), 120 + i * 90));
       document.querySelectorAll("[data-rv]").forEach((el) => io.observe(el));

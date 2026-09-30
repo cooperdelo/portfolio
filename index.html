@@ -10,11 +10,13 @@
 <link rel="manifest" href="/site.webmanifest" />
 <meta property="og:title" content="Cooper Delo" />
 <meta property="og:description" content="Founder of PlugVerse. Films, motion and product. CS and Business at UNC Chapel Hill." />
-<meta property="og:image" content="https://cooperdelo.com/photos/v2/title-campus.jpg" />
+<meta property="og:image" content="https://cooperdelo.com/img/hero-poster-1280.jpg" />
 <meta property="og:url" content="https://cooperdelo.com" />
 <meta name="twitter:card" content="summary_large_image" />
 <link rel="preload" href="/fonts/DrukWideBold.woff2" as="font" type="font/woff2" crossorigin />
 <link rel="preload" href="/fonts/NimbusSans-Bold.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="preload" as="image" type="image/avif" media="(min-width: 701px)" imagesrcset="/img/hero-poster-1280.avif 1280w, /img/hero-poster-1920.avif 1920w" imagesizes="100vw" fetchpriority="high" />
+<link rel="preload" as="image" type="image/avif" media="(max-width: 700px)" href="/img/hero-poster-m-720.avif" fetchpriority="high" />
 <link rel="stylesheet" href="/assets/site.css" />
 <script>(function(d){var r=d.documentElement;try{if(sessionStorage.getItem('cd-intro'))r.classList.add('seen')}catch(e){}if(matchMedia('(prefers-reduced-motion: reduce)').matches)r.classList.add('rm')})(document)</script>
 </head>
@@ -30,7 +32,10 @@
 </header>
 <main>
   <section class="title">
-    <div class="bg"><img src="/photos/v2/title-campus.jpg" alt="Cooper Delo on campus in Chapel Hill" fetchpriority="high" /></div>
+    <div class="bg">
+      <picture><source media="(max-width: 700px)" type="image/avif" srcset="/img/hero-poster-m-720.avif" /><source media="(max-width: 700px)" srcset="/img/hero-poster-m-720.jpg" /><source type="image/avif" srcset="/img/hero-poster-1280.avif 1280w, /img/hero-poster-1920.avif 1920w" sizes="100vw" /><img src="/img/hero-poster-1920.jpg" srcset="/img/hero-poster-1280.jpg 1280w, /img/hero-poster-1920.jpg 1920w" sizes="100vw" width="1920" height="1080" alt="Cooper Delo on Franklin Street, Chapel Hill" fetchpriority="high" decoding="async" /></picture>
+      <video class="hero-vid" muted loop playsinline autoplay preload="auto" data-d="/videos/hero/hero-1920" data-m="/videos/hero/hero-720x1280" aria-hidden="true"></video>
+    </div>
     <div class="copy">
       <h1 data-hero><span class="line"><span>Founder of PlugVerse.</span></span><span class="line"><span>I make films, motion</span></span><span class="line"><span>and product.</span></span><span class="line"><span>CS + Business, UNC.</span></span></h1>
       <div class="meta"><a class="pill" href="#work">See the work <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1 8h13M9 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></a><a class="pill" href="https://cal.com/cooper-delo1" target="_blank" rel="noreferrer">Book a call</a></div>
@@ -53,7 +58,7 @@
         <a href="/work/chapter-one" data-handoff data-cursor="View">
           <span class="label no">01</span>
           <span class="t">Chapter One</span>
-          <span class="poster film"><img src="/videos/work/chapter-one.jpg" alt="" loading="lazy" decoding="async" /></span>
+          <span class="poster film"><picture><source type="image/avif" srcset="/img/p-chapter-one-640.avif 640w, /img/p-chapter-one-960.avif 960w" sizes="(max-width: 900px) 100vw, 1px" /><source type="image/webp" srcset="/img/p-chapter-one-640.webp 640w, /img/p-chapter-one-960.webp 960w" sizes="(max-width: 900px) 100vw, 1px" /><img src="/img/p-chapter-one-960.jpg" srcset="/img/p-chapter-one-640.jpg 640w, /img/p-chapter-one-960.jpg 960w" sizes="(max-width: 900px) 100vw, 1px" width="960" height="540" alt="" loading="lazy" decoding="async" /></picture></span>
           <span class="meta-m"><span class="d">Short film</span><span class="yr">2026</span></span>
           <span class="go"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1 8h13M9 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1 8h13M9 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></span>
         </a>
@@ -63,7 +68,7 @@
         <a href="/work/plugverse-launch-film" data-handoff data-cursor="View">
           <span class="label no">02</span>
           <span class="t">PlugVerse launch film</span>
-          <span class="poster film"><img src="/videos/work/launch-film.jpg" alt="" loading="lazy" decoding="async" /></span>
+          <span class="poster film"><picture><source type="image/avif" srcset="/img/p-launch-film-640.avif 640w, /img/p-launch-film-960.avif 960w" sizes="(max-width: 900px) 100vw, 1px" /><source type="image/webp" srcset="/img/p-launch-film-640.webp 640w, /img/p-launch-film-960.webp 960w" sizes="(max-width: 900px) 100vw, 1px" /><img src="/img/p-launch-film-960.jpg" srcset="/img/p-launch-film-640.jpg 640w, /img/p-launch-film-960.jpg 960w" sizes="(max-width: 900px) 100vw, 1px" width="960" height="540" alt="" loading="lazy" decoding="async" /></picture></span>
           <span class="meta-m"><span class="d">Short film</span><span class="yr">2026</span></span>
           <span class="go"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1 8h13M9 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1 8h13M9 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></span>
         </a>
@@ -73,7 +78,7 @@
         <a href="/work/the-start" data-handoff data-cursor="View">
           <span class="label no">03</span>
           <span class="t">The Start</span>
-          <span class="poster film"><img src="/videos/work/the-start.jpg" alt="" loading="lazy" decoding="async" /></span>
+          <span class="poster film"><picture><source type="image/avif" srcset="/img/p-the-start-640.avif 640w, /img/p-the-start-960.avif 960w" sizes="(max-width: 900px) 100vw, 1px" /><source type="image/webp" srcset="/img/p-the-start-640.webp 640w, /img/p-the-start-960.webp 960w" sizes="(max-width: 900px) 100vw, 1px" /><img src="/img/p-the-start-960.jpg" srcset="/img/p-the-start-640.jpg 640w, /img/p-the-start-960.jpg 960w" sizes="(max-width: 900px) 100vw, 1px" width="960" height="540" alt="" loading="lazy" decoding="async" /></picture></span>
           <span class="meta-m"><span class="d">Short film, opening</span><span class="yr">2026</span></span>
           <span class="go"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1 8h13M9 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1 8h13M9 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></span>
         </a>
@@ -83,17 +88,17 @@
         <a href="/work/bioswap" data-handoff data-cursor="View">
           <span class="label no">04</span>
           <span class="t">Bioswap</span>
-          <span class="poster film"><img src="/videos/work/bioswap.jpg" alt="" loading="lazy" decoding="async" /></span>
+          <span class="poster film"><picture><source type="image/avif" srcset="/img/p-bioswap-640.avif 640w, /img/p-bioswap-960.avif 960w" sizes="(max-width: 900px) 100vw, 1px" /><source type="image/webp" srcset="/img/p-bioswap-640.webp 640w, /img/p-bioswap-960.webp 960w" sizes="(max-width: 900px) 100vw, 1px" /><img src="/img/p-bioswap-960.jpg" srcset="/img/p-bioswap-640.jpg 640w, /img/p-bioswap-960.jpg 960w" sizes="(max-width: 900px) 100vw, 1px" width="960" height="960" alt="" loading="lazy" decoding="async" /></picture></span>
           <span class="meta-m"><span class="d">Motion design</span><span class="yr">2026</span></span>
           <span class="go"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1 8h13M9 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1 8h13M9 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></span>
         </a>
         <div class="rule"></div>
       </li>
-      <li class="row" data-rv data-src="/videos/work/plugverse-product.mp4" data-poster="/videos/work/plugverse-product.jpg" data-ar="16/9">
+      <li class="row" data-rv data-src="/videos/work/pv-turntable.mp4" data-poster="/videos/work/pv-turntable.jpg" data-ar="1/1">
         <a href="/work/plugverse-product" data-handoff data-cursor="View">
           <span class="label no">05</span>
           <span class="t">PlugVerse product</span>
-          <span class="poster film"><img src="/videos/work/plugverse-product.jpg" alt="" loading="lazy" decoding="async" /></span>
+          <span class="poster film"><picture><source type="image/avif" srcset="/img/p-pv-turntable-640.avif 640w, /img/p-pv-turntable-1080.avif 1080w" sizes="(max-width: 900px) 100vw, 1px" /><source type="image/webp" srcset="/img/p-pv-turntable-640.webp 640w, /img/p-pv-turntable-1080.webp 1080w" sizes="(max-width: 900px) 100vw, 1px" /><img src="/img/p-pv-turntable-1080.jpg" srcset="/img/p-pv-turntable-640.jpg 640w, /img/p-pv-turntable-1080.jpg 1080w" sizes="(max-width: 900px) 100vw, 1px" width="1080" height="1080" alt="" loading="lazy" decoding="async" /></picture></span>
           <span class="meta-m"><span class="d">Product design, full stack</span><span class="yr">2025/26</span></span>
           <span class="go"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1 8h13M9 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1 8h13M9 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></span>
         </a>
@@ -103,7 +108,7 @@
         <a href="/work/rubber-band" data-handoff data-cursor="View">
           <span class="label no">06</span>
           <span class="t">Rubber Band</span>
-          <span class="poster film"><img src="/videos/work/rubber-band.jpg" alt="" loading="lazy" decoding="async" /></span>
+          <span class="poster film"><picture><source type="image/avif" srcset="/img/p-rubber-band-640.avif 640w, /img/p-rubber-band-960.avif 960w" sizes="(max-width: 900px) 100vw, 1px" /><source type="image/webp" srcset="/img/p-rubber-band-640.webp 640w, /img/p-rubber-band-960.webp 960w" sizes="(max-width: 900px) 100vw, 1px" /><img src="/img/p-rubber-band-960.jpg" srcset="/img/p-rubber-band-640.jpg 640w, /img/p-rubber-band-960.jpg 960w" sizes="(max-width: 900px) 100vw, 1px" width="960" height="540" alt="" loading="lazy" decoding="async" /></picture></span>
           <span class="meta-m"><span class="d">Live, guitar</span><span class="yr">2025</span></span>
           <span class="go"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1 8h13M9 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1 8h13M9 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></span>
         </a>
@@ -114,12 +119,17 @@
 
   <section class="frames dark" aria-label="Chapel Hill, in frames">
     <p class="big" data-rv><span class="line"><span>Chapel Hill,</span></span><span class="line"><span>in frames</span></span></p>
-    <div class="grid"><figure class="f1" data-speed="0.10" data-rv><div class="film clip"><img src="/photos/v2/franklin-walk.jpg" alt="Franklin St." loading="lazy" decoding="async" /></div><figcaption class="label"><span>Franklin St.</span><span>Chapel Hill</span></figcaption></figure><figure class="f2" data-speed="-0.06" data-rv><div class="film clip"><img src="/photos/v2/houseshow-band.jpg" alt="House show" loading="lazy" decoding="async" /></div><figcaption class="label"><span>House show</span><span>Chapel Hill</span></figcaption></figure><figure class="f3" data-speed="0.14" data-rv><div class="film clip"><img src="/photos/v2/golden.jpg" alt="Still from Cooper Delo footage" loading="lazy" decoding="async" /></div></figure><figure class="f4" data-speed="-0.10" data-rv><div class="film clip"><img src="/photos/v2/belltower.jpg" alt="The bell tower" loading="lazy" decoding="async" /></div><figcaption class="label"><span>The bell tower</span><span>Chapel Hill</span></figcaption></figure><figure class="f5" data-speed="0.06" data-rv><div class="film clip"><img src="/photos/v2/bar-gig.jpg" alt="Might As Well" loading="lazy" decoding="async" /></div><figcaption class="label"><span>Might As Well</span><span>Chapel Hill</span></figcaption></figure><figure class="f6" data-speed="-0.14" data-rv><div class="film clip"><img src="/photos/v2/chiphi.jpg" alt="Chi Phi" loading="lazy" decoding="async" /></div><figcaption class="label"><span>Chi Phi</span><span>Chapel Hill</span></figcaption></figure><figure class="f7" data-speed="0.12" data-rv><div class="film clip"><img src="/photos/v2/title-franklin.jpg" alt="Still from Cooper Delo footage" loading="lazy" decoding="async" /></div></figure><figure class="f8" data-speed="-0.05" data-rv><div class="film clip"><img src="/photos/v2/quad.jpg" alt="Campus" loading="lazy" decoding="async" /></div><figcaption class="label"><span>Campus</span><span>Chapel Hill</span></figcaption></figure></div>
+    <div class="grid"><figure class="f1" data-speed="0.10" data-rv><div class="film clip"><picture><source type="image/avif" srcset="/img/desk-guitar-640.avif 640w, /img/desk-guitar-1280.avif 1280w, /img/desk-guitar-1920.avif 1920w" sizes="(max-width: 800px) 70vw, 45vw" /><source type="image/webp" srcset="/img/desk-guitar-640.webp 640w, /img/desk-guitar-1280.webp 1280w, /img/desk-guitar-1920.webp 1920w" sizes="(max-width: 800px) 70vw, 45vw" /><img src="/img/desk-guitar-1280.jpg" srcset="/img/desk-guitar-640.jpg 640w, /img/desk-guitar-1280.jpg 1280w, /img/desk-guitar-1920.jpg 1920w" sizes="(max-width: 800px) 70vw, 45vw" width="1920" height="1080" alt="Writing, late" loading="lazy" decoding="async" /></picture></div><figcaption class="label"><span>Writing, late</span><span>Chapel Hill</span></figcaption></figure><figure class="f2" data-speed="-0.06" data-rv><div class="film clip"><picture><source type="image/avif" srcset="/img/chiphi-solo-640.avif 640w, /img/chiphi-solo-1280.avif 1280w, /img/chiphi-solo-1920.avif 1920w" sizes="(max-width: 800px) 70vw, 45vw" /><source type="image/webp" srcset="/img/chiphi-solo-640.webp 640w, /img/chiphi-solo-1280.webp 1280w, /img/chiphi-solo-1920.webp 1920w" sizes="(max-width: 800px) 70vw, 45vw" /><img src="/img/chiphi-solo-1280.jpg" srcset="/img/chiphi-solo-640.jpg 640w, /img/chiphi-solo-1280.jpg 1280w, /img/chiphi-solo-1920.jpg 1920w" sizes="(max-width: 800px) 70vw, 45vw" width="1920" height="1080" alt="Chi Phi" loading="lazy" decoding="async" /></picture></div><figcaption class="label"><span>Chi Phi</span><span>Chapel Hill</span></figcaption></figure><figure class="f3" data-speed="0.14" data-rv><div class="film clip"><picture><source type="image/avif" srcset="/img/desk-phone-640.avif 640w, /img/desk-phone-1280.avif 1280w, /img/desk-phone-1920.avif 1920w" sizes="(max-width: 800px) 70vw, 45vw" /><source type="image/webp" srcset="/img/desk-phone-640.webp 640w, /img/desk-phone-1280.webp 1280w, /img/desk-phone-1920.webp 1920w" sizes="(max-width: 800px) 70vw, 45vw" /><img src="/img/desk-phone-1280.jpg" srcset="/img/desk-phone-640.jpg 640w, /img/desk-phone-1280.jpg 1280w, /img/desk-phone-1920.jpg 1920w" sizes="(max-width: 800px) 70vw, 45vw" width="1920" height="1080" alt="Booking the next one" loading="lazy" decoding="async" /></picture></div><figcaption class="label"><span>Booking the next one</span><span>Chapel Hill</span></figcaption></figure><figure class="f4" data-speed="-0.10" data-rv><div class="film clip"><picture><source type="image/avif" srcset="/img/belltower-640.avif 640w, /img/belltower-1280.avif 1280w, /img/belltower-1600.avif 1600w" sizes="(max-width: 800px) 70vw, 45vw" /><source type="image/webp" srcset="/img/belltower-640.webp 640w, /img/belltower-1280.webp 1280w, /img/belltower-1600.webp 1600w" sizes="(max-width: 800px) 70vw, 45vw" /><img src="/img/belltower-1280.jpg" srcset="/img/belltower-640.jpg 640w, /img/belltower-1280.jpg 1280w, /img/belltower-1600.jpg 1600w" sizes="(max-width: 800px) 70vw, 45vw" width="1600" height="900" alt="The bell tower" loading="lazy" decoding="async" /></picture></div><figcaption class="label"><span>The bell tower</span><span>Chapel Hill</span></figcaption></figure><figure class="f5" data-speed="0.06" data-rv><div class="film clip"><picture><source type="image/avif" srcset="/img/bar-gig-640.avif 640w, /img/bar-gig-1280.avif 1280w, /img/bar-gig-1600.avif 1600w" sizes="(max-width: 800px) 70vw, 45vw" /><source type="image/webp" srcset="/img/bar-gig-640.webp 640w, /img/bar-gig-1280.webp 1280w, /img/bar-gig-1600.webp 1600w" sizes="(max-width: 800px) 70vw, 45vw" /><img src="/img/bar-gig-1280.jpg" srcset="/img/bar-gig-640.jpg 640w, /img/bar-gig-1280.jpg 1280w, /img/bar-gig-1600.jpg 1600w" sizes="(max-width: 800px) 70vw, 45vw" width="1600" height="900" alt="Might As Well" loading="lazy" decoding="async" /></picture></div><figcaption class="label"><span>Might As Well</span><span>Chapel Hill</span></figcaption></figure><figure class="f6" data-speed="-0.14" data-rv><div class="film clip"><picture><source type="image/avif" srcset="/img/chiphi-steps-640.avif 640w, /img/chiphi-steps-1280.avif 1280w, /img/chiphi-steps-1600.avif 1600w" sizes="(max-width: 800px) 70vw, 45vw" /><source type="image/webp" srcset="/img/chiphi-steps-640.webp 640w, /img/chiphi-steps-1280.webp 1280w, /img/chiphi-steps-1600.webp 1600w" sizes="(max-width: 800px) 70vw, 45vw" /><img src="/img/chiphi-steps-1280.jpg" srcset="/img/chiphi-steps-640.jpg 640w, /img/chiphi-steps-1280.jpg 1280w, /img/chiphi-steps-1600.jpg 1600w" sizes="(max-width: 800px) 70vw, 45vw" width="1600" height="900" alt="Chi Phi house" loading="lazy" decoding="async" /></picture></div><figcaption class="label"><span>Chi Phi house</span><span>Chapel Hill</span></figcaption></figure><figure class="f7" data-speed="0.08" data-rv><div class="film clip"><picture><source type="image/avif" srcset="/img/chiphi-porch-640.avif 640w, /img/chiphi-porch-1280.avif 1280w, /img/chiphi-porch-1920.avif 1920w" sizes="(max-width: 800px) 70vw, 45vw" /><source type="image/webp" srcset="/img/chiphi-porch-640.webp 640w, /img/chiphi-porch-1280.webp 1280w, /img/chiphi-porch-1920.webp 1920w" sizes="(max-width: 800px) 70vw, 45vw" /><img src="/img/chiphi-porch-1280.jpg" srcset="/img/chiphi-porch-640.jpg 640w, /img/chiphi-porch-1280.jpg 1280w, /img/chiphi-porch-1920.jpg 1920w" sizes="(max-width: 800px) 70vw, 45vw" width="1920" height="1080" alt="Porch show, Rubber Band" loading="lazy" decoding="async" /></picture></div><figcaption class="label"><span>Porch show, Rubber Band</span><span>Chapel Hill</span></figcaption></figure></div>
   </section>
 
   <section class="about light" id="about" aria-label="About">
-    <div class="pic" data-rv><div class="film clip float b"><img src="/photos/v2/library.jpg" alt="Cooper Delo in Davis Library" loading="lazy" decoding="async" /></div></div>
-    <div>
+    <div class="pic" data-rv><div class="film clip float b"><picture><source type="image/avif" srcset="/img/lawn-640.avif 640w, /img/lawn-1280.avif 1280w, /img/lawn-1920.avif 1920w" sizes="(max-width: 900px) 100vw, 40vw" /><source type="image/webp" srcset="/img/lawn-640.webp 640w, /img/lawn-1280.webp 1280w, /img/lawn-1920.webp 1920w" sizes="(max-width: 900px) 100vw, 40vw" /><img src="/img/lawn-1280.jpg" srcset="/img/lawn-640.jpg 640w, /img/lawn-1280.jpg 1280w, /img/lawn-1920.jpg 1920w" sizes="(max-width: 900px) 100vw, 40vw" width="1920" height="1080" alt="Cooper Delo on the lawn at dusk" loading="lazy" decoding="async" /></picture></div></div>
+    <div class="txt">
+      <div class="intro-t" data-rv>
+        <p class="label">About</p>
+        <h2 class="about-h"><span class="line"><span>I'm Cooper.</span></span></h2>
+        <p class="lede">Junior at UNC Chapel Hill, studying CS and Business. I built PlugVerse on my own, play guitar in Rubber Band and shoot and cut my own films.</p>
+      </div>
       <ul class="facts" data-rv>
         <li><span class="label">01</span><span>Built PlugVerse solo. Live since 23 Sep 2026.</span></li>
         <li><span class="label">02</span><span>Guitar in Rubber Band. I run the bookings too.</span></li>
@@ -137,7 +147,7 @@
   </section>
 </main>
 <footer class="contact" id="contact">
-  <div class="bg"><img src="/photos/v2/lawn-gig.jpg" alt="" loading="lazy" decoding="async" /></div>
+  <div class="bg"><picture><source type="image/avif" srcset="/img/chiphi-porch-640.avif 640w, /img/chiphi-porch-1280.avif 1280w, /img/chiphi-porch-1920.avif 1920w" sizes="100vw" /><source type="image/webp" srcset="/img/chiphi-porch-640.webp 640w, /img/chiphi-porch-1280.webp 1280w, /img/chiphi-porch-1920.webp 1920w" sizes="100vw" /><img src="/img/chiphi-porch-1280.jpg" srcset="/img/chiphi-porch-640.jpg 640w, /img/chiphi-porch-1280.jpg 1280w, /img/chiphi-porch-1920.jpg 1920w" sizes="100vw" width="1920" height="1080" alt="" loading="lazy" decoding="async" /></picture></div>
   <p class="label say">Say hi</p>
   <a class="mail" href="mailto:cooper@plugverse.app" data-rv><span class="line"><span data-fit>cooper@plugverse.app</span></span></a>
   <div class="cta">
