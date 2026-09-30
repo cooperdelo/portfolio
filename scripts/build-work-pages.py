@@ -1,23 +1,43 @@
 # Builds index.html, /work/*.html and plugverse.html from one data table.
 # Run: python scripts/build-work-pages.py   (no deps). Output is committed; the site has no build step.
 # v2 (2026-09-29): no view counts or stats anywhere public. The footage is the argument.
+# Photos: every photo slot lives in content/photos.json (see README-PHOTOS.md). This script runs scripts/images.py
+# first, so changing a slot's src and rerunning re-encodes that photo and swaps it into every page that shows the slot.
 import html, pathlib, json
+import images
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 E = html.escape
 EMAIL = "cooper@plugverse.app"
 CAL = "https://cal.com/cooper-delo1"
 
-MAN = json.loads((pathlib.Path(__file__).resolve().parent / "images.json").read_text())
+SLOTS, MAN = images.build()
 
-def pic(key, alt="", sizes="100vw", eager=False, cls=""):
+def mid_w(key):
+    ws = MAN[key]["w"]
+    return next((w for w in ws if w >= 1280), ws[-1])
+
+def pic(key, alt="", sizes="100vw", eager=False, cls="", focus=None):
     m = MAN[key]; ws = m["w"]; W, H = m["ar"]
     ss = lambda ext: ", ".join(f"/img/{key}-{w}.{ext} {w}w" for w in ws)
-    mid = next((w for w in ws if w >= 1280), ws[-1])
+    mid = mid_w(key)
     load = 'fetchpriority="high" decoding="async"' if eager else 'loading="lazy" decoding="async"'
     c = f' class="{cls}"' if cls else ""
+    st = f' style="object-position:{E(focus)}"' if focus else ""
     return (f'<picture><source type="image/avif" srcset="{ss("avif")}" sizes="{sizes}" /><source type="image/webp" srcset="{ss("webp")}" sizes="{sizes}" />'
-            f'<img{c} src="/img/{key}-{mid}.jpg" srcset="{ss("jpg")}" sizes="{sizes}" width="{W}" height="{H}" alt="{E(alt)}" {load} /></picture>')
+            f'<img{c}{st} src="/img/{key}-{mid}.jpg" srcset="{ss("jpg")}" sizes="{sizes}" width="{W}" height="{H}" alt="{E(alt)}" {load} /></picture>')
+
+def K(slot):
+    """Derivative name (/img/<name>-<w>.<ext>) for a slot in content/photos.json."""
+    return SLOTS[slot]["key"]
+
+def cap(slot):
+    return SLOTS[slot].get("caption", "")
+
+def spic(slot, alt="", sizes="100vw", eager=False, cls=""):
+    """<picture> for a photo slot. The slot's own alt (photos.json) wins over the default passed in here."""
+    s = SLOTS[slot]
+    return pic(s["key"], s.get("alt", alt), sizes, eager, cls, s.get("focus"))
 
 ARROW = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1 8h13M9 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>'
 PLAY = '<svg viewBox="0 0 14 14" aria-hidden="true"><path d="M2 1l11 6-11 6z" fill="currentColor"/></svg>'
@@ -28,26 +48,26 @@ WORK = [
        say="Junior year. Chapel Hill, NC.",
        credits=[("Role", "Director, editor"), ("Year", "2026"), ("Tools", "DaVinci Resolve Studio"),
                 ("Link", [("Instagram", "https://www.instagram.com/p/DcM4LvpxbXi/"), ("TikTok", "https://www.tiktok.com/@cooperdelo/video/7675530318664731934")])],
-       stills=[("w-ch1-belltower", "wide", "The bell tower"), ("w-ch1-street", "", "Franklin St."), ("w-ch1-house", "drop", "")]),
+       stills=[("work-chapter-one-still-1", "wide"), ("work-chapter-one-still-2", ""), ("work-chapter-one-still-3", "drop")]),
   dict(slug="plugverse-launch-film", title="PlugVerse launch film", disc="Short film", year="2026", video="launch-film", ar="16/9",
        full="launch-film-full", full_ar="16/9", runtime="1:00",
        say="My first short film, made for my startup's launch.",
        credits=[("Role", "Director, editor"), ("Year", "2026"), ("Tools", "DaVinci Resolve Studio, Fusion"),
                 ("Link", [("Instagram", "https://www.instagram.com/p/Ddoy0gcTvp2/"), ("TikTok", "https://www.tiktok.com/@cooperdelo/video/7688777020007845151")])],
-       stills=[("w-launch-film-1", "wide", "48 hours before"), ("w-launch-film-2", "", ""), ("w-launch-film-3", "drop", ""), ("w-launch-film-4", "wide", "")]),
+       stills=[("work-plugverse-launch-film-still-1", "wide"), ("work-plugverse-launch-film-still-2", ""), ("work-plugverse-launch-film-still-3", "drop"), ("work-plugverse-launch-film-still-4", "wide")]),
   dict(slug="the-start", title="The Start", disc="Short film, opening", year="2026", video="the-start", ar="16/9",
        full="the-start-full", full_ar="16/9", runtime="0:20",
        say="I am terrified of starting.",
        credits=[("Role", "Director, editor"), ("Year", "2026"), ("Tools", "DaVinci Resolve Studio"),
                 ("Link", [("Instagram", "https://www.instagram.com/p/Ddg7Hn2RAHP/"), ("TikTok", "https://www.tiktok.com/@cooperdelo/video/7687644625829498143")])],
-       stills=[("w-afraid-s1", "", ""), ("w-afraid-s2", "drop", ""), ("w-afraid-s3", "", ""), ("w-afraid-s4", "drop", "")]),
+       stills=[("work-the-start-still-1", ""), ("work-the-start-still-2", "drop"), ("work-the-start-still-3", ""), ("work-the-start-still-4", "drop")]),
   dict(slug="bioswap", title="Bioswap", disc="Motion design", year="2026", video="bioswap", ar="1/1",
        full="bioswap-full", full_ar="1/1", runtime="0:20",
        say="What's your rate?",
        credits=[("Role", "Motion design"), ("Year", "2026"), ("Tools", "Remotion, React"), ("Link", [("plugverse.app", "https://plugverse.app")])],
-       stills=[("w-bioswap-1", "", ""), ("w-bioswap-2", "drop", ""), ("w-bioswap-3", "", ""), ("w-bioswap-4", "drop", "")], still_ar="1/1"),
+       stills=[("work-bioswap-still-1", ""), ("work-bioswap-still-2", "drop"), ("work-bioswap-still-3", ""), ("work-bioswap-still-4", "drop")], still_ar="1/1"),
   dict(slug="plugverse-product", title="PlugVerse product", disc="Product design, full stack", year="2025/26", video="pv-turntable", ar="1/1",
-       say="Every show. One link.", product=True, hero_img="r-pv-hero",
+       say="Every show. One link.", product=True, hero_img="work-plugverse-product-hero",
        credits=[("Role", "Founder. Design, front end, back end"), ("Year", "Nov 2025 to now"),
                 ("Tools", "Next.js, React, Supabase, Stripe Connect, Claude Code"),
                 ("Link", [("plugverse.app", "https://plugverse.app"), ("The company", "/plugverse")])],
@@ -56,19 +76,20 @@ WORK = [
        say="Chapel Hill cover band. I play guitar and run the bookings.",
        credits=[("Role", "Guitar, bookings"), ("Year", "2025 to now"), ("Gear", "PRS Custom 24-08, Telecaster, Pod Go"),
                 ("Link", [("Band page", "/rubber-band"), ("Book the band", "https://plugverse.app/a/2499f269-dff2-4025-85a6-cf1ff8991382")])],
-       stills=[("chiphi-solo", "wide", "Chi Phi, Chapel Hill"), ("bar-gig", "", "Might As Well"), ("chiphi-porch", "drop", "Chi Phi")]),
+       stills=[("work-rubber-band-still-1", "wide"), ("work-rubber-band-still-2", ""), ("work-rubber-band-still-3", "drop")]),
 ]
 
-COMPANY = dict(slug="plugverse", path="/plugverse", no="", title="PlugVerse", disc="Company", year="2025/26", hero_img="w-pv-pitch",
+COMPANY = dict(slug="plugverse", path="/plugverse", no="", title="PlugVerse", disc="Company", year="2025/26", hero_img="plugverse-hero",
        say="I built PlugVerse solo so a band can get booked from one link.",
        credits=[("Role", "Founder. Design and engineering"), ("Year", "Nov 2025 to now. Live 23 Sep 2026"),
                 ("Tools", "Next.js, React, Supabase, Stripe Connect, Claude Code"),
                 ("Link", [("plugverse.app", "https://plugverse.app"), ("Product", "/work/plugverse-product"), ("Launch film", "/work/plugverse-launch-film")])],
-       stills=[("w-pv-luby", "", "Luby Pitch Competition"), ("r-pv-duo", "drop", "Calendar and contract, rendered from the live app"), ("r-pv-hero", "wide", "plugverse.app, rendered from the live app")])
+       stills=[("plugverse-still-1", ""), ("plugverse-still-2", "drop"), ("plugverse-still-3", "wide")])
 
 HEAD_JS = "(function(d){var r=d.documentElement;try{if(sessionStorage.getItem('cd-intro'))r.classList.add('seen')}catch(e){}if(matchMedia('(prefers-reduced-motion: reduce)').matches)r.classList.add('rm')})(document)"
 
-def head(title, desc, url, image="https://cooperdelo.com/img/hero-poster-1280.jpg", preload=""):
+def head(title, desc, url, image=None, preload=""):
+    image = image or f"https://cooperdelo.com/img/{K('home-hero-poster')}-{mid_w(K('home-hero-poster'))}.jpg"
     return f"""<!doctype html>
 <html lang="en">
 <head>
@@ -103,9 +124,9 @@ NAV = f"""<header class="nav label">
 SCRIPTS = """<script src="/assets/lenis.min.js" defer></script>
 <script src="/assets/site.js" defer></script>"""
 
-def footer(bg="chiphi-band"):
+def footer(bg="footer"):
     return f"""<footer class="contact" id="contact">
-  <div class="bg">{pic(bg, "", "100vw")}</div>
+  <div class="bg">{spic(bg, "", "100vw")}</div>
   <p class="label say">Say hi</p>
   <a class="mail" href="mailto:{EMAIL}" data-rv><span class="line"><span data-fit>{EMAIL}</span></span></a>
   <div class="cta">
@@ -144,17 +165,17 @@ def credits_table(w):
 def stills_block(w):
     figs = []
     ar = w.get("still_ar", "16/9").replace("/", " / ")
-    for i, (n, cls, cap) in enumerate(w["stills"]):
+    for i, (n, cls) in enumerate(w["stills"]):
         fl = ["float", "float b", "float c"][i % 3]
-        c = f'<figcaption class="label">{E(cap)}</figcaption>' if cap else ""
+        c = f'<figcaption class="label">{E(cap(n))}</figcaption>' if cap(n) else ""
         sz = "(max-width: 700px) 100vw, " + ("100vw" if cls == "wide" else "50vw")
-        figs.append(f'<figure class="{cls}" data-rv style="--ar:{ar}"><div class="film clip {fl}">{pic(n, w["title"] + ", still " + str(i + 1), sz)}</div>{c}</figure>')
+        figs.append(f'<figure class="{cls}" data-rv style="--ar:{ar}"><div class="film clip {fl}">{spic(n, w["title"] + ", still " + str(i + 1), sz)}</div>{c}</figure>')
     return f'<section class="stills light" aria-label="Stills">{"".join(figs)}</section>' if figs else ""
 
 def product_block():
-    shots = [("r-pv-trio", "wide", "Dashboard, booking chat and landing on iPhone"), ("r-pv-macbook", "", "Rubber Band's booking page"),
-             ("r-pv-duo", "drop", "Calendar and contract"), ("r-pv-mb-dash", "wide", "Artist dashboard")]
-    figs = "".join(f'<figure class="{c}" data-rv style="--ar:{MAN[k]["ar"][0]} / {MAN[k]["ar"][1]}"><div class="film clip">{pic(k, cap, "(max-width: 700px) 100vw, " + ("100vw" if c == "wide" else "50vw"))}</div><figcaption class="label">{E(cap)}</figcaption></figure>' for k, c, cap in shots)
+    shots = [("work-plugverse-product-render-1", "wide"), ("work-plugverse-product-render-2", ""),
+             ("work-plugverse-product-render-3", "drop"), ("work-plugverse-product-render-4", "wide")]
+    figs = "".join(f'<figure class="{c}" data-rv style="--ar:{MAN[K(s)]["ar"][0]} / {MAN[K(s)]["ar"][1]}"><div class="film clip">{spic(s, cap(s), "(max-width: 700px) 100vw, " + ("100vw" if c == "wide" else "50vw"))}</div><figcaption class="label">{E(cap(s))}</figcaption></figure>' for s, c in shots)
     turn = """<figure class="turn" data-rv><div class="film clip"><video data-lazy muted loop playsinline preload="none" poster="/videos/work/pv-turntable.jpg" aria-label="PlugVerse on iPhone, turntable"><source src="/videos/work/pv-turntable.webm" type="video/webm; codecs=av01.0.08M.08" /><source src="/videos/work/pv-turntable.mp4" type="video/mp4" /></video></div><figcaption class="label">Real screens, rendered in Blender</figcaption></figure>"""
     return f'<section class="renders dark" aria-label="Device renders">{figs}{turn}</section>'
 
@@ -162,8 +183,8 @@ def case(w, nxt, no):
     poster = f"/videos/work/{w.get('video')}.jpg"
     if w.get("hero_img"):
         k = w["hero_img"]
-        media = f'<div class="media"><div class="zoom">{pic(k, w["title"], "(max-width: 700px) 180vh, 100vw" if w.get("product") else "100vw", eager=True)}</div></div>'
-        poster = f"/img/{k}-1280.jpg"
+        media = f'<div class="media"><div class="zoom">{spic(k, w["title"], "(max-width: 700px) 180vh, 100vw" if w.get("product") else "100vw", eager=True)}</div></div>'
+        poster = f"/img/{K(k)}-{mid_w(K(k))}.jpg"
     else:
         media = f'<div class="media"><div class="zoom"><video src="/videos/work/{w["video"]}.mp4" poster="{poster}" autoplay muted loop playsinline preload="auto" aria-label="{E(w["title"])}, loop"></video></div></div>'
         if w["ar"] in ("1/1", "9/16"):
@@ -210,7 +231,7 @@ def case(w, nxt, no):
   <a class="next dark" href="/work/{nxt['slug']}" data-cursor="Next">
     <span class="label"><span>Next</span><span>{E(nxt['disc'])}</span></span>
     <span class="t">{E(nxt['title'])}</span>
-    <span class="thumb film">{pic("p-" + nxt["video"], "", "(max-width: 800px) 100vw, 26vw")}</span>
+    <span class="thumb film">{spic("work-poster-" + nxt["slug"], "", "(max-width: 800px) 100vw, 26vw")}</span>
   </a>
 </main>
 {footer()}
@@ -227,7 +248,7 @@ def index_rows():
         <a href="/work/{w['slug']}" data-handoff data-cursor="View">
           <span class="label no">{no}</span>
           <span class="t">{E(w['title'])}</span>
-          <span class="poster film">{pic("p-" + w["video"], "", "(max-width: 900px) 100vw, 1px")}</span>
+          <span class="poster film">{spic("work-poster-" + w["slug"], "", "(max-width: 900px) 100vw, 1px")}</span>
           <span class="meta-m"><span class="d">{E(w['disc'])}</span><span class="yr">{E(w['year'])}</span></span>
           <span class="go">{ARROW}{ARROW}</span>
         </a>
@@ -235,12 +256,13 @@ def index_rows():
       </li>""")
     return "\n".join(out)
 
-FRAMES = [("desk-guitar", "f1", "Writing, late", "0.10"), ("chiphi-solo", "f2", "Chi Phi", "-0.06"), ("desk-phone", "f3", "Booking the next one", "0.14"),
-          ("belltower", "f4", "The bell tower", "-0.10"), ("bar-gig", "f5", "Might As Well", "0.06"), ("chiphi-steps", "f6", "Chi Phi house", "-0.14"),
-          ("chiphi-porch", "f7", "Porch show, Rubber Band", "0.08")]
+# collage layout: (photo slot, grid position class, parallax speed). Photos and captions live in content/photos.json.
+FRAMES = [("home-collage-1", "f1", "0.10"), ("home-collage-2", "f2", "-0.06"), ("home-collage-3", "f3", "0.14"),
+          ("home-collage-4", "f4", "-0.10"), ("home-collage-5", "f5", "0.06"), ("home-collage-6", "f6", "-0.14"),
+          ("home-collage-7", "f7", "0.08")]
 
 def frames_block():
-    figs = "".join(f'<figure class="{c}" data-speed="{sp}" data-rv><div class="film clip">{pic(n, cap or "Cooper Delo", "(max-width: 800px) 70vw, 45vw")}</div>{f"""<figcaption class="label"><span>{E(cap)}</span><span>Chapel Hill</span></figcaption>""" if cap else ""}</figure>' for n, c, cap, sp in FRAMES)
+    figs = "".join(f'<figure class="{c}" data-speed="{sp}" data-rv><div class="film clip">{spic(n, cap(n) or "Cooper Delo", "(max-width: 800px) 70vw, 45vw")}</div>{f"""<figcaption class="label"><span>{E(cap(n))}</span><span>Chapel Hill</span></figcaption>""" if cap(n) else ""}</figure>' for n, c, sp in FRAMES)
     return figs
 
 INDEX = """{HEAD}
@@ -253,7 +275,7 @@ INDEX = """{HEAD}
 <main>
   <section class="title">
     <div class="bg">
-      <picture><source media="(max-width: 700px)" type="image/avif" srcset="/img/hero-poster-m-720.avif" /><source media="(max-width: 700px)" srcset="/img/hero-poster-m-720.jpg" /><source type="image/avif" srcset="/img/hero-poster-1280.avif 1280w, /img/hero-poster-1920.avif 1920w" sizes="100vw" /><img src="/img/hero-poster-1920.jpg" srcset="/img/hero-poster-1280.jpg 1280w, /img/hero-poster-1920.jpg 1920w" sizes="100vw" width="1920" height="1080" alt="Cooper Delo on Franklin Street, Chapel Hill" fetchpriority="high" decoding="async" /></picture>
+      {HEROPIC}
       <video class="hero-vid" muted loop playsinline autoplay preload="auto" data-d="/videos/hero/hero-1920" data-m="/videos/hero/hero-720x1280" aria-hidden="true"></video>
     </div>
     <div class="copy">
@@ -367,7 +389,7 @@ def resume_page():
 {NAV}
 <main>
   <section class="r-hero dark">
-    <div class="r-pic film">{pic("chiphi-solo-2", "Cooper Delo playing guitar at Chi Phi", "(max-width: 800px) 100vw, 55vw", eager=True)}</div>
+    <div class="r-pic film">{spic("resume-hero", "Cooper Delo playing guitar at Chi Phi", "(max-width: 800px) 100vw, 55vw", eager=True)}</div>
     <div class="r-copy" data-hero>
       <p class="label">Resume, 2026</p>
       <h1>{lines("Cooper")}{lines("Delo")}</h1>
@@ -384,9 +406,9 @@ def resume_page():
     <ol class="rrows">{resume_rows(RESUME_ROLES, 1)}</ol>
   </section>
   <section class="r-strip dark" aria-label="Photos">
-    <figure class="film">{pic("desk-guitar", "Cooper at his desk with a guitar", "(max-width: 700px) 100vw, 33vw")}</figure>
-    <figure class="film">{pic("bar-gig", "Cooper at Might As Well", "(max-width: 700px) 100vw, 33vw")}</figure>
-    <figure class="film">{pic("w-pv-luby", "Luby Pitch Competition", "(max-width: 700px) 100vw, 33vw")}</figure>
+    <figure class="film">{spic("resume-strip-1", "Cooper at his desk with a guitar", "(max-width: 700px) 100vw, 33vw")}</figure>
+    <figure class="film">{spic("resume-strip-2", "Cooper at Might As Well", "(max-width: 700px) 100vw, 33vw")}</figure>
+    <figure class="film">{spic("resume-strip-3", "Luby Pitch Competition", "(max-width: 700px) 100vw, 33vw")}</figure>
   </section>
   <section class="r-list light" aria-label="Projects and leadership">
     <h2 class="r-h" data-rv>{lines("Projects")}</h2>
@@ -408,13 +430,21 @@ if __name__ == "__main__":
         (ROOT / "work" / f"{w['slug']}.html").write_text(case(w, WORK[(i + 1) % len(WORK)], f"{i + 1:02d}"), encoding="utf-8")
     (ROOT / "plugverse.html").write_text(case(COMPANY, WORK[4], ""), encoding="utf-8")
     (ROOT / "resume.html").write_text(resume_page(), encoding="utf-8")
-    HP = """
-<link rel="preload" as="image" type="image/avif" media="(min-width: 701px)" imagesrcset="/img/hero-poster-1280.avif 1280w, /img/hero-poster-1920.avif 1920w" imagesizes="100vw" fetchpriority="high" />
-<link rel="preload" as="image" type="image/avif" media="(max-width: 700px)" href="/img/hero-poster-m-720.avif" fetchpriority="high" />"""
+    hd, hm = K("home-hero-poster"), K("home-hero-poster-mobile")
+    dws = [w for w in MAN[hd]["w"] if w >= 1280] or MAN[hd]["w"][-1:]
+    mw = MAN[hm]["w"][-1]
+    dset = lambda ext: ", ".join(f"/img/{hd}-{w}.{ext} {w}w" for w in dws)
+    HW, HH = MAN[hd]["ar"]
+    HEROPIC = (f'<picture><source media="(max-width: 700px)" type="image/avif" srcset="/img/{hm}-{mw}.avif" /><source media="(max-width: 700px)" srcset="/img/{hm}-{mw}.jpg" />'
+               f'<source type="image/avif" srcset="{dset("avif")}" sizes="100vw" /><img src="/img/{hd}-{dws[-1]}.jpg" srcset="{dset("jpg")}" sizes="100vw" width="{HW}" height="{HH}" '
+               f'alt="{E(SLOTS["home-hero-poster"].get("alt", ""))}" fetchpriority="high" decoding="async" /></picture>')
+    HP = f"""
+<link rel="preload" as="image" type="image/avif" media="(min-width: 701px)" imagesrcset="{dset("avif")}" imagesizes="100vw" fetchpriority="high" />
+<link rel="preload" as="image" type="image/avif" media="(max-width: 700px)" href="/img/{hm}-{mw}.avif" fetchpriority="high" />"""
     page = (INDEX.replace("{HEAD}", head("Cooper Delo", "Founder of PlugVerse. Films, motion and product. CS and Business at UNC Chapel Hill.", "https://cooperdelo.com", preload=HP))
-            .replace("{NAV}", NAV).replace("{ROWS}", index_rows()).replace("{COUNT}", str(len(WORK)))
+            .replace("{NAV}", NAV).replace("{HEROPIC}", HEROPIC).replace("{ROWS}", index_rows()).replace("{COUNT}", str(len(WORK)))
             .replace("{L1}", lines("Selected work")).replace("{L2}", lines("Chapel Hill,")).replace("{L3}", lines("in frames"))
-            .replace("{FRAMES}", frames_block()).replace("{FOOTER}", footer("chiphi-porch")).replace("{ABOUTPIC}", pic("lawn", "Cooper Delo on the lawn at dusk", "(max-width: 900px) 100vw, 40vw")).replace("{SCRIPTS}", SCRIPTS)
+            .replace("{FRAMES}", frames_block()).replace("{FOOTER}", footer("home-footer")).replace("{ABOUTPIC}", spic("home-about", "Cooper Delo on the lawn at dusk", "(max-width: 900px) 100vw, 40vw")).replace("{SCRIPTS}", SCRIPTS)
             .replace("{CAL}", CAL).replace("{ARROW}", ARROW))
     (ROOT / "index.html").write_text(page, encoding="utf-8")
     urls = ["/", "/resume", "/plugverse", "/rubber-band", "/privacy", "/terms"] + [f"/work/{w['slug']}" for w in WORK]
