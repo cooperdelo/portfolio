@@ -130,7 +130,7 @@ html.seen .intro, html.rm .intro { display: none; }
 .wordmark .m { display: none; }
 @media (max-width: 700px) {
   .title { height: 92svh; min-height: 560px; }
-  .title .bg img, .title .hero-vid { object-position: 50% 50%; }
+  .title .bg img, .title .hero-vid { object-position: 15% 50%; }
   .title .copy { top: 72px; flex-direction: column; }
   .title h1 { font-size: 25px; }
   .title .meta { text-align: left; align-items: flex-start; }
