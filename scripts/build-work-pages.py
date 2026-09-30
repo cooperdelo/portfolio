@@ -56,7 +56,7 @@ WORK = [
        say="Chapel Hill cover band. I play guitar and run the bookings.",
        credits=[("Role", "Guitar, bookings"), ("Year", "2025 to now"), ("Gear", "PRS Custom 24-08, Telecaster, Pod Go"),
                 ("Link", [("Band page", "/rubber-band"), ("Book the band", "https://plugverse.app/a/2499f269-dff2-4025-85a6-cf1ff8991382")])],
-       stills=[("chiphi-solo", "wide", "Chi Phi, Chapel Hill"), ("bar-gig", "", "Might As Well"), ("chiphi-porch", "drop", "Chi Phi"), ("chiphi-solo-2", "wide", "")]),
+       stills=[("chiphi-solo", "wide", "Chi Phi, Chapel Hill"), ("bar-gig", "", "Might As Well"), ("chiphi-porch", "drop", "Chi Phi")]),
 ]
 
 COMPANY = dict(slug="plugverse", path="/plugverse", no="", title="PlugVerse", disc="Company", year="2025/26", hero_img="w-pv-pitch",
@@ -64,7 +64,7 @@ COMPANY = dict(slug="plugverse", path="/plugverse", no="", title="PlugVerse", di
        credits=[("Role", "Founder. Design and engineering"), ("Year", "Nov 2025 to now. Live 23 Sep 2026"),
                 ("Tools", "Next.js, React, Supabase, Stripe Connect, Claude Code"),
                 ("Link", [("plugverse.app", "https://plugverse.app"), ("Product", "/work/plugverse-product"), ("Launch film", "/work/plugverse-launch-film")])],
-       stills=[("w-pv-luby", "", "Luby Pitch Competition"), ("w-pv-merch", "drop", "Merch"), ("r-pv-hero", "wide", "plugverse.app, rendered from the live app")])
+       stills=[("w-pv-luby", "", "Luby Pitch Competition"), ("r-pv-duo", "drop", "Calendar and contract, rendered from the live app"), ("r-pv-hero", "wide", "plugverse.app, rendered from the live app")])
 
 HEAD_JS = "(function(d){var r=d.documentElement;try{if(sessionStorage.getItem('cd-intro'))r.classList.add('seen')}catch(e){}if(matchMedia('(prefers-reduced-motion: reduce)').matches)r.classList.add('rm')})(document)"
 
