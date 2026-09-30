@@ -1,330 +1,161 @@
 // =====================================================================
-// /admin/finance/_js/dashboard.js — finance overview
+// /admin/finance/_js/dashboard.js — Finance overview v7 (2026-09-29).
+// Reads: account_balances + personal_balance_snapshots (live-data balances()),
+// financial_transactions, v_fund_1789. Realtime refresh on financial_transactions.
 // =====================================================================
 import { sb, fmtUSD, fmtUSDCompact, fmtMonth, subscribeTransactions } from '/admin/_shell/supabase.js';
 import { mountShell, toast, monthsBack, monthKey } from '/admin/_shell/admin-shell.js';
 import { balances } from '/admin/_shell/live-data.js';
-import { reveal, countUp } from '/admin/_shell/motion.js';
+import { statTile, esc } from '/admin/_shell/ui.js';
+import { reveal, countUp, growX } from '/admin/_shell/motion.js';
+import { C, applyChartTheme, fillUnder } from '/admin/_shell/chart-theme.js';
 
-const ctx = await mountShell({ title: 'Finance · Overview', demo: true });
-const DEMO = !!ctx?.demo;
+await mountShell({ title: 'Finance · Overview', demo: true });
+applyChartTheme();
 
-// ---------------- Balances (Mercury auto + money-watch email alerts) ----------------
 const ACCT = { wells_fargo_checking: 'Wells Fargo checking', roth_ira: 'Roth IRA', coinbase_crypto: 'Coinbase' };
 const acctName = (a) => ACCT[a] || String(a || '').replace(/_/g, ' ').replace(/^./, c => c.toUpperCase());
 const dayLbl = (d) => new Date(String(d).length === 10 ? d + 'T12:00:00' : d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'America/New_York' });
 const hrsOld = (d) => (Date.now() - new Date(String(d).length === 10 ? d + 'T23:59:00' : d).getTime()) / 3.6e6;
+const usd0 = (v) => '$' + Math.round(Number(v) || 0).toLocaleString('en-US');
+const $ = (id) => document.getElementById(id);
+function setStat(id, o) { const el = $(id); el.className = 'stat' + (o.accent ? ' is-accent' : ''); const t = document.createElement('div'); t.innerHTML = statTile(o); el.innerHTML = t.firstElementChild.innerHTML; }
+
+// ---------------- Balances ----------------
 async function renderBalances() {
-  const el = document.getElementById('balances');
+  const el = $('balances');
   let b;
-  try { b = await balances(); } catch (e) { el.innerHTML = `<div class="sv-empty"><div class="e1">Couldn't load balances</div><div class="e2">${escapeHtml(e?.message || e)}</div></div>`; return; }
-  const group = (title, rows, name, cls, src, staleH) => {
-    if (!rows.length) return `<div class="bal-group ${cls}"><h3>${title}</h3><div class="sv-empty"><div class="e1">No balance yet</div></div></div>`;
-    const tot = rows.reduce((a, r) => a + Number(r.balance || 0), 0);
-    const asof = rows.map(r => r.as_of).sort().pop();
-    const stale = hrsOld(asof) > staleH;
-    return `<div class="bal-group ${cls}"><h3>${title}</h3>
-      <div class="bal-tot"><span class="v" data-usd="${tot}">${fmtUSD(tot)}</span></div>
-      ${rows.map(r => `<div class="bal-row"><span class="n">${escapeHtml(name(r))}</span><span class="v">${fmtUSD(r.balance)}</span></div>`).join('')}
-      <div class="bal-meta">${src} · as of ${dayLbl(asof)}${stale ? ' <span class="chip stale red">stale</span>' : ''}</div></div>`;
-  };
-  el.innerHTML = `<div class="bal-grid">
-    ${group('PlugVerse · Mercury', b.business, r => r.account_label + (r.balance_kind && r.balance_kind !== 'available' ? ` (${r.balance_kind})` : ''), 'pv', 'Mercury, available', 48)}
-    ${group('Personal', b.personal, r => acctName(r.account), '', 'Balance alert emails', 24 * 7)}
-  </div>`;
-  reveal(el.querySelectorAll('.bal-group'), { stagger: 80 });
-  el.querySelectorAll('[data-usd]').forEach((n, i) => countUp(n, Number(n.dataset.usd), { delay: 120 + i * 80, format: (v) => fmtUSD(v) }));
+  try { b = await balances(); } catch (e) { el.innerHTML = `<div class="sv-empty"><div class="e1">Couldn't load balances</div><div class="e2">${esc(e?.message || e)}</div></div>`; return; }
+  const tot = (rows) => rows.reduce((a, r) => a + Number(r.balance || 0), 0);
+  const asof = (rows) => rows.map(r => r.as_of).sort().pop();
+  const staleChip = (d, h) => d && hrsOld(d) > h ? ' <span class="chip stale">stale</span>' : '';
+  setStat('hsBiz', { k: 'PlugVerse cash', v: b.business.length ? `<span data-usd="${tot(b.business)}">$0</span>` : '–', d: b.business.length ? `${b.business.length} Mercury accounts` : 'No balance yet', src: b.business.length ? `Mercury · available · as of ${dayLbl(asof(b.business))}${staleChip(asof(b.business), 48)}` : 'Mercury' });
+  setStat('hsPers', { k: 'Personal cash', v: b.personal.length ? `<span data-usd="${tot(b.personal)}">$0</span>` : '–', d: b.personal.map(r => acctName(r.account)).join(' · '), src: b.personal.length ? `Balance alert emails · as of ${dayLbl(asof(b.personal))}${staleChip(asof(b.personal), 168)}` : 'Balance alert emails' });
+  document.querySelectorAll('#hero [data-usd]').forEach((n, i) => countUp(n, Number(n.dataset.usd), { delay: i * 90, format: usd0 }));
+  const group = (title, rows, name) => rows.length ? `<div class="t-label" style="color:var(--text-3);margin:14px 0 2px">${title}</div>${rows.map(r => `<div class="bal-row"><span class="n">${esc(name(r))}</span><span class="v">${fmtUSD(r.balance)}</span></div>`).join('')}` : '';
+  el.innerHTML = `<div class="sv-h" style="margin-bottom:0"><h2>Accounts</h2></div>
+    ${group('PlugVerse · Mercury', b.business, r => r.account_label + (r.balance_kind && r.balance_kind !== 'available' ? ` (${r.balance_kind})` : ''))}
+    ${group('Personal', b.personal, r => acctName(r.account))}`;
 }
 renderBalances();
 
-// Brand palette (matches shell.css)
-const C = {
-  ink:     __cv('--text','#F4EFE6'),
-  ink2:    __cv('--text-2','#DDD4C5'),
-  muted:   __cv('--text-3','#6F6A60'),
-  rust:    __cv('--accent','#FF4D2E'),
-  crimson: '#C8102E',
-  stage:   '#6B3FA0',
-  pink:    '#F2C1D1',
-  cyan:    '#B2E3E1',
-  lavender:'#C9BEE6',
-  sage:    '#7A8A6E',
-  cream:   '#F2EDE4',
-};
-
-// Chart.js global theme
-Chart.defaults.color = C.ink2;
-Chart.defaults.font.family = '"Geist Mono", ui-monospace, monospace';
-Chart.defaults.font.size = 11;
-Chart.defaults.borderColor = __cv('--border','rgba(244,239,230,0.10)');
-Chart.defaults.plugins.legend.labels.color = C.ink2;
-Chart.defaults.plugins.tooltip.backgroundColor = __cv('--surface','rgba(20,17,15,0.95)');
-Chart.defaults.plugins.tooltip.titleColor = C.ink;
-Chart.defaults.plugins.tooltip.bodyColor = C.ink2;
-Chart.defaults.plugins.tooltip.borderColor = __cv('--border-2','rgba(244,239,230,0.18)');
-Chart.defaults.plugins.tooltip.borderWidth = 1;
-Chart.defaults.plugins.tooltip.padding = 10;
-Chart.defaults.plugins.tooltip.cornerRadius = 8;
-
 const charts = {};
-
 async function loadAll() {
-  // Pull everything we need in parallel
   const [tx, fund] = await Promise.all([
     sb.from('financial_transactions').select('*').is('deleted_at', null).order('date', { ascending: false }),
     sb.from('v_fund_1789').select('*').single(),
   ]);
-
-  if (tx.error)   { toast('Failed to load transactions', 'err'); console.error(tx.error); return; }
+  if (tx.error) { toast('Failed to load transactions', 'err'); console.error(tx.error); return; }
   const rows = tx.data || [];
   renderKpis(rows, fund.data || { total_received: 0, total_spent: 0, remaining: 0 });
   renderFlow(rows);
   renderCategories(rows);
   renderRunway(rows);
-  renderEntity(rows);
-  renderRecent(rows.slice(0, 12));
+  renderRecent(rows.slice(0, 10));
 }
 
-// ---------------- KPI cards ----------------
-
+// ---------------- KPIs ----------------
 function renderKpis(rows, fund) {
-  const now  = new Date();
-  const year = now.getFullYear();
-  const mkey = monthKey(now);
-
-  const pv  = rows.filter(r => r.entity === 'plugverse');
-  const pvIncome  = sumIf(pv, r => r.type === 'income');
-  const pvExpense = sumIf(pv, r => r.type === 'expense');
+  const now = new Date(), year = now.getFullYear(), mkey = monthKey(now);
+  const pv = rows.filter(r => r.entity === 'plugverse');
+  const pvIncome = sumIf(pv, r => r.type === 'income'), pvExpense = sumIf(pv, r => r.type === 'expense');
   const pvNet = pvIncome - pvExpense;
-
-  const personalMtd = sumIf(rows, r =>
-    r.entity === 'personal' && r.type === 'expense' && monthKey(r.date) === mkey
-  );
-  const foodMtd = sumIf(rows, r =>
-    r.is_food_log === true && monthKey(r.date) === mkey
-  );
-  const deductYtd = sumIf(rows, r =>
-    r.is_tax_deductible && new Date(r.date).getFullYear() === year
-  );
+  const personalMtd = sumIf(rows, r => r.entity === 'personal' && r.type === 'expense' && monthKey(r.date) === mkey);
+  const prevKey = monthKey(new Date(now.getFullYear(), now.getMonth() - 1, 1));
+  const personalPrev = sumIf(rows, r => r.entity === 'personal' && r.type === 'expense' && monthKey(r.date) === prevKey);
+  const foodMtd = sumIf(rows, r => r.is_food_log === true && monthKey(r.date) === mkey);
+  const deductYtd = sumIf(rows, r => r.is_tax_deductible && new Date(r.date).getFullYear() === year);
   const recent30 = rows.filter(r => daysAgo(r.date) <= 30).length;
-
-  setK('pv_net',          fmtUSDCompact(pvNet));
-  setK('pv_delta',        `In ${fmtUSDCompact(pvIncome)} · Out ${fmtUSDCompact(pvExpense)}`);
-  setK('fund_remaining',  fmtUSDCompact(fund.remaining));
-  setK('fund_delta',      `${fmtUSD(fund.total_spent)} spent of $1,850 award`);
-  setK('pers_mtd',        fmtUSDCompact(personalMtd));
-  setK('pers_delta',      'This month · personal expenses');
-  setK('food_mtd',        fmtUSDCompact(foodMtd));
-  setK('food_delta',      'This month · for parents');
-  setK('ded_ytd',         fmtUSDCompact(deductYtd));
-  setK('ded_delta',       `${year} · tax deductible`);
-  setK('tx_count',        rows.length);
-  setK('tx_recent',       `${recent30} in last 30 days`);
-
-  // Color the deltas
-  setDelta('pv_delta', pvNet >= 0 ? 'pos' : 'neg');
+  const newest = rows[0]?.date;
+  setStat('hsPv', { k: 'PlugVerse net', v: `<span data-usd="${pvNet}">$0</span>`, d: `In ${fmtUSDCompact(pvIncome)} · out ${fmtUSDCompact(pvExpense)}`, src: `Ledger · all time${newest ? ' · as of ' + dayLbl(newest) : ''}` });
+  setStat('hsMtd', { k: 'Spent this month', v: `<span data-usd="${personalMtd}">$0</span>`, d: personalPrev ? `<span class="chip ${personalMtd > personalPrev ? 'up' : 'down'}">${fmtUSDCompact(personalPrev)} last month</span>` : '', src: `Personal · card alerts + Mercury${newest ? ' · as of ' + dayLbl(newest) : ''}` });
+  document.querySelectorAll('#hsPv [data-usd], #hsMtd [data-usd]').forEach((n, i) => countUp(n, Number(n.dataset.usd), { delay: i * 90, format: usd0 }));
+  setK('fund_remaining', fmtUSDCompact(fund.remaining));
+  setK('fund_delta', `${fmtUSD(fund.total_spent)} of $1,850 spent`);
+  setK('food_mtd', fmtUSDCompact(foodMtd));
+  setK('ded_ytd', fmtUSDCompact(deductYtd));
+  setK('ded_delta', String(year));
+  setK('tx_count', rows.length);
+  setK('tx_recent', `${recent30} in 30 days`);
 }
-
-function setK(key, val) {
-  const el = document.querySelector(`[data-k="${key}"]`);
-  if (el) el.textContent = val;
-}
-function setDelta(key, cls) {
-  const el = document.querySelector(`[data-k="${key}"]`);
-  if (el) el.className = 'delta ' + cls;
-}
-function sumIf(rows, pred) {
-  return rows.reduce((acc, r) => acc + (pred(r) ? Number(r.amount) : 0), 0);
-}
-function daysAgo(dateStr) {
-  return (Date.now() - new Date(dateStr).getTime()) / 86400000;
-}
+function setK(key, val) { const el = document.querySelector(`[data-k="${key}"]`); if (el) el.textContent = val; }
+function sumIf(rows, pred) { return rows.reduce((acc, r) => acc + (pred(r) ? Number(r.amount) : 0), 0); }
+function daysAgo(dateStr) { return (Date.now() - new Date(dateStr).getTime()) / 86400000; }
 
 // ---------------- Charts ----------------
-
-function gradient(ctx, color) {
-  const g = ctx.createLinearGradient(0, 0, 0, ctx.canvas.height);
-  g.addColorStop(0, color + 'CC');
-  g.addColorStop(1, color + '11');
-  return g;
-}
-
 function renderFlow(rows) {
   const months = monthsBack(12);
-  const labels = months.map(d => fmtMonth(d));
-  const inflow  = months.map(d => sumIf(rows, r => r.type === 'income'  && monthKey(r.date) === monthKey(d)));
+  const labels = months.map(d => d.toLocaleDateString('en-US', { month: 'short' }));
+  const inflow = months.map(d => sumIf(rows, r => r.type === 'income' && monthKey(r.date) === monthKey(d)));
   const outflow = months.map(d => sumIf(rows, r => r.type === 'expense' && monthKey(r.date) === monthKey(d)));
-
-  const ctx = document.getElementById('chart-flow').getContext('2d');
   charts.flow?.destroy();
-  charts.flow = new Chart(ctx, {
+  charts.flow = new Chart($('chart-flow').getContext('2d'), {
     type: 'bar',
-    data: {
-      labels,
-      datasets: [
-        { label: 'Income',  data: inflow,  backgroundColor: C.sage,   borderRadius: 4, borderSkipped: false },
-        { label: 'Expense', data: outflow, backgroundColor: C.rust,   borderRadius: 4, borderSkipped: false },
-      ],
-    },
-    options: chartOpts({ grid: true, money: true }),
+    data: { labels, datasets: [
+      { label: 'In', data: inflow, backgroundColor: C.bone },
+      { label: 'Out', data: outflow, backgroundColor: 'rgba(244,241,234,.26)' },
+    ] },
+    options: chartOpts({ money: true }),
   });
+  void fmtMonth;
 }
-
+// Categories as pill meters (no donut): the biggest is solid bone.
 function renderCategories(rows) {
   const since = new Date(); since.setDate(since.getDate() - 90);
   const buckets = {};
-  for (const r of rows) {
-    if (new Date(r.date) < since) continue;
-    if (r.type !== 'expense') continue;
-    const k = r.category || 'uncategorized';
-    buckets[k] = (buckets[k] || 0) + Number(r.amount);
-  }
-  const entries = Object.entries(buckets).sort((a,b)=>b[1]-a[1]).slice(0, 8);
-  const labels  = entries.map(([k])=> prettyCat(k));
-  const data    = entries.map(([,v])=> v);
-  const palette = [C.rust, C.crimson, C.stage, C.lavender, C.cyan, C.pink, C.sage, C.cream];
-
-  const ctx = document.getElementById('chart-cats').getContext('2d');
-  charts.cats?.destroy();
-  charts.cats = new Chart(ctx, {
-    type: 'doughnut',
-    data: { labels, datasets: [{ data, backgroundColor: palette, borderColor: 'rgba(10,9,8,0.6)', borderWidth: 2 }] },
-    options: {
-      maintainAspectRatio: false,
-      cutout: '62%',
-      plugins: {
-        legend: { position: 'bottom', labels: { boxWidth: 10, padding: 10, font: { size: 10 } } },
-        tooltip: { callbacks: { label: (c) => `${c.label}: ${fmtUSD(c.parsed)}` } },
-      },
-    },
-  });
+  for (const r of rows) { if (new Date(r.date) < since || r.type !== 'expense') continue; const k = r.category || 'uncategorized'; buckets[k] = (buckets[k] || 0) + Number(r.amount); }
+  const entries = Object.entries(buckets).sort((a, b) => b[1] - a[1]).slice(0, 7);
+  const max = entries[0]?.[1] || 1;
+  $('cats').innerHTML = entries.map(([k, v], i) => `<div class="row" style="display:block;padding:10px 0">
+      <div style="display:flex;justify-content:space-between;gap:10px;margin-bottom:7px"><span class="t" style="font-weight:400;color:var(--text-2)">${esc(prettyCat(k))}</span><span class="r">${usd0(v)}</span></div>
+      <div class="meter thin"><i data-growx style="--p:${(v / max * 100).toFixed(1)}%;${i ? 'opacity:.45' : ''}"></i></div></div>`).join('') || '<div class="empty">No spend in 90 days.</div>';
+  growX($('cats'), { delay: 200, stagger: 70 });
 }
-
 function renderRunway(rows) {
-  const pv = rows.filter(r => r.entity === 'plugverse').sort((a,b)=> new Date(a.date) - new Date(b.date));
+  const pv = rows.filter(r => r.entity === 'plugverse').sort((a, b) => new Date(a.date) - new Date(b.date));
   let running = 0;
-  const points = pv.map(r => {
-    running += (r.type === 'income' ? +Number(r.amount) : -Number(r.amount));
-    return { x: r.date, y: running };
-  });
-
-  const ctx = document.getElementById('chart-runway').getContext('2d');
+  const points = pv.map(r => { running += (r.type === 'income' ? +Number(r.amount) : -Number(r.amount)); return { x: r.date, y: running }; });
+  const ctx = $('chart-runway').getContext('2d');
   charts.runway?.destroy();
   charts.runway = new Chart(ctx, {
     type: 'line',
-    data: {
-      datasets: [{
-        label: 'Plugverse · cumulative net',
-        data: points,
-        borderColor: C.rust,
-        backgroundColor: gradient(ctx, C.rust),
-        fill: true,
-        tension: 0.34,
-        borderWidth: 2,
-        pointRadius: 0,
-        pointHoverRadius: 4,
-        pointHoverBackgroundColor: C.rust,
-      }],
-    },
-    options: chartOpts({ grid: true, money: true, time: true }),
+    data: { datasets: [{ label: 'PlugVerse · cumulative net', data: points, borderColor: C.bone, backgroundColor: fillUnder(ctx), fill: true, borderWidth: 1.6, pointHoverRadius: 4, pointHoverBackgroundColor: C.bone }] },
+    options: chartOpts({ money: true, time: true, legend: false }),
   });
 }
-
-function renderEntity(rows) {
-  const year = new Date().getFullYear();
-  const ent = { personal: 0, plugverse: 0, '1789_fund': 0 };
-  for (const r of rows) {
-    if (new Date(r.date).getFullYear() !== year) continue;
-    if (ent[r.entity] != null) ent[r.entity] += Number(r.amount);
-  }
-  const ctx = document.getElementById('chart-entity').getContext('2d');
-  charts.entity?.destroy();
-  charts.entity = new Chart(ctx, {
-    type: 'doughnut',
-    data: {
-      labels: ['Personal', 'Plugverse', '1789 Fund'],
-      datasets: [{
-        data: [ent.personal, ent.plugverse, ent['1789_fund']],
-        backgroundColor: [C.lavender, C.rust, C.cyan],
-        borderColor: 'rgba(10,9,8,0.6)', borderWidth: 2,
-      }],
-    },
-    options: {
-      maintainAspectRatio: false, cutout: '62%',
-      plugins: {
-        legend: { position: 'bottom', labels: { boxWidth: 10, padding: 10, font: { size: 10 } } },
-        tooltip: { callbacks: { label: (c) => `${c.label}: ${fmtUSD(c.parsed)}` } },
-      },
-    },
-  });
-}
-
-function chartOpts({ grid = false, money = false, time = false } = {}) {
+function chartOpts({ money = false, time = false, legend = true } = {}) {
   return {
     maintainAspectRatio: false,
     interaction: { mode: 'index', intersect: false },
     plugins: {
-      legend: { position: 'bottom', labels: { boxWidth: 10, padding: 10, font: { size: 10 } } },
+      legend: { display: legend, position: 'top', align: 'end' },
       tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${money ? fmtUSD(c.parsed.y ?? c.parsed) : c.parsed}` } },
     },
     scales: {
-      x: time
-        ? { type: 'time', time: { unit: 'month', tooltipFormat: 'MMM yyyy' }, grid: { color: __cv('--border','rgba(244,239,230,0.05)') } }
-        : { grid: { color: __cv('--border','rgba(244,239,230,0.05)') }, ticks: { autoSkip: true, maxRotation: 0 } },
-      y: { grid: grid ? { color: __cv('--border','rgba(244,239,230,0.05)') } : { display: false }, ticks: { callback: (v) => money ? fmtUSDCompact(v) : v } },
+      x: time ? { type: 'time', time: { unit: 'month', tooltipFormat: 'MMM yyyy' }, grid: { display: false }, border: { display: false } }
+        : { grid: { display: false }, border: { display: false }, ticks: { autoSkip: true, maxRotation: 0 } },
+      y: { grid: { color: C.grid }, border: { display: false }, ticks: { callback: (v) => money ? fmtUSDCompact(v) : v, maxTicksLimit: 5 } },
     },
   };
 }
 
 // ---------------- Recent table ----------------
-
 function renderRecent(rows) {
-  const tbody = document.getElementById('recent-tbody');
-  if (!rows.length) {
-    tbody.innerHTML = `<tr><td colspan="6" class="empty">No transactions yet</td></tr>`;
-    return;
-  }
-  tbody.innerHTML = rows.map(r => {
-    const ent = entityPill(r.entity);
-    const typ = `<span class="pill ${r.type === 'income' ? 'income' : 'expense'}">${r.type}</span>`;
-    const amtClass = r.type === 'income' ? 'pos' : 'neg';
-    return `
-      <tr>
-        <td class="mono meta">${new Date(r.date).toLocaleDateString('en-US', { month:'short', day:'2-digit', year:'2-digit' })}</td>
-        <td>
-          <div class="desc">${escapeHtml(r.description)}</div>
-          ${r.merchant ? `<div class="meta">${escapeHtml(r.merchant)}</div>` : ''}
-        </td>
-        <td>${ent}</td>
-        <td class="mono meta">${prettyCat(r.category)}</td>
-        <td>${typ}</td>
-        <td class="right mono" style="color:${r.type === 'income' ? C.sage : C.rust};">
-          ${r.type === 'income' ? '+' : '−'}${fmtUSD(r.amount)}
-        </td>
-      </tr>`;
-  }).join('');
+  const tbody = $('recent-tbody');
+  if (!rows.length) { tbody.innerHTML = `<tr><td colspan="5" class="empty">No transactions yet</td></tr>`; return; }
+  tbody.innerHTML = rows.map(r => `<tr>
+      <td class="mono">${new Date(r.date).toLocaleDateString('en-US', { month: 'short', day: '2-digit' })}</td>
+      <td><div class="desc">${esc(r.description)}</div>${r.merchant ? `<div class="meta">${esc(r.merchant)}</div>` : ''}</td>
+      <td>${entityPill(r.entity)}</td>
+      <td class="meta">${esc(prettyCat(r.category))}</td>
+      <td class="right" style="font-family:var(--f-display);font-size:12.5px;color:${r.type === 'income' ? 'var(--text)' : 'var(--text-3)'}">${r.type === 'income' ? '+' : '-'}${fmtUSD(r.amount)}</td>
+    </tr>`).join('');
 }
-
-function entityPill(e) {
-  const map = { personal: 'personal', plugverse: 'plugverse', '1789_fund': 'fund1789' };
-  const label = (e || '').replace('_', ' ');
-  return `<span class="pill ${map[e] || ''}">${label}</span>`;
-}
+function entityPill(e) { const map = { personal: 'personal', plugverse: 'plugverse', '1789_fund': 'fund1789' }; return `<span class="pill ${map[e] || ''}">${esc((e || '').replace('_', ' '))}</span>`; }
 function prettyCat(c) { return (c || '').replace(/_/g, ' '); }
-function escapeHtml(s) { return String(s || '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c])); }
 
 // ---------------- Realtime ----------------
-
-const indicator = document.getElementById('live-indicator');
-if (DEMO) {
-  // Localhost demo: balances only (transactions are not in the demo snapshot).
-  indicator.textContent = 'Demo';
-  document.getElementById('recent-tbody').innerHTML = `<tr><td colspan="6" class="empty">Private. Shows when you sign in.</td></tr>`;
-} else {
-  subscribeTransactions((payload) => {
-    indicator.textContent = 'Live · updated';
-    loadAll().then(() => setTimeout(() => { indicator.textContent = 'Live · syncing'; }, 1800));
-  });
-  await loadAll();
-  indicator.textContent = 'Live · syncing';
-}
+const indicator = $('live-indicator');
+subscribeTransactions(() => { indicator.textContent = 'Updated'; loadAll().then(() => setTimeout(() => { indicator.textContent = 'Live'; }, 1800)); });
+await loadAll();
+reveal(document.querySelectorAll('#hero .stat, main .grid > *'), { stagger: 60, y: 14 });

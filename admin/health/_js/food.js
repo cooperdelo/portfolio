@@ -1,5 +1,5 @@
 // =====================================================================
-// /admin/health/_js/food.js — photo + caption food logging
+// /admin/health/_js/food.js, photo + caption food logging
 // Uploads photo to Storage bucket 'health-food-photos', inserts a
 // health_food_log row (status='pending'). The food-photo-analysis
 // scheduled task (Claude vision + local USDA DB) fills macros later.
@@ -10,6 +10,7 @@ import { mountShell, toast } from '/admin/_shell/admin-shell.js';
 await mountShell({ title: 'Food Log · Health' });
 
 const BUCKET = 'health-food-photos';
+const esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
 
 // ---- selected day (defaults to today; can log/view any past day) ----
 const todayStr = () => new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD local (ET)
@@ -74,11 +75,11 @@ async function saveEntry({ withPhoto }) {
   btnP.disabled = btnT.disabled = false;
   if (error) { console.error(error); toast(error.message || 'Save failed', 'err', 4000); return; }
 
-  toast('Logged ✓');
+  toast('Logged');
   // reset
   picked = null; fileInput.value = ''; captionEl.value = ''; symptomEl.value = '';
   preview.style.display = 'none'; drop.classList.remove('hasimg');
-  dropText.textContent = '📷 Tap to take / choose a photo';
+  dropText.textContent = 'Take or choose a photo';
   loadToday();
 }
 
@@ -96,25 +97,25 @@ async function loadToday() {
   const list = document.getElementById('list');
   const { data, error } = await sb.from('health_food_log')
     .select('*').eq('day', day).order('occurred_at', { ascending: false });
-  if (error) { list.innerHTML = `<p class="sublabel">Couldn't load (${error.message})</p>`; return; }
-  if (!data?.length) { list.innerHTML = `<p class="sublabel" style="opacity:.6;">Nothing logged yet today.</p>`; return; }
+  if (error) { list.innerHTML = `<div class="empty-line">Couldn't load (${esc(error.message)})</div>`; return; }
+  if (!data?.length) { list.innerHTML = `<div class="empty-line">Nothing yet.</div>`; return; }
 
   const rows = await Promise.all(data.map(async (r) => {
     const url = await signedUrl(r.photo_path);
     const t = new Date(r.occurred_at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
     const macros = r.status === 'analyzed'
-      ? `<div class="macros">${r.calories ?? '?'} cal · ${r.protein_g ?? '?'}p / ${r.carbs_g ?? '?'}c / ${r.fat_g ?? '?'}f${r.flagged_irritants?.length ? ' · ⚠ ' + r.flagged_irritants.join(', ') : ''}</div>`
+      ? `<div class="macros">${r.calories ?? '?'} cal · ${r.protein_g ?? '?'}p / ${r.carbs_g ?? '?'}c / ${r.fat_g ?? '?'}f${r.flagged_irritants?.length ? ' · irritants ' + r.flagged_irritants.join(', ') : ''}</div>`
       : '';
     const symptomNote = r.symptom_note
-      ? `<div class="macros" style="opacity:.8;margin-top:.25rem;">💬 ${r.symptom_note}</div>`
+      ? `<div class="macros">${esc(r.symptom_note)}</div>`
       : '';
     return `<div class="entry">
-      ${url ? `<img src="${url}" alt="">` : '<div class="entry" style="width:56px;height:56px;border-radius:9px;background:#222;"></div>'}
-      <div style="flex:1 1 auto;">
-        <div style="display:flex;justify-content:space-between;gap:.5rem;">
-          <b>${r.caption}</b><span class="pill ${r.status}">${r.status}</span>
+      ${url ? `<img src="${url}" alt="">` : '<span class="ph"></span>'}
+      <div class="bd">
+        <div class="hd">
+          <b>${esc(r.caption)}</b><span class="pill ${esc(r.status)}">${esc(r.status)}</span>
         </div>
-        <div class="macros" style="opacity:.5;">${t}</div>
+        <div class="macros">${t}</div>
         ${macros}
         ${symptomNote}
       </div></div>`;

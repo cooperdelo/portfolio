@@ -4,9 +4,8 @@ import { mountShell, toast, monthsBack, monthKey } from '/admin/_shell/admin-she
 if (!(await requireFullAdminOrRedirect())) throw new Error('access denied');
 await mountShell({ title: 'Food Log · Finance' });
 
-const C = { rust: __cv('--accent','#FF4D2E'), sage: '#7A8A6E', ink2: __cv('--text-2','#DDD4C5') };
-Chart.defaults.color = C.ink2;
-Chart.defaults.font.family = '"Geist Mono", ui-monospace, monospace';
+import { C, applyChartTheme } from '/admin/_shell/chart-theme.js';
+applyChartTheme();
 
 let chart = null;
 let rowsAll = [];
@@ -50,7 +49,7 @@ function render() {
   setK('month_count', `${monthCount} entr${monthCount === 1 ? 'y' : 'ies'}`);
   setK('month_avg',   fmtUSD(monthAvg));
   setK('last_month',  fmtUSD(priorTotal));
-  setK('mom',         mom == null ? '—' : `${mom >= 0 ? '+' : ''}${mom.toFixed(1)}% vs prior`);
+  setK('mom',         mom == null ? '–' : `${mom >= 0 ? '+' : ''}${mom.toFixed(1)}% vs prior`);
   setK('ytd',         fmtUSD(ytd));
   const momEl = document.querySelector('[data-k="mom"]');
   if (mom != null) momEl.className = 'delta ' + (mom >= 0 ? 'neg' : 'pos');
@@ -63,11 +62,11 @@ function render() {
   chart?.destroy();
   chart = new Chart(ctx, {
     type: 'bar',
-    data: { labels, datasets: [{ label: 'Food spend', data, backgroundColor: C.rust, borderRadius: 4 }] },
+    data: { labels, datasets: [{ label: 'Food spend', data, backgroundColor: C.bone }] },
     options: {
       maintainAspectRatio: false,
       plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => `${fmtUSD(c.parsed.y)}` } } },
-      scales: { y: { ticks: { callback: (v) => fmtUSDCompact(v) }, grid: { color: __cv('--border','rgba(244,239,230,0.05)') } }, x: { grid: { display: false } } },
+      scales: { y: { ticks: { callback: (v) => fmtUSDCompact(v), maxTicksLimit: 5 }, grid: { color: C.grid }, border: { display: false } }, x: { grid: { display: false }, border: { display: false } } },
     },
   });
 
@@ -78,8 +77,8 @@ function render() {
     <tr>
       <td class="mono meta">${new Date(r.date).toLocaleDateString('en-US', { month:'short', day:'2-digit' })}</td>
       <td><div class="desc">${escapeHtml(r.description)}</div></td>
-      <td class="mono meta">${escapeHtml(r.merchant || '—')}</td>
-      <td class="mono meta">${escapeHtml(r.account || '—')}</td>
+      <td class="mono meta">${escapeHtml(r.merchant || '–')}</td>
+      <td class="mono meta">${escapeHtml(r.account || '–')}</td>
       <td class="right mono">${fmtUSD(r.amount)}</td>
     </tr>`).join('');
 }
@@ -92,7 +91,7 @@ document.getElementById('copy-summary').addEventListener('click', async () => {
     `Food log · ${monthLabel}`,
     `Total: ${fmtUSD(total)} across ${inMonth.length} entries`,
     '',
-    ...inMonth.map(r => `${new Date(r.date).toLocaleDateString()} · ${r.description}${r.merchant ? ` (${r.merchant})` : ''} — ${fmtUSD(r.amount)}`),
+    ...inMonth.map(r => `${new Date(r.date).toLocaleDateString()} · ${r.description}${r.merchant ? ` (${r.merchant})` : ''}, ${fmtUSD(r.amount)}`),
   ];
   await navigator.clipboard.writeText(lines.join('\n'));
   toast('Summary copied');

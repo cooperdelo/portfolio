@@ -2,7 +2,7 @@
 // /admin/finance/_js/networth.js
 // Personal net-worth rollup. Auth-gated (full) via the shared admin shell.
 //
-// DE-DUPED: the "Liquid" section does NOT re-list Roth/brokerage/crypto —
+// DE-DUPED: the "Liquid" section does NOT re-list Roth/brokerage/crypto –
 // it pulls the live total straight from the Investments page's source
 // (investment_positions + investment cash accounts in Supabase), so there
 // is one source of truth. This page only OWNS what lives nowhere else:
@@ -20,20 +20,20 @@ const SNAPSHOT = '2026-07-24';
 const data = {
   liquid: [
     // [0] filled live from Investments; [1] checking lives nowhere else.
-    { name: 'Investments — Roth · brokerage · crypto · cash', meta: 'live from the Investments page', cls: 'personal', value: 7661, include: true, locked: true },
-    { name: 'Personal checking', meta: 'Wells Fargo + Truist — not tracked elsewhere; get current number', cls: 'personal', value: null, include: true },
+    { name: 'Investments, Roth · brokerage · crypto · cash', meta: 'live from the Investments page', cls: 'personal', value: 7661, include: true, locked: true },
+    { name: 'Personal checking', meta: 'Wells Fargo + Truist, not tracked elsewhere; get current number', cls: 'personal', value: null, include: true },
   ],
   phys: [
-    { name: 'Custom PC — i9-11900K · RTX 3070 · 32GB · 3.25TB', meta: 'pulled from machine · used-build value', cls: 'personal', value: 1100, include: true },
+    { name: 'Custom PC, i9-11900K · RTX 3070 · 32GB · 3.25TB', meta: 'pulled from machine · used-build value', cls: 'personal', value: 1100, include: true },
     { name: 'MacBook (M3)', meta: '', cls: 'personal', value: 1150, include: true },
     { name: '2× computer monitors', meta: 'est.', cls: 'personal', value: 350, include: true },
-    { name: 'Studio monitors (pair)', meta: 'speakers — paid ~$200; used ~$180', cls: 'personal', value: 180, include: true },
+    { name: 'Studio monitors (pair)', meta: 'speakers, paid ~$200; used ~$180', cls: 'personal', value: 180, include: true },
     { name: 'Logitech wireless mouse', meta: 'est.', cls: 'personal', value: 40, include: true },
     { name: 'iPhone 17 Pro', meta: '$1,099 retail / ~$950 used', cls: 'personal', value: 1000, include: true },
     { name: 'Meta Ray-Ban glasses', meta: 'paid $480', cls: 'personal', value: 480, include: true },
     { name: 'Garmin Vivoactive 6', meta: '~$300 retail', cls: 'personal', value: 300, include: true },
     { name: 'Emporio Armani watch', meta: 'est.', cls: 'personal', value: 250, include: true },
-    { name: 'Breitling watch', meta: 'replica (Thailand) — ~$0 resale', cls: 'personal', value: 0, include: true },
+    { name: 'Breitling watch', meta: 'replica (Thailand), ~$0 resale', cls: 'personal', value: 0, include: true },
     { name: 'Gibson bass', meta: 'paid ~$400–500', cls: 'personal', value: 450, include: true },
     { name: 'PRS SE Custom 24', meta: 'used ~$550–700', cls: 'personal', value: 600, include: true },
     { name: 'Takamine acoustic-electric', meta: 'paid ~$600; used ~$500', cls: 'personal', value: 550, include: true },
@@ -49,16 +49,16 @@ const data = {
     { name: 'DJI Mic Mini', meta: '', cls: 'personal', value: 150, include: true },
     { name: 'Variable ND filter', meta: '', cls: 'personal', value: 50, include: true },
     { name: 'tomtoc 22L bag', meta: '', cls: 'personal', value: 50, include: true },
-    { name: 'Golf set — T100 irons · TSi3 driver + 3W · TM hybrid · 3× SM9 wedges · TM putter', meta: 'used: irons ~$700, TSi3 driver ~$260, TSi3 3W ~$200, hybrid ~$90, 3× SM9 ~$285, putter ~$175', cls: 'personal', value: 1710, include: true },
-    { name: 'Sony A7C II kit (+ Sigma 28-70 f/2.8 · 35mm f/1.4 · gimbal · light)', meta: 'PLANNED buy from the $20K — off until purchased', cls: 'plugverse', value: 5000, include: false },
-    { name: 'Car / vehicle', meta: 'parent-titled — not yours', cls: 'flag', value: null, include: false },
+    { name: 'Golf set, T100 irons · TSi3 driver + 3W · TM hybrid · 3× SM9 wedges · TM putter', meta: 'used: irons ~$700, TSi3 driver ~$260, TSi3 3W ~$200, hybrid ~$90, 3× SM9 ~$285, putter ~$175', cls: 'personal', value: 1710, include: true },
+    { name: 'Sony A7C II kit (+ Sigma 28-70 f/2.8 · 35mm f/1.4 · gimbal · light)', meta: 'PLANNED buy from the $20K, off until purchased', cls: 'plugverse', value: 5000, include: false },
+    { name: 'Car / vehicle', meta: 'parent-titled, not yours', cls: 'flag', value: null, include: false },
   ],
   liab: [
     { name: 'Debt', meta: 'cards paid monthly', cls: 'personal', value: 0, include: true },
-    { name: 'Tax reserve owed', meta: '~25–30% of band 1099 + $20K prize — set aside', cls: 'flag', value: null, include: true },
+    { name: 'Tax reserve owed', meta: '~25–30% of band 1099 + $20K prize, set aside', cls: 'flag', value: null, include: true },
   ],
   biz: [
-    { name: 'Luby Pitch prize', meta: 'NOT in Mercury (bal $137.48) — confirm location; taxable', cls: 'flag', value: 20000, include: true },
+    { name: 'Luby Pitch prize', meta: 'NOT in Mercury (bal $137.48), confirm location; taxable', cls: 'flag', value: 20000, include: true },
     { name: 'Mercury business checking', meta: 'live balance ' + SNAPSHOT, cls: 'plugverse', value: 137.48, include: true },
     { name: 'Mercury savings', meta: 'live balance', cls: 'plugverse', value: 0, include: true },
     { name: 'PlugVerse LLC equity', meta: 'book ~$0, speculative upside', cls: 'plugverse', value: 0, include: true },
@@ -82,7 +82,7 @@ async function syncLiquidFromInvestments() {
     (acctRes.data || []).forEach(a => { total += Number(a.cash_balance || 0); });
     if (total > 0) {
       data.liquid[0].value = Math.round(total);
-      data.liquid[0].meta = 'live from Investments (investment_positions)';
+      data.liquid[0].meta = 'Investments page · live';
     }
   } catch (_) { /* keep snapshot fallback */ }
 }
@@ -90,7 +90,7 @@ async function syncLiquidFromInvestments() {
 function rowHTML(r, key, i) {
   const c = []; if (r.value === null) c.push('tbd'); if (!r.include) c.push('off');
   const valueCell = r.locked
-    ? `<span class="locked-val">${r.value === null ? '—' : fmt(r.value)}</span> <a class="synced-tag" href="/admin/finance/investments.html">synced ↗</a>`
+    ? `<span class="locked-val">${r.value === null ? '–' : fmt(r.value)}</span> <a class="synced-tag" href="/admin/finance/investments.html">synced ↗</a>`
     : `<input type="number" step="1" data-k="${key}" data-i="${i}" value="${r.value === null ? '' : r.value}" placeholder="TBD">`;
   return `<tr class="${c.join(' ')}">
     <td class="chk"><input type="checkbox" data-k="${key}" data-i="${i}" ${r.include ? 'checked' : ''}></td>
@@ -129,9 +129,9 @@ document.addEventListener('input', (e) => {
 });
 
 const stamp = document.getElementById('nw-stamp');
-if (stamp) stamp.textContent = 'Balances live · physical items hand-valued ' + SNAPSHOT;
+if (stamp) stamp.textContent = 'Physical hand-valued ' + SNAPSHOT;
 const foot = document.getElementById('nw-foot');
-if (foot) foot.innerHTML = 'Liquid is pulled live from the Investments page (one source of truth) — only personal checking is entered here. Personal net worth = liquid + owned physical − liabilities. Business (Plugverse) is tracked separately. The Sony camera is off by default (funded by the $20K). The replica Breitling counts as $0.';
+if (foot) foot.textContent = 'Liquid: Investments page + balance feeds · physical: hand-valued ' + SNAPSHOT;
 
 // 2026-09-28 stale sweep: the Mercury rows were a hand-typed Jul 24 figure ($137.48)
 // shown as "live". They now read the automatic balance feeds (Mercury API ->
@@ -149,7 +149,7 @@ async function syncBalances() {
     const personal = b.personal.filter(r => /check/i.test(r.account || '') && r.balance != null);
     if (personal.length) {
       data.liquid[1].value = Math.round(personal.reduce((a, r) => a + Number(r.balance), 0));
-      data.liquid[1].meta = personal.map(r => `${r.account} as of ${d(String(r.as_of).slice(0, 10))}`).join(' · ') + ' (email alerts)';
+      data.liquid[1].meta = personal.map(r => `${String(r.account || '').replace(/_/g, ' ')} · as of ${d(String(r.as_of).slice(0, 10))}`).join(' · ') + ' · email alerts';
     }
   } catch (_) { /* leave rows as-is; the stamp below still says snapshot */ }
 }

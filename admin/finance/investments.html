@@ -6,6 +6,7 @@
 <meta name="robots" content="noindex, nofollow, noarchive" />
 <title>Investments · CD Admin</title>
 <link rel="stylesheet" href="/admin/_shell/admin-shell.css" />
+<style>@media (max-width: 600px) { table.data th:nth-child(2), table.data td:nth-child(2), table.data th:nth-child(3), table.data td:nth-child(3), table.data th:nth-child(5), table.data td:nth-child(5), table.data th:nth-child(7), table.data td:nth-child(7) { display: none; } }</style>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
 </head>
@@ -22,27 +23,25 @@
     </div>
 
     <div class="kpi-grid" id="inv-kpis">
-      <div class="card"><div class="label">Total value</div><div class="value" data-k="total_value">—</div><div class="delta flat" data-k="total_gain">Gain/loss</div></div>
-      <div class="card"><div class="label">Cost basis</div><div class="value" data-k="total_cost">—</div><div class="delta flat">Sum of basis</div></div>
-      <div class="card"><div class="label">Uninvested cash</div><div class="value" data-k="cash_total">—</div><div class="delta flat">Settlement + crypto USD</div></div>
-      <div class="card"><div class="label">Last price update</div><div class="value" data-k="last_update">—</div><div class="delta flat" data-k="pos_count">Positions: —</div></div>
+      <div class="card"><div class="label">Total value</div><div class="value" data-k="total_value">–</div><div class="delta flat" data-k="total_gain">Coinbase · Roth IRA</div></div>
+      <div class="card"><div class="label">Cost basis</div><div class="value" data-k="total_cost">–</div><div class="delta flat">Coinbase · Roth IRA</div></div>
+      <div class="card"><div class="label">Cash</div><div class="value" data-k="cash_total">–</div><div class="delta flat">Roth IRA cash</div></div>
+      <div class="card"><div class="label">Prices as of</div><div class="value word" data-k="last_update">–</div><div class="delta flat" data-k="pos_count">–</div></div>
     </div>
 
-    <div class="chart-row">
-      <div class="card chart-card">
-        <h3>Allocation · <span class="accent">by symbol</span></h3>
-        <div class="sub">Weight of each position by current value</div>
+    <div class="grid">
+      <div class="card chart-card span-6">
+        <h3>By symbol</h3>
         <div class="chart-canvas-wrap tall"><canvas id="chart-alloc"></canvas></div>
       </div>
-      <div class="card chart-card">
-        <h3>Allocation · <span class="accent">by account</span></h3>
-        <div class="sub">Roth vs taxable vs other</div>
+      <div class="card chart-card span-6">
+        <h3>By account</h3>
         <div class="chart-canvas-wrap tall"><canvas id="chart-acct"></canvas></div>
       </div>
     </div>
 
     <h2 class="section-h">Positions</h2>
-    <div class="card" style="padding:0; overflow:hidden;">
+    <div class="card">
       <div class="tbl-wrap">
         <table class="data">
           <thead>
@@ -59,17 +58,17 @@
             </tr>
           </thead>
           <tbody id="pos-tbody">
-            <tr><td colspan="9" class="empty">No positions yet — click "Add position"</td></tr>
+            <tr><td colspan="9" class="empty">No positions yet, click "Add position"</td></tr>
           </tbody>
         </table>
       </div>
     </div>
 
     <!-- Add position modal (lightweight inline) -->
-    <div id="add-modal" style="display:none; position:fixed; inset:0; z-index:5000; background:rgba(10,9,8,0.7); backdrop-filter: blur(12px);">
-      <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:min(560px, 92%);">
-        <div class="card">
-          <h2 class="section-h" style="margin-top:0;">New <span class="accent">position</span></h2>
+    <div id="add-modal" style="display:none; position:fixed; inset:0; z-index:5000; background:rgba(6,5,4,0.6);">
+      <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:min(560px, calc(100% - 32px)); max-height:calc(100dvh - 32px); overflow:auto;">
+        <div class="card" style="background:var(--glass-strong)">
+          <h2 class="section-h" style="margin-top:0;">Position</h2>
           <form id="pos-form" class="form-grid">
             <div class="field"><label>Symbol</label><input name="symbol" required placeholder="VTI, BTC, ETH" /></div>
             <div class="field"><label>Name</label><input name="name" placeholder="Vanguard Total Market" /></div>

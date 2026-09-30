@@ -1,5 +1,5 @@
 // =====================================================================
-// /admin/_shell/icons.js — the admin's one icon set.
+// /admin/_shell/icons.js, the admin's one icon set.
 // Path data copied from Lucide (https://lucide.dev), ISC License:
 //   Copyright (c) for portions of Lucide are held by Cole Bemis 2013-2022
 //   as part of Feather (MIT). All other copyright (c) for Lucide are held

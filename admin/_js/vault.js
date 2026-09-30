@@ -1,4 +1,4 @@
-// /admin/_js/vault.js — Vault (v4, 2026-09-28): the admin view of the vault mirror.
+// /admin/_js/vault.js, Vault (v4, 2026-09-28): the admin view of the vault mirror.
 // Reads (live, Supabase): vault_documents (Context/BUILD-LIST.md, Projects/personal-brand/
 // CONTENT-STATUS.md, and the file index), decisions, opportunities, agent_bus, task_run_log.
 // Every card shows its last update and a red stale chip when older than its cadence.
@@ -23,7 +23,7 @@ const CAD = { build: 24, content: 24 * 7, opps: 36, mirror: 26, bus: 24 };
 const stale = (x, h) => x && hoursSince(x) > h ? `<span class="chip stale red">stale · ${esc(ago(x))}</span>` : '';
 const upd = (x, h) => `<div class="sv-meta">${x ? `Updated ${esc(ago(x))}` : 'Never updated'} ${h ? stale(x, h) : ''}</div>`;
 const head = (t, href) => `<div class="sv-h" style="margin-bottom:.4rem"><h2 class="disp">${esc(t)}</h2>${href ? `<a href="${href}">Open</a>` : ''}</div>`;
-const notMirrored = (p) => emptyState(`${p.split('/').pop()} is not in the Supabase mirror yet`, '');
+const notMirrored = (p) => emptyState(`${p.split('/').pop()} · not mirrored`, '');
 
 app.innerHTML = pageHead('', 'Vault') + `
   <section class="sv-grid c4" id="stats"></section>
@@ -66,7 +66,7 @@ Promise.all([pDocs, pBus.catch(() => [])]).then(([docs, bus]) => {
   document.getElementById('stats').innerHTML =
     cell('Files mirrored', (DEMO && V.docs_total ? V.docs_total : docs.length).toLocaleString('en-US')) +
     cell('Changed in 24h', day) +
-    cell('Last change', last ? esc(ago(last)) : '—', stale(last, CAD.mirror)) +
+    cell('Last change', last ? esc(ago(last)) : '–', stale(last, CAD.mirror)) +
     cell('Open agent messages', open);
 }).catch(e => fail('stats', e));
 
@@ -95,7 +95,7 @@ pPinned.then(pinned => {
   const rows = i < 0 ? [] : doc.content.slice(i).split('\n').slice(1).filter(l => /^\|/.test(l)).map(l => l.split('|').slice(1, -1).map(c => c.trim())).filter(c => c.length >= 3 && !/^-+$/.test(c[0]) && c[0] !== '#');
   const monday = (() => { const d = new Date(); d.setDate(d.getDate() - ((d.getDay() + 6) % 7)); return d.toISOString().slice(0, 10); })();
   el.innerHTML = head('Content this week') + `
-    <div class="dec-num"><span class="hc-num md">${week ? esc(fmtDay(week)) : '—'}</span><span class="mono">week of${week && week < monday ? ' <span class="chip stale red">last week</span>' : ''}</span></div>
+    <div class="dec-num"><span class="hc-num md">${week ? esc(fmtDay(week)) : '–'}</span><span class="mono">week of${week && week < monday ? ' <span class="chip stale red">last week</span>' : ''}</span></div>
     <div class="rows">${rows.map(c => `<div class="row"><div class="grow"><div class="t">${esc(c[1])}</div></div><span class="sv-num">${esc(c[2])}</span></div>`).join('') || emptyState('No target table this week', '')}</div>
     ${upd(doc.updated_at, CAD.content)}`;
 }).catch(e => fail('content', e));
@@ -116,7 +116,7 @@ pOpp.then(rows => {
   const last = rows.map(r => r.updated_at).sort().pop();
   document.getElementById('opps').innerHTML = head('Opportunities', '/admin/earn/') + `
     <div class="dec-num"><span class="hc-num md">${open.length}</span><span class="mono">open</span></div>
-    <div class="rows">${open.slice(0, 6).map(r => `<div class="row"><div class="grow"><div class="t">${esc(r.title)}</div><div class="s">${esc(r.estimate || '')}</div></div><span class="sv-muted" style="font-size:.78rem;white-space:nowrap">fit ${esc(r.fit ?? '—')} · ${esc(r.time_hours ?? '—')}h</span></div>`).join('') || emptyState('No open opportunities', '')}</div>
+    <div class="rows">${open.slice(0, 6).map(r => `<div class="row"><div class="grow"><div class="t">${esc(r.title)}</div><div class="s">${esc(r.estimate || '')}</div></div><span class="sv-muted" style="font-size:.78rem;white-space:nowrap">fit ${esc(r.fit ?? '–')} · ${esc(r.time_hours ?? '–')}h</span></div>`).join('') || emptyState('No open opportunities', '')}</div>
     ${upd(last, CAD.opps)}`;
 }).catch(e => fail('opps', e));
 

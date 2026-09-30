@@ -43,8 +43,8 @@ function render(totals, rows) {
       <td class="mono meta">${new Date(r.date).toLocaleDateString('en-US', { month:'short', day:'2-digit', year:'2-digit' })}</td>
       <td><div class="desc">${escapeHtml(r.description)}</div>${r.notes ? `<div class="meta">${escapeHtml(r.notes)}</div>` : ''}</td>
       <td class="mono meta">${(r.category || '').replace(/_/g, ' ')}</td>
-      <td class="mono meta">${escapeHtml(r.merchant || '—')}</td>
-      <td class="right mono" style="color: var(--rust, #FF4D2E);">−${fmtUSD(r.amount)}</td>
+      <td class="mono meta">${escapeHtml(r.merchant || '–')}</td>
+      <td class="right" style="font-family:var(--f-display);font-size:12.5px;white-space:nowrap;color:var(--text-2)">-${fmtUSD(r.amount)}</td>
     </tr>`).join('');
 }
 

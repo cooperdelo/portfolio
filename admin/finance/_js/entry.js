@@ -1,5 +1,5 @@
 // =====================================================================
-// /admin/finance/_js/entry.js — add or edit a transaction
+// /admin/finance/_js/entry.js, add or edit a transaction
 // =====================================================================
 import { sb, getAdminRole } from '/admin/_shell/supabase.js';
 import { mountShell, toast } from '/admin/_shell/admin-shell.js';
@@ -71,7 +71,7 @@ form.elements['deductible_pct'].value = '100';
 if (!editId && form.elements['funding_source']) form.elements['funding_source'].value = '1789_fund';
 
 if (editId) {
-  modeH1.innerHTML = 'EDIT <span class="accent">entry</span>';
+  modeH1.innerHTML = 'EDIT entry';
   modeEyebrow.textContent = 'Editing existing record';
   deleteBtn.style.display = 'inline-flex';
 

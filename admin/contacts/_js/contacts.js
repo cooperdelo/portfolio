@@ -196,7 +196,7 @@ function renderDue() {
           <div class="when ${overdue ? 'overdue' : ''}">${lbl}</div>
         </div>`;
       }).join('')
-    : `<div class="empty">Clear — no upcoming next-steps.</div>`;
+    : `<div class="empty">Clear, no upcoming next-steps.</div>`;
 }
 
 function renderCold() {
@@ -293,12 +293,12 @@ function contactView(c) {
   const pinBadge   = c.is_pinned ? `<span class="badge pin">Pinned</span>` : '';
   const owedBadge  = Number(c.payout_owed) > 0 ? `<span class="badge owed">$${Number(c.payout_owed).toFixed(0)} owed</span>` : '';
 
-  // Inline pipeline editor — pills mutate the row immediately
+  // Inline pipeline editor, pills mutate the row immediately
   const stagePills = STAGES.map(s =>
     `<button class="pill ${c.pipeline_stage === s ? 'on' : ''}" data-pipe-set="${esc(s)}">${esc(labelStage(s))}</button>`
   ).join('');
 
-  // Copy chips — only show ones with values
+  // Copy chips, only show ones with values
   const copyChips = [
     c.email     ? { lbl: 'Email',    val: c.email, copy: c.email } : null,
     c.phone     ? { lbl: 'Phone',    val: c.phone, copy: c.phone } : null,
@@ -326,7 +326,7 @@ function contactView(c) {
       </div>
       <div class="ax">
         <div class="lbl">Warm path</div>
-        <div class="val muted">${esc(c.warm_path || '—')}</div>
+        <div class="val muted">${esc(c.warm_path || '–')}</div>
       </div>
     </div>`;
 
@@ -379,7 +379,7 @@ function contactForm(c) {
   const stageOpts = STAGES.map(s => `<option value="${s}" ${c?.pipeline_stage === s ? 'selected' : ''}>${labelStage(s)}</option>`).join('');
   const typeChoices = [...PIPELINE_TYPES];
   if (c?.pipeline_type && !typeChoices.includes(c.pipeline_type)) typeChoices.push(c.pipeline_type);
-  const typeOpts = `<option value="" ${!c?.pipeline_type ? 'selected' : ''}>—</option>` +
+  const typeOpts = `<option value="" ${!c?.pipeline_type ? 'selected' : ''}>–</option>` +
     typeChoices.map(t => `<option value="${t}" ${c?.pipeline_type === t ? 'selected' : ''}>${cap(t)}</option>`).join('');
   const tagsStr = (c?.tags || []).join(', ');
 
@@ -411,7 +411,7 @@ function contactForm(c) {
       </div>
 
       <div class="grid-2">
-        <div class="field"><label>Pipeline stage</label><select name="pipeline_stage"><option value="">—</option>${stageOpts}</select></div>
+        <div class="field"><label>Pipeline stage</label><select name="pipeline_stage"><option value="">–</option>${stageOpts}</select></div>
         <div class="field"><label>Pipeline type</label><select name="pipeline_type">${typeOpts}</select></div>
       </div>
       <div class="field"><label>Warm path</label><input name="warm_path" value="${esc(c?.warm_path || '')}" placeholder="e.g. Cooper direct, Kendall intro"></div>
@@ -498,7 +498,7 @@ document.addEventListener('click', async e => {
     chip.querySelector('.lbl').textContent = 'Copied';
     setTimeout(() => { chip.classList.remove('copied'); chip.querySelector('.lbl').textContent = orig; }, 1400);
   } catch {
-    toast('Copy failed — select manually', 'err');
+    toast('Copy failed, select manually', 'err');
   }
 });
 

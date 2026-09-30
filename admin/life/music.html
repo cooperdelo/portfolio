@@ -7,7 +7,6 @@
 <title>Life · Music · CD Admin</title>
 <link rel="stylesheet" href="/admin/_shell/admin-shell.css" />
 <style>
-  .lead-in{font-family:var(--f-display);font-style:italic;font-size:1.05rem;color:var(--ink-2);max-width:60ch;line-height:1.4;margin:-.6rem 0 1.6rem}
   .ro{font-family:"Geist Mono",monospace;font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:.14rem .5rem}
   .two-col{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
   @media(max-width:820px){.two-col{grid-template-columns:1fr}}
@@ -22,41 +21,40 @@
       <div>
         <h1>Music</h1>
       </div>
-      <div class="actions"><span class="live-dot" id="synced">Auto-synced</span><span class="ro">read-only</span></div>
+      <div class="actions"><span class="live-dot" id="synced">Auto-synced</span></div>
     </div>
-    <p class="lead-in">Two tracks: the cover band that pays, and the Cooper Delo project that's the real creative bet. Both feed the north star.</p>
 
     <div class="kpi-grid">
       <div class="card"><div class="label">Spotify streams</div><div class="value">34K+</div><div class="delta flat">Cooper Delo · lifetime</div></div>
       <div class="card"><div class="label">Band income</div><div class="value">~$3K</div><div class="delta flat">per semester · Rubber Band</div></div>
       <div class="card"><div class="label">Followers (personal)</div><div class="value">~128</div><div class="delta flat">content account · growth stage</div></div>
-      <div class="card"><div class="label">Watch item</div><div class="value" style="font-size:1.35rem;color:var(--rust)">Succession</div><div class="delta flat">band continuity after May grads</div></div>
+      <div class="card"><div class="label">Watch item</div><div class="value word">Succession</div><div class="delta flat">band continuity after May grads</div></div>
     </div>
 
     <div class="two-col">
       <div class="card">
-        <h2 class="section-h" style="margin-top:0;">Rubber Band <span class="accent">(cover)</span></h2>
+        <h2 class="section-h" style="margin-top:0;">Rubber Band (cover)</h2>
         <ul class="llist">
           <li><b>Role:</b> sing + guitar; ~3–4 gigs/month in season.</li>
           <li><b>Pay:</b> $200–300/person/gig; charity $100–140.</li>
           <li><b>Income:</b> ~$3,000/semester (~$6K/yr with summer).</li>
-          <li><b>Risk:</b> May grads leaving — plan continuity/succession.</li>
-          <li><b>Tax:</b> 1099 / cash — track for Schedule C.</li>
+          <li><b>Risk:</b> May grads leaving, plan continuity/succession.</li>
+          <li><b>Tax:</b> 1099 / cash, track for Schedule C.</li>
         </ul>
       </div>
       <div class="card">
-        <h2 class="section-h" style="margin-top:0;">Cooper Delo <span class="accent">(artist)</span></h2>
+        <h2 class="section-h" style="margin-top:0;">Cooper Delo (artist)</h2>
         <ul class="llist">
           <li><b>Streams:</b> 34K+ on Spotify; a real residual asset to grow.</li>
           <li><b>Status:</b> the primary creative outlet; releases stalled during the Plugverse build.</li>
-          <li><b>Gear:</b> full home studio (interface, mics, monitors) — capture is not the bottleneck.</li>
-          <li><b>Move:</b> record/post one track — done &gt; perfect.</li>
+          <li><b>Gear:</b> full home studio (interface, mics, monitors), capture is not the bottleneck.</li>
+          <li><b>Move:</b> record/post one track, done &gt; perfect.</li>
           <li><b>Open:</b> confirm distributor (DistroKid?) to pull royalty balance.</li>
         </ul>
       </div>
     </div>
 
-    <h2 class="section-h">Recent <span class="accent">gigs</span></h2>
+    <h2 class="section-h">Recent gigs</h2>
     <div class="card" style="padding:0;overflow:hidden;"><div class="tbl-wrap"><table class="data">
       <thead><tr><th>Gig</th><th>Type</th><th class="right">Payout</th></tr></thead>
       <tbody id="gig-body"></tbody>

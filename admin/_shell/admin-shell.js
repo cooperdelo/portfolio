@@ -80,17 +80,16 @@ const TABS = {
   plugverse: [['/admin/', 'Home', 'home'], ['/admin/plugverse/', 'KPIs', 'gauge'], ['/admin/plugverse/ops.html', 'Ops', 'workflow'], ['/admin/finance/plugverse.html', 'P&L', 'chart-column']],
 };
 
-// Theme: 'light' | 'dark' | null (follow system). Pages that pin a theme in
-// their own <html data-theme> (carousels, broll) are left alone.
-const THEME_KEY = 'cd-theme';
-function storedTheme() { try { return localStorage.getItem(THEME_KEY); } catch { return null; } }
-function applyTheme(t) {
+// Pages that pin a theme in their own <html data-theme> (carousels, broll) are left alone.
+// v6 film (2026-09-29): the admin is dark only (near-black ground under glass),
+// so every page resolves to dark regardless of the stored or system theme.
+function applyTheme() {
   const root = document.documentElement;
   if (root.dataset.themePinned) return;
-  if (t === 'light' || t === 'dark') root.dataset.theme = t; else delete root.dataset.theme;
+  root.dataset.theme = 'dark';
 }
-// Brand fonts: PlugVerse pages use the PlugVerse type (Geist + Inter), everything
-// else uses Cooper's personal kit (Space Grotesk + Hanken Grotesk). See admin-shell.css v4.
+// Brand marker kept for page-specific rules. Type is the same everywhere since v6:
+// Druk Wide Bold + Nimbus Sans (+ Geist Mono for tiny metadata). See admin-shell.css v6.
 (function initBrand() {
   const p = location.pathname.toLowerCase();
   if (p.startsWith('/admin/plugverse/') || p === '/admin/finance/plugverse.html') document.documentElement.dataset.brand = 'plugverse';
@@ -98,13 +97,9 @@ function applyTheme(t) {
 (function initTheme() {
   const root = document.documentElement;
   if (root.dataset.theme) { root.dataset.themePinned = '1'; return; }
-  applyTheme(storedTheme());
+  applyTheme();
 })();
-function currentTheme() {
-  const t = document.documentElement.dataset.theme;
-  if (t) return t;
-  return matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-}
+
 
 function visibleForRole(item, role) {
   if (!item.roles) return true;
@@ -130,18 +125,20 @@ function railHTML(activePath, email, role) {
 
   return `
     <aside class="rail">
-      <div class="brand"><span class="logo">CD</span>Cooper Delo${roleBadge}</div>
+      <a class="brand" href="/admin/" aria-label="Admin home">Cooper Delo${roleBadge}</a>
       <button class="rail-search" data-openpalette aria-label="Search">${icon('search', { size: 15, cls: 'rs-mag' })}<span>Search</span><kbd>Ctrl K</kbd></button>
       <button class="rail-toggle" data-railtoggle aria-label="Menu" aria-expanded="false">${icon('menu', { size: 18 })}</button>
-      ${sections}
-      <div class="rail-foot">
-        <span class="who" title="Signed in">${email || ''}</span>
-        <div class="rf-btns">
-          <button class="theme-toggle signout" data-themetoggle type="button"></button>
-          <button class="signout" data-signout>${icon('log-out', { size: 14 })}<span>Sign out</span></button>
+      <nav class="rail-nav" aria-label="All pages">
+        ${sections}
+        <div class="rail-foot">
+          <span class="who" title="Signed in">${email || ''}</span>
+          <div class="rf-btns">
+            <button class="signout" data-signout>${icon('log-out', { size: 14 })}<span>Sign out</span></button>
+          </div>
         </div>
-      </div>
-    </aside>`;
+      </nav>
+    </aside>
+    <div class="rail-scrim" data-railclose></div>`;
 }
 
 function tabbarHTML(activePath, role) {
@@ -172,7 +169,7 @@ function filterTilesByRole(role) {
 }
 
 // =====================================================================
-// Command palette (⌘K / Ctrl+K, or "/") — jump to any page or run a quick
+// Command palette (⌘K / Ctrl+K, or "/"), jump to any page or run a quick
 // action from anywhere. The single biggest "get around fast" win.
 // =====================================================================
 const QUICK_ACTIONS = [
@@ -190,7 +187,7 @@ function fuzzy(q, s) {
   q = (q || '').toLowerCase(); s = (s || '').toLowerCase();
   if (!q) return 0;
   const idx = s.indexOf(q);
-  if (idx >= 0) return 120 - idx;            // substring match — strongest, prefer early
+  if (idx >= 0) return 120 - idx;            // substring match, strongest, prefer early
   let qi = 0, score = 0, last = -2;
   for (let i = 0; i < s.length && qi < q.length; i++) {
     if (s[i] === q[qi]) { score += (i === last + 1 ? 3 : 1); last = i; qi++; }
@@ -287,7 +284,11 @@ export function isLocalDemo() {
 }
 
 export async function mountShell({ title, demo = false } = {}) {
-  const demoMode = demo && isLocalDemo();
+  // Pages that pass demo:true render their snapshot data. Since v6 every page also
+  // skips the gate on localhost ?demo (design review of the chrome; queries then run
+  // unauthenticated, so RLS returns nothing). Never true on any real host.
+  const demoMode = isLocalDemo();
+  void demo;
   // 1) Gate the page on auth (membership in admin_allowlist, any role)
   if (!demoMode) {
     const ok = await requireAdminOrRedirect();
@@ -306,7 +307,7 @@ export async function mountShell({ title, demo = false } = {}) {
 
   const wrap = document.createElement('div');
   wrap.className = 'admin-app';
-  wrap.innerHTML = railHTML(location.pathname, email, role) + '<div class="main"></div>';
+  wrap.innerHTML = railHTML(location.pathname, email, role) + '<div class="main" id="top"></div>';
   document.body.prepend(wrap);
 
   const mainSlot = wrap.querySelector('.main');
@@ -316,43 +317,52 @@ export async function mountShell({ title, demo = false } = {}) {
   // 4) Hook sign-out
   wrap.querySelector('[data-signout]')?.addEventListener('click', signOut);
 
-  // 4b) Mobile hamburger — expands the rail's nav sections + sign-out into an
+  // 4b) Mobile hamburger, expands the rail's nav sections + sign-out into an
   // in-flow dropdown panel (below 900px the rail collapses to a slim top bar
   // and hides the nav by default; this is the only way to reach it on mobile).
   const railEl = wrap.querySelector('.rail');
   const toggleBtn = wrap.querySelector('[data-railtoggle]');
+  let tabMenu = null;
   const setMenu = (open) => {
     railEl.classList.toggle('menu-open', open);
     toggleBtn?.setAttribute('aria-expanded', String(open));
+    tabMenu?.setAttribute('aria-expanded', String(open));
     if (toggleBtn) toggleBtn.innerHTML = icon(open ? 'x' : 'menu', { size: 18 });
   };
+  // keep the current page visible in a rail that is taller than the screen
+  const navEl = railEl.querySelector('.rail-nav'), activeEl = railEl.querySelector('.nav-item.active');
+  if (navEl && activeEl && innerWidth > 900) {
+    const top = activeEl.getBoundingClientRect().top - navEl.getBoundingClientRect().top;
+    const over = top + activeEl.offsetHeight - (navEl.clientHeight - 60);
+    if (over > 0) navEl.scrollTop = over;
+  }
   toggleBtn?.addEventListener('click', () => setMenu(!railEl.classList.contains('menu-open')));
   railEl.querySelectorAll('a.nav-item').forEach(a => a.addEventListener('click', () => setMenu(false)));
+  wrap.querySelector('[data-railclose]')?.addEventListener('click', () => setMenu(false));
+  addEventListener('keydown', (e) => { if (e.key === 'Escape' && railEl.classList.contains('menu-open')) setMenu(false); });
 
-  // 4c) Mobile bottom tabs + theme toggle
+  // 4c) Mobile bottom tab pill; "More" slides the full menu up as a glass sheet
   const tabbar = el(tabbarHTML(location.pathname, role));
   document.body.appendChild(tabbar);
-  tabbar.querySelector('[data-tabmenu]')?.addEventListener('click', (e) => {
-    e.preventDefault(); setMenu(!railEl.classList.contains('menu-open')); scrollTo({ top: 0 });
+  tabMenu = tabbar.querySelector('[data-tabmenu]');
+  tabMenu?.setAttribute('aria-expanded', 'false');
+  tabMenu?.addEventListener('click', (e) => {
+    e.preventDefault(); setMenu(!railEl.classList.contains('menu-open'));
   });
-  const themeBtn = wrap.querySelector('[data-themetoggle]');
-  const paintThemeBtn = () => {
-    if (!themeBtn) return;
-    const dark = currentTheme() === 'dark';
-    themeBtn.innerHTML = `${icon(dark ? 'sun' : 'moon', { size: 14 })}<span>${dark ? 'Light' : 'Dark'}</span>`;
-    themeBtn.setAttribute('aria-label', dark ? 'Switch to light mode' : 'Switch to dark mode');
-  };
-  if (document.documentElement.dataset.themePinned) themeBtn?.remove();
-  themeBtn?.addEventListener('click', () => {
-    const next = currentTheme() === 'dark' ? 'light' : 'dark';
-    try { localStorage.setItem(THEME_KEY, next); } catch {}
-    applyTheme(next); paintThemeBtn();
-    window.dispatchEvent(new CustomEvent('cd-theme', { detail: next }));
-  });
-  paintThemeBtn();
 
   // 5) Tile-level role gating (anything in the DOM with data-role)
   filterTilesByRole(role);
+
+  // 5b) House style: no em dashes on screen, even inside agent-written rows.
+  // Text nodes only (never input values); " x \u2014 y" reads "x, y".
+  const EM = /\s*\u2014\s*/g;
+  const scrub = (root) => {
+    const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    for (let n = w.nextNode(); n; n = w.nextNode()) if (n.nodeValue.includes('\u2014') && !n.parentElement?.closest('textarea,script,style,code,pre')) n.nodeValue = n.nodeValue.replace(EM, (m) => (/^\s|\s$/.test(m) ? ', ' : '\u2013'));
+  };
+  scrub(document.body);
+  let scrubT = 0;
+  new MutationObserver(() => { clearTimeout(scrubT); scrubT = setTimeout(() => scrub(document.body), 30); }).observe(document.body, { childList: true, subtree: true, characterData: true });
 
   // 6) Command palette + recent-page tracking
   mountPalette(role);

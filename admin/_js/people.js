@@ -58,14 +58,7 @@ const whyShown = (p) => p.why_they_matter && !/^inner circle\.?$/i.test(p.why_th
 function winPath(rel) { return rel ? VAULT_ROOT + rel.replace(/\//g, '\\') : ''; }
 
 async function load() {
-  if (DEMO) {
-    try {
-      const snap = await (await fetch('/admin/_dev/snapshot.local.json', { cache: 'no-store' })).json();
-      people = snap?.people?.rows || []; engagers = snap?.people?.engagers || [];
-      (snap?.people?.contacts || []).forEach(c => contacts.set(c.id, c));
-    } catch { people = []; }
-    return render();
-  }
+  // localhost ?demo: sb is the snapshot-backed demo client (see supabase.js)
   const [p, e] = await Promise.all([
     sb.from('people_orbit').select('*').order('name'),
     sb.from('engagers').select('*').order('last_seen', { ascending: false }).order('interactions', { ascending: false }).limit(200),

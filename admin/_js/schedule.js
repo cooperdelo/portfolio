@@ -1,4 +1,4 @@
-// /admin/_js/schedule.js — Content schedule v2 (2026-09-28 17:35 ruling).
+// /admin/_js/schedule.js, Content schedule v2 (2026-09-28 17:35 ruling).
 // Rows: Personal (1 short-form a day Mon-Sat), PlugVerse (1 a day Mon-Sat), LinkedIn
 // (its own row, Mon + Thu). Sunday is a Film & prep column, no posting.
 // Every option carries a reference that performed: tap a chip to see the stats, link,
@@ -48,7 +48,7 @@ const norm = (rows) => rows.map(r => (r.status === 'needs-confirm' && r.answer ?
 const today = todayKey();
 const rowsOfWeek = () => ALL.filter(r => weekKey(r) === WEEK);
 
-app.innerHTML = pageHead('', 'Schedule', `<span class="sc-week" id="scWeek"></span><span class="sc-wk-tabs" id="scTabs"></span>`) + `
+app.innerHTML = pageHead('', 'Schedule', `<span class="sc-week" id="scWeek"></span><span class="sc-wk-tabs" id="scTabs" role="tablist"></span>`) + `
   <section class="sc-brand" id="scBrand" aria-label="What the personal account is for"></section>
   <section class="sc-streaks" id="scStreaks" aria-label="Posted this week"></section>
   <section class="sc-grid" id="scGrid" aria-label="Posting schedule"><div class="shimmer" style="height:320px;grid-column:1/-1"></div></section>`;
@@ -101,11 +101,10 @@ function paintBrand() {
     return `<span class="sc-pil ${cls}" title="${esc(tip)}"><b>${esc(p.label)}</b><span>${n}${t ? '/' + t : ''}${done ? ` · ${done} posted` : ''}</span></span>`;
   }).join('');
   const untagged = rows.filter(r => !r.pillar).length;
-  el.innerHTML = `
-    ${BRAND.why_follow ? `<p class="sc-why"><span class="sc-why-k">Why they follow</span>${esc(BRAND.why_follow)}</p>` : ''}
-    ${BRAND.throughline ? `<p class="sc-thru">${esc(BRAND.throughline)}</p>` : ''}
-    <div class="sc-pils" aria-label="Personal pillars this week, planned of target">${chips}${untagged ? `<span class="sc-pil none"><b>No pillar</b><span>${untagged}</span></span>` : ''}</div>
-    ${BRAND.rules ? `<p class="sc-rules">${esc(BRAND.rules)}</p>` : ''}`;
+  // Numbers only on screen; the brand lines (why they follow, throughline, rules) stay one hover away.
+  el.title = [BRAND.throughline, BRAND.why_follow, BRAND.rules].filter(Boolean).join('\n\n');
+  el.innerHTML = `<span class="t-label">Pillars · @cooperdelo</span>
+    <div class="sc-pils" aria-label="Personal pillars this week, planned of target">${chips}${untagged ? `<span class="sc-pil none"><b>No pillar</b><span>${untagged}</span></span>` : ''}</div>`;
 }
 
 const pillarTag = (r) => {
@@ -167,7 +166,6 @@ function piece(r) {
     <div class="sc-p-top"><span class="sc-pill st-${esc(st)}"${st === 'posted' && r.posted_via === 'auto' ? ' title="Matched automatically from your feed"' : ''}>${esc(STATUS[st] || st)}</span>${tonight}${time ? `<span class="sc-time">${esc(time)}</span>` : ''}</div>
     <button class="sc-p-t" data-act="open">${esc(title)}</button>
     ${r.format ? `<div class="sc-p-meta">${pillarTag(r)}<span class="sc-fmt" title="${esc(fmtWhy(r.format))}">${esc(fmtName(r.format))}</span><span class="sc-p-plats">${marks}</span></div>` : `<div class="sc-p-plats">${marks}</div>`}
-    ${r.note && needsPick ? `<div class="sc-note">${esc(r.note)}</div>` : ''}
     ${opts}${pickedLine}
     <div class="sc-p-act">${actions}</div>
   </article>`;
@@ -371,7 +369,7 @@ function openDrawer(id, focus) {
 function closeDrawer() {
   const wrap = document.getElementById('scDrawer'); if (!wrap || wrap.hidden) return;
   wrap.classList.remove('on'); document.documentElement.classList.remove('dr-lock');
-  setTimeout(() => { wrap.hidden = true; }, 220);
+  setTimeout(() => { if (!wrap.classList.contains('on')) wrap.hidden = true; }, 900); // after the slide-out
   DRAWER = null;
   history.replaceState(null, '', location.pathname + location.search);
   lastFocus?.focus?.();

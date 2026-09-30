@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -10,68 +10,50 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="apple-mobile-web-app-title" content="Health" />
 <meta name="theme-color" content="#0C0B0A" />
-<title>Health Insights · CD Admin</title>
+<title>Health · CD Admin</title>
 <link rel="stylesheet" href="/admin/_shell/admin-shell.css" />
 <style>
-  .kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:.75rem;margin-bottom:1.5rem;}
-  .kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:.95rem 1.05rem;min-width:0;}
-  @media (max-width:560px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr));gap:.5rem;}.kpi .n{font-size:1.45rem;}}
-  .kpi .n{font-family:var(--f-display);font-size:1.7rem;font-weight:700;letter-spacing:-.03em;font-variant-numeric:tabular-nums;color:var(--text);line-height:1.1;}
-  .kpi .n.good{color:var(--pos);} .kpi .n.warn{color:var(--accent-ink);} .kpi .n.bad{color:var(--neg);}
-  .kpi .l{font-size:.78rem;color:var(--text-3);margin-top:.3rem;}
-  .hx h2{font-family:var(--f-display);font-size:1.05rem;font-weight:700;letter-spacing:-.015em;margin:0 0 .7rem;color:var(--text);}
-  .hx{margin-bottom:1.2rem;}
-  table{width:100%;border-collapse:collapse;font-size:.84rem;font-variant-numeric:tabular-nums;}
-  th,td{padding:.55rem .6rem;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap;color:var(--text-2);}
-  th{color:var(--text-3);font-weight:550;font-size:.76rem;}
-  tr:last-child td{border-bottom:0;}
-  .sev{display:inline-block;min-width:24px;text-align:center;border-radius:6px;padding:.05rem .35rem;}
-  .flarerow td{background:var(--accent-tint);}
-  .muted{color:var(--text-3);}
-  .hbody{font-size:.88rem;color:var(--text-2);line-height:1.55;}
-  .sig{display:flex;gap:.65rem;align-items:flex-start;padding:.55rem 0;border-top:1px solid var(--border);}
-  .sig:first-child{border-top:0;padding-top:0;}
-  .sig .ic{color:var(--text-3);margin-top:.2rem;}
-  .foot{color:var(--text-3);font-size:.76rem;line-height:1.5;margin-top:.8rem;}
-  .wk{display:flex;justify-content:space-between;gap:.8rem;padding:.55rem 0;border-top:1px solid var(--border);}
-  .wk:first-child{border-top:0;padding-top:0;}
-  .wk span:last-child{color:var(--text-3);font-variant-numeric:tabular-nums;white-space:nowrap;}
-  .flag{display:inline-flex;align-items:center;gap:.25rem;color:var(--accent-ink);}
+  .kmini { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 14px; margin-bottom: 14px; }
+  .kmini .sv-card { padding: 14px 16px; }
+  .kmini .num { font-size: clamp(18px, 1.8vw, 24px); display: block; margin: 10px 0 2px; }
+  .sev { display: inline-block; min-width: 26px; text-align: center; border-radius: 999px; padding: 1px 7px; font-weight: 700; }
+  .sev.s1 { background: rgba(244, 241, 234, .08); } .sev.s2 { background: rgba(244, 241, 234, .2); } .sev.s3 { background: var(--bone); color: var(--ink-0); }
+  tr.flarerow td { background: rgba(244, 241, 234, .05); }
+  .sig { display: flex; gap: 12px; align-items: flex-start; padding: 12px 0; border-top: 1px solid var(--line); font-size: 13.5px; color: var(--text-2); line-height: 1.5; }
+  .sig:first-child { border-top: 0; padding-top: 0; }
+  .sig .ic { color: var(--text); margin-top: 2px; }
+  .flag { display: inline-flex; align-items: center; gap: 4px; color: var(--text); }
+  @media (max-width: 900px) { .kmini { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; } }
+  @media (max-width: 600px) { #days th:nth-child(3), #days td:nth-child(3), #days th:nth-child(4), #days td:nth-child(4), #days th:nth-child(6), #days td:nth-child(6), #days th:nth-child(9), #days td:nth-child(9) { display: none; } }
 </style>
 </head>
 <body>
   <main>
-    <div class="page-head">
-      <div><h1>Health</h1></div>
+    <header class="page-head">
+      <h1>Health</h1>
       <div class="actions">
         <a class="btn ghost" href="/admin/health/food.html">Food</a>
         <a class="btn primary" href="/admin/health/log.html" id="logBtn">Daily log</a>
       </div>
-    </div>
+    </header>
 
-    <div class="kpis" id="kpis"></div>
+    <section class="stat-row" id="kpis" style="--n:4"><div class="stat"><div class="shimmer" style="height:100%"></div></div><div class="stat"></div><div class="stat"></div><div class="stat"></div></section>
+    <section class="kmini" id="kmini"></section>
 
-    <div class="card hx">
-      <h2>Trigger signal</h2>
-      <div class="hbody" id="signal">Gathering data</div>
-    </div>
-
-    <div class="card hx">
-      <h2>Recent workouts</h2>
-      <div id="workouts" class="hbody"></div>
-    </div>
-
-    <div class="card hx">
-      <h2>Last 30 days</h2>
-      <div style="overflow-x:auto;">
-        <table>
-          <thead><tr>
-            <th>Date</th><th>Sleep</th><th>Stress</th><th>Mood</th>
-            <th>Symptom</th><th>BMs</th><th>HBI proxy</th><th>Blood</th><th>Irritants</th>
-          </tr></thead>
-          <tbody id="rows"><tr><td colspan="9" class="muted">Loading</td></tr></tbody>
-        </table>
+    <section class="grid">
+      <div class="sv-card span-7"><div class="sv-h"><h2>Sleep</h2><span class="mono" id="sleepMeta">14 nights · Garmin</span></div><div id="sleepChart"></div></div>
+      <div class="span-5 col">
+        <div class="sv-card"><div class="sv-h"><h2>Signals</h2></div><div id="signal"><div class="shimmer" style="height:80px"></div></div></div>
+        <div class="sv-card"><div class="sv-h"><h2>Workouts</h2><span class="mono">Garmin</span></div><div class="rows" id="workouts"></div></div>
       </div>
+    </section>
+
+    <h2 class="section-h">30 days</h2>
+    <div class="tbl-wrap">
+      <table class="data" id="days">
+        <thead><tr><th>Day</th><th>Sleep</th><th>Stress</th><th>Mood</th><th>Symptom</th><th>BMs</th><th>HBI proxy</th><th>Blood</th><th>Irritants</th></tr></thead>
+        <tbody id="rows"><tr><td colspan="9" class="empty">Loading</td></tr></tbody>
+      </table>
     </div>
   </main>
   <script type="module" src="/admin/health/_js/dashboard.js"></script>

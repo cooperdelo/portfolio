@@ -1,50 +1,44 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="robots" content="noindex, nofollow, noarchive" />
+<meta name="theme-color" content="#0C0B0A" />
 <title>Plugverse P&amp;L · CD Admin</title>
 <link rel="stylesheet" href="/admin/_shell/admin-shell.css" />
+<style>@media (max-width: 600px) { table.data th:nth-child(3), table.data td:nth-child(3), table.data th:nth-child(4), table.data td:nth-child(4), table.data th:nth-child(5), table.data td:nth-child(5) { display: none; } }</style>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
 </head>
 <body>
   <main>
-    <div class="page-head">
-      <div>
-        <h1>P&amp;L and runway</h1>
-      </div>
-    </div>
+    <header class="page-head"><h1>P&amp;L</h1></header>
 
     <div class="kpi-grid">
-      <div class="card"><div class="label">Total income</div><div class="value" data-k="income">—</div><div class="delta flat">All time</div></div>
-      <div class="card"><div class="label">Total expense</div><div class="value" data-k="expense">—</div><div class="delta flat">All time</div></div>
-      <div class="card"><div class="label">Net</div><div class="value" data-k="net">—</div><div class="delta flat" data-k="net_pct">Margin</div></div>
-      <div class="card"><div class="label">Burn · last 30d</div><div class="value" data-k="burn">—</div><div class="delta flat">Trailing</div></div>
+      <div class="card"><div class="label">Income</div><div class="value" data-k="income">–</div><div class="delta flat">PlugVerse · all time</div></div>
+      <div class="card"><div class="label">Expense</div><div class="value" data-k="expense">–</div><div class="delta flat">PlugVerse · all time</div></div>
+      <div class="card"><div class="label">Net</div><div class="value" data-k="net">–</div><div class="delta flat" data-k="net_pct">margin</div></div>
+      <div class="card"><div class="label">Burn · 30 days</div><div class="value" data-k="burn">–</div><div class="delta flat">PlugVerse · trailing</div></div>
     </div>
 
-    <div class="chart-row">
-      <div class="card chart-card">
-        <h3>Monthly <span class="accent">P&amp;L</span></h3>
-        <div class="sub">Income vs expense · last 12 months</div>
+    <div class="grid">
+      <div class="card chart-card span-8">
+        <div class="sv-h"><h2>By month</h2><span class="mono">12 months</span></div>
         <div class="chart-canvas-wrap tall"><canvas id="chart-pnl"></canvas></div>
       </div>
-      <div class="card chart-card">
-        <h3>Expense <span class="accent">categories</span></h3>
-        <div class="sub">Last 90 days</div>
+      <div class="card chart-card span-4">
+        <div class="sv-h"><h2>Where it went</h2><span class="mono">90 days</span></div>
         <div class="chart-canvas-wrap tall"><canvas id="chart-cats"></canvas></div>
       </div>
     </div>
 
     <h2 class="section-h">Ledger</h2>
-    <div class="card" style="padding:0; overflow:hidden;">
+    <div class="card">
       <div class="tbl-wrap">
         <table class="data">
-          <thead>
-            <tr><th>Date</th><th>Description</th><th>Category</th><th>Vendor</th><th>Type</th><th class="right">Amount</th></tr>
-          </thead>
-          <tbody id="ledger-tbody"><tr><td colspan="6" class="empty">Loading…</td></tr></tbody>
+          <thead><tr><th>Date</th><th>What</th><th>Category</th><th>Vendor</th><th>Type</th><th class="right">Amount</th></tr></thead>
+          <tbody id="ledger-tbody"><tr><td colspan="6" class="empty">Loading</td></tr></tbody>
         </table>
       </div>
     </div>

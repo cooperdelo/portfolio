@@ -68,7 +68,7 @@ function render() {
         const pct = Number(r.deductible_pct ?? 100);
         const dedAmt = Number(r.amount) * pct / 100;
         const flags = [
-          r.cpa_review_needed ? '<span class="pill" style="color:#ff6b6b">cpa</span>' : '',
+          r.cpa_review_needed ? '<span class="pill">cpa</span>' : '',
           r.is_food_log       ? '<span class="pill food">food</span>' : '',
           r.entity            ? `<span class="pill ${r.entity === 'plugverse' ? 'plugverse' : (r.entity === '1789_fund' ? 'fund1789' : 'personal')}">${(r.entity || '').replace('_',' ')}</span>` : '',
         ].filter(Boolean).join(' ');
@@ -76,7 +76,7 @@ function render() {
           <tr>
             <td class="mono meta">${new Date(r.date).toLocaleDateString('en-US', { month:'short', day:'2-digit', year:'2-digit' })}</td>
             <td><div class="desc">${escapeHtml(r.description)}</div>${r.writeoff_notes ? `<div class="meta">${escapeHtml(r.writeoff_notes)}</div>` : ''}</td>
-            <td class="mono meta">${(r.tax_category || '—').replace(/_/g, ' ')}</td>
+            <td class="mono meta">${(r.tax_category || '–').replace(/_/g, ' ')}</td>
             <td class="mono">${pct}%</td>
             <td class="right mono">${fmtUSD(r.amount)}</td>
             <td class="right mono"><strong>${fmtUSD(dedAmt)}</strong></td>

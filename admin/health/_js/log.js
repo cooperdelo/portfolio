@@ -1,11 +1,11 @@
 // =====================================================================
-// /admin/health/_js/log.js — Crohn's DAY EDITOR
+// /admin/health/_js/log.js, Crohn's DAY EDITOR
 // Pick any date → load everything logged that day → add/edit/delete:
 //   • check-in (health_daily, upsert per day)   • intake (health_intake)
 //   • multiple bathroom trips (health_bristol)   • multiple meals (health_food_log)
 // Built for night batch-logging: shoot photos through the day, log it all here.
 // NOTE: bristol/food/intake `day` is a GENERATED column from occurred_at
-// (America/New_York), so we set occurred_at — never `day` — for past days.
+// (America/New_York), so we set occurred_at, never `day`, for past days.
 // =====================================================================
 import { sb } from '/admin/_shell/supabase.js';
 import { mountShell, toast } from '/admin/_shell/admin-shell.js';
@@ -26,7 +26,7 @@ function tsFor(timeStr) {
 const fmtTime = (iso) => new Date(iso).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
 const timeInputVal = (iso) => { const d = new Date(iso); return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`; };
 const esc = (s) => (s || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
-const fmtSleep = (m) => (m == null ? '—' : `${Math.floor(m / 60)}h${String(m % 60).padStart(2, '0')}`);
+const fmtSleep = (m) => (m == null ? '–' : `${Math.floor(m / 60)}h${String(m % 60).padStart(2, '0')}`);
 const $ = (id) => document.getElementById(id);
 
 // ---------------- reusable controls (get + set) ----------------
@@ -127,7 +127,7 @@ function renderGarmin(row) {
     ['Steps', row.steps != null ? row.steps.toLocaleString() : null, row.steps], ['Active cal', row.active_calories, row.active_calories],
     ['Body fat', row.body_fat_pct != null ? `${row.body_fat_pct}%` : null, row.body_fat_pct],
   ].filter(s => s[2] != null);
-  if (!stats.length) { box.innerHTML = `<div class="empty">No Garmin data for this day yet.</div>`; sync.textContent = 'not synced'; return; }
+  if (!stats.length) { box.innerHTML = `<div class="empty">No sync for this day.</div>`; sync.textContent = 'not synced'; return; }
   box.innerHTML = stats.map(([l, v]) => `<div class="gstat"><div class="n">${v}</div><div class="l">${l}</div></div>`).join('');
   sync.textContent = row.garmin_synced_at ? `synced ${fmtTime(row.garmin_synced_at)}` : '';
 }
@@ -140,7 +140,7 @@ function renderWorkouts(workouts) {
     const label = w.name || (w.activity_type || 'Workout').replace(/_/g, ' ');
     const statusPill = w.source === 'manual' ? `<span class="pill ${w.status}" style="margin-left:.4rem;">${w.status}</span>` : '';
     const details = w.status === 'pending'
-      ? `<div class="meta">${w.start_time ? fmtTime(w.start_time) : ''} · awaiting tonight's analysis</div>${w.note ? `<div class="meta">"${w.note}"</div>` : ''}`
+      ? `<div class="meta">${w.start_time ? fmtTime(w.start_time) : ''} · pending</div>${w.note ? `<div class="meta">"${w.note}"</div>` : ''}`
       : `<div class="meta">${w.start_time ? fmtTime(w.start_time) : ''}${w.duration_min ? ' · ' + fmtDur(w.duration_min) : ''}${w.calories ? ' · ' + w.calories + ' cal' : ''}${w.avg_hr ? ' · avg HR ' + w.avg_hr : ''}</div>`;
     return `<div class="entry">
       <span class="btype" style="width:auto;padding:.15rem .5rem;font-size:.72rem;">${(w.activity_type || (w.source === 'manual' ? 'logging…' : 'workout')).replace(/_/g, ' ')}</span>
@@ -165,7 +165,7 @@ $('save-workout').addEventListener('click', async () => {
   });
   btn.disabled = false;
   if (error) { console.error(error); return toast(error.message || 'Save failed', 'err', 4000); }
-  toast('Workout added ✓ — analyzed tonight');
+  toast('Workout added');
   $('workout-desc').value = ''; $('workout-time').value = '';
   loadDay();
 });
@@ -174,13 +174,13 @@ $('save-workout').addEventListener('click', async () => {
 function renderTrips(trips) {
   $('trip-count').textContent = trips.length ? `${trips.length} today` : '';
   const list = $('trip-list');
-  if (!trips.length) { list.innerHTML = `<div class="empty">No trips logged this day.</div>`; return; }
+  if (!trips.length) { list.innerHTML = `<div class="empty">None logged.</div>`; return; }
   list.innerHTML = trips.map(t => {
     const flags = [t.blood && 'blood', t.mucus && 'mucus', t.urgency && 'urgency', t.pain ? `pain ${t.pain}` : null].filter(Boolean);
     const loose = t.bristol >= 6;
     return `<div data-trip-wrap="${t.id}">
       <div class="entry">
-        <span class="btype" style="${loose ? 'background:rgba(255,107,77,.25);color:#ff9b7d' : ''}">${t.bristol}</span>
+        <span class="btype" style="${loose ? 'background:rgba(244,241,234,.25);color:var(--bone)' : ''}">${t.bristol}</span>
         <div class="body"><b>Bristol ${t.bristol}</b>
           <div class="meta">${fmtTime(t.occurred_at)}${flags.length ? ' · ' + flags.join(' · ') : ''}</div></div>
         <button class="edit-btn" data-edit-trip="${t.id}" title="Edit">&#9998;</button>
@@ -230,7 +230,7 @@ function renderTrips(trips) {
         urgency: f.querySelector('.e-urgency').classList.contains('on'),
       }).eq('id', id);
       if (error) return toast(error.message, 'err');
-      toast('Trip updated ✓'); loadDay();
+      toast('Trip updated'); loadDay();
     });
   });
 }
@@ -245,7 +245,7 @@ $('save-bristol').addEventListener('click', async () => {
   });
   btn.disabled = false;
   if (error) { console.error(error); return toast(error.message || 'Save failed', 'err', 4000); }
-  toast('Trip added ✓');
+  toast('Trip added');
   bristol.set(null); blood.set(false); mucus.set(false); urgency.set(false); bPain.set(0); $('b-time').value = '';
   loadDay();
 });
@@ -256,22 +256,22 @@ $('mealphoto').addEventListener('change', (e) => {
   mealFiles = Array.from(e.target.files || []);
   const thumbs = $('mealthumbs');
   thumbs.innerHTML = mealFiles.map(f => `<img src="${URL.createObjectURL(f)}" alt="">`).join('');
-  $('drop-text').textContent = mealFiles.length ? `${mealFiles.length} photo${mealFiles.length > 1 ? 's' : ''} ready` : '📷 Tap to add meal photo(s)';
+  $('drop-text').textContent = mealFiles.length ? `${mealFiles.length} photo${mealFiles.length > 1 ? 's' : ''} ready` : 'Add meal photos';
 });
 
 async function renderMeals(meals) {
   $('meal-count').textContent = meals.length ? `${meals.length} today` : '';
   const list = $('meal-list');
-  if (!meals.length) { list.innerHTML = `<div class="empty">No meals logged this day.</div>`; return; }
+  if (!meals.length) { list.innerHTML = `<div class="empty">None logged.</div>`; return; }
   const rows = await Promise.all(meals.map(async (m) => {
     const url = await signedUrl(m.photo_path);
     const calBadge = (m.status === 'analyzed' && m.calories != null) ? `<span class="calbadge">${m.calories} cal</span>` : '';
     const macros = m.status === 'analyzed'
-      ? `<div class="meta">${m.protein_g ?? '?'}p · ${m.carbs_g ?? '?'}c · ${m.fat_g ?? '?'}f${m.flagged_irritants?.length ? ' · ⚠ ' + m.flagged_irritants.join(', ') : ''}</div>` : '';
-    const symptomNote = m.symptom_note ? `<div class="meta" style="opacity:.85;margin-top:.15rem;">💬 ${esc(m.symptom_note)}</div>` : '';
+      ? `<div class="meta">${m.protein_g ?? '?'}p · ${m.carbs_g ?? '?'}c · ${m.fat_g ?? '?'}f${m.flagged_irritants?.length ? ' · irritants ' + m.flagged_irritants.join(', ') : ''}</div>` : '';
+    const symptomNote = m.symptom_note ? `<div class="meta" style="opacity:.85;margin-top:.15rem;">${esc(m.symptom_note)}</div>` : '';
     return `<div data-meal-wrap="${m.id}">
       <div class="entry">
-        ${url ? `<img src="${url}" alt="">` : `<div class="entry" style="width:52px;height:52px;background:#222;"></div>`}
+        ${url ? `<img src="${url}" alt="">` : `<span class="btype">M</span>`}
         <div class="body">
           <div style="display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;">
             <b>${m.caption || '(no caption)'}</b>${calBadge}
@@ -288,10 +288,10 @@ async function renderMeals(meals) {
           <div class="field" style="flex:1 1 200px;"><label>Caption</label><input type="text" class="e-caption" value="${esc(m.caption)}" /></div>
         </div>
         <div class="field">
-          <label>How did it feel? <span style="opacity:.55;text-transform:none;letter-spacing:0;">(add/edit anytime — doesn't trigger re-analysis)</span></label>
+          <label>How it felt</label>
           <textarea class="e-symptom" style="min-height:60px;">${esc(m.symptom_note)}</textarea>
         </div>
-        <div class="pending-note">Editing the caption re-queues this meal for the nightly macro re-analysis. The symptom note doesn't.</div>
+        <div class="pending-note">New caption re-runs the macros tonight</div>
         <div class="row">
           <button class="btn primary e-save">Save</button>
           <button class="btn ghost e-cancel">Cancel</button>
@@ -332,25 +332,25 @@ async function renderMeals(meals) {
       }
       const { error } = await sb.from('health_food_log').update(payload).eq('id', id);
       if (error) return toast(error.message, 'err');
-      toast('Meal updated ✓'); loadDay();
+      toast('Meal updated'); loadDay();
     });
   });
 }
 
-// ---------------- today's totals (from analyzed meals only — no target, just what's logged) ----------------
+// ---------------- today's totals (from analyzed meals only, no target, just what's logged) ----------------
 function renderDayTotals(meals) {
   const box = $('daytotals'), note = $('totals-note');
   const analyzed = meals.filter(m => m.status === 'analyzed');
   const pending = meals.filter(m => m.status === 'pending' || m.status === 'manual').length;
   const sum = (k) => analyzed.reduce((a, m) => a + (Number(m[k]) || 0), 0);
-  if (!meals.length) { box.innerHTML = `<div class="empty">Nothing logged yet today.</div>`; note.textContent = ''; return; }
+  if (!meals.length) { box.innerHTML = `<div class="empty">Nothing yet.</div>`; note.textContent = ''; return; }
   box.innerHTML = [
     ['Calories', Math.round(sum('calories'))],
     ['Protein', `${Math.round(sum('protein_g'))}g`],
     ['Carbs', `${Math.round(sum('carbs_g'))}g`],
     ['Fat', `${Math.round(sum('fat_g'))}g`],
   ].map(([l, v]) => `<div class="t"><b>${v}</b><span>${l}</span></div>`).join('');
-  note.textContent = pending ? `${pending} meal${pending > 1 ? 's' : ''} awaiting tonight's analysis` : (analyzed.length ? 'all analyzed' : '');
+  note.textContent = pending ? `${pending} pending` : (analyzed.length ? 'analyzed' : '');
 }
 
 $('save-meal').addEventListener('click', async () => {
@@ -376,9 +376,9 @@ $('save-meal').addEventListener('click', async () => {
       const ins = await sb.from('health_food_log').insert({ occurred_at, caption, status: 'manual', symptom_note: symptomNote });
       if (ins.error) throw ins.error;
     }
-    toast(`Added ${mealFiles.length || 1} meal${(mealFiles.length || 1) > 1 ? 's' : ''} ✓`);
+    toast(`Added ${mealFiles.length || 1} meal${(mealFiles.length || 1) > 1 ? 's' : ''}`);
     mealFiles = []; $('mealphoto').value = ''; $('mealcap').value = ''; $('meal-symptom').value = ''; $('mealthumbs').innerHTML = '';
-    $('drop-text').textContent = '📷 Tap to add meal photo(s)'; $('meal-time').value = '';
+    $('drop-text').textContent = 'Add meal photos'; $('meal-time').value = '';
     loadDay();
   } catch (err) { console.error(err); toast(err.message || 'Save failed', 'err', 4000); }
   btn.disabled = false;
@@ -392,13 +392,13 @@ $('save-checkin').addEventListener('click', async () => {
     symptom_severity: sev.get(), flare: flare.get(),
     note: $('day-note').value.trim() || null, updated_at: new Date().toISOString(),
   };
-  // only touch weight if typed — avoids nulling out a Garmin-synced value on days you don't weigh in
+  // only touch weight if typed, avoids nulling out a Garmin-synced value on days you don't weigh in
   const wv = weightInput.value.trim();
   if (wv) { payload.weight_lb = +wv; payload.weight_source = 'manual'; }
   const { error } = await sb.from('health_daily').upsert(payload, { onConflict: 'day' });
   btn.disabled = false;
   if (error) { console.error(error); return toast(error.message || 'Save failed', 'err', 4000); }
-  toast('Check-in saved ✓');
+  toast('Check-in saved');
 });
 
 // ---------------- intake (idempotent: clear the day + re-insert) ----------------
@@ -421,7 +421,7 @@ $('save-intake').addEventListener('click', async () => {
     if (ins.error) { btn.disabled = false; console.error(ins.error); return toast(ins.error.message, 'err', 4000); }
   }
   btn.disabled = false;
-  toast('Intake saved ✓');
+  toast('Intake saved');
 });
 
 // ---------------- go ----------------

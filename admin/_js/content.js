@@ -1,4 +1,4 @@
-// /admin/_js/content.js — Content: automatic "All posts" feed + calendar.
+// /admin/_js/content.js, Content: automatic "All posts" feed + calendar.
 // Reads: v_social_posts_latest via live-data.js socialPostsLatest() (posts, newest
 // metrics, permanent thumbnail in storage bucket social-thumbs). Nothing on this
 // page is typed or pasted: posts arrive from the social-pull collector.
@@ -72,13 +72,13 @@ function card(p) {
   const val = p.reach;
   const th = p.thumb_url
     ? `<img alt="" loading="lazy" decoding="async" src="${esc(p.thumb_url)}"><span class="tag"><span class="pm ${esc(p.platform)}" title="${esc(platName(p.platform))}">${pmIcon(p.platform, 14)}</span></span>`
-    : `<div class="none"><span class="pm ${esc(p.platform)}" title="${esc(platName(p.platform))}">${pmIcon(p.platform, 20)}</span></div>`;
+    : `<div class="none line"><span class="fl">${esc(cap || platName(p.platform))}</span></div><span class="tag"><span class="pm ${esc(p.platform)}" title="${esc(platName(p.platform))}">${pmIcon(p.platform, 14)}</span></span>`;
   return `<a class="pcard${pv ? ' pv' : ''}" href="${esc(p.permalink)}" target="_blank" rel="noopener" title="${esc(cap)}">
     <div class="th">${th}</div>
     <div class="bd">
       <div class="meta"><span class="h">${esc(platName(p.platform))} · @${esc(handle)}</span><span class="d">${esc(date)}</span></div>
       <div class="cap">${esc(cap) || '<span class="sv-muted">No caption</span>'}</div>
-      <div class="km"><span class="v${val == null ? ' nil' : ''}" title="${val == null ? '' : fmtNum(val)}">${val == null ? '—' : esc(fmtCompact(val))}</span><span class="l">${esc(val == null ? 'no metrics yet' : p.reachLabel)}</span></div>
+      <div class="km"><span class="v${val == null ? ' nil' : ''}" title="${val == null ? '' : fmtNum(val)}">${val == null ? '–' : esc(fmtCompact(val))}</span><span class="l">${esc(val == null ? 'no metrics yet' : p.reachLabel)}</span></div>
       ${p.as_of && val != null ? `<div class="asof">as of ${esc(fmtDay(p.as_of, { month: 'short', day: 'numeric' }))}</div>` : ''}
     </div></a>`;
 }

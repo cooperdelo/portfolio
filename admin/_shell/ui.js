@@ -1,5 +1,5 @@
 // =====================================================================
-// /admin/_shell/ui.js — shared render helpers for the v5 (Stanley) pages.
+// /admin/_shell/ui.js, shared render helpers for the v5 (Stanley) pages.
 // Pure functions that return HTML strings, so pages stay small and every
 // number is rendered the same way: value, platform, handle, as-of, stale.
 // =====================================================================
@@ -12,9 +12,9 @@ export const STALE_HOURS = 36;
 export function esc(s) {
   return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
-export const fmtNum = (n) => (n == null || isNaN(n)) ? '—' : Number(n).toLocaleString('en-US');
+export const fmtNum = (n) => (n == null || isNaN(n)) ? '–' : Number(n).toLocaleString('en-US');
 export function fmtCompact(n) {
-  if (n == null || isNaN(n)) return '—';
+  if (n == null || isNaN(n)) return '–';
   const v = Number(n), a = Math.abs(v);
   if (a >= 1e6) return (v / 1e6).toFixed(a >= 1e7 ? 0 : 1).replace(/\.0$/, '') + 'M';
   if (a >= 1e4) return Math.round(v / 1e3) + 'k';
@@ -36,10 +36,10 @@ export function todayET() {
   return new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
 }
 export function fmtDay(x, opts = { month: 'short', day: 'numeric' }) {
-  const d = toDate(x); return d ? d.toLocaleDateString('en-US', opts) : '—';
+  const d = toDate(x); return d ? d.toLocaleDateString('en-US', opts) : '–';
 }
 export function fmtWhen(x) {
-  const d = toDate(x); if (!d) return '—';
+  const d = toDate(x); if (!d) return '–';
   return d.toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
 }
 export function ago(x) {
@@ -103,6 +103,31 @@ export function sparkline(values, { w = 220, h = 40 } = {}) {
   return `<svg class="spark" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" aria-hidden="true"><path class="a" data-fade d="${line} L${w} ${h} L0 ${h} Z"/><path class="l" data-draw pathLength="1" vector-effect="non-scaling-stroke" d="${line}"/><circle class="end" data-fade cx="${ex.toFixed(1)}" cy="${ey.toFixed(1)}" r="2.6" vector-effect="non-scaling-stroke"/></svg>`;
 }
 
+// Pill bar chart (the reference dashboards' capsule bars). items: [{ label, value, title, now }]
+// Every bar sits in a full-height track; the tallest bar is solid bone, the rest are dimmer.
+export function pillBars(items, { height = 180, fmt = fmtCompact, values = true } = {}) {
+  const max = Math.max(1, ...items.map(i => Number(i.value) || 0));
+  let peak = -1, pv = 0;
+  items.forEach((it, k) => { if ((Number(it.value) || 0) > pv) { pv = Number(it.value); peak = k; } });
+  const bars = items.map((it, k) => {
+    const v = Number(it.value) || 0, p = v ? Math.max(5, v / max * 100) : 0;
+    const cls = `pbar${k === peak ? ' peak' : ''}${it.now ? ' now' : ''}${v ? '' : ' zero'}`;
+    return `<div class="${cls}" style="--p:${p.toFixed(1)}%"${it.title ? ` title="${esc(it.title)}"` : ''}><div class="track"><i class="fill" data-pill></i></div>${values && v ? `<span class="pv">${esc(fmt(v))}</span>` : ''}</div>`;
+  }).join('');
+  return `<div class="pbars-wrap"><div class="pbars" style="--n:${items.length};--h:${height}px">${bars}</div>
+    <div class="pl-row" style="--n:${items.length}">${items.map(it => `<span${it.now ? ' class="now"' : ''}>${esc(it.label)}</span>`).join('')}</div></div>`;
+}
+
+// One hero stat tile: label (platform · handle), big number, delta line, optional spark, source line.
+export function statTile({ k, v, small = '', d = '', spark = '', src = '', href = '', accent = false, id = '' }) {
+  const tag = href ? 'a' : 'div';
+  return `<${tag} class="stat${accent ? ' is-accent' : ''}"${href ? ` href="${esc(href)}"` : ''}${id ? ` id="${esc(id)}"` : ''}>
+    <div class="k">${k}</div>
+    <div class="v">${v}${small ? `<small>${small}</small>` : ''}</div>
+    <div class="d">${d}</div>${spark}
+    ${src ? `<div class="src">${src}</div>` : ''}</${tag}>`;
+}
+
 // GitHub-style year heatmap. `byDay` maps 'YYYY-MM-DD' -> number.
 export function heatmap(byDay, { days = 364, title = v => v } = {}) {
   const end = toDate(todayET());
@@ -123,7 +148,7 @@ export function heatmap(byDay, { days = 364, title = v => v } = {}) {
     cells += `<i class="${lvl(v)}" title="${esc(fmtDay(k, { month: 'short', day: 'numeric', year: 'numeric' }))}${v ? ' · ' + esc(title(v)) : ''}"></i>`;
   }
   return `<div class="hm-wrap"><div class="hm-months">${months}</div><div class="hm">${cells}</div></div>
-    <div class="hm-legend">Less <i style="background:var(--surface-3)"></i><i class="l1" style="background:color-mix(in srgb,var(--accent) 25%,var(--surface-3))"></i><i style="background:color-mix(in srgb,var(--accent) 50%,var(--surface-3))"></i><i style="background:color-mix(in srgb,var(--accent) 75%,var(--surface-3))"></i><i style="background:var(--accent)"></i> More</div>`;
+    <div class="hm-legend">Less <i></i><i class="l1"></i><i class="l2"></i><i class="l3"></i><i class="l4"></i> More</div>`;
 }
 
 // Bars = posts (value at post date), line = follower snapshots. Tooltip on bars.
@@ -187,21 +212,19 @@ export function postCard(p, { metric } = {}) {
 // THE STALENESS RULE (admin-stale-sweep 2026-09-28): anything past-dated or older than
 // its cadence is shown as stale, never as current. Pages that still embed a hand-written
 // snapshot call this with the snapshot date + how often it is supposed to refresh.
-// Past the cadence: the "Auto-synced" label is replaced with the real age, a banner says
-// the data is history, and the content is dimmed so it can't be read as current.
+// Past the cadence the header label turns into the page's one orange chip with the real
+// snapshot date and age, and every tile's source line carries that date too, so nothing
+// reads as current. (v7: no banner, no dimming; dimmed text read as a broken page.)
 export function staleSnapshot(asOfDate, cadenceDays, { what = 'This page' } = {}) {
+  void what;
   const d = toDate(asOfDate); if (!d) return false;
   const age = Math.floor((Date.now() - d.getTime()) / 864e5);
   const label = document.getElementById('synced');
   const when = fmtDay(d, { month: 'short', day: 'numeric', year: 'numeric' });
+  const short = fmtDay(d, { month: 'short', day: 'numeric' });
   if (age <= cadenceDays) { if (label) label.textContent = `Snapshot · ${when}`; return false; }
-  if (label) { label.textContent = `Stale · ${when} · ${age}d old`; label.style.color = 'var(--rust)'; label.classList.remove('live-dot'); }
-  const head = document.querySelector('main .page-head');
-  if (head && !document.getElementById('stale-banner')) {
-    head.insertAdjacentHTML('afterend', `<div id="stale-banner" class="err-banner" style="font-family:'Geist Mono',monospace;font-size:.72rem;letter-spacing:.06em;color:var(--rust);padding:.75rem 1rem;border:1px solid rgba(255,77,46,.4);border-radius:10px;background:rgba(255,77,46,.05);margin-bottom:1.2rem"><strong>Out of date.</strong> ${esc(what)} is a snapshot from ${esc(when)} (${age} days old; it should refresh every ${cadenceDays} days). Nothing below is current. Kept greyed out as history until an automatic feed replaces it.</div>`);
-    let n = document.getElementById('stale-banner').nextElementSibling;
-    while (n) { n.style.opacity = '0.4'; n.style.filter = 'grayscale(1)'; n = n.nextElementSibling; }
-  }
+  if (label) { label.className = 'chip stale-hot'; label.textContent = `As of ${when} · ${age}d old`; }
+  document.querySelectorAll('main .kpi-grid .delta').forEach(n => { if (!n.dataset.asof) { n.dataset.asof = '1'; n.textContent = `${n.textContent.trim()} · ${short}`; } });
   return true;
 }
 

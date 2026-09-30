@@ -7,27 +7,23 @@
 <title>Funding sources · CD Admin</title>
 <link rel="stylesheet" href="/admin/_shell/admin-shell.css" />
 <style>
-  .fs-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
-  .fs-card { padding: 1.5rem 1.6rem; display: flex; flex-direction: column; gap: 0.6rem; }
-  .fs-card .name { font-family: "Geist", sans-serif; font-weight: 600; font-size: 1.15rem; color: var(--ink); letter-spacing: -0.005em; }
-  .fs-card .slug-row { display: flex; justify-content: space-between; align-items: baseline; gap: 0.6rem; flex-wrap: wrap; }
-  .fs-card .slug { font-family: "Geist Mono", monospace; font-size: 0.6rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--muted); }
-  .fs-card .award { font-family: "Geist Mono", monospace; font-size: 0.6rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-2); }
-  .fs-card .award.unbounded { color: var(--sage); }
-  .fs-card .remaining { font-family:var(--f-display); font-size: clamp(2rem, 4vw, 2.6rem); line-height: 1; color: var(--ink); letter-spacing: -0.01em; margin-top: 0.3rem; }
-  .fs-card .remaining.exhausted { color: var(--rust); }
-  .fs-card .remaining.negative { color: var(--rust); }
-  .fs-card .sub { font-family: "Geist Mono", monospace; font-size: 0.62rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); }
-  .fs-bar { height: 12px; border-radius: 999px; background: rgba(244,239,230,0.06); overflow: hidden; border: 1px solid rgba(244,239,230,0.1); margin-top: 0.5rem; position: relative; }
-  .fs-bar > .fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--rust), var(--crimson)); box-shadow: 0 0 18px -4px rgba(255,77,46,0.55); transition: width 0.7s cubic-bezier(0.22,1,0.36,1); }
-  .fs-bar.unbounded > .fill { background: linear-gradient(90deg, var(--sage), #b5c0a3); box-shadow: 0 0 18px -4px rgba(122,138,110,0.55); }
-  .fs-bar.exhausted > .fill { background: linear-gradient(90deg, var(--crimson), #ff6b6b); }
-  .fs-card .pct-row { display: flex; justify-content: space-between; margin-top: 0.4rem; font-family: "Geist Mono", monospace; font-size: 0.6rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); }
-  .fs-card .actions { margin-top: auto; padding-top: 0.8rem; display: flex; gap: 0.5rem; flex-wrap: wrap; }
-  .fs-card .actions a { font-family: "Geist Mono", monospace; font-size: 0.6rem; letter-spacing: 0.22em; text-transform: uppercase; padding: 0.55rem 0.85rem; border-radius: 999px; background: rgba(244,239,230,0.04); border: 1px solid var(--card-border); color: var(--ink-2); transition: all 0.2s; }
-  .fs-card .actions a:hover { color: var(--rust); border-color: rgba(255,77,46,0.5); }
-  .fs-card .started { font-family: "Geist Mono", monospace; font-size: 0.58rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); opacity: 0.7; }
-  .fs-inactive { opacity: 0.55; }
+  /* funding sources: one glass card each, Druk remaining, bone pill meter */
+  .fs-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; margin-bottom: 14px; }
+  .fs-card { display: flex; flex-direction: column; gap: 8px; container-type: inline-size; }
+  .fs-card .name { font-weight: 700; font-size: 15px; color: var(--text); }
+  .fs-card .slug-row { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+  .fs-card .slug, .fs-card .award, .fs-card .sub, .fs-card .started, .fs-card .pct-row { font-family: var(--f-mono); font-size: 10px; text-transform: uppercase; color: var(--text-3); }
+  .fs-card .award { color: var(--text-2); }
+  .fs-card .remaining { font-family: var(--f-display); font-size: clamp(24px, 13cqi, 44px); line-height: .92; color: var(--text); margin-top: 10px; }
+  .fs-card .remaining.exhausted, .fs-card .remaining.negative { color: var(--text-3); }
+  .fs-bar { height: 8px; border-radius: 999px; background: rgba(244, 241, 234, .07); overflow: hidden; margin-top: 6px; }
+  .fs-bar > .fill { height: 100%; width: 0%; border-radius: inherit; background: var(--bone); transition: width 1.1s var(--ease); }
+  .fs-bar.unbounded > .fill { background: rgba(244, 241, 234, .5); }
+  .fs-card .pct-row { display: flex; justify-content: space-between; }
+  .fs-card .actions { margin-top: auto; padding-top: 10px; display: flex; gap: 6px; flex-wrap: wrap; }
+  .fs-card .actions a { display: inline-flex; align-items: center; min-height: 30px; padding: 5px 12px; border-radius: 999px; border: 1px solid var(--line-2); font-weight: 700; font-size: 11.5px; color: var(--text); transition: background var(--t-fast) var(--ease), color var(--t-fast) var(--ease); }
+  .fs-card .actions a:hover { background: var(--bone); color: var(--ink-0); }
+  .fs-inactive { opacity: .55; }
 </style>
 </head>
 <body>
@@ -37,16 +33,16 @@
         <h1>Funding</h1>
       </div>
       <div class="actions">
-        <span class="live-dot" id="live-indicator">Live · syncing</span>
-        <a class="btn" href="/admin/finance/">← Dashboard</a>
+        <span class="live-dot" id="live-indicator">Live</span>
+        <a class="btn" href="/admin/finance/">Overview</a>
       </div>
     </div>
 
     <div class="kpi-grid">
-      <div class="card"><div class="label">Total received</div><div class="value" data-k="t_received">—</div><div class="delta flat" data-k="t_received_sub">All time · across all sources</div></div>
-      <div class="card"><div class="label">Total spent</div><div class="value" data-k="t_spent">—</div><div class="delta flat" data-k="t_spent_sub">All time · funded expenses only</div></div>
-      <div class="card"><div class="label">Available</div><div class="value" data-k="t_remaining">—</div><div class="delta flat" data-k="t_remaining_sub">Across active sources</div></div>
-      <div class="card"><div class="label">Active sources</div><div class="value" data-k="t_sources">—</div><div class="delta flat" data-k="t_sources_sub">In rotation</div></div>
+      <div class="card"><div class="label">Total received</div><div class="value" data-k="t_received">–</div><div class="delta flat" data-k="t_received_sub">Ledger · all time</div></div>
+      <div class="card"><div class="label">Total spent</div><div class="value" data-k="t_spent">–</div><div class="delta flat" data-k="t_spent_sub">Funded expenses</div></div>
+      <div class="card"><div class="label">Available</div><div class="value" data-k="t_remaining">–</div><div class="delta flat" data-k="t_remaining_sub">Active sources</div></div>
+      <div class="card"><div class="label">Active sources</div><div class="value" data-k="t_sources">–</div><div class="delta flat" data-k="t_sources_sub">Funding ledger</div></div>
     </div>
 
     <h2 class="section-h">Active</h2>
@@ -109,8 +105,7 @@
           <div class="name">${escapeHtml(s.display_name)}</div>
           ${awardLine}
         </div>
-        <div class="slug">${escapeHtml(s.slug)}</div>
-        <div class="remaining ${remCls}">${fmtUSDCompact(remaining)}${unbounded ? '' : ' left'}</div>
+        <div class="remaining ${remCls}">${remaining < -0.005 ? '-' : ''}${fmtUSDCompact(Math.abs(remaining))}${unbounded ? '' : ' left'}</div>
         <div class="sub">${subLine}</div>
         <div class="fs-bar ${barCls}"><div class="fill" style="width:${pct}%"></div></div>
         <div class="pct-row">${pctLine}</div>
