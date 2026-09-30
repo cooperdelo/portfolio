@@ -1,5 +1,5 @@
 {
- "hero-poster": {
+ "poster-montage-1920-3a4824": {
   "w": [
    640,
    1280,
@@ -10,13 +10,13 @@
    1080
   ],
   "stamp": {
-   "src": "C:/Users/coope/Desktop/Claude/Projects/design-references/proofs/portfolio/_work/hero/poster-1920.jpg",
-   "size": 114479,
-   "mtime": 1790727110,
+   "src": "C:/Users/coope/Desktop/Claude/Projects/design-references/proofs/portfolio/_work/hero/poster-montage-1920.jpg",
+   "size": 269046,
+   "mtime": 1790750928,
    "crop": null
   }
  },
- "hero-poster-m": {
+ "poster-montage-720-2adb49": {
   "w": [
    640,
    720
@@ -26,9 +26,9 @@
    1280
   ],
   "stamp": {
-   "src": "C:/Users/coope/Desktop/Claude/Projects/design-references/proofs/portfolio/_work/hero/poster-720.jpg",
-   "size": 52573,
-   "mtime": 1790727110,
+   "src": "C:/Users/coope/Desktop/Claude/Projects/design-references/proofs/portfolio/_work/hero/poster-montage-720.jpg",
+   "size": 152699,
+   "mtime": 1790751823,
    "crop": null
   }
  },
@@ -128,7 +128,7 @@
    "crop": null
   }
  },
- "desk-guitar": {
+ "cand-027-3b4f1e": {
   "w": [
    640,
    1280,
@@ -139,30 +139,36 @@
    1080
   ],
   "stamp": {
-   "src": "C:/Users/coope/Desktop/Claude/Projects/design-references/proofs/portfolio/_work/cands/desk-guitar_001.88.jpg",
-   "size": 144693,
-   "mtime": 1790727918,
+   "src": "C:/Users/coope/Desktop/Claude/Projects/design-references/review-board/candidates/full/cand-027.jpg",
+   "size": 302150,
+   "mtime": 1790735561,
    "crop": null
   }
  },
- "chiphi-solo": {
+ "home-collage-2-band-porch-1cde07-c46a56e": {
   "w": [
    640,
    1280,
-   1920
+   1920,
+   2400
   ],
   "ar": [
-   1920,
-   1080
+   3072,
+   2160
   ],
   "stamp": {
-   "src": "C:/Users/coope/Desktop/Claude/Projects/design-references/proofs/portfolio/_work/cands/chiphi-solo-b_001.02.jpg",
-   "size": 325117,
-   "mtime": 1790727955,
-   "crop": null
+   "src": "photos/home-collage-2-band-porch.jpg",
+   "size": 2344936,
+   "mtime": 1790749333,
+   "crop": [
+    0.15,
+    0,
+    0.95,
+    1
+   ]
   }
  },
- "desk-phone": {
+ "cand-033-ccf393": {
   "w": [
    640,
    1280,
@@ -173,9 +179,9 @@
    1080
   ],
   "stamp": {
-   "src": "C:/Users/coope/Desktop/Claude/Projects/design-references/proofs/portfolio/_work/cands/desk-phone_002.59.jpg",
-   "size": 119333,
-   "mtime": 1790727901,
+   "src": "C:/Users/coope/Desktop/Claude/Projects/design-references/review-board/candidates/full/cand-033.jpg",
+   "size": 338730,
+   "mtime": 1790735562,
    "crop": null
   }
  },
@@ -213,24 +219,29 @@
    "crop": null
   }
  },
- "chiphi-steps": {
+ "home-collage-6-gig2-wide-crowd-090-331b3e-c03e237": {
   "w": [
    640,
    1280,
-   1600
+   1728
   ],
   "ar": [
-   1600,
-   900
+   1728,
+   1663
   ],
   "stamp": {
-   "src": "photos/v2/chiphi.jpg",
-   "size": 320124,
-   "mtime": 1790724047,
-   "crop": null
+   "src": "photos/home-collage-6-gig2_wide_crowd_090.jpg",
+   "size": 1469459,
+   "mtime": 1790749319,
+   "crop": [
+    0.33,
+    0.2,
+    0.78,
+    0.97
+   ]
   }
  },
- "chiphi-porch": {
+ "cand-003-175b1a": {
   "w": [
    640,
    1280,
@@ -241,9 +252,9 @@
    1080
   ],
   "stamp": {
-   "src": "C:/Users/coope/Desktop/Claude/Projects/design-references/proofs/portfolio/_work/cands/gig-porch_002.34.jpg",
-   "size": 285678,
-   "mtime": 1790727976,
+   "src": "C:/Users/coope/Desktop/Claude/Projects/design-references/review-board/candidates/full/cand-003.jpg",
+   "size": 406221,
+   "mtime": 1790735549,
    "crop": null
   }
  },
@@ -261,6 +272,23 @@
    "src": "C:/Users/coope/Desktop/Claude/Projects/design-references/proofs/portfolio/_work/cands/lawn-c_002.85.jpg",
    "size": 220082,
    "mtime": 1790727899,
+   "crop": null
+  }
+ },
+ "chiphi-porch": {
+  "w": [
+   640,
+   1280,
+   1920
+  ],
+  "ar": [
+   1920,
+   1080
+  ],
+  "stamp": {
+   "src": "C:/Users/coope/Desktop/Claude/Projects/design-references/proofs/portfolio/_work/cands/gig-porch_002.34.jpg",
+   "size": 285678,
+   "mtime": 1790727976,
    "crop": null
   }
  },
@@ -622,6 +650,41 @@
    "crop": null
   }
  },
+ "chiphi-solo": {
+  "w": [
+   640,
+   1280,
+   1920
+  ],
+  "ar": [
+   1920,
+   1080
+  ],
+  "stamp": {
+   "src": "C:/Users/coope/Desktop/Claude/Projects/design-references/proofs/portfolio/_work/cands/chiphi-solo-b_001.02.jpg",
+   "size": 325117,
+   "mtime": 1790727955,
+   "crop": null
+  }
+ },
+ "gig-rubber-wedding-lineup-5cce0b": {
+  "w": [
+   640,
+   1280,
+   1920,
+   2304
+  ],
+  "ar": [
+   2304,
+   1536
+  ],
+  "stamp": {
+   "src": "photos/gig_rubber_wedding_lineup.jpg",
+   "size": 1334087,
+   "mtime": 1790718981,
+   "crop": null
+  }
+ },
  "w-pv-pitch": {
   "w": [
    640,
@@ -670,6 +733,142 @@
    "src": "C:/Users/coope/Desktop/Claude/Projects/design-references/proofs/portfolio/_work/cands/chiphi-solo-b_000.78.jpg",
    "size": 276788,
    "mtime": 1790727952,
+   "crop": null
+  }
+ },
+ "gig-rubber-tent-purple-83b0f7": {
+  "w": [
+   640,
+   1280,
+   1440
+  ],
+  "ar": [
+   1440,
+   1085
+  ],
+  "stamp": {
+   "src": "photos/gig_rubber_tent_purple.jpg",
+   "size": 182018,
+   "mtime": 1790718981,
+   "crop": null
+  }
+ },
+ "cand-028-586f9a": {
+  "w": [
+   640,
+   1280,
+   1920
+  ],
+  "ar": [
+   1920,
+   1080
+  ],
+  "stamp": {
+   "src": "C:/Users/coope/Desktop/Claude/Projects/design-references/review-board/candidates/full/cand-028.jpg",
+   "size": 165387,
+   "mtime": 1790735561,
+   "crop": null
+  }
+ },
+ "home-collage-6-gig2-wide-crowd-090-331b3e": {
+  "w": [
+   640,
+   1280,
+   1920,
+   2400
+  ],
+  "ar": [
+   3840,
+   2160
+  ],
+  "stamp": {
+   "src": "photos/home-collage-6-gig2_wide_crowd_090.jpg",
+   "size": 1469459,
+   "mtime": 1790749319,
+   "crop": null
+  }
+ },
+ "hero-poster": {
+  "w": [
+   640,
+   1280,
+   1920
+  ],
+  "ar": [
+   1920,
+   1080
+  ],
+  "stamp": {
+   "src": "C:/Users/coope/Desktop/Claude/Projects/design-references/proofs/portfolio/_work/hero/poster-1920.jpg",
+   "size": 114479,
+   "mtime": 1790727110,
+   "crop": null
+  }
+ },
+ "hero-poster-m": {
+  "w": [
+   640,
+   720
+  ],
+  "ar": [
+   720,
+   1280
+  ],
+  "stamp": {
+   "src": "C:/Users/coope/Desktop/Claude/Projects/design-references/proofs/portfolio/_work/hero/poster-720.jpg",
+   "size": 52573,
+   "mtime": 1790727110,
+   "crop": null
+  }
+ },
+ "desk-guitar": {
+  "w": [
+   640,
+   1280,
+   1920
+  ],
+  "ar": [
+   1920,
+   1080
+  ],
+  "stamp": {
+   "src": "C:/Users/coope/Desktop/Claude/Projects/design-references/proofs/portfolio/_work/cands/desk-guitar_001.88.jpg",
+   "size": 144693,
+   "mtime": 1790727918,
+   "crop": null
+  }
+ },
+ "desk-phone": {
+  "w": [
+   640,
+   1280,
+   1920
+  ],
+  "ar": [
+   1920,
+   1080
+  ],
+  "stamp": {
+   "src": "C:/Users/coope/Desktop/Claude/Projects/design-references/proofs/portfolio/_work/cands/desk-phone_002.59.jpg",
+   "size": 119333,
+   "mtime": 1790727901,
+   "crop": null
+  }
+ },
+ "chiphi-steps": {
+  "w": [
+   640,
+   1280,
+   1600
+  ],
+  "ar": [
+   1600,
+   900
+  ],
+  "stamp": {
+   "src": "photos/v2/chiphi.jpg",
+   "size": 320124,
+   "mtime": 1790724047,
    "crop": null
   }
  },

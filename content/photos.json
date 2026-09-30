@@ -1,9 +1,8 @@
 {
  "about": "Every photo slot on the site. To swap a photo, change its src and run: python scripts/build-work-pages.py  (see README-PHOTOS.md). src can be a full path on this PC or a path inside the repo. Optional per slot: caption (shown under the photo where the layout has one), alt (screen-reader text), focus (CSS object-position, e.g. \"50% 30%\"), crop ([left, top, right, bottom] as fractions, e.g. [0.1, 0, 0.9, 1]). kind video-poster = a frame that stands in for a video until it plays; swap it together with the video.",
  "slots": [
-  {"slot_id": "home-hero-poster", "page": "home", "kind": "video-poster", "src": "C:/Users/coope/Desktop/Claude/Projects/design-references/proofs/portfolio/_work/hero/poster-1920.jpg", "alt": "Cooper Delo on Franklin Street, Chapel Hill"},
-  {"slot_id": "home-hero-poster-mobile", "page": "home", "kind": "video-poster", "src": "C:/Users/coope/Desktop/Claude/Projects/design-references/proofs/portfolio/_work/hero/poster-720.jpg"},
-
+  {"slot_id": "home-hero-poster", "page": "home", "kind": "video-poster", "src": "C:/Users/coope/Desktop/Claude/Projects/design-references/proofs/portfolio/_work/hero/poster-montage-1920.jpg", "alt": "Cooper Delo in Chapel Hill"},
+  {"slot_id": "home-hero-poster-mobile", "page": "home", "kind": "video-poster", "src": "C:/Users/coope/Desktop/Claude/Projects/design-references/proofs/portfolio/_work/hero/poster-montage-720.jpg"},
   {"slot_id": "work-poster-chapter-one", "page": "home work index + Next link", "kind": "video-poster", "src": "videos/work/chapter-one.jpg"},
   {"slot_id": "work-poster-plugverse-launch-film", "page": "home work index + Next link", "kind": "video-poster", "src": "videos/work/launch-film.jpg"},
   {"slot_id": "work-poster-the-start", "page": "home work index + Next link", "kind": "video-poster", "src": "videos/work/the-start.jpg"},
@@ -11,15 +10,16 @@
   {"slot_id": "work-poster-plugverse-product", "page": "home work index + Next link", "kind": "video-poster", "src": "videos/work/pv-turntable.jpg"},
   {"slot_id": "work-poster-rubber-band", "page": "home work index + Next link", "kind": "video-poster", "src": "videos/work/rubber-band.jpg"},
 
-  {"slot_id": "home-collage-1", "page": "home", "src": "C:/Users/coope/Desktop/Claude/Projects/design-references/proofs/portfolio/_work/cands/desk-guitar_001.88.jpg", "caption": "Writing, late"},
-  {"slot_id": "home-collage-2", "page": "home", "src": "C:/Users/coope/Desktop/Claude/Projects/design-references/proofs/portfolio/_work/cands/chiphi-solo-b_001.02.jpg", "caption": "Chi Phi"},
-  {"slot_id": "home-collage-3", "page": "home", "src": "C:/Users/coope/Desktop/Claude/Projects/design-references/proofs/portfolio/_work/cands/desk-phone_002.59.jpg", "caption": "Booking the next one"},
+  {"slot_id": "home-collage-1", "page": "home", "src": "C:/Users/coope/Desktop/Claude/Projects/design-references/review-board/candidates/full/cand-027.jpg", "caption": "At the laptop", "focus": "48% 40%"},
+  {"slot_id": "home-collage-2", "page": "home", "src": "photos/home-collage-2-band-porch.jpg", "caption": "Porch show, Rubber Band", "crop": [0.15, 0, 0.95, 1], "focus": "50% 40%"},
+  {"slot_id": "home-collage-3", "page": "home", "src": "C:/Users/coope/Desktop/Claude/Projects/design-references/review-board/candidates/full/cand-033.jpg", "caption": "Pi Kapp poolhouse", "focus": "18% 45%"},
   {"slot_id": "home-collage-4", "page": "home", "src": "photos/v2/belltower.jpg", "caption": "The bell tower"},
   {"slot_id": "home-collage-5", "page": "home", "src": "photos/v2/bar-gig.jpg", "caption": "Might As Well"},
-  {"slot_id": "home-collage-6", "page": "home", "src": "photos/v2/chiphi.jpg", "caption": "Chi Phi house"},
-  {"slot_id": "home-collage-7", "page": "home", "src": "C:/Users/coope/Desktop/Claude/Projects/design-references/proofs/portfolio/_work/cands/gig-porch_002.34.jpg", "caption": "Porch show, Rubber Band"},
+  {"slot_id": "home-collage-6", "page": "home", "src": "photos/home-collage-6-gig2_wide_crowd_090.jpg", "caption": "Setting up", "focus": "50% 45%", "crop": [0.33, 0.2, 0.78, 0.97]},
+  {"slot_id": "home-collage-7", "page": "home", "src": "C:/Users/coope/Desktop/Claude/Projects/design-references/review-board/candidates/full/cand-003.jpg", "caption": "Franklin St.", "focus": "45% 50%"},
   {"slot_id": "home-about", "page": "home", "src": "C:/Users/coope/Desktop/Claude/Projects/design-references/proofs/portfolio/_work/cands/lawn-c_002.85.jpg", "alt": "Cooper Delo on the lawn at dusk"},
   {"slot_id": "home-footer", "page": "home", "src": "C:/Users/coope/Desktop/Claude/Projects/design-references/proofs/portfolio/_work/cands/gig-porch_002.34.jpg"},
+
   {"slot_id": "footer", "page": "every page except home (footer background)", "src": "C:/Users/coope/Desktop/Claude/Projects/design-references/proofs/portfolio/_work/cands/chiphi-solo-a_002.33.jpg"},
 
   {"slot_id": "work-chapter-one-still-1", "page": "/work/chapter-one", "src": "photos/work/ch1-belltower.jpg", "caption": "The bell tower"},
@@ -49,7 +49,7 @@
 
   {"slot_id": "work-rubber-band-still-1", "page": "/work/rubber-band", "src": "C:/Users/coope/Desktop/Claude/Projects/design-references/proofs/portfolio/_work/cands/chiphi-solo-b_001.02.jpg", "caption": "Chi Phi, Chapel Hill"},
   {"slot_id": "work-rubber-band-still-2", "page": "/work/rubber-band", "src": "photos/v2/bar-gig.jpg", "caption": "Might As Well"},
-  {"slot_id": "work-rubber-band-still-3", "page": "/work/rubber-band", "src": "C:/Users/coope/Desktop/Claude/Projects/design-references/proofs/portfolio/_work/cands/gig-porch_002.34.jpg", "caption": "Chi Phi"},
+  {"slot_id": "work-rubber-band-still-3", "page": "/work/rubber-band", "src": "photos/gig_rubber_wedding_lineup.jpg", "caption": "Wedding gig", "focus": "38% 35%"},
 
   {"slot_id": "plugverse-hero", "page": "/plugverse", "src": "photos/work/pv-pitch.jpg"},
   {"slot_id": "plugverse-still-1", "page": "/plugverse", "src": "photos/work/pv-luby.jpg", "caption": "Luby Pitch Competition"},
@@ -57,8 +57,8 @@
   {"slot_id": "plugverse-still-3", "page": "/plugverse", "src": "renders/pv-hero.png", "caption": "plugverse.app, rendered from the live app"},
 
   {"slot_id": "resume-hero", "page": "/resume", "src": "C:/Users/coope/Desktop/Claude/Projects/design-references/proofs/portfolio/_work/cands/chiphi-solo-b_000.78.jpg", "alt": "Cooper Delo playing guitar at Chi Phi"},
-  {"slot_id": "resume-strip-1", "page": "/resume", "src": "C:/Users/coope/Desktop/Claude/Projects/design-references/proofs/portfolio/_work/cands/desk-guitar_001.88.jpg", "alt": "Cooper at his desk with a guitar"},
-  {"slot_id": "resume-strip-2", "page": "/resume", "src": "photos/v2/bar-gig.jpg", "alt": "Cooper at Might As Well"},
+  {"slot_id": "resume-strip-1", "page": "/resume", "src": "photos/gig_rubber_tent_purple.jpg", "alt": "Cooper playing under a lit tent", "focus": "62% 40%"},
+  {"slot_id": "resume-strip-2", "page": "/resume", "src": "C:/Users/coope/Desktop/Claude/Projects/design-references/review-board/candidates/full/cand-028.jpg", "alt": "Cooper in a glass office doorway", "focus": "54% 40%"},
   {"slot_id": "resume-strip-3", "page": "/resume", "src": "photos/work/pv-luby.jpg", "alt": "Luby Pitch Competition"}
  ]
 }

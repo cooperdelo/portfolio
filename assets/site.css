@@ -130,10 +130,11 @@ html.seen .intro, html.rm .intro { display: none; }
 .wordmark .m { display: none; }
 @media (max-width: 700px) {
   .title { height: 92svh; min-height: 560px; }
-  .title .bg img, .title .hero-vid { object-position: 15% 50%; }
-  .title .copy { top: 72px; flex-direction: column; }
+  .title .bg img, .title .hero-vid { object-position: 50% 50%; } /* phone montage is already cropped around him */
+  .title .copy { top: 72px; bottom: calc(27vw + 30px); flex-direction: column; justify-content: space-between; }
   .title h1 { font-size: 25px; }
-  .title .meta { text-align: left; align-items: flex-start; }
+  /* pills sit in one row above the wordmark bar so his face stays clear on phones */
+  .title .meta { text-align: left; align-items: center; flex-direction: row; flex-wrap: wrap; gap: 10px; }
   .wordmark .d { display: none; }
   .wordmark .m { display: block; line-height: .8; }
 }

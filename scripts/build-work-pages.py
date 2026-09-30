@@ -276,7 +276,7 @@ INDEX = """{HEAD}
   <section class="title">
     <div class="bg">
       {HEROPIC}
-      <video class="hero-vid" muted loop playsinline autoplay preload="auto" data-d="/videos/hero/hero-1920" data-m="/videos/hero/hero-720x1280" aria-hidden="true"></video>
+      <video class="hero-vid" muted loop playsinline autoplay preload="auto" data-d="/videos/hero/hero-montage-1920" data-m="/videos/hero/hero-montage-720x1280" aria-hidden="true"></video>
     </div>
     <div class="copy">
       <h1 data-hero><span class="line"><span>Founder of PlugVerse.</span></span><span class="line"><span>I make films, motion</span></span><span class="line"><span>and product.</span></span><span class="line"><span>CS + Business, UNC.</span></span></h1>
