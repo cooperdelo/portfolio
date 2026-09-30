@@ -61,8 +61,8 @@ WORK = [
        credits=[("Role", "Director, editor"), ("Year", "2026"), ("Tools", "DaVinci Resolve Studio"),
                 ("Link", [("Instagram", "https://www.instagram.com/p/Ddg7Hn2RAHP/"), ("TikTok", "https://www.tiktok.com/@cooperdelo/video/7687644625829498143")])],
        stills=[("work-the-start-still-1", ""), ("work-the-start-still-2", "drop"), ("work-the-start-still-3", ""), ("work-the-start-still-4", "drop")]),
-  dict(slug="bioswap", title="Bioswap", disc="Motion design", year="2026", video="bioswap", ar="1/1",
-       full="bioswap-full", full_ar="1/1", runtime="0:20",
+  dict(slug="bioswap", title="Bioswap", disc="Motion design", year="2026", video="bioswap-final", ar="1/1",
+       full="bioswap-final-full", full_ar="1/1", runtime="0:19", webm=True,  # motion_final.mov, 2026-09-30
        say="What's your rate?",
        credits=[("Role", "Motion design"), ("Year", "2026"), ("Tools", "Remotion, React"), ("Link", [("plugverse.app", "https://plugverse.app")])],
        stills=[("work-bioswap-still-1", ""), ("work-bioswap-still-2", "drop"), ("work-bioswap-still-3", ""), ("work-bioswap-still-4", "drop")], still_ar="1/1"),
@@ -179,27 +179,35 @@ def product_block():
     turn = """<figure class="turn" data-rv><div class="film clip"><video data-lazy muted loop playsinline preload="none" poster="/videos/work/pv-turntable.jpg" aria-label="PlugVerse on iPhone, turntable"><source src="/videos/work/pv-turntable.webm" type="video/webm; codecs=av01.0.08M.08" /><source src="/videos/work/pv-turntable.mp4" type="video/mp4" /></video></div><figcaption class="label">Real screens, rendered in Blender</figcaption></figure>"""
     return f'<section class="renders dark" aria-label="Device renders">{figs}{turn}</section>'
 
+def vsrc(name, webm, codec="av01.0.08M.08"):
+    """(src attribute, inner <source> tags) for a /videos/work clip. With webm=True the AV1 WebM goes first, MP4 is the fallback."""
+    if webm:
+        return "", f'<source src="/videos/work/{name}.webm" type="video/webm; codecs={codec}" /><source src="/videos/work/{name}.mp4" type="video/mp4" />'
+    return f' src="/videos/work/{name}.mp4"', ""
+
 def case(w, nxt, no):
     poster = f"/videos/work/{w.get('video')}.jpg"
+    la, li = vsrc(w.get("video"), w.get("webm"))
     if w.get("hero_img"):
         k = w["hero_img"]
         media = f'<div class="media"><div class="zoom">{spic(k, w["title"], "(max-width: 700px) 180vh, 100vw" if w.get("product") else "100vw", eager=True)}</div></div>'
         poster = f"/img/{K(k)}-{mid_w(K(k))}.jpg"
     else:
-        media = f'<div class="media"><div class="zoom"><video src="/videos/work/{w["video"]}.mp4" poster="{poster}" autoplay muted loop playsinline preload="auto" aria-label="{E(w["title"])}, loop"></video></div></div>'
+        media = f'<div class="media"><div class="zoom"><video{la} poster="{poster}" autoplay muted loop playsinline preload="auto" aria-label="{E(w["title"])}, loop">{li}</video></div></div>'
         if w["ar"] in ("1/1", "9/16"):
             a, b = (int(x) for x in w["ar"].split("/"))
             media = f'''<div class="media contain" style="--ar:{w["ar"].replace("/", " / ")}; --arn:{a / b:.4f}">
       <div class="back"><img src="{poster}" alt="" /></div>
-      <div class="front"><div class="zoom"><video src="/videos/work/{w["video"]}.mp4" poster="{poster}" autoplay muted loop playsinline preload="auto" aria-label="{E(w["title"])}, loop"></video></div></div>
+      <div class="front"><div class="zoom"><video{la} poster="{poster}" autoplay muted loop playsinline preload="auto" aria-label="{E(w["title"])}, loop">{li}</video></div></div>
     </div>'''
     watch = ""
     if w.get("full"):
         a, b = (int(x) for x in w["full_ar"].split("/"))
         shape = " square" if a == b else (" tall" if a < b else "")
+        fa, fi = vsrc(w["full"], w.get("webm"), "av01.0.12M.08")
         watch = f'''<section class="watch dark" aria-label="Watch">
     <div class="player{shape}" style="--ar:{a} / {b}; --arn:{a / b:.4f}" data-cursor="Play">
-      <video src="/videos/work/{w["full"]}.mp4" poster="{poster}" playsinline preload="none" aria-label="{E(w["title"])}, full cut"></video>
+      <video{fa} poster="{poster}" playsinline preload="none" aria-label="{E(w["title"])}, full cut">{fi}</video>
       <button class="cover" type="button" aria-label="Play {E(w["title"])} with sound"><span class="btn">{PLAY} Play with sound</span></button>
     </div>
     <div class="under label"><span>{E(w["title"])}</span><span>{E(w.get("runtime", ""))}</span></div>
@@ -244,7 +252,7 @@ def index_rows():
     out = []
     for i, w in enumerate(WORK):
         no = f"{i + 1:02d}"
-        out.append(f"""      <li class="row" data-rv data-src="/videos/work/{w['video']}.mp4" data-poster="/videos/work/{w['video']}.jpg" data-ar="{w['ar']}">
+        out.append(f"""      <li class="row" data-rv data-src="/videos/work/{w['video']}.mp4" data-poster="/videos/work/{w['video']}.jpg"{f' data-webm="/videos/work/{w["video"]}.webm"' if w.get("webm") else ""} data-ar="{w['ar']}">
         <a href="/work/{w['slug']}" data-handoff data-cursor="View">
           <span class="label no">{no}</span>
           <span class="t">{E(w['title'])}</span>

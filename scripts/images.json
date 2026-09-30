@@ -44,7 +44,7 @@
   "stamp": {
    "src": "videos/work/chapter-one.jpg",
    "size": 49045,
-   "mtime": 1790724150,
+   "mtime": 1790777754,
    "crop": null
   }
  },
@@ -60,7 +60,7 @@
   "stamp": {
    "src": "videos/work/launch-film.jpg",
    "size": 31145,
-   "mtime": 1790719602,
+   "mtime": 1790777754,
    "crop": null
   }
  },
@@ -76,11 +76,11 @@
   "stamp": {
    "src": "videos/work/the-start.jpg",
    "size": 79617,
-   "mtime": 1790726075,
+   "mtime": 1790777754,
    "crop": null
   }
  },
- "p-bioswap": {
+ "bioswap-final-8cae30": {
   "w": [
    640,
    960
@@ -90,9 +90,9 @@
    960
   ],
   "stamp": {
-   "src": "videos/work/bioswap.jpg",
-   "size": 33297,
-   "mtime": 1790719609,
+   "src": "videos/work/bioswap-final.jpg",
+   "size": 95166,
+   "mtime": 1790781396,
    "crop": null
   }
  },
@@ -108,7 +108,7 @@
   "stamp": {
    "src": "videos/work/pv-turntable.jpg",
    "size": 66087,
-   "mtime": 1790728928,
+   "mtime": 1790777754,
    "crop": null
   }
  },
@@ -124,7 +124,7 @@
   "stamp": {
    "src": "videos/work/rubber-band.jpg",
    "size": 112486,
-   "mtime": 1790724494,
+   "mtime": 1790777754,
    "crop": null
   }
  },
@@ -159,7 +159,7 @@
   "stamp": {
    "src": "photos/home-collage-2-band-porch.jpg",
    "size": 2344936,
-   "mtime": 1790749333,
+   "mtime": 1790777740,
    "crop": [
     0.15,
     0,
@@ -198,7 +198,7 @@
   "stamp": {
    "src": "photos/v2/belltower.jpg",
    "size": 143005,
-   "mtime": 1790724046,
+   "mtime": 1790777742,
    "crop": null
   }
  },
@@ -215,7 +215,7 @@
   "stamp": {
    "src": "photos/v2/bar-gig.jpg",
    "size": 152505,
-   "mtime": 1790724047,
+   "mtime": 1790777742,
    "crop": null
   }
  },
@@ -232,7 +232,7 @@
   "stamp": {
    "src": "photos/home-collage-6-gig2_wide_crowd_090.jpg",
    "size": 1469459,
-   "mtime": 1790749319,
+   "mtime": 1790777740,
    "crop": [
     0.33,
     0.2,
@@ -322,7 +322,7 @@
   "stamp": {
    "src": "photos/work/ch1-belltower.jpg",
    "size": 178670,
-   "mtime": 1790724151,
+   "mtime": 1790777742,
    "crop": null
   }
  },
@@ -339,7 +339,7 @@
   "stamp": {
    "src": "photos/work/ch1-street.jpg",
    "size": 281150,
-   "mtime": 1790724152,
+   "mtime": 1790777742,
    "crop": null
   }
  },
@@ -356,7 +356,7 @@
   "stamp": {
    "src": "photos/work/ch1-house.jpg",
    "size": 409813,
-   "mtime": 1790724152,
+   "mtime": 1790777742,
    "crop": null
   }
  },
@@ -373,7 +373,7 @@
   "stamp": {
    "src": "photos/work/launch-film-1.jpg",
    "size": 137064,
-   "mtime": 1790719611,
+   "mtime": 1790777742,
    "crop": null
   }
  },
@@ -390,7 +390,7 @@
   "stamp": {
    "src": "photos/work/launch-film-2.jpg",
    "size": 68632,
-   "mtime": 1790719611,
+   "mtime": 1790777742,
    "crop": null
   }
  },
@@ -407,7 +407,7 @@
   "stamp": {
    "src": "photos/work/launch-film-3.jpg",
    "size": 105318,
-   "mtime": 1790719612,
+   "mtime": 1790777742,
    "crop": null
   }
  },
@@ -424,7 +424,7 @@
   "stamp": {
    "src": "photos/work/launch-film-4.jpg",
    "size": 122378,
-   "mtime": 1790719612,
+   "mtime": 1790777742,
    "crop": null
   }
  },
@@ -441,7 +441,7 @@
   "stamp": {
    "src": "photos/work/afraid-s1.jpg",
    "size": 202488,
-   "mtime": 1790721732,
+   "mtime": 1790777742,
    "crop": null
   }
  },
@@ -458,7 +458,7 @@
   "stamp": {
    "src": "photos/work/afraid-s2.jpg",
    "size": 87745,
-   "mtime": 1790721732,
+   "mtime": 1790777742,
    "crop": null
   }
  },
@@ -475,7 +475,7 @@
   "stamp": {
    "src": "photos/work/afraid-s3.jpg",
    "size": 166829,
-   "mtime": 1790721733,
+   "mtime": 1790777742,
    "crop": null
   }
  },
@@ -492,7 +492,7 @@
   "stamp": {
    "src": "photos/work/afraid-s4.jpg",
    "size": 112140,
-   "mtime": 1790721733,
+   "mtime": 1790777742,
    "crop": null
   }
  },
@@ -507,8 +507,8 @@
   ],
   "stamp": {
    "src": "photos/work/bioswap-1.jpg",
-   "size": 99231,
-   "mtime": 1790719616,
+   "size": 24907,
+   "mtime": 1790781453,
    "crop": null
   }
  },
@@ -523,8 +523,8 @@
   ],
   "stamp": {
    "src": "photos/work/bioswap-2.jpg",
-   "size": 81817,
-   "mtime": 1790719616,
+   "size": 71514,
+   "mtime": 1790781397,
    "crop": null
   }
  },
@@ -539,8 +539,8 @@
   ],
   "stamp": {
    "src": "photos/work/bioswap-3.jpg",
-   "size": 33411,
-   "mtime": 1790719616,
+   "size": 64744,
+   "mtime": 1790781397,
    "crop": null
   }
  },
@@ -555,8 +555,8 @@
   ],
   "stamp": {
    "src": "photos/work/bioswap-4.jpg",
-   "size": 39509,
-   "mtime": 1790719616,
+   "size": 45238,
+   "mtime": 1790781397,
    "crop": null
   }
  },
@@ -681,7 +681,7 @@
   "stamp": {
    "src": "photos/gig_rubber_wedding_lineup.jpg",
    "size": 1334087,
-   "mtime": 1790718981,
+   "mtime": 1790777739,
    "crop": null
   }
  },
@@ -698,7 +698,7 @@
   "stamp": {
    "src": "photos/work/pv-pitch.jpg",
    "size": 212344,
-   "mtime": 1790721668,
+   "mtime": 1790777742,
    "crop": null
   }
  },
@@ -715,7 +715,7 @@
   "stamp": {
    "src": "photos/work/pv-luby.jpg",
    "size": 267083,
-   "mtime": 1790721668,
+   "mtime": 1790777742,
    "crop": null
   }
  },
@@ -749,7 +749,7 @@
   "stamp": {
    "src": "photos/gig_rubber_tent_purple.jpg",
    "size": 182018,
-   "mtime": 1790718981,
+   "mtime": 1790777739,
    "crop": null
   }
  },
@@ -766,7 +766,23 @@
   "stamp": {
    "src": "photos/golf_portrait.jpg",
    "size": 491727,
-   "mtime": 1790718981,
+   "mtime": 1790777739,
+   "crop": null
+  }
+ },
+ "p-bioswap": {
+  "w": [
+   640,
+   960
+  ],
+  "ar": [
+   960,
+   960
+  ],
+  "stamp": {
+   "src": "videos/work/bioswap.jpg",
+   "size": 33297,
+   "mtime": 1790719609,
    "crop": null
   }
  },

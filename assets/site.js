@@ -120,7 +120,11 @@
       if (layers.has(row)) return layers.get(row);
       const m = document.createElement("div"); m.className = "m";
       const v = document.createElement("video"); v.muted = true; v.loop = true; v.playsInline = true; v.preload = "none";
-      v.setAttribute("muted", ""); v.setAttribute("playsinline", ""); v.poster = row.dataset.poster || ""; v.src = row.dataset.src;
+      v.setAttribute("muted", ""); v.setAttribute("playsinline", ""); v.poster = row.dataset.poster || "";
+      if (row.dataset.webm) { // AV1 WebM first where the row has one, the MP4 stays the fallback
+        const s1 = document.createElement("source"); s1.src = row.dataset.webm; s1.type = 'video/webm; codecs="av01.0.08M.08"';
+        const s2 = document.createElement("source"); s2.src = row.dataset.src; s2.type = "video/mp4"; v.append(s1, s2);
+      } else v.src = row.dataset.src;
       m.appendChild(v); box.appendChild(m); layers.set(row, m); return m;
     }
     function place() {
