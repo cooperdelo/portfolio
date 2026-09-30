@@ -125,7 +125,7 @@ html.seen .intro, html.rm .intro { display: none; }
 .title .foot { position: absolute; z-index: 2; left: 0; right: 0; bottom: 0; padding: 0 var(--gutter); }
 .title .foot .bar { display: flex; justify-content: space-between; padding-bottom: 10px; }
 .wordmark { font-family: var(--display); text-transform: uppercase; line-height: .78; white-space: nowrap; letter-spacing: -.02em; font-size: 8.4vw; margin: 0; padding-bottom: .03em; }
-.wordmark [data-fit] { padding-right: .03em; }
+.wordmark [data-fit] { padding-right: .08em; }
 .wordmark .line > span { transition-duration: 1.6s; }
 .wordmark .m { display: none; }
 @media (max-width: 700px) {

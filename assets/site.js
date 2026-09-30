@@ -22,7 +22,7 @@
       const box = el.parentElement.clientWidth;
       el.style.fontSize = "100px";
       const w = Math.max(el.getBoundingClientRect().width, el.scrollWidth) || 1;
-      const safe = el.closest(".wordmark") ? 0.98 : 0.995;
+      const safe = el.closest(".wordmark") ? 0.95 : 0.995; // Druk's round O overshoots its advance box, so leave real room
       const size = Math.floor((box * safe / w) * 100 * 100) / 100;
       const g = el.dataset.fit;
       if (g) (groups[g] = groups[g] || []).push([el, size]); else el.style.fontSize = size + "px";
