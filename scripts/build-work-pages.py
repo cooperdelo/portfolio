@@ -346,10 +346,10 @@ INDEX = """{HEAD}
 
 # ---------------- resume (facts: vault Projects/portfolio-website/resume.md + Cooper_Delo_Resume_2026.pdf) ----------------
 # 2026-09-30 (Cooper's rulings, vault Context/achievements.md): experience ordered by strength, Truist filled from his
-# LinkedIn title, PlugVerse bookings $70K+ (supersedes older booking figures), Music minor added, GCA moved to Projects.
+# LinkedIn title, Rubber Band bookings $70K+ (not PlugVerse), Music minor added, GCA moved to Projects.
 RESUME_ROLES = [
   ("PlugVerse", "Founder and CEO", "Chapel Hill, NC", "Nov 2025 to now", [
-      "Founded PlugVerse LLC. Sole developer of a full-stack artist and venue booking marketplace. $70K+ in bookings.",
+      "Founded PlugVerse LLC. Sole developer of a full-stack artist and venue booking marketplace.",
       "Built on Next.js, React, Supabase and Stripe Connect. 8 user roles, 48-suite QA pipeline.",
       "Won the $20K Luby Pitch Competition and a $1,850 1789 grant. Managing a 4-person intern team."], "/work/plugverse-product"),
   ("Truist Financial", "Systems Engineering Intern (Collaboration & A/V), Technology & Innovation Track", "Charlotte, NC", "May 2026 to Aug 2026", [
@@ -364,7 +364,7 @@ RESUME_ROLES = [
 RESUME_PROJECTS = [
   ("Rubber Band", "Guitarist and business manager", "Chapel Hill, NC", "Jul 2025 to now", [
       "Guitar and vocals for UNC's top event cover band.",
-      "Manage all contracts, venue negotiations and pricing."], "/work/rubber-band"),
+      "Manage all bookings, client and venue relationships, contracts, negotiations and pricing. Generated $70K+ in cumulative bookings."], "/work/rubber-band"),
   ("Carolina Data Challenge 2025", "Data Analyst", "Chapel Hill, NC", "Sep 2025", [
       "Modeled risk for the $500B space economy. Presented an investment matrix to industry judges."], None),
   ("Global Career Accelerator", "Data Analyst Trainee", "Chapel Hill, NC", "May 2025 to Jul 2025", [
@@ -391,7 +391,7 @@ def resume_page():
     skills = [("Code", "JavaScript, TypeScript, React, Next.js, Node.js, Python, SQL, Java"),
               ("Stack", "Supabase, PostgreSQL, Stripe API, Vercel, GitHub, PostHog, Azure, Claude AI and API"),
               ("Tools", "Jira, Miro"),
-              ("Clubs", "1789 Venture Lab, Finance Society, Busi-Tech Club, Consulting Club, UNC Habitat for Humanity"),
+              ("Clubs", "1789 Venture Fund, Busi-Tech Club"),
               ("Certs", "SQL and Python Specialist (UNC GCA), Powering Medicine (NC State)"),
               ("Into", "Cybersecurity, AI, golf, music production, guitar")]
     tr = lambda rows: "".join(f'<tr><th scope="row">{E(k)}</th><td>{E(v)}</td></tr>' for k, v in rows)
