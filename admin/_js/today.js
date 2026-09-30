@@ -1,4 +1,4 @@
-// /admin/_js/today.js — TODAY command center (2026-09-28).
+// /admin/_js/today.js, TODAY command center (2026-09-28).
 // Replaces the MORNING-*.md files. Agents write rows into command_center and
 // content_plan; this page only shows them and takes one-tap answers.
 // No file paths on screen: a row's source shows only as a hover title on "source".
@@ -16,6 +16,9 @@ const src = (r) => r.source_path ? `<span class="td-src" tabindex="0" title="${e
 const optLabel = (opts, v) => (opts || []).find(o => o.v === v)?.label || v;
 
 let CC = [], LADDER = [], LIST = null;
+// Home's hero row listens for this: { done, total, waiting, firstWaiting }.
+const STATE = { done: 0, total: 0, waiting: 0, firstWaiting: '' };
+const emit = (patch) => { Object.assign(STATE, patch); dispatchEvent(new CustomEvent('cd:today', { detail: { ...STATE } })); };
 
 export async function mountToday() {
   const [cc, ladder, list] = await Promise.all([commandCenter(), contentLadder().catch(e => { console.error(e); return null; }), todayList().catch(e => { console.error(e); return null; })]);
@@ -65,12 +68,14 @@ function paintDo() {
   const feeling = LIST[0]?.feeling || 'normal';
   const live = LIST.filter(r => !r.deferred), deferred = LIST.filter(r => r.deferred);
   const done = live.filter(r => r.done).length, total = live.length;
+  emit({ done, total });
   const item = (r) => {
     const w = when(r);
-    const sub = r.grp === 'calendar' ? r.location : r.grp === 'content' ? r.sub : (!r.done ? r.sub : '');
-    return `<li class="td-item${r.done ? ' is-done' : ''}${r.deferred ? ' is-deferred' : ''}" data-grp="${r.grp}" data-ref="${esc(r.ref)}">
+    // Names and actions only on the row; the agent's longer note lives in the hover title.
+    const sub = r.grp === 'calendar' ? r.location : r.grp === 'content' ? r.sub : '';
+    return `<li class="td-item${r.done ? ' is-done' : ''}${r.deferred ? ' is-deferred' : ''}" data-grp="${r.grp}" data-ref="${esc(r.ref)}"${r.sub && r.grp === 'task' ? ` title="${esc(r.sub)}"` : ''}>
       <button class="td-check" aria-pressed="${!!r.done}" aria-label="${r.done ? 'Mark not done' : 'Mark done'}: ${esc(r.title)}"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7"/></svg></button>
-      <div class="td-txt"><div class="td-t">${r.grp === 'calendar' && w ? `<span class="td-time">${esc(w)}</span>` : ''}${esc(r.title)}${r.grp !== 'calendar' && w ? `<span class="td-due">${esc(w)}</span>` : ''}${r.carried_count ? `<span class="td-carry">carried ${r.carried_count}x</span>` : ''}${r.deferred ? '<span class="td-carry">deferred</span>' : ''}</div>
+      <div class="td-txt"><div class="td-t">${r.grp === 'calendar' && w ? `<span class="td-time">${esc(w)}</span>` : ''}${esc(r.title)}${r.grp !== 'calendar' && w ? `<span class="td-due">${esc(w)}</span>` : ''}${r.carried_count > 1 ? `<span class="td-carry">carried ${r.carried_count}x</span>` : ''}${r.deferred ? '<span class="td-carry">deferred</span>' : ''}</div>
       ${sub ? `<div class="td-b">${esc(sub)}</div>` : ''}</div></li>`;
   };
   const groups = GROUPS.map(([g, label]) => {
@@ -79,7 +84,7 @@ function paintDo() {
     return rows.length ? `<div class="td-g"><div class="td-gl">${label}</div><ul class="td-list">${rows.map(item).join('')}</ul></div>` : '';
   }).join('');
   el.innerHTML = `<div class="sv-h"><h2 class="disp">Today</h2><span class="td-count">${total ? `${done} of ${total} done` : 'Nothing today'}</span></div>
-    <div class="td-prog" role="progressbar" aria-valuemin="0" aria-valuemax="${total}" aria-valuenow="${done}"><i style="width:${total ? Math.round(done / total * 100) : 0}%"></i></div>
+    <div class="td-prog meter thin" role="progressbar" aria-valuemin="0" aria-valuemax="${total}" aria-valuenow="${done}"><i style="--p:${total ? Math.round(done / total * 100) : 0}%;transition:width var(--t) var(--ease)"></i></div>
     <div class="td-feel" role="group" aria-label="How are you feeling today">${FEEL.map(([v, l]) => `<button class="td-fb" data-v="${v}" aria-pressed="${feeling === v}">${l}</button>`).join('')}</div>
     ${groups || `<p class="td-empty">Nothing on your list.</p>`}
     ${deferred.length ? `<details class="td-done"><summary>${deferred.length} deferred to tomorrow</summary><ul class="td-list">${deferred.map(item).join('')}</ul></details>` : ''}`;
@@ -109,21 +114,25 @@ const VAULT = 'C:\\Users\\coope\\Desktop\\Claude\\';
 const noDash = (s) => String(s ?? '').replace(/\s*[\u2014\u2013]\s*/g, ', ');
 const pickLabel = (r) => CLOSE[r.answer] || optLabel(r.options, r.answer);
 const isRecent = (iso) => iso && Date.now() - new Date(iso).getTime() < 864e5;
+let DECIDE_ALL = false;
 function paintDecide() {
   const open = CC.filter(r => r.kind === 'decide' && !r.done);
   const waiting = open.filter(r => !r.answer).sort((a, b) => a.priority - b.priority);
   const sent = [...open.filter(r => r.answer), ...CC.filter(r => r.kind === 'decide' && r.done && CLOSE[r.answer] && isRecent(r.answered_at))];
+  emit({ waiting: waiting.length, firstWaiting: waiting[0] ? noDash(waiting[0].title) : '' });
   const card = (r) => `<article class="sv-card td-card is-click" data-id="${r.id}" tabindex="0" role="button" aria-label="More about: ${esc(r.title)}">
       <div class="td-t">${esc(noDash(r.title))}</div>
       ${r.body ? `<p class="td-b">${esc(noDash(r.body))}</p>` : ''}
-      <div class="td-opts">${(r.options || []).map(o => `<button class="td-opt${o.rec ? ' rec' : ''}" data-v="${esc(o.v)}"${o.rec ? ' title="Claude\'s pick"' : ''}>${esc(o.label)}</button>`).join('')}</div>
-      <div class="td-card-foot"><button class="td-more">Details</button><button class="td-close" data-close="already done">Already done</button></div>
+      <div class="td-opts">${(r.options || []).map(o => `<button class="td-opt${o.rec ? ' rec' : ''}" data-v="${esc(o.v)}"${o.rec ? ' title="Claude\'s pick"' : ''}>${esc(o.label)}</button>`).join('')}<button class="td-close" data-close="already done">Already done</button></div>
     </article>`;
   const sentRow = (r) => `<li data-id="${r.id}"><span class="td-t">${esc(noDash(r.title))}</span><span class="td-pick">${esc(pickLabel(r))}</span><button class="td-undo" aria-label="Undo">Undo</button></li>`;
+  const SHOW = 4, extra = Math.max(0, waiting.length - SHOW);
   $('tdDecide').innerHTML = `<div class="sv-h"><h2 class="disp">Decide</h2><span class="td-count">${waiting.length ? `${waiting.length} waiting` : 'Nothing waiting'}</span></div>
-    ${waiting.length ? `<div class="td-cards">${waiting.map(card).join('')}</div>` : ''}
+    ${waiting.length ? `<div class="td-cards${DECIDE_ALL ? ' all' : ''}">${waiting.map(card).join('')}</div>` : ''}
+    ${extra && !DECIDE_ALL ? `<button class="td-all btn small ghost">${extra} more</button>` : ''}
     ${sent.length ? `<ul class="td-sent">${sent.map(sentRow).join('')}</ul>` : ''}`;
   const root = $('tdDecide');
+  root.querySelector('.td-all')?.addEventListener('click', () => { DECIDE_ALL = true; paintDecide(); });
   root.querySelectorAll('.td-opt').forEach(b => b.addEventListener('click', (e) => { e.stopPropagation(); answer(+b.closest('[data-id]').dataset.id, b.dataset.v); }));
   root.querySelectorAll('.td-close').forEach(b => b.addEventListener('click', (e) => { e.stopPropagation(); closeRow(+b.closest('[data-id]').dataset.id, b.dataset.close); }));
   root.querySelectorAll('.td-undo').forEach(b => b.addEventListener('click', () => undo(+b.closest('[data-id]').dataset.id)));
@@ -198,7 +207,7 @@ function openDrawer(id) {
 function closeDrawer() {
   if (!DRAWER || DRAWER.hidden) return;
   DRAWER.classList.remove('in'); document.documentElement.classList.remove('dr-open');
-  setTimeout(() => { DRAWER.hidden = true; }, 180);
+  setTimeout(() => { if (!DRAWER.classList.contains('in')) DRAWER.hidden = true; }, 900); // after the slide-out finishes
   if (LAST_FOCUS && document.contains(LAST_FOCUS)) LAST_FOCUS.focus();
 }
 
@@ -218,7 +227,7 @@ function paintLadder() {
       : r.answer ? `<div class="td-picked">You picked <b>${esc(optLabel(r.options, r.answer))}</b> <button class="td-undo">Undo</button></div>` : '';
     return `<li class="td-rung${isToday ? ' now' : ''}${r.status === 'posted' ? ' is-done' : ''}" data-id="${r.id}">
       <span class="td-day">${esc(r.day_label || 'Any day')}</span>
-      <div class="td-txt"><div class="td-t">${esc(r.piece)}</div>${r.note && r.status !== 'posted' ? `<div class="td-b">${esc(r.note)}</div>` : ''}${opts}</div>
+      <div class="td-txt"><div class="td-t"${r.note ? ` title="${esc(r.note)}"` : ''}>${esc(r.piece)}</div>${opts}</div>
       <span class="td-pill ${cls}">${esc(label)}</span></li>`;
   };
   el.innerHTML = `<div class="sv-h"><h2 class="disp">This week</h2><span class="td-count">${posted} of ${LADDER.length} posted · <a href="/admin/schedule/">Schedule</a></span></div>

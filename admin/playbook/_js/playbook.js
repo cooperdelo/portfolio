@@ -109,7 +109,7 @@ function render() {
   $('#k-pb').textContent     = state.items.filter(x => x.scope === 'personal-brand').length;
   $('#k-pv').textContent     = state.items.filter(x => x.scope === 'plugverse').length;
 
-  // Type filter row — rebuild with counts (within the current scope filter, ignoring type filter)
+  // Type filter row, rebuild with counts (within the current scope filter, ignoring type filter)
   const scopeMatches = state.items.filter(it =>
     state.filters.scope === 'all' || it.scope === state.filters.scope
   );
@@ -161,7 +161,7 @@ function itemCard(it) {
   </div>`;
 }
 
-// Minimal markdown renderer — enough for the body field's typical content.
+// Minimal markdown renderer, enough for the body field's typical content.
 function renderMd(text) {
   if (!text) return '';
   let h = String(text).replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));

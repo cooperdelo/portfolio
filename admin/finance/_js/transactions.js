@@ -98,12 +98,12 @@ function render() {
 function rowHTML(r) {
   const ent = entityPill(r.entity);
   const typ = `<span class="pill ${r.type === 'income' ? 'income' : 'expense'}">${r.type}</span>`;
-  const sign = r.type === 'income' ? '+' : '−';
-  const color = r.type === 'income' ? 'var(--good)' : 'var(--rust, #FF4D2E)';
+  const sign = r.type === 'income' ? '+' : '-';
+  const color = r.type === 'income' ? 'var(--text)' : 'var(--text-3)';
   const tags = [
     r.is_food_log         ? '<span class="pill food">food</span>' : '',
     r.is_tax_deductible   ? '<span class="pill deduct">deduct</span>' : '',
-    r.cpa_review_needed   ? '<span class="pill" style="color:#ff6b6b">cpa</span>' : '',
+    r.cpa_review_needed   ? '<span class="pill">cpa</span>' : '',
   ].filter(Boolean).join(' ');
 
   return `
@@ -116,17 +116,17 @@ function rowHTML(r) {
       </td>
       <td>${ent}</td>
       <td class="mono meta">${prettyCat(r.category)}</td>
-      <td class="mono meta">${prettyCat(r.account || '—')}</td>
+      <td class="mono meta">${prettyCat(r.account || '–')}</td>
       <td>${typ}</td>
-      <td class="right mono" style="color:${color};">${sign}${fmtUSD(r.amount)}</td>
+      <td class="right" style="color:${color};font-family:var(--f-display);font-size:12.5px;white-space:nowrap">${sign}${fmtUSD(r.amount)}</td>
       <td class="right">
-        <button class="btn small danger" data-del="${r.id}" title="Delete">×</button>
+        <button class="btn small ghost" data-del="${r.id}" title="Delete" aria-label="Delete">×</button>
       </td>
     </tr>`;
 }
 
 async function deleteRow(id) {
-  // Soft delete (sets deleted_at) — preserves audit trail
+  // Soft delete (sets deleted_at), preserves audit trail
   if (!confirm('Delete this transaction? It will be removed from all views.')) return;
   const { error } = await sb.from('financial_transactions').update({ deleted_at: new Date().toISOString() }).eq('id', id);
   if (error) { toast('Delete failed', 'err'); console.error(error); return; }

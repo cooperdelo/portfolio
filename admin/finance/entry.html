@@ -6,6 +6,7 @@
 <meta name="robots" content="noindex, nofollow, noarchive" />
 <title>Add transaction · CD Admin</title>
 <link rel="stylesheet" href="/admin/_shell/admin-shell.css" />
+<style>.card { max-width: 880px; padding: 24px; } .checkrow { font-size: 13.5px; color: var(--text-2); min-height: 40px; }</style>
 </head>
 <body>
   <main>
@@ -47,13 +48,13 @@
           </div>
           <div class="field">
             <label>Category</label>
-            <input type="text" name="category" list="cat-list" required placeholder="food, software, marketing…" />
+            <input type="text" name="category" list="cat-list" required placeholder="food, software, marketing" />
             <datalist id="cat-list"></datalist>
           </div>
           <div class="field">
             <label>Account</label>
             <select name="account">
-              <option value="">—</option>
+              <option value="">–</option>
             </select>
           </div>
           <div class="field" style="grid-column: 1 / -1;">
@@ -67,7 +68,7 @@
           <div class="field">
             <label>Funded by</label>
             <select name="funding_source">
-              <option value="">— none / personal default —</option>
+              <option value="">– none / personal default –</option>
             </select>
           </div>
           <div class="field" style="grid-column: 1 / -1;">
@@ -76,7 +77,7 @@
           </div>
         </div>
 
-        <h2 class="section-h" style="font-size: 1.1rem; margin: 1.8rem 0 0.6rem;">Flags</h2>
+        <h2 class="section-h" style="margin: 26px 0 12px;">Flags</h2>
         <div class="form-grid">
           <label class="checkrow">
             <input type="checkbox" name="is_food_log" />

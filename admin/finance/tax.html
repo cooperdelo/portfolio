@@ -1,51 +1,47 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="robots" content="noindex, nofollow, noarchive" />
+<meta name="theme-color" content="#0C0B0A" />
 <title>Tax Prep · CD Admin</title>
 <link rel="stylesheet" href="/admin/_shell/admin-shell.css" />
+<style>.ded td:first-child, .ded td:nth-child(5), .ded td:nth-child(6) { white-space: nowrap; } .ded td:nth-child(7) .pill { margin: 1px 2px; }
+@media (max-width: 600px) { #ded-tbody td:nth-child(3), #ded-tbody td:nth-child(4), #ded-tbody td:nth-child(5), #ded-tbody td:nth-child(7), .ded th:nth-child(3), .ded th:nth-child(4), .ded th:nth-child(5), .ded th:nth-child(7) { display: none; } }</style>
 </head>
 <body>
   <main>
-    <div class="page-head">
-      <div>
-        <h1>Tax prep</h1>
-      </div>
-      <div class="actions">
-        <select id="year-pick" style="padding: 0.55rem 0.85rem; background: rgba(20,17,15,0.7); border: 1px solid var(--card-border); color: var(--ink); border-radius: 999px; font-family: 'Geist Mono', monospace; font-size: 0.7rem; letter-spacing: 0.18em; text-transform: uppercase;"></select>
-      </div>
-    </div>
+    <header class="page-head">
+      <h1>Tax prep</h1>
+      <div class="actions"><select id="year-pick" style="width:auto;border-radius:999px"></select></div>
+    </header>
 
     <div class="kpi-grid">
-      <div class="card"><div class="label">Deductible · YTD</div><div class="value" data-k="ded_total">—</div><div class="delta flat">After percentage</div></div>
-      <div class="card"><div class="label">Gross flagged</div><div class="value" data-k="gross_total">—</div><div class="delta flat">Before percentage</div></div>
-      <div class="card"><div class="label">Entries flagged</div><div class="value" data-k="entries">—</div><div class="delta flat">Tax deductible</div></div>
-      <div class="card"><div class="label">Needs CPA</div><div class="value" data-k="cpa_count">—</div><div class="delta flat" data-k="cpa_amt">unresolved</div></div>
+      <div class="card"><div class="label">Deductible</div><div class="value" data-k="ded_total">–</div><div class="delta flat">Ledger · after %</div></div>
+      <div class="card"><div class="label">Gross flagged</div><div class="value" data-k="gross_total">–</div><div class="delta flat">Ledger · before %</div></div>
+      <div class="card"><div class="label">Entries</div><div class="value" data-k="entries">–</div><div class="delta flat">Ledger · deductible flag</div></div>
+      <div class="card"><div class="label">Needs CPA</div><div class="value" data-k="cpa_count">–</div><div class="delta flat" data-k="cpa_amt">Ledger · CPA flag</div></div>
     </div>
 
-    <h2 class="section-h">By <span class="accent">category</span></h2>
-    <div class="card" style="padding:0; overflow:hidden; margin-bottom: 2rem;">
-      <div class="tbl-wrap">
-        <table class="data">
-          <thead>
-            <tr><th>Tax category</th><th class="right">Entries</th><th class="right">Gross</th><th class="right">Deductible</th></tr>
-          </thead>
-          <tbody id="cat-tbody"><tr><td colspan="4" class="empty">Loading…</td></tr></tbody>
-        </table>
+    <div class="grid">
+      <div class="span-12">
+        <h2 class="section-h" style="margin-top:4px">By category</h2>
+        <div class="tbl-wrap">
+          <table class="data">
+            <thead><tr><th>Category</th><th class="right">Entries</th><th class="right">Gross</th><th class="right">Deductible</th></tr></thead>
+            <tbody id="cat-tbody"><tr><td colspan="4" class="empty">Loading</td></tr></tbody>
+          </table>
+        </div>
       </div>
-    </div>
-
-    <h2 class="section-h">All <span class="accent">flagged</span></h2>
-    <div class="card" style="padding:0; overflow:hidden;">
-      <div class="tbl-wrap">
-        <table class="data">
-          <thead>
-            <tr><th>Date</th><th>Description</th><th>Tax category</th><th>Pct</th><th class="right">Gross</th><th class="right">Deductible</th><th>Flags</th></tr>
-          </thead>
-          <tbody id="ded-tbody"><tr><td colspan="7" class="empty">Loading…</td></tr></tbody>
-        </table>
+      <div class="span-12">
+        <h2 class="section-h" style="margin-top:18px">Flagged</h2>
+        <div class="tbl-wrap">
+          <table class="data ded">
+            <thead><tr><th>Date</th><th>What</th><th>Category</th><th>Pct</th><th class="right">Gross</th><th class="right">Deductible</th><th>Flags</th></tr></thead>
+            <tbody id="ded-tbody"><tr><td colspan="7" class="empty">Loading</td></tr></tbody>
+          </table>
+        </div>
       </div>
     </div>
   </main>

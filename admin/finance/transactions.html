@@ -6,6 +6,10 @@
 <meta name="robots" content="noindex, nofollow, noarchive" />
 <title>Transactions · CD Admin</title>
 <link rel="stylesheet" href="/admin/_shell/admin-shell.css" />
+<style>
+  /* phones: date, what, amount only */
+  @media (max-width: 600px) { table.data th:nth-child(n+3):nth-child(-n+6), table.data td:nth-child(n+3):nth-child(-n+6) { display: none; } .filters select { flex: 1 1 45%; min-width: 0; } }
+</style>
 </head>
 <body>
   <main>
@@ -20,7 +24,7 @@
     </div>
 
     <div class="filters">
-      <input type="search" id="f-search" placeholder="Search description, merchant, notes…" style="min-width:260px; flex:1;" />
+      <input type="search" id="f-search" placeholder="Search" style="min-width:220px; flex:1;" />
       <select id="f-entity">
         <option value="">All entities</option>
         <option value="personal">Personal</option>
@@ -69,7 +73,7 @@
           </tbody>
         </table>
       </div>
-      <div style="padding: 0.9rem 1.2rem; display:flex; justify-content:space-between; align-items:center; border-top:1px solid rgba(244,239,230,0.08); font-family: 'Geist Mono', monospace; font-size: 0.7rem; letter-spacing: 0.18em; text-transform:uppercase; color: var(--muted, #6F6A60);">
+      <div class="tbl-foot">
         <span id="tx-count">0 rows</span>
         <span id="tx-total">Total · $0</span>
       </div>

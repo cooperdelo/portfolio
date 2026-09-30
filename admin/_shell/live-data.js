@@ -1,5 +1,5 @@
 // =====================================================================
-// /admin/_shell/live-data.js — zero-manual-input data module (2026-09-28, admin-data-audit).
+// /admin/_shell/live-data.js, zero-manual-input data module (2026-09-28, admin-data-audit).
 // Every loader reads a Supabase view that is filled automatically. Nothing here
 // asks Cooper to paste, type or register anything. Each row carries its own
 // timestamp so the page can show "as of" and flag staleness.

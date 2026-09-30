@@ -1,4 +1,4 @@
-// /admin/_js/integrations.js — where every number comes from, live.
+// /admin/_js/integrations.js, where every number comes from, live.
 // Reads: integration_sources_status() RPC (non-secret connection state + last runs),
 // social_pipeline_health, social_account_snapshots, task_run_log.
 // Tokens never load into this page. Connect buttons hand off to server-side OAuth:
@@ -171,4 +171,4 @@ document.getElementById('snaps').innerHTML = (sn.data || []).filter(r => r.follo
 
 const lastBy = {};
 (runs.data || []).forEach(r => { if (!lastBy[r.task]) lastBy[r.task] = r; });
-document.getElementById('watch').innerHTML = Object.values(lastBy).map(r => `<div class="row" style="align-items:flex-start"><div class="grow"><div class="t">${esc(r.task)} · ${esc(ago(r.ran_at))}</div><div class="sv-text" style="white-space:normal;font-size:.82rem">${esc((r.note || '').slice(0, 280))}</div></div>${statusChip(r.status)}</div>`).join('') || emptyState('No watcher runs yet.', '');
+document.getElementById('watch').innerHTML = Object.values(lastBy).map(r => `<div class="row" style="align-items:flex-start"><div class="grow"><div class="t">${esc(r.task)} · ${esc(ago(r.ran_at))}</div><div class="sv-text clamp2" title="${esc(r.note || '')}">${esc((r.note || '').slice(0, 280))}</div></div>${statusChip(r.status)}</div>`).join('') || emptyState('No watcher runs yet.', '');

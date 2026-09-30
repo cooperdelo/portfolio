@@ -1,6 +1,6 @@
 // =====================================================================
 // /admin/academics/_js/academics.js
-// Degree progress dashboard — source of truth: degree-audit-2026-07-07.
+// Degree progress dashboard, source of truth: degree-audit-2026-07-07.
 // Data embedded here (updates ~once/semester). Easy to move to Supabase later.
 // =====================================================================
 import { mountShell } from '/admin/_shell/admin-shell.js';
@@ -18,13 +18,13 @@ const DATA = {
       note:'Group 1 ✓ (MUSC 121). Still need a Group-2 course (e.g. MUSC 261) + ~3 more MUSC hrs (a lesson/ensemble counts). ≈2 courses.' },
   ],
   remaining: [
-    { t:'BUSI 410 — Business Analytics (core; not in Fall ’26!)', h:'3' },
+    { t:'BUSI 410, Business Analytics (core; not in Fall ’26!)', h:'3' },
     { t:'BUSI 403 · 402/ECON 410 · 404 · 411 · 412 (remaining core)', h:'~12' },
     { t:'BUSI electives', h:'18' },
     { t:'Gen-ed: Engagement with the Human Past', h:'3' },
     { t:'Gen-ed: Research & Discovery', h:'~3' },
-    { t:'CS minor — 1 more (COMP 311 or 420+)', h:'3' },
-    { t:'Music minor — Group 2 + ~3 hrs', h:'~6' },
+    { t:'CS minor, 1 more (COMP 311 or 420+)', h:'3' },
+    { t:'Music minor, Group 2 + ~3 hrs', h:'~6' },
   ],
   terms: [
     { term:'Fall 2026', title:'Junior Fall', state:'enrolled', where:'Chapel Hill',
@@ -55,16 +55,16 @@ root.appendChild(el(`
   <div class="ring-wrap">
     <svg width="150" height="150" viewBox="0 0 150 150">
       <circle cx="75" cy="75" r="${R}" fill="none" stroke="rgba(244,239,230,0.10)" stroke-width="10"/>
-      <circle cx="75" cy="75" r="${R}" fill="none" stroke="#FF4D2E" stroke-width="10" stroke-linecap="round"
+      <circle cx="75" cy="75" r="${R}" fill="none" stroke="var(--accent)" stroke-width="10" stroke-linecap="round"
         stroke-dasharray="${C}" stroke-dashoffset="${C}" transform="rotate(-90 75 75)" id="ring"/>
     </svg>
     <div class="num"><b>${pct}%</b><span>to 120 hrs</span></div>
   </div>
   <div class="hero-facts">
-    <div class="fact"><div class="k">Cumulative GPA</div><div class="v rust">${DATA.gpa}</div></div>
+    <div class="fact"><div class="k">Cumulative GPA</div><div class="v">${DATA.gpa}</div></div>
     <div class="fact"><div class="k">Credits</div><div class="v">${after}<small> / ${DATA.creditsTotal} after Fall ’26</small></div></div>
     <div class="fact"><div class="k">Graduation</div><div class="v">${DATA.gradTerm}</div></div>
-    <div class="fact"><div class="k">Degree audit</div><div class="v">${new Date(DATA.auditDate+'T12:00').toLocaleDateString('en-US',{month:'short',day:'numeric'})}<small> · ${Math.round((Date.now()-new Date(DATA.auditDate+'T12:00'))/864e5)}d old${(Date.now()-new Date(DATA.auditDate+'T12:00'))/864e5 > DATA.auditCadenceDays ? ' · STALE, re-run audit' : ''}</small></div></div>
+    <div class="fact"><div class="k">Degree audit</div><div class="v">${new Date(DATA.auditDate+'T12:00').toLocaleDateString('en-US',{month:'short',day:'numeric'})}<small> · ${Math.round((Date.now()-new Date(DATA.auditDate+'T12:00'))/864e5)}d old${(Date.now()-new Date(DATA.auditDate+'T12:00'))/864e5 > DATA.auditCadenceDays ? ' · re-run audit' : ''}</small></div></div>
   </div>
 </div>`));
 requestAnimationFrame(()=>{ const r=document.getElementById('ring'); r.style.transition='stroke-dashoffset 1.1s cubic-bezier(.22,1,.36,1)'; r.style.strokeDashoffset=off; });
@@ -81,18 +81,18 @@ DATA.programs.forEach(p=>{
     <p style="font-size:0.8rem;color:var(--ink-2);margin-top:0.7rem;line-height:1.5;">${p.note}</p>
   </div>`));
 });
-root.appendChild(el(`<h2 class="section-h">Majors & <span class="accent">minors</span></h2>`));
+root.appendChild(el(`<h2 class="section-h">Majors & minors</h2>`));
 root.appendChild(pg);
 
 // ---- remaining ----
-root.appendChild(el(`<h2 class="section-h">Still to <span class="accent">take</span></h2>`));
-const todo = el(`<div class="card"><ul class="todo"></ul></div>`);
+root.appendChild(el(`<h2 class="section-h">Still to take</h2>`));
+const todo = el(`<div class="card"><ul class="acad-todo"></ul></div>`);
 const ul = todo.querySelector('ul');
 DATA.remaining.forEach(r=> ul.appendChild(el(`<li><span class="chk"></span><span>${r.t}</span><span class="hrs">${r.h} hrs</span></li>`)));
 root.appendChild(todo);
 
 // ---- timeline ----
-root.appendChild(el(`<h2 class="section-h">The <span class="accent">plan</span> · Fall ’26 → Spring ’28</h2>`));
+root.appendChild(el(`<h2 class="section-h">The plan · Fall ’26 → Spring ’28</h2>`));
 const tl = el(`<div class="timeline"></div>`);
 DATA.terms.forEach(t=>{
   const term = el(`<div class="term ${t.abroad?'abroad':''} ${t.state==='enrolled'?'':''}">

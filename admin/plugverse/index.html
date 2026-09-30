@@ -7,7 +7,9 @@
 <title>Plugverse · CD Admin</title>
 <link rel="stylesheet" href="/admin/_shell/admin-shell.css" />
 <style>
-  .pv-spark { width: 100%; height: 36px; margin-top: 0.5rem; display: block; }
+  .pv-spark { width: 100%; height: 36px; margin: 0 0 10px; display: block; order: 2; }
+  .kpi-grid > .card .label { order: 0; } .kpi-grid > .card .value { order: 1; } .kpi-grid > .card .delta { order: 3; }
+  .pv-spark:empty { display: none; }
   .pv-spark path.line { fill: none; stroke: var(--rust); stroke-width: 1.6; opacity: 0.85; }
   .pv-spark path.area { fill: var(--rust); opacity: 0.12; }
   .pv-spark.flat path.line { stroke: var(--muted); }
@@ -19,7 +21,7 @@
   .pv-events .ev { font-family: "Geist Mono", monospace; font-size: 0.78rem; color: var(--ink); letter-spacing: 0.01em; }
   .pv-events .n { font-family:var(--f-display); font-size: 1.1rem; color: var(--rust); line-height: 1; }
 
-  .pv-errors { font-family: "Geist Mono", monospace; font-size: 0.7rem; letter-spacing: 0.08em; color: var(--rust); padding: 0.7rem 1rem; border: 1px solid rgba(255,77,46,0.4); border-radius: 10px; background: rgba(255,77,46,0.05); margin-bottom: 1.4rem; }
+  .pv-errors { font-family: "Geist Mono", monospace; font-size: 0.7rem; letter-spacing: 0.08em; color: var(--rust); padding: 0.7rem 1rem; border: 1px solid rgba(244,241,234,0.4); border-radius: 10px; background: rgba(244,241,234,0.05); margin-bottom: 1.4rem; }
   .pv-errors strong { color: var(--rust); }
 </style>
 </head>
@@ -38,18 +40,18 @@
     <div id="errors-box"></div>
 
     <div class="kpi-grid">
-      <div class="card"><div class="label">MRR</div><div class="value" data-k="mrr">—</div><div class="delta flat" data-k="mrr_sub">From active subscriptions</div><svg class="pv-spark" data-spark="mrr_cents"></svg></div>
-      <div class="card"><div class="label">ARR</div><div class="value" data-k="arr">—</div><div class="delta flat">MRR × 12</div></div>
-      <div class="card"><div class="label">Active subs</div><div class="value" data-k="active_subs">—</div><div class="delta flat" data-k="active_subs_sub">Currently paying</div><svg class="pv-spark" data-spark="active_subscriptions"></svg></div>
-      <div class="card"><div class="label">Total users</div><div class="value" data-k="users_total">—</div><div class="delta flat" data-k="users_sub">All accounts</div><svg class="pv-spark" data-spark="users_total"></svg></div>
-      <div class="card"><div class="label">Signups · 24h</div><div class="value" data-k="signups_24h">—</div><div class="delta flat" data-k="signups_24h_sub">New accounts today</div></div>
-      <div class="card"><div class="label">Signups · 7d</div><div class="value" data-k="signups_7d">—</div><div class="delta flat" data-k="signups_7d_sub">Last week</div><svg class="pv-spark" data-spark="signups_7d"></svg></div>
-      <div class="card"><div class="label">Churn · 7d</div><div class="value" data-k="churn_7d">—</div><div class="delta flat">Cancellations last week</div></div>
-      <div class="card"><div class="label">Artists onboarded</div><div class="value" data-k="artists_onboarded">—</div><div class="delta flat" data-k="artists_sub">Of total artist profiles</div></div>
-      <div class="card"><div class="label">Total GMV</div><div class="value" data-k="gmv">—</div><div class="delta flat" data-k="gmv_sub">Through Plugverse</div></div>
-      <div class="card"><div class="label">Gigs completed</div><div class="value" data-k="gigs">—</div><div class="delta flat">Lifetime</div></div>
-      <div class="card"><div class="label">Stripe pending</div><div class="value" data-k="payouts_pending">—</div><div class="delta flat">Payouts queued</div></div>
-      <div class="card"><div class="label">Stripe paid · MTD</div><div class="value" data-k="payouts_paid">—</div><div class="delta flat">Settled this month</div></div>
+      <div class="card"><div class="label">MRR</div><div class="value" data-k="mrr">–</div><div class="delta flat" data-k="mrr_sub">From active subscriptions</div><svg class="pv-spark" data-spark="mrr_cents"></svg></div>
+      <div class="card"><div class="label">ARR</div><div class="value" data-k="arr">–</div><div class="delta flat">MRR × 12</div></div>
+      <div class="card"><div class="label">Active subs</div><div class="value" data-k="active_subs">–</div><div class="delta flat" data-k="active_subs_sub">Currently paying</div><svg class="pv-spark" data-spark="active_subscriptions"></svg></div>
+      <div class="card"><div class="label">Total users</div><div class="value" data-k="users_total">–</div><div class="delta flat" data-k="users_sub">All accounts</div><svg class="pv-spark" data-spark="users_total"></svg></div>
+      <div class="card"><div class="label">Signups · 24h</div><div class="value" data-k="signups_24h">–</div><div class="delta flat" data-k="signups_24h_sub">New accounts today</div></div>
+      <div class="card"><div class="label">Signups · 7d</div><div class="value" data-k="signups_7d">–</div><div class="delta flat" data-k="signups_7d_sub">Last week</div><svg class="pv-spark" data-spark="signups_7d"></svg></div>
+      <div class="card"><div class="label">Churn · 7d</div><div class="value" data-k="churn_7d">–</div><div class="delta flat">Cancellations last week</div></div>
+      <div class="card"><div class="label">Artists onboarded</div><div class="value" data-k="artists_onboarded">–</div><div class="delta flat" data-k="artists_sub">Of total artist profiles</div></div>
+      <div class="card"><div class="label">Total GMV</div><div class="value" data-k="gmv">–</div><div class="delta flat" data-k="gmv_sub">Through Plugverse</div></div>
+      <div class="card"><div class="label">Gigs completed</div><div class="value" data-k="gigs">–</div><div class="delta flat">Lifetime</div></div>
+      <div class="card"><div class="label">Stripe pending</div><div class="value" data-k="payouts_pending">–</div><div class="delta flat">Payouts queued</div></div>
+      <div class="card"><div class="label">Stripe paid · MTD</div><div class="value" data-k="payouts_paid">–</div><div class="delta flat">Settled this month</div></div>
     </div>
 
     <h2 class="section-h">Top events · 7d <span class="accent" id="top-events-source">PostHog</span></h2>
@@ -71,10 +73,10 @@
     const refreshBtn = document.getElementById('refresh-btn');
 
     function setK(k, v){ const e = document.querySelector(`[data-k="${k}"]`); if (e) e.textContent = v; }
-    function fmtUSD(cents){ if (cents == null) return '—'; return '$' + (Number(cents)/100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
-    function fmtUSDk(cents){ if (cents == null) return '—'; const v = Number(cents)/100; if (Math.abs(v) >= 1000) return '$' + (v/1000).toFixed(1) + 'k'; return '$' + v.toFixed(0); }
-    function fmtN(n){ if (n == null) return '—'; return Number(n).toLocaleString('en-US'); }
-    function pct(n){ if (n == null) return '—'; return n.toFixed(1) + '%'; }
+    function fmtUSD(cents){ if (cents == null) return '–'; return '$' + (Number(cents)/100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+    function fmtUSDk(cents){ if (cents == null) return '–'; const v = Number(cents)/100; if (Math.abs(v) >= 1000) return '$' + (v/1000).toFixed(1) + 'k'; return '$' + v.toFixed(0); }
+    function fmtN(n){ if (n == null) return '–'; return Number(n).toLocaleString('en-US'); }
+    function pct(n){ if (n == null) return '–'; return n.toFixed(1) + '%'; }
 
     function sparkline(svg, series){
       svg.innerHTML = '';
@@ -97,7 +99,7 @@
     function renderErrors(errors){
       if (!errors || !errors.length){ errBox.innerHTML = ''; return; }
       errBox.innerHTML = `<div class="pv-errors"><strong>Some sources are down:</strong> ` +
-        errors.map(e => `${e.source} — ${e.error.replace(/</g, '&lt;')}`).join(' · ') +
+        errors.map(e => `${e.source}, ${e.error.replace(/</g, '&lt;')}`).join(' · ') +
         `</div>`;
     }
 
@@ -146,7 +148,7 @@
       refreshBtn.disabled = true;
       const { data: sessionData } = await sb.auth.getSession();
       const jwt = sessionData?.session?.access_token;
-      if (!jwt){ toast('Session expired — sign in again', 'err'); indicator.textContent = 'Offline'; return; }
+      if (!jwt){ toast('Session expired, sign in again', 'err'); indicator.textContent = 'Offline'; document.getElementById('top-events').innerHTML = '<li class="empty">Offline</li>'; refreshBtn.disabled = false; return; }
 
       try {
         const r = await fetch('/api/plugverse-kpi', {

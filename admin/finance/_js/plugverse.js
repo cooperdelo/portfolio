@@ -1,13 +1,11 @@
 import { sb, fmtUSD, fmtUSDCompact, fmtMonth, subscribeTransactions } from '/admin/_shell/supabase.js';
 import { mountShell, toast, monthsBack, monthKey } from '/admin/_shell/admin-shell.js';
 
-await mountShell({ title: 'Plugverse P&L · Finance' });
+import { C, MONO, applyChartTheme } from '/admin/_shell/chart-theme.js';
 
-const C = { rust: __cv('--accent','#FF4D2E'), sage: '#7A8A6E', crimson: '#C8102E', stage: '#6B3FA0',
-            pink: '#F2C1D1', cyan: '#B2E3E1', lavender: '#C9BEE6', cream: '#F2EDE4', ink2: __cv('--text-2','#DDD4C5') };
-const palette = [C.rust, C.crimson, C.stage, C.lavender, C.cyan, C.pink, C.sage, C.cream];
-Chart.defaults.color = C.ink2;
-Chart.defaults.font.family = '"Geist Mono", ui-monospace, monospace';
+await mountShell({ title: 'Plugverse P&L · Finance' });
+applyChartTheme();
+const palette = MONO;
 
 const charts = {};
 
@@ -31,7 +29,7 @@ function render(rows) {
   setK('income',  fmtUSDCompact(income));
   setK('expense', fmtUSDCompact(expense));
   setK('net',     `${net >= 0 ? '+' : '−'}${fmtUSDCompact(Math.abs(net))}`);
-  setK('net_pct', income ? `${((net / income) * 100).toFixed(1)}% margin` : '—');
+  setK('net_pct', income ? `${((net / income) * 100).toFixed(1)}% margin` : '–');
   setK('burn',    fmtUSDCompact(burn30));
   document.querySelector('[data-k="net"]').closest('.card').querySelector('.delta').className = 'delta ' + (net >= 0 ? 'pos' : 'neg');
 
@@ -46,13 +44,13 @@ function render(rows) {
   charts.pnl = new Chart(ctx1, {
     type: 'bar',
     data: { labels, datasets: [
-      { label: 'Income',  data: inc, backgroundColor: C.sage, borderRadius: 4 },
-      { label: 'Expense', data: exp, backgroundColor: C.rust, borderRadius: 4 },
+      { label: 'In',  data: inc, backgroundColor: C.bone },
+      { label: 'Out', data: exp, backgroundColor: 'rgba(244,241,234,.26)' },
     ]},
     options: {
       maintainAspectRatio: false,
-      plugins: { legend: { position: 'bottom' }, tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${fmtUSD(c.parsed.y)}` } } },
-      scales: { y: { ticks: { callback: (v) => fmtUSDCompact(v) }, grid: { color: __cv('--border','rgba(244,239,230,0.05)') } }, x: { grid: { display: false } } },
+      plugins: { legend: { position: 'top', align: 'end' }, tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${fmtUSD(c.parsed.y)}` } } },
+      scales: { y: { ticks: { callback: (v) => fmtUSDCompact(v), maxTicksLimit: 5 }, grid: { color: C.grid }, border: { display: false } }, x: { grid: { display: false }, border: { display: false } } },
     },
   });
 
@@ -69,8 +67,8 @@ function render(rows) {
   if (entries.length) {
     charts.cats = new Chart(ctx2, {
       type: 'doughnut',
-      data: { labels: entries.map(([k]) => k.replace(/_/g, ' ')), datasets: [{ data: entries.map(([,v]) => v), backgroundColor: palette, borderColor: 'rgba(10,9,8,0.6)', borderWidth: 2 }] },
-      options: { maintainAspectRatio: false, cutout: '62%', plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, padding: 10 } }, tooltip: { callbacks: { label: (c) => `${c.label}: ${fmtUSD(c.parsed)}` } } } },
+      data: { labels: entries.map(([k]) => k.replace(/_/g, ' ')), datasets: [{ data: entries.map(([,v]) => v), backgroundColor: palette, borderColor: 'rgba(12,11,10,0.9)', borderWidth: 3, borderRadius: 6 }] },
+      options: { maintainAspectRatio: false, cutout: '76%', plugins: { legend: { position: 'bottom', labels: { padding: 10 } }, tooltip: { callbacks: { label: (c) => `${c.label}: ${fmtUSD(c.parsed)}` } } } },
     });
   }
 
@@ -82,10 +80,10 @@ function render(rows) {
       <td class="mono meta">${new Date(r.date).toLocaleDateString('en-US', { month:'short', day:'2-digit', year:'2-digit' })}</td>
       <td><div class="desc">${escapeHtml(r.description)}</div></td>
       <td class="mono meta">${(r.category || '').replace(/_/g, ' ')}</td>
-      <td class="mono meta">${escapeHtml(r.merchant || '—')}</td>
+      <td class="mono meta">${escapeHtml(r.merchant || '–')}</td>
       <td><span class="pill ${r.type === 'income' ? 'income' : 'expense'}">${r.type}</span></td>
-      <td class="right mono" style="color:${r.type === 'income' ? 'var(--good)' : 'var(--rust, #FF4D2E)'};">
-        ${r.type === 'income' ? '+' : '−'}${fmtUSD(r.amount)}
+      <td class="right" style="font-family:var(--f-display);font-size:12.5px;white-space:nowrap;color:${r.type === 'income' ? 'var(--text)' : 'var(--text-3)'};">
+        ${r.type === 'income' ? '+' : '-'}${fmtUSD(r.amount)}
       </td>
     </tr>`).join('');
 }

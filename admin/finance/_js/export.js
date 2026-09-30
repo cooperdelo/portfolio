@@ -1,5 +1,5 @@
 // =====================================================================
-// /admin/finance/_js/export.js — generate XLSX/CSV downloads from Supabase
+// /admin/finance/_js/export.js, generate XLSX/CSV downloads from Supabase
 // SheetJS is loaded as a global from the page (xlsx.full.min.js).
 // =====================================================================
 import { sb, requireFullAdminOrRedirect } from '/admin/_shell/supabase.js';

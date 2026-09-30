@@ -1,17 +1,18 @@
-// /admin/_js/rituals.js — one card per scheduled agent.
+// /admin/_js/rituals.js, one card per scheduled agent.
 // Reads: task_run_log (runs), vault_documents (what each task wrote, by owner_task).
 // Display-only on purpose (open decision: toggles). Missed-run detection is
 // inferred from each task's own median gap between runs.
 import { sb } from '/admin/_shell/supabase.js';
 import { mountShell } from '/admin/_shell/admin-shell.js';
 import { requireFullAdminOrRedirect } from '/admin/_shell/supabase.js';
-import { esc, ago, fmtWhen, emptyState, statusChip, pageHead, ymd, toDate, modal, todayET } from '/admin/_shell/ui.js';
+import { esc, ago, fmtWhen, emptyState, statusChip, pageHead, ymd, toDate, modal, todayET, statTile } from '/admin/_shell/ui.js';
+import { reveal } from '/admin/_shell/motion.js';
 
 if (!(await requireFullAdminOrRedirect())) throw new Error('not full admin');
 await mountShell({ title: 'Rituals' });
 const app = document.getElementById('app');
 app.innerHTML = pageHead('Today', 'Rituals', '<div class="seg" id="seg"></div>') + `
-  <div class="sv-grid c4" id="summary" style="margin-bottom:1rem"></div>
+  <section class="stat-row" id="summary" style="--n:4"></section>
   <div class="sv-grid auto" id="cards"><div class="shimmer" style="height:200px"></div></div>`;
 
 const since = new Date(Date.now() - 60 * 864e5).toISOString();
@@ -38,12 +39,14 @@ const rank = (t) => t.last.status === 'failed' ? 0 : t.missed ? 1 : t.last.statu
 tasks.sort((a, b) => rank(a) - rank(b) || toDate(b.last.ran_at) - toDate(a.last.ran_at));
 
 const count = (f) => tasks.filter(f).length;
+const failedN = count(t => t.last.status === 'failed');
 document.getElementById('summary').innerHTML = [
-  ['Agents seen (60 days)', tasks.length, ''],
-  ['Last run failed', count(t => t.last.status === 'failed'), 'fail'],
-  ['Looks missed', count(t => t.missed), 'stale'],
-  ['Ran in the last 24h', count(t => Date.now() - toDate(t.last.ran_at) < 864e5), 'ok'],
-].map(([k, v, c]) => `<div class="sv-card"><div class="sv-label">${k}</div><div class="sv-num md">${v}</div><div class="sv-meta">task_run_log · as of ${esc(fmtWhen(new Date()))}</div></div>`).join('');
+  ['Agents · 60 days', tasks.length, false],
+  ['Last run failed', failedN, failedN > 0],
+  ['Looks missed', count(t => t.missed), false],
+  ['Ran in 24h', count(t => Date.now() - toDate(t.last.ran_at) < 864e5), false],
+].map(([k, v, a]) => statTile({ k, v: String(v), accent: a, src: `Agent run log · ${esc(fmtWhen(new Date()))}` })).join('');
+reveal(document.querySelectorAll('#summary .stat'), { stagger: 70, y: 14 });
 
 let filter = 'all';
 function draw() {
@@ -60,14 +63,14 @@ function draw() {
       dots.push(`<i class="${worst || ''}" title="${esc(d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }))}: ${day.length ? day.length + ' run(s), ' + esc(worst) : 'no run'}"></i>`);
     }
     const produced = (docsBy[t.task] || []).slice(0, 3);
-    const cadence = t.median ? (t.median < 864e5 * 0.8 ? `about every ${Math.round(t.median / 3.6e6)}h` : `about every ${Math.round(t.median / 864e5)} day(s)`) : 'cadence unknown (fewer than 3 runs)';
+    const cadence = t.median ? (t.median < 864e5 * 0.8 ? `every ${Math.round(t.median / 3.6e6)}h` : `every ${Math.round(t.median / 864e5)}d`) : '';
     return `<div class="sv-card" id="${esc(t.task)}">
-      <div style="display:flex;align-items:center;gap:.5rem;justify-content:space-between"><h3>${esc(t.task)}</h3>${statusChip(t.last.status)}</div>
-      <div class="sv-meta">last run ${esc(ago(t.last.ran_at))} · ${esc(cadence)} ${t.missed ? '<span class="chip stale">looks missed</span>' : ''}</div>
+      <div class="sv-h" style="margin-bottom:6px"><h3 class="code" style="text-transform:none;letter-spacing:0;font-size:13px">${esc(t.task)}</h3>${statusChip(t.last.status)}</div>
+      <div class="sv-meta" style="margin-top:0">${esc(ago(t.last.ran_at))}${cadence ? ' · ' + esc(cadence) : ''} ${t.missed ? '<span class="chip stale">missed</span>' : ''}</div>
       <div class="dots" aria-label="Last 14 days">${dots.join('')}</div>
-      <div class="note">${esc(t.last.note || '')}</div>
-      <div class="produced">${produced.map(d => `<a href="#" data-path="${esc(d.path)}">${esc(d.path)} <span class="sv-muted">· ${esc(ago(d.updated_at))}</span></a>`).join('') || '<span class="sv-muted">No vault files owned by this task</span>'}</div>
-      <div style="margin-top:.7rem"><button class="btn small" data-runs="${esc(t.task)}">Run history</button></div>
+      ${t.last.note ? `<div class="note" title="${esc(t.last.note)}">${esc(t.last.note)}</div>` : ''}
+      ${produced.length ? `<div class="produced">${produced.map(d => `<a href="#" data-path="${esc(d.path)}">${esc(d.path.split('/').pop())} <span class="sv-muted">· ${esc(ago(d.updated_at))}</span></a>`).join('')}</div>` : ''}
+      <div style="margin-top:12px"><button class="btn small" data-runs="${esc(t.task)}">Runs</button></div>
     </div>`;
   }).join('') || emptyState('No agents match', 'Fed by task_run_log. Each scheduled task writes one row per run.');
   document.querySelectorAll('[data-path]').forEach(a => a.onclick = (e) => { e.preventDefault(); location.href = '/admin/brain/?path=' + encodeURIComponent(a.dataset.path); });

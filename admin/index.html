@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -10,52 +10,50 @@
 <meta name="apple-mobile-web-app-title" content="CD Admin" />
 <meta name="theme-color" content="#0C0B0A" />
 <title>Home · CD Admin</title>
+<link rel="preload" href="/admin/_shell/fonts/DrukWideBold.woff2" as="font" type="font/woff2" crossorigin />
 <link rel="stylesheet" href="/admin/_shell/admin-shell.css" />
 <link rel="stylesheet" href="/admin/_shell/home.css" />
 </head>
 <body class="home">
 <main>
   <header class="mast" id="mast">
-    <div class="mast-l">
-      <h1 id="greet">Hello, Cooper</h1>
-    </div>
+    <h1 id="greet">Hello, Cooper</h1>
+    <div class="actions"><span class="mono mast-when" id="when"></span></div>
   </header>
 
-  <section class="today" id="today" data-role="full" aria-label="Today">
-    <div class="td-status" id="tdStatus"><span class="td-dot"></span><span>Checking systems…</span></div>
-    <div class="td-grid">
-      <div class="sv-card pad-lg td-do" id="tdDo"><div class="shimmer" style="height:160px"></div></div>
-      <div class="td-decide" id="tdDecide"><div class="shimmer" style="height:160px"></div></div>
+  <div class="td-status" id="tdStatus" data-role="full"><span class="td-dot"></span><span>Checking systems</span></div>
+
+  <section class="stat-row" id="heroRow" style="--n:4" data-role="full" aria-label="Today in numbers">
+    <div class="stat" id="hsToday"><div class="shimmer" style="height:100%"></div></div>
+    <div class="stat" id="hsDecide"><div class="shimmer" style="height:100%"></div></div>
+    <div class="stat" id="hsWeek"><div class="shimmer" style="height:100%"></div></div>
+    <div class="stat" id="hsReach"><div class="shimmer" style="height:100%"></div></div>
+  </section>
+
+  <section class="grid today" id="today" data-role="full" aria-label="Today">
+    <div class="span-7 col">
+      <div class="sv-card td-do" id="tdDo"><div class="shimmer" style="height:180px"></div></div>
+      <div class="sv-card td-ladder" id="tdLadder"><div class="shimmer" style="height:180px"></div></div>
     </div>
-    <div class="sv-card pad-lg td-ladder" id="tdLadder"><div class="shimmer" style="height:140px"></div></div>
+    <div class="span-5 col">
+      <div class="sv-card td-decide" id="tdDecide"><div class="shimmer" style="height:180px"></div></div>
+      <div class="sv-card improve" id="improve"><div class="shimmer" style="height:90px"></div></div>
+      <div class="sv-card" id="vaultCard"><div class="shimmer" style="height:90px"></div></div>
+    </div>
   </section>
 
-  <section class="improve" data-role="full" aria-label="What to improve">
-    <div class="sv-card pad-lg" id="improve"><div class="shimmer" style="height:160px"></div></div>
+  <section class="grid" data-role="full">
+    <div class="sv-card span-7 stretch" id="heroChart"><div class="shimmer" style="height:240px"></div></div>
+    <div class="span-5 aud" id="pulse"><div class="shimmer" style="height:150px"></div><div class="shimmer" style="height:150px"></div></div>
   </section>
 
-  <section class="hero" id="hero" data-role="full" aria-label="LinkedIn impressions">
-    <div class="hero-chart" id="heroChart"><div class="shimmer" style="height:200px;opacity:.15"></div></div>
+  <section class="grid" data-role="full" id="pvSec" hidden>
+    <div class="span-12 aud aud-row" id="pvGrid"></div>
   </section>
 
-  <section class="sv-section" data-role="full">
-    <div class="sv-h"><h2 class="disp">System pulse</h2><a href="/admin/rituals/">Rituals</a></div>
-    <div class="sv-card pad-lg sys" id="system"><div class="shimmer" style="height:180px"></div></div>
-  </section>
-
-  <section class="sv-section" data-role="full">
-    <div class="sv-h"><h2 class="disp">Audience</h2><a href="/admin/insights/">All insights</a></div>
-    <div class="sv-grid c4 aud" id="pulse"><div class="shimmer" style="height:120px"></div></div>
-  </section>
-
-  <section class="sv-section pv" data-role="full" id="pvSec" hidden>
-    <div class="sv-h"><h2 class="disp"><span class="pv-mark">PlugVerse</span> accounts</h2><a href="/admin/plugverse/">PlugVerse KPIs</a></div>
-    <div class="sv-grid c4 aud" id="pvGrid"></div>
-  </section>
-
-  <section class="sv-section sv-grid c2" data-role="full">
-    <div class="sv-card pad-lg" id="health"><div class="shimmer" style="height:120px"></div></div>
-    <div class="sv-card pad-lg" id="vaultCard"><div class="shimmer" style="height:120px"></div></div>
+  <section class="grid" data-role="full">
+    <div class="sv-card span-8 sys" id="system"><div class="shimmer" style="height:220px"></div></div>
+    <div class="sv-card span-4" id="health"><div class="shimmer" style="height:220px"></div></div>
   </section>
 </main>
 <script type="module" src="/admin/_js/home.js"></script>

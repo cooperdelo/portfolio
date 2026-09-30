@@ -4,29 +4,22 @@
 // Stale-while-revalidate: prices older than 5 minutes trigger a sync on load.
 // =====================================================================
 import { sb, fmtUSD, fmtUSDCompact, getSession, requireFullAdminOrRedirect } from '/admin/_shell/supabase.js';
-import { mountShell, toast } from '/admin/_shell/admin-shell.js';
+import { mountShell, toast, isLocalDemo } from '/admin/_shell/admin-shell.js';
+import { applyChartTheme, MONO } from '/admin/_shell/chart-theme.js';
 
 if (!(await requireFullAdminOrRedirect())) throw new Error('access denied');
 await mountShell({ title: 'Investments · Finance' });
-
-const C = {
-  ink2: __cv('--text-2','#DDD4C5'), rust: __cv('--accent','#FF4D2E'), crimson: '#C8102E', stage: '#6B3FA0',
-  pink: '#F2C1D1', cyan: '#B2E3E1', lavender: '#C9BEE6', sage: '#7A8A6E', cream: '#F2EDE4',
-};
-
-Chart.defaults.color = C.ink2;
-Chart.defaults.font.family = '"Geist Mono", ui-monospace, monospace';
-Chart.defaults.font.size = 11;
+applyChartTheme();
 
 const charts = {};
-const palette = [C.rust, C.crimson, C.stage, C.lavender, C.cyan, C.pink, C.sage, C.cream];
+const palette = MONO;
 
-const SYNC_TTL_MS = 5 * 60 * 1000; // 5 min — don't re-sync if any price is fresher than this
+const SYNC_TTL_MS = 5 * 60 * 1000; // 5 min, don't re-sync if any price is fresher than this
 
 // Sub-dollar crypto needs more precision than fmtUSD gives.
 function fmtPrice(n) {
   const v = Number(n || 0);
-  if (v === 0) return '—';
+  if (v === 0) return '–';
   if (Math.abs(v) < 1) {
     return '$' + v.toLocaleString('en-US', { maximumFractionDigits: 6, minimumFractionDigits: 2 });
   }
@@ -75,7 +68,7 @@ async function load({ forceSync = false } = {}) {
   let rows = await fetchPositions();
   const cashAccounts = await fetchCashAccounts();
 
-  if (forceSync || isStale(rows)) {
+  if (!isLocalDemo() && (forceSync || isStale(rows))) {
     const result = await syncPrices();
     if (result?.updated_count) {
       rows = await fetchPositions();
@@ -108,34 +101,34 @@ function render(rows, cashAccounts) {
   setK('total_cost',  fmtUSDCompact(totalCost));
   setK('cash_total',  fmtUSD(cashTotal));
   setK('pos_count',   `Positions: ${rows.length}`);
-  setK('last_update', lastUpdate ? lastUpdate.toLocaleString([], { month:'short', day:'numeric', hour:'numeric', minute:'2-digit' }) : '—');
+  setK('last_update', lastUpdate ? lastUpdate.toLocaleString([], { month:'short', day:'numeric', hour:'numeric', minute:'2-digit' }) : '–');
 
   // Table
   const tbody = document.getElementById('pos-tbody');
   if (!rows.length) {
-    tbody.innerHTML = `<tr><td colspan="9" class="empty">No positions yet — click "Add position"</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="9" class="empty">No positions yet, click "Add position"</td></tr>`;
   } else {
     tbody.innerHTML = rows.map(r => {
       const value = Number(r.shares || 0) * Number(r.current_price || 0);
       const cost  = Number(r.shares || 0) * Number(r.cost_basis || 0);
       const g     = value - cost;
-      const gClr  = g >= 0 ? 'var(--good)' : 'var(--rust, #FF4D2E)';
+      const gClr  = g >= 0 ? 'var(--text)' : 'var(--text-3)';
       const sharesStr = r.asset_type === 'crypto'
         ? Number(r.shares).toLocaleString('en-US', { maximumFractionDigits: 8 })
         : Number(r.shares).toLocaleString('en-US', { maximumFractionDigits: 4 });
       return `
         <tr>
           <td class="mono"><strong>${escapeHtml(r.symbol)}</strong>${r.asset_type === 'crypto' ? ' <span class="meta">₿</span>' : ''}</td>
-          <td>${escapeHtml(r.name || '—')}</td>
-          <td class="mono meta">${escapeHtml(r.account_slug || '—')}</td>
+          <td>${escapeHtml(r.name || '–')}</td>
+          <td class="mono meta">${escapeHtml(r.account_slug || '–')}</td>
           <td class="right mono">${sharesStr}</td>
-          <td class="right mono">${r.current_price ? fmtPrice(r.current_price) : '—'}</td>
+          <td class="right mono">${r.current_price ? fmtPrice(r.current_price) : '–'}</td>
           <td class="right mono"><strong>${fmtUSD(value)}</strong></td>
           <td class="right mono meta">${fmtUSD(cost)}</td>
           <td class="right mono" style="color:${gClr};">${g >= 0 ? '+' : '−'}${fmtUSD(Math.abs(g))}</td>
           <td class="right">
             <button class="btn small" data-edit="${r.id}">Edit</button>
-            <button class="btn small danger" data-del="${r.id}">×</button>
+            <button class="btn small ghost" data-del="${r.id}" aria-label="Delete">×</button>
           </td>
         </tr>`;
     }).join('');
@@ -183,11 +176,11 @@ function drawDonut(id, labels, data) {
   }
   charts[id] = new Chart(ctx, {
     type: 'doughnut',
-    data: { labels, datasets: [{ data, backgroundColor: palette, borderColor: 'rgba(10,9,8,0.6)', borderWidth: 2 }] },
+    data: { labels, datasets: [{ data, backgroundColor: palette, borderColor: 'rgba(12,11,10,0.9)', borderWidth: 3, borderRadius: 6 }] },
     options: {
-      maintainAspectRatio: false, cutout: '62%',
+      maintainAspectRatio: false, cutout: '76%',
       plugins: {
-        legend: { position: 'bottom', labels: { boxWidth: 10, padding: 10 } },
+        legend: { position: 'right', labels: { padding: 12 } },
         tooltip: { callbacks: { label: (c) => `${c.label}: ${fmtUSD(c.parsed)}` } },
       },
     },

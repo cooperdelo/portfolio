@@ -1,18 +1,19 @@
 // =====================================================================
-// /admin/health/_js/dashboard.js — insights over the Crohn's tracker
+// /admin/health/_js/dashboard.js, insights over the Crohn's tracker
 // Adds an auto-computed Harvey-Bradshaw Index (HBI) proxy + actionable
 // insight cards, all from data already logged (zero added friction).
 // =====================================================================
 import { sb } from '/admin/_shell/supabase.js';
 import { mountShell } from '/admin/_shell/admin-shell.js';
 import { icon } from '/admin/_shell/icons.js';
+import { statTile, pillBars, sparkline } from '/admin/_shell/ui.js';
+import { reveal, growPills, drawOn } from '/admin/_shell/motion.js';
 
 await mountShell({ title: 'Health', demo: true });
 document.getElementById('logBtn')?.insertAdjacentHTML('afterbegin', icon('plus', { size: 14 }));
 
-const fmtSleep = (m) => (m == null ? '—' : `${Math.floor(m / 60)}h${String(m % 60).padStart(2, '0')}`);
-const sevColor = (s) => s == null ? 'transparent'
-  : s >= 7 ? 'var(--neg-tint)' : s >= 4 ? 'var(--accent-tint-2)' : 'var(--pos-tint)';
+const fmtSleep = (m) => (m == null ? '–' : `${Math.floor(m / 60)}h${String(m % 60).padStart(2, '0')}`);
+const sevClass = (s) => s == null ? '' : s >= 7 ? 's3' : s >= 4 ? 's2' : 's1';
 const avg = (a) => { const v = a.filter(x => x != null); return v.length ? v.reduce((x, y) => x + y, 0) / v.length : null; };
 
 // ---- pull data ----
@@ -32,15 +33,13 @@ const workoutsEl = document.getElementById('workouts');
 {
   const wk = wko.data || [];
   if (!wk.length) {
-    workoutsEl.innerHTML = '<span class="muted">No workouts synced yet.</span>';
+    workoutsEl.innerHTML = '<div class="empty">No workouts synced yet.</div>';
   } else {
-    workoutsEl.innerHTML = wk.map(w => {
+    workoutsEl.innerHTML = wk.slice(0, 5).map(w => {
       const d = new Date(w.start_time || `${w.day}T12:00:00`).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-      const dur = w.duration_min ? (w.duration_min >= 60 ? `${Math.floor(w.duration_min / 60)}h${String(Math.round(w.duration_min % 60)).padStart(2, '0')}` : `${Math.round(w.duration_min)}min`) : '—';
-      return `<div class="wk">
-        <span>${d} · ${(w.activity_type || 'workout').replace(/_/g, ' ')}${w.name ? ', ' + w.name : ''}</span>
-        <span>${dur}${w.calories ? ' · ' + w.calories + ' cal' : ''}${w.avg_hr ? ' · ' + w.avg_hr + ' bpm avg' : ''}</span>
-      </div>`;
+      const dur = w.duration_min ? (w.duration_min >= 60 ? `${Math.floor(w.duration_min / 60)}h${String(Math.round(w.duration_min % 60)).padStart(2, '0')}` : `${Math.round(w.duration_min)}m`) : '–';
+      return `<div class="row"><div class="grow"><div class="t">${(w.name || (w.activity_type || 'workout').replace(/_/g, ' '))}</div>
+        <div class="s">${d}${w.calories ? ' · ' + w.calories + ' cal' : ''}${w.avg_hr ? ' · ' + w.avg_hr + ' bpm' : ''}</div></div><span class="r">${dur}</span></div>`;
     }).join('');
   }
 }
@@ -59,9 +58,9 @@ function hbi(r) {
   const liquid = liquidByDay[r.day] || 0;
   return wellbeing + pain + liquid;
 }
-const hbiBand = (v) => v == null ? ['—', 'muted'] : v < 5 ? ['Remission', 'good'] : v <= 7 ? ['Mild', 'warn'] : v <= 16 ? ['Moderate', 'warn'] : ['Severe', 'bad'];
+const hbiBand = (v) => v == null ? ['–', 'muted'] : v < 5 ? ['Remission', 'good'] : v <= 7 ? ['Mild', 'warn'] : v <= 16 ? ['Moderate', 'warn'] : ['Severe', 'bad'];
 
-function card(n, l, cls = '') { return `<div class="kpi"><div class="n ${cls}">${n}</div><div class="l">${l}</div></div>`; }
+function card(n, l) { return `<div class="sv-card flat"><div class="t-label" style="color:var(--text-3)">${l}</div><span class="num">${n}</span></div>`; }
 
 function render() {
   const asc = [...rows].sort((a, b) => a.day.localeCompare(b.day));
@@ -81,17 +80,31 @@ function render() {
   const netCalDays = last7.filter(r => r.food_calories && r.active_calories != null);
   const avgNetCal = netCalDays.length ? avg(netCalDays.map(r => r.food_calories - r.active_calories)) : null;
 
-  // KPIs
+  // KPIs: four hero tiles, five small ones
+  const asOf = rows[0]?.day ? new Date(rows[0].day + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '';
+  const sleep7 = avg(last7.map(r => r.sleep_minutes));
   kpis.innerHTML =
-    card(hbi7 == null ? '—' : hbi7.toFixed(1), `HBI proxy · ${band}`, hbi7 == null ? '' : (hbi7 < 5 ? 'good' : hbi7 <= 7 ? 'warn' : 'bad')) +
-    card(avg(last7.map(r => r.sleep_minutes)) == null ? '—' : fmtSleep(Math.round(avg(last7.map(r => r.sleep_minutes)))), 'Avg sleep (7d)') +
-    card(avg(last7.map(r => r.stress_avg)) == null ? '—' : Math.round(avg(last7.map(r => r.stress_avg))), 'Garmin stress (7d)') +
-    card(flareDays, 'Flare days (30d)', flareDays ? 'warn' : '') +
-    card(bloodDays, 'Blood days (30d)', bloodDays ? 'bad' : '') +
-    card(latestW == null ? '—' : latestW, latestW == null ? 'Weight (lb)' : `Weight (lb)${wDelta != null ? ` · ${wDelta > 0 ? '+' : ''}${wDelta.toFixed(1)} / ${weighed.length}d` : ''}`, wDelta == null ? '' : (wDelta < 0 ? 'good' : wDelta > 0 ? 'warn' : '')) +
-    card(avgSteps == null ? '—' : Math.round(avgSteps).toLocaleString(), 'Avg steps (7d)') +
-    card(avgActiveCal == null ? '—' : Math.round(avgActiveCal), 'Avg active cal (7d)') +
-    card(avgNetCal == null ? '—' : Math.round(avgNetCal), 'Food − active cal (7d)', avgNetCal == null ? '' : (avgNetCal < 0 ? 'good' : 'warn'));
+    statTile({ k: 'HBI proxy · 7d', v: hbi7 == null ? '–' : hbi7.toFixed(1), d: hbi7 == null ? '' : `<span class="chip">${band}</span>`, src: `Daily log + Bristol · ${asOf}` }) +
+    statTile({ k: 'Sleep · 7d avg', v: sleep7 == null ? '–' : fmtSleep(Math.round(sleep7)), spark: sparkline(asc.slice(-14).map(r => r.sleep_minutes)), src: `Garmin · ${asOf}` }) +
+    statTile({ k: 'Steps · 7d avg', v: avgSteps == null ? '–' : Math.round(avgSteps).toLocaleString(), spark: sparkline(asc.slice(-14).map(r => r.steps)), src: `Garmin · ${asOf}` }) +
+    statTile({ k: 'Weight', v: latestW == null ? '–' : String(latestW), small: latestW == null ? '' : 'lb', d: wDelta != null ? `<span class="chip">${wDelta > 0 ? '+' : ''}${wDelta.toFixed(1)} lb · ${weighed.length} weigh-ins</span>` : 'No weigh-ins', src: `Daily log · ${asOf}` });
+  document.getElementById('kmini').innerHTML =
+    card(avg(last7.map(r => r.stress_avg)) == null ? '–' : Math.round(avg(last7.map(r => r.stress_avg))), 'Stress · 7d') +
+    card(flareDays, 'Flare days · 30d') +
+    card(bloodDays, 'Blood days · 30d') +
+    card(avgActiveCal == null ? '–' : Math.round(avgActiveCal), 'Active cal · 7d') +
+    card(avgNetCal == null ? '–' : Math.round(avgNetCal), 'Food minus active · 7d');
+  reveal(document.querySelectorAll('#kpis .stat, #kmini > *'), { stagger: 60, y: 14 });
+  drawOn(kpis, { delay: 300 });
+
+  // Sleep, last 14 nights, as capsule bars
+  const nights = asc.slice(-14);
+  document.getElementById('sleepChart').innerHTML = pillBars(nights.map((r, i) => ({
+    label: new Date(r.day + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'narrow' }),
+    value: r.sleep_minutes || 0, now: i === nights.length - 1,
+    title: `${new Date(r.day + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}: ${fmtSleep(r.sleep_minutes)}${r.sleep_score ? ' · score ' + r.sleep_score : ''}`,
+  })), { height: 200, fmt: (m) => fmtSleep(m) });
+  growPills(document.getElementById('sleepChart'), { delay: 250 });
 
   // ---- ACTIONABLE INSIGHTS ----
   const insights = [];
@@ -118,9 +131,8 @@ function render() {
   }
   // med adherence
   const missedBud = rows.slice(0, 14).filter(r => r.mood != null); // proxy: days logged
-  if (!insights.length) signal.innerHTML = '<span class="muted">No patterns yet. They show after about two weeks of logs.</span>';
-  else signal.innerHTML = insights.map(([i, t]) => `<div class="sig">${icon(i, { size: 16 })}<span>${t}</span></div>`).join('')
-    + `<div class="foot">HBI proxy is wellbeing + pain + liquid stools per day, a lower bound. Food minus active cal leaves out resting burn, so read the trend. Not medical advice.</div>`;
+  if (!insights.length) signal.innerHTML = '<div class="empty">No patterns yet.</div>';
+  else signal.innerHTML = insights.map(([i, t]) => `<div class="sig">${icon(i, { size: 16 })}<span>${t}</span></div>`).join('');
 
   // ---- table ----
   tbody.innerHTML = rows.slice(0, 30).map(r => {
@@ -129,11 +141,11 @@ function render() {
     return `<tr class="${r.flare ? 'flarerow' : ''}">
       <td>${d}</td>
       <td>${fmtSleep(r.sleep_minutes)}</td>
-      <td>${r.stress_avg ?? '<span class=muted>—</span>'}</td>
-      <td>${r.mood ?? '<span class=muted>—</span>'}</td>
-      <td><span class="sev" style="background:${sevColor(r.symptom_severity)}">${r.symptom_severity ?? '—'}</span></td>
+      <td>${r.stress_avg ?? '<span class=muted>–</span>'}</td>
+      <td>${r.mood ?? '<span class=muted>–</span>'}</td>
+      <td><span class="sev ${sevClass(r.symptom_severity)}">${r.symptom_severity ?? '–'}</span></td>
       <td>${r.bm_count || 0}</td>
-      <td>${h == null ? '<span class=muted>—</span>' : `${h} <span class="muted" style="font-size:.78em">${hb}</span>`}</td>
+      <td>${h == null ? '<span class=muted>–</span>' : `${h} <span class="muted" style="font-size:.78em">${hb}</span>`}</td>
       <td>${r.any_blood ? `<span class="flag" title="Blood">${icon('droplet', { size: 14, label: 'Blood' })}</span>` : ''}</td>
       <td>${r.irritant_count ? `<span class="flag">${icon('alert-triangle', { size: 13 })}${r.irritant_count}</span>` : ''}</td>
     </tr>`;
@@ -143,7 +155,7 @@ function render() {
 // ---- gate: render only after all declarations above are initialized ----
 if (tl.error) { tbody.innerHTML = `<tr><td colspan="9" class="muted">Couldn't load: ${tl.error.message}</td></tr>`; }
 else if (!rows.length) {
-  kpis.innerHTML = card('—', 'No logs yet');
+  kpis.innerHTML = card('–', 'No logs yet');
   signal.innerHTML = '<span class="muted">No data yet.</span>';
   tbody.innerHTML = `<tr><td colspan="9" class="muted">No data yet.</td></tr>`;
 } else {

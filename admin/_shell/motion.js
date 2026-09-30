@@ -1,11 +1,24 @@
 // =====================================================================
-// /admin/_shell/motion.js — the admin's motion kit. No dependencies.
-// WAAPI + rAF only, transform/opacity only (compositor friendly, 60fps).
+// /admin/_shell/motion.js, the admin's motion kit. No dependencies.
+// WAAPI + rAF only, transform/clip-path only (compositor friendly, 60fps).
+// v6 film (2026-09-29): Cooper's motion rules. One ease everywhere, no opacity
+// fades between states: things rise out of a clip, grow from a baseline or scale
+// out of their own spot, so nothing appears from nowhere.
 // Every effect collapses to the final state under prefers-reduced-motion.
 // =====================================================================
 
 export const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
-const EASE = 'cubic-bezier(.16,1,.3,1)';
+const EASE = 'cubic-bezier(.22,1,.44,1)';
+// JS copy of cubic-bezier(.22,1,.44,1) for rAF-driven counters.
+function bez(x) {
+  const X1 = .22, Y1 = 1, X2 = .44, Y2 = 1;
+  const cx = 3 * X1, bx = 3 * (X2 - X1) - cx, ax = 1 - cx - bx;
+  const cy = 3 * Y1, by = 3 * (Y2 - Y1) - cy, ay = 1 - cy - by;
+  let t = x;
+  for (let i = 0; i < 8; i++) { const f = ((ax * t + bx) * t + cx) * t - x, d = (3 * ax * t + 2 * bx) * t + cx; if (Math.abs(f) < 1e-5 || !d) break; t -= f / d; }
+  t = Math.min(1, Math.max(0, t));
+  return ((ay * t + by) * t + cy) * t;
+}
 
 /** Run fn once when el scrolls into view (immediately if IO is missing). */
 export function onVisible(el, fn, { margin = '0px 0px -8% 0px' } = {}) {
@@ -17,25 +30,25 @@ export function onVisible(el, fn, { margin = '0px 0px -8% 0px' } = {}) {
   io.observe(el);
 }
 
-/** Staggered entrance: fade + rise + de-blur. */
-export function reveal(nodes, { y = 8, stagger = 60, delay = 0, dur = 620 } = {}) {
+/** Staggered entrance: rise out of a clip (physical, no fade). */
+export function reveal(nodes, { y = 14, stagger = 70, delay = 0, dur = 1100 } = {}) {
   const list = [...(nodes instanceof Element ? [nodes] : nodes)];
   if (REDUCED) return;
-  y = Math.min(y, 8); stagger = Math.min(stagger, 60); // 2026-09-28 de-slop: calmer entrances, no blur
+  y = Math.min(Math.max(y, 10), 18); stagger = Math.min(stagger, 80);
   list.forEach((el, i) => el.animate(
-    [{ opacity: 0, transform: `translate3d(0,${y}px,0)` },
-     { opacity: 1, transform: 'translate3d(0,0,0)' }],
+    [{ clipPath: 'inset(-30% -30% 100% -30%)', transform: `translate3d(0,${y}px,0)` },
+     { clipPath: 'inset(-30% -30% -30% -30%)', transform: 'translate3d(0,0,0)' }],
     { duration: dur, delay: delay + i * stagger, easing: EASE, fill: 'backwards' }));
 }
 
 /** Count a number up from 0. Keeps width steady via tabular numerals in CSS. */
 export function countUp(el, to, { dur = 1100, delay = 0, format = (n) => Math.round(n).toLocaleString('en-US') } = {}) {
   if (!el) return;
-  if (to == null || isNaN(to)) { el.textContent = '—'; return; }
+  if (to == null || isNaN(to)) { el.textContent = '–'; return; }
   if (REDUCED) { el.textContent = format(to); return; }
   el.textContent = format(0);
   const t0 = performance.now() + delay;
-  const ease = (t) => (t >= 1 ? 1 : 1 - Math.pow(2, -10 * t)); // expo out
+  const ease = (t) => (t >= 1 ? 1 : bez(t)); // the one ease, same curve as CSS
   const step = (now) => {
     const t = Math.max(0, (now - t0) / dur);
     el.textContent = format(to * ease(t));
@@ -50,10 +63,15 @@ export function drawOn(root, { delay = 0, dur = 1400 } = {}) {
   root.querySelectorAll('path[data-draw]').forEach((p, i) => {
     p.style.strokeDasharray = '1';
     p.animate([{ strokeDashoffset: 1 }, { strokeDashoffset: 0 }],
-      { duration: dur, delay: delay + i * 90, easing: 'cubic-bezier(.65,0,.35,1)', fill: 'backwards' });
+      { duration: dur, delay: delay + i * 90, easing: EASE, fill: 'backwards' });
   });
-  root.querySelectorAll('[data-fade]').forEach((p, i) => p.animate([{ opacity: 0 }, { opacity: 1 }],
-    { duration: 900, delay: delay + 500 + i * 90, easing: EASE, fill: 'backwards' }));
+  // area fills grow up from the baseline, end dots scale out of their own point
+  root.querySelectorAll('[data-fade]').forEach((p, i) => {
+    p.style.transformBox = 'fill-box';
+    p.style.transformOrigin = p.tagName.toLowerCase() === 'circle' ? '50% 50%' : '50% 100%';
+    p.animate([{ transform: p.tagName.toLowerCase() === 'circle' ? 'scale(0)' : 'scaleY(0)' }, { transform: 'none' }],
+      { duration: 1000, delay: delay + 500 + i * 90, easing: EASE, fill: 'backwards' });
+  });
 }
 
 /** Bars grow from their baseline (CSS gives them transform-box: fill-box). */
@@ -69,15 +87,23 @@ export function growX(root, { delay = 0, stagger = 60 } = {}) {
   if (!root || REDUCED) return;
   root.querySelectorAll('[data-growx]').forEach((b, i) => b.animate(
     [{ transform: 'scaleX(0)' }, { transform: 'scaleX(1)' }],
-    { duration: 750, delay: delay + i * stagger, easing: EASE, fill: 'backwards' }));
+    { duration: 1100, delay: delay + i * stagger, easing: EASE, fill: 'backwards' }));
 }
 
-/** Pop in small things (delta chips, dots) with a soft overshoot. */
+/** Pill bars rise out of their track from the baseline. */
+export function growPills(root, { delay = 0, stagger = 55 } = {}) {
+  if (!root || REDUCED) return;
+  root.querySelectorAll('[data-pill]').forEach((b, i) => b.animate(
+    [{ transform: 'scaleY(0)' }, { transform: 'scaleY(1)' }],
+    { duration: 1300, delay: delay + i * stagger, easing: EASE, fill: 'backwards' }));
+}
+
+/** Small things (delta chips, dots) unfold sideways out of their own spot. */
 export function pop(nodes, { delay = 0, stagger = 40 } = {}) {
   if (REDUCED) return;
   [...nodes].forEach((el, i) => el.animate(
-    [{ opacity: 0 }, { opacity: 1 }],
-    { duration: 400, delay: delay + i * stagger, easing: EASE, fill: 'backwards' }));
+    [{ clipPath: 'inset(0 100% 0 0 round 999px)', transform: 'translateX(-4px)' }, { clipPath: 'inset(0 0% 0 0 round 999px)', transform: 'none' }],
+    { duration: 800, delay: delay + i * stagger, easing: EASE, fill: 'backwards' }));
 }
 
 /** Cursor spotlight + depth on cards: sets --mx/--my, CSS does the rest. */

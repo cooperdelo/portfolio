@@ -8,26 +8,28 @@
 <link rel="stylesheet" href="/admin/_shell/admin-shell.css" />
 <style>
   .tabs { display: flex; gap: 0.4rem; margin-bottom: 1.6rem; flex-wrap: wrap; }
-  .tab { font-family: "Geist Mono", monospace; font-size: 0.7rem; letter-spacing: 0.22em; text-transform: uppercase; padding: 0.7rem 1.1rem; border-radius: 999px; background: rgba(244,239,230,0.04); border: 1px solid var(--card-border); color: var(--ink-2); cursor: pointer; transition: all 0.2s; }
-  .tab:hover { color: var(--ink); border-color: rgba(244,239,230,0.3); }
-  .tab.active { background: rgba(255,77,46,0.1); border-color: rgba(255,77,46,0.5); color: var(--ink); }
+  .tab { font-family: var(--f-ui); font-weight: 700; font-size: 12px; padding: 8px 15px; border-radius: 999px; background: rgba(244,241,234,.05); border: 1px solid var(--line-2); color: var(--text-2); cursor: pointer; transition: background var(--t-fast) var(--ease), color var(--t-fast) var(--ease); }
+  .tab:hover { color: var(--text); border-color: rgba(244,241,234,.4); }
+  .tab.active { background: var(--bone); border-color: var(--bone); color: var(--ink-0); }
+  #acct-tabs .tab { font-family: var(--f-mono); font-weight: 400; font-size: 10.5px; padding: 6px 12px; }
+  #acct-tabs .tab.active { background: var(--fill-3); color: var(--text); border-color: rgba(244,241,234,.4); }
 
   .post-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 0.9rem; margin-bottom: 2rem; }
-  .post { padding: 0; border-radius: 14px; overflow: hidden; background: var(--card-bg); border: 1px solid var(--card-border); transition: border-color 0.25s; }
+  .post { padding: 0; border-radius: 20px; overflow: hidden; background: var(--glass); border: 1px solid var(--line); box-shadow: var(--glass-edge), var(--glass-glow); backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur); transition: border-color var(--t-fast) var(--ease); }
   .post:hover { border-color: var(--card-border-hover); }
   .post .thumb { position: relative; overflow: hidden; aspect-ratio: 1 / 1; background: #14110F center/cover no-repeat; position: relative; }
   .post .thumb .badge { position: absolute; top: 0.6rem; left: 0.6rem; font-family: "Geist Mono", monospace; font-size: 0.55rem; letter-spacing: 0.18em; text-transform: uppercase; padding: 0.25rem 0.5rem; border-radius: 4px; background: rgba(0,0,0,0.6); color: var(--ink); }
   .post .body { padding: 0.85rem 1rem 1rem; }
-  .post .cap { font-family: "Geist", sans-serif; font-size: 0.82rem; line-height: 1.4; color: var(--ink-2); margin-bottom: 0.6rem; max-height: 3.4rem; overflow: hidden; }
+  .post .cap { font-family: var(--f-ui); font-size: 0.82rem; line-height: 1.4; color: var(--ink-2); margin-bottom: 0.6rem; max-height: 3.4rem; overflow: hidden; }
   .post .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem 0.7rem; font-family: "Geist Mono", monospace; font-size: 0.6rem; letter-spacing: 0.1em; color: var(--muted); }
-  .post .stats .stat { display: flex; flex-direction: column; gap: 0.05rem; min-width: 0; }
+  .post .stats .stat { display: flex; flex-direction: column; gap: 0.05rem; min-width: 0; min-height: 0; padding: 0; background: none; border: 0; border-radius: 0; box-shadow: none; backdrop-filter: none; -webkit-backdrop-filter: none; animation: none; overflow: visible; }
   .post .stats .stat .n { font-family:var(--f-display); font-size: 1.05rem; color: var(--ink); letter-spacing: 0; line-height: 1; }
   .post .stats .stat .n.muted { color: var(--muted); }
   .post .stats .stat .lbl { font-size: 0.55rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--muted); }
   .post .stats .stat .lbl .pct { color: var(--sage); margin-left: 0.25rem; }
   .post .date { font-family: "Geist Mono", monospace; font-size: 0.58rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--muted); margin-top: 0.7rem; padding-top: 0.55rem; border-top: 1px solid rgba(244,239,230,0.06); }
 
-  .err-banner { font-family: "Geist Mono", monospace; font-size: 0.7rem; letter-spacing: 0.08em; color: var(--rust); padding: 0.7rem 1rem; border: 1px solid rgba(255,77,46,0.4); border-radius: 10px; background: rgba(255,77,46,0.05); margin-bottom: 1.4rem; }
+  .err-banner { font-family: "Geist Mono", monospace; font-size: 0.7rem; letter-spacing: 0.08em; color: var(--rust); padding: 0.7rem 1rem; border: 1px solid rgba(244,241,234,0.4); border-radius: 10px; background: rgba(244,241,234,0.05); margin-bottom: 1.4rem; }
   .err-banner strong { color: var(--rust); }
   .err-banner a { color: var(--rust); text-decoration: underline; text-underline-offset: 3px; }
 
@@ -42,13 +44,13 @@
   .top-card .rank { position: absolute; top: 0.55rem; left: 0.55rem; font-family:var(--f-display); font-size: 1.6rem; color: var(--ink); text-shadow: 0 0 8px rgba(0,0,0,0.7); line-height: 1; }
   .top-card .thumb { overflow: hidden; aspect-ratio: 1 / 1; background: #14110F center/cover no-repeat; position: relative; }
   .top-card .body { padding: 0.7rem 0.85rem; }
-  .top-card .views { font-family:var(--f-display); font-size: 1.3rem; color: var(--rust); line-height: 1; margin-bottom: 0.2rem; }
+  .top-card .views { font-family:var(--f-display); font-size: 1.3rem; color: var(--text); line-height: 1; margin-bottom: 0.2rem; }
   .top-card .lbl  { font-family: "Geist Mono", monospace; font-size: 0.52rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--muted); }
-  .top-card .cap  { font-family: "Geist", sans-serif; font-size: 0.74rem; color: var(--ink-2); margin-top: 0.4rem; line-height: 1.35; max-height: 2rem; overflow: hidden; }
+  .top-card .cap  { font-family: var(--f-ui); font-size: 0.74rem; color: var(--ink-2); margin-top: 0.4rem; line-height: 1.35; max-height: 2rem; overflow: hidden; }
 
   /* Hashtag table */
   .ht-tbl { width: 100%; }
-  .ht-tag { font-family: "Geist Mono", monospace; font-size: 0.78rem; color: var(--rust); letter-spacing: 0.01em; }
+  .ht-tag { font-family: "Geist Mono", monospace; font-size: 0.78rem; color: var(--text); letter-spacing: 0.01em; }
   .ht-tbl .n { font-family:var(--f-display); font-size: 1.05rem; color: var(--ink); letter-spacing: 0; line-height: 1; }
 
   /* Watch-time leaderboard rows */
@@ -57,9 +59,9 @@
   .wt-row:last-child { border-bottom: 0; }
   .wt-row .rank { font-family:var(--f-display); font-size: 1.3rem; color: var(--ink); }
   .wt-row .thumb { width: 4rem; height: 4rem; border-radius: 6px; background: #14110F center/cover no-repeat; }
-  .wt-row .cap { font-family: "Geist", sans-serif; font-size: 0.85rem; color: var(--ink-2); line-height: 1.4; max-height: 2.8rem; overflow: hidden; }
+  .wt-row .cap { font-family: var(--f-ui); font-size: 0.85rem; color: var(--ink-2); line-height: 1.4; max-height: 2.8rem; overflow: hidden; }
   .wt-row .meta { font-family: "Geist Mono", monospace; font-size: 0.6rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); margin-top: 0.25rem; }
-  .wt-row .stat { text-align: right; }
+  .wt-row .stat { text-align: right; min-height: 0; padding: 0; background: none; border: 0; border-radius: 0; box-shadow: none; backdrop-filter: none; -webkit-backdrop-filter: none; animation: none; overflow: visible; display: block; }
   .wt-row .stat .n { font-family:var(--f-display); font-size: 1.15rem; color: var(--ink); line-height: 1; }
   .wt-row .stat .lbl { font-family: "Geist Mono", monospace; font-size: 0.55rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--muted); margin-top: 0.2rem; }
   @media (max-width: 720px) {
@@ -70,15 +72,15 @@
   /* Post detail sheet */
   .scrim { position: fixed; inset: 0; background: rgba(0,0,0,0.78); z-index: 90; opacity: 0; pointer-events: none; transition: opacity 0.35s; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
   .scrim.on { opacity: 1; pointer-events: auto; }
-  .sheet { position: fixed; left: 50%; top: 50%; transform: translate(-50%, calc(-50% + 4rem)); width: min(880px, 94vw); max-height: 90vh; overflow-y: auto; background: rgba(20,17,15,0.94); backdrop-filter: blur(40px) saturate(180%); border: 1px solid rgba(244,239,230,0.14); border-radius: 22px; padding: 1.8rem 2rem 2rem; z-index: 95; opacity: 0; pointer-events: none; transition: all 0.4s cubic-bezier(0.22,1,0.36,1); }
-  .sheet.on { opacity: 1; pointer-events: auto; transform: translate(-50%, -50%); }
+  .sheet { position: fixed; left: 50%; top: 50%; transform: translate(-50%, calc(-50% + 4rem)); width: min(880px, 94vw); max-height: 90vh; overflow-y: auto; background: rgba(20,17,15,0.94); backdrop-filter: blur(40px) saturate(180%); border: 1px solid rgba(244,239,230,0.14); border-radius: 22px; padding: 1.8rem 2rem 2rem; z-index: 95; opacity: 1; pointer-events: none; visibility: hidden; transition: transform .8s var(--ease), visibility 0s .8s; }
+  .sheet.on { opacity: 1; pointer-events: auto; visibility: visible; transform: translate(-50%, -50%); transition: transform .8s var(--ease), visibility 0s; }
   .sheet .close { position: absolute; top: 1rem; right: 1.1rem; font-family: "Geist Mono", monospace; font-size: 0.65rem; letter-spacing: 0.22em; text-transform: uppercase; padding: 0.5rem 0.8rem; border-radius: 999px; background: rgba(244,239,230,0.05); border: 1px solid rgba(244,239,230,0.1); color: var(--ink-2); cursor: pointer; transition: all 0.15s; }
   .sheet .close:hover { color: var(--rust); border-color: var(--rust); }
-  .sheet h2 { font-family: "Geist", sans-serif; font-weight: 600; font-size: 1.25rem; line-height: 1.2; letter-spacing: -0.01em; margin: 0 0 1rem; padding-right: 4rem; }
+  .sheet h2 { font-family: var(--f-ui); font-weight: 600; font-size: 1.25rem; line-height: 1.2; letter-spacing: -0.01em; margin: 0 0 1rem; padding-right: 4rem; }
   .sheet .detail-layout { display: grid; grid-template-columns: 220px 1fr; gap: 1.4rem; margin-bottom: 1.4rem; }
   @media (max-width: 680px) { .sheet .detail-layout { grid-template-columns: 1fr; } }
   .sheet .d-thumb { aspect-ratio: 1 / 1; background: #14110F center/cover no-repeat; border-radius: 10px; }
-  .sheet .d-caption { font-family: "Geist", sans-serif; font-size: 0.92rem; line-height: 1.55; color: var(--ink-2); white-space: pre-wrap; max-height: 220px; overflow-y: auto; }
+  .sheet .d-caption { font-family: var(--f-ui); font-size: 0.92rem; line-height: 1.55; color: var(--ink-2); white-space: pre-wrap; max-height: 220px; overflow-y: auto; }
   .sheet .d-meta { font-family: "Geist Mono", monospace; font-size: 0.6rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); margin-top: 0.6rem; }
   .sheet .d-meta a { color: var(--rust); }
   .sheet .d-stats { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.5rem; margin-bottom: 1.4rem; }
@@ -87,7 +89,7 @@
   .sheet .d-stat .n { font-family:var(--f-display); font-size: 1.2rem; color: var(--ink); line-height: 1; }
   .sheet .d-stat .n.muted { color: var(--muted); }
   .sheet .d-stat .lbl { font-family: "Geist Mono", monospace; font-size: 0.55rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--muted); margin-top: 0.3rem; }
-  .sheet .chart-h { font-family: "Geist", sans-serif; font-weight: 600; font-size: 0.95rem; letter-spacing: -0.005em; color: var(--ink); margin: 0 0 0.6rem; }
+  .sheet .chart-h { font-family: var(--f-ui); font-weight: 600; font-size: 0.95rem; letter-spacing: -0.005em; color: var(--ink); margin: 0 0 0.6rem; }
   .sheet .chart-wrap { position: relative; height: 240px; }
 </style>
 </head>
@@ -114,21 +116,21 @@
     <div id="error-slot"></div>
 
     <div class="kpi-grid" id="kpi-slot">
-      <div class="card"><div class="label">Followers</div><div class="value" data-k="followers">—</div><div class="delta flat" data-k="followers_sub">—</div></div>
-      <div class="card"><div class="label">Posts total</div><div class="value" data-k="posts_total">—</div><div class="delta flat" data-k="posts_sub">—</div></div>
-      <div class="card"><div class="label">Last post</div><div class="value" data-k="last_post">—</div><div class="delta flat" data-k="last_post_sub">—</div></div>
-      <div class="card"><div class="label" data-k="sum_label">Views, last 30 days</div><div class="value" data-k="sum30">—</div><div class="delta flat" data-k="sum30_sub">—</div></div>
+      <div class="card"><div class="label">Followers</div><div class="value" data-k="followers">–</div><div class="delta flat" data-k="followers_sub">–</div></div>
+      <div class="card"><div class="label">Posts total</div><div class="value" data-k="posts_total">–</div><div class="delta flat" data-k="posts_sub">–</div></div>
+      <div class="card"><div class="label">Last post</div><div class="value" data-k="last_post">–</div><div class="delta flat" data-k="last_post_sub">–</div></div>
+      <div class="card"><div class="label" data-k="sum_label">Views, last 30 days</div><div class="value" data-k="sum30">–</div><div class="delta flat" data-k="sum30_sub">–</div></div>
     </div>
 
-    <h2 class="section-h">Top 5 · <span class="accent">last 30 days</span></h2>
+    <h2 class="section-h">Top 5 · last 30 days</h2>
     <div class="top-row" id="top-row"></div>
 
-    <h2 class="section-h">Hashtag <span class="accent">performance</span></h2>
+    <h2 class="section-h">Hashtag performance</h2>
     <div class="card" id="hashtag-card" style="padding:0;overflow:hidden;margin-bottom:2rem">
       <div class="tbl-wrap">
         <table class="data ht-tbl">
           <thead><tr><th>Hashtag</th><th class="right">Posts</th><th class="right" data-k="ht_total">Total views</th><th class="right" data-k="ht_avg">Avg views</th><th class="right">vs account avg</th></tr></thead>
-          <tbody id="hashtag-tbody"><tr><td colspan="5" class="empty">—</td></tr></tbody>
+          <tbody id="hashtag-tbody"><tr><td colspan="5" class="empty">–</td></tr></tbody>
         </table>
       </div>
     </div>
@@ -198,7 +200,7 @@
       const acct = (ACCTS || []).find(a => a.platform === plat && sameHandle(a.handle, handle));
       const mLabel = plat === 'linkedin' ? (posts.some(p => p.impressions != null) ? 'impressions' : 'reactions') : 'views';
 
-      // KPIs — every number carries its date and source.
+      // KPIs, every number carries its date and source.
       if (acct) {
         const prev = acct.history.find(h => h.date !== acct.date && h.followers != null);
         const delta = prev && acct.followers != null ? acct.followers - prev.followers : null;
@@ -207,19 +209,19 @@
         setK('posts_total', acct.posts_total != null ? fmtNum(acct.posts_total) : fmtNum(posts.length));
         setK('posts_sub', acct.posts_total != null ? `on profile · as of ${esc(fmtDay(acct.date))}` : `posts on file (profile count not reported)`);
       } else {
-        setK('followers', '—'); setK('followers_sub', `No follower snapshot for @${esc(handle)} yet`);
+        setK('followers', '–'); setK('followers_sub', `No follower snapshot for @${esc(handle)} yet`);
         setK('posts_total', fmtNum(posts.length)); setK('posts_sub', 'posts on file');
       }
       const last = posts[0];
       const lastDays = last ? Math.floor((Date.now() - new Date(last.posted_at)) / 864e5) : null;
-      setK('last_post', last ? (lastDays === 0 ? 'Today' : lastDays + 'd ago') : '—');
+      setK('last_post', last ? (lastDays === 0 ? 'Today' : lastDays + 'd ago') : '–');
       setK('last_post_sub', last ? esc(fmtDay(last.posted_at, { month: 'short', day: 'numeric', year: 'numeric' })) : 'No posts on file');
       const cut = Date.now() - 30 * 864e5;
       const recent = posts.filter(p => new Date(p.posted_at).getTime() >= cut);
       const sum = recent.reduce((a, p) => a + (metricOf(p).v || 0), 0);
       const asOf = posts.map(p => p.as_of).filter(Boolean).sort().pop();
       setK('sum_label', `${mLabel[0].toUpperCase() + mLabel.slice(1)}, last 30 days`);
-      setK('sum30', recent.length ? fmtCompact(sum) : '—');
+      setK('sum30', recent.length ? fmtCompact(sum) : '–');
       setK('sum30_sub', `${recent.length} post${recent.length === 1 ? '' : 's'}${asOf ? ` · metrics as of ${esc(fmtDay(asOf))}` : ''} ${asOf ? staleChip(asOf, STALE_H[plat]) : ''}`);
 
       // Top 5, last 30 days, by the platform's key metric.
@@ -238,8 +240,8 @@
         const avg = h.sum / h.n, rel = acctAvg ? avg / acctAvg : null;
         return `<tr><td><span class="ht-tag">${esc(h.t)}</span></td><td class="right mono"><span class="n">${fmtNum(h.n)}</span></td>
           <td class="right mono"><span class="n">${fmtCompact(h.sum)}</span></td><td class="right mono"><span class="n">${fmtCompact(Math.round(avg))}</span></td>
-          <td class="right mono" style="color:${rel == null ? 'var(--muted)' : rel >= 1 ? 'var(--good,#7A8A6E)' : 'var(--rust)'}">${rel == null ? '—' : rel.toFixed(1) + '×'}</td></tr>`;
-      }).join('') : `<tr><td colspan="5" class="empty">${posts.length ? 'No hashtags in captions that have metrics.' : '—'}</td></tr>`;
+          <td class="right mono" style="color:${rel == null ? 'var(--muted)' : rel >= 1 ? 'var(--good,#7A8A6E)' : 'var(--rust)'}">${rel == null ? '–' : rel.toFixed(1) + '×'}</td></tr>`;
+      }).join('') : `<tr><td colspan="5" class="empty">${posts.length ? 'No hashtags in captions that have metrics.' : '–'}</td></tr>`;
 
       // Recent posts with cached thumbnails.
       $('post-grid').innerHTML = posts.length ? posts.slice(0, 24).map(p => card(p)).join('')
@@ -252,13 +254,13 @@
       const cap = String(p.caption || '').replace(/\s+/g, ' ').trim();
       const first = cap.slice(0, compact ? 70 : 130) || '(no caption)';
       const thumb = p.thumb_url ? `<img src="${esc(p.thumb_url)}" alt="" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" onerror="this.remove()">` : '';
-      // No cached thumbnail: a quiet tint tile with a platform mark (the caption is already below).
-      const fallback = `<div style="position:absolute;inset:0;display:grid;place-items:center;background:radial-gradient(120% 90% at 30% 20%,rgba(255,77,46,.10),transparent 60%),#14110F;font-family:'Geist Mono',monospace;font-size:.6rem;letter-spacing:.22em;text-transform:uppercase;color:var(--muted)">${esc(NAME[p.platform] || '')} · no thumbnail</div>`;
+      // No cached thumbnail: the post's own first line on a tint tile (spec: never a placeholder).
+      const fallback = `<div style="position:absolute;inset:0;display:flex;align-items:flex-end;padding:14px;background:linear-gradient(180deg,rgba(244,241,234,.07),rgba(244,241,234,.02));font-family:var(--f-ui);font-weight:700;font-size:14px;line-height:1.3;color:var(--text)"><span style="display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden">${esc(cap.split(/[#\n]/)[0].slice(0, 120) || NAME[p.platform] || '')}</span></div>`;
       const href = p.permalink ? ` href="${esc(p.permalink)}" target="_blank" rel="noopener"` : '';
       if (compact) return `<a class="card top-card"${href} style="display:block;color:inherit;text-decoration:none">
         <div class="thumb">${fallback}${thumb}<span class="rank">${rank}</span></div>
-        <div class="body"><div class="views">${m.v == null ? '—' : fmtCompact(m.v)}</div><div class="lbl">${esc(m.l)}</div><div class="cap">${esc(first)}</div></div></a>`;
-      const st = (l, v) => `<div class="stat"><span class="n ${v == null ? 'muted' : ''}">${v == null ? '—' : fmtCompact(v)}</span><span class="lbl">${l}</span></div>`;
+        <div class="body"><div class="views">${m.v == null ? '–' : fmtCompact(m.v)}</div><div class="lbl">${esc(m.l)}</div><div class="cap">${esc(first)}</div></div></a>`;
+      const st = (l, v) => `<div class="stat"><span class="n ${v == null ? 'muted' : ''}">${v == null ? '–' : fmtCompact(v)}</span><span class="lbl">${l}</span></div>`;
       const cells = p.platform === 'linkedin'
         ? [st('impr.', p.impressions), st('reactions', p.likes), st('comments', p.comments)]
         : [st('views', p.views), st('likes', p.likes), st('comments', p.comments)];

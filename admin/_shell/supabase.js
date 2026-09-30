@@ -17,7 +17,7 @@ const SUPABASE_PUBLISHABLE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiO
 // allowlist lives in the admin_allowlist table.
 export const ADMIN_EMAIL = 'delocooper6@gmail.com';
 
-export const sb = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+const realClient = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
   auth: {
     persistSession: true,
     autoRefreshToken: true,
@@ -26,6 +26,13 @@ export const sb = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
   },
 });
 
+// Localhost-only design preview: http://localhost|127.0.0.1 + ?demo answers table reads
+// from the gitignored admin/_dev/snapshot.local.json. Never true on any real host
+// (https, any other hostname), so production and Vercel previews always use the real client.
+const LOCAL_DEMO = location.protocol === 'http:' && (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+  && new URLSearchParams(location.search).has('demo');
+export const sb = LOCAL_DEMO ? (await import('./demo-db.js')).demoClient(realClient) : realClient;
+
 // ---------- Session helpers ----------
 
 export async function getSession() {
@@ -33,7 +40,7 @@ export async function getSession() {
   return session;
 }
 
-// Cached role lookup — one round-trip per page load, then memoized.
+// Cached role lookup, one round-trip per page load, then memoized.
 let _roleCache = { email: null, role: null, fetchedAt: 0 };
 async function fetchRoleForCurrentSession() {
   const s = await getSession();
@@ -55,6 +62,7 @@ async function fetchRoleForCurrentSession() {
 
 /** Returns 'full' | 'plugverse' | null. Memoized per session. */
 export async function getAdminRole() {
+  if (LOCAL_DEMO) return 'full';
   const s = await getSession();
   const email = s?.user?.email || null;
   // Bust cache if the session changed (sign out + sign in as a different user)
@@ -73,7 +81,7 @@ export async function isFullAdmin() {
   return (await getAdminRole()) === 'full';
 }
 
-/** True for 'full' or 'plugverse' — i.e. anyone with Plugverse-finance access. */
+/** True for 'full' or 'plugverse', i.e. anyone with Plugverse-finance access. */
 export async function isPlugverseAdmin() {
   const r = await getAdminRole();
   return r === 'full' || r === 'plugverse';

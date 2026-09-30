@@ -1,5 +1,5 @@
 // =====================================================================
-// /admin/_shell/data.js — shared loaders for the v5 pages.
+// /admin/_shell/data.js, shared loaders for the v5 pages.
 // Every loader returns rows that already carry their own as-of + source so
 // the page can print "platform · handle · as of" next to each number.
 // =====================================================================
@@ -56,7 +56,8 @@ export async function postsWithMetrics() {
     return {
       ...p, m, reach, as_of: m?.as_of || null,
       reachLabel: p.platform === 'linkedin' ? 'impressions' : 'views',
-      thumb: p.thumbnail_url || (p.media_type && /image|carousel/i.test(p.media_type) ? p.media_url : null),
+      // Only permanent copies (Supabase storage). Platform CDN links expire and 403.
+      thumb: [p.thumbnail_url, p.media_type && /image|carousel/i.test(p.media_type) ? p.media_url : null].find(u => u && /supabase\.co\/storage\//.test(u)) || null,
     };
   });
 }
