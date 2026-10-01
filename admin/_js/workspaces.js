@@ -32,11 +32,12 @@ if(mode==='choose') {
 async function priorities(pv){
  const el=document.querySelector('#ws-priorities');
  try{
-  let q=sb.from('command_center').select('id,title,kind,priority,due,source_path,updated_at,expires_at').eq('done',false).order('priority').limit(20);
-  q=pv?q.like('source_path','Projects/plugverse/%'):q.not('source_path','like','Projects/plugverse/%');
+  const q=sb.from('command_center').select('id,title,kind,priority,due,source_path,updated_at,expires_at').eq('done',false).order('priority').limit(500);
   const {data,error}=await q;if(error)throw error;
-  const rows=(data||[]).filter(r=>!r.expires_at||Date.parse(r.expires_at)>Date.now()).slice(0,5);
-  el.innerHTML='<h2>What needs you</h2>'+(rows.length?`<ul class="ws-list">${rows.map(r=>`<li><div><strong>${esc(r.title)}</strong><small>${scopeForTask(r)==='unclassified'?'Scope needs review · ':''}${esc(r.kind||'Action')}${r.due?' · due '+esc(date(r.due)):''}</small><small>${esc(r.source_path||'Source not recorded')} · updated ${esc(date(r.updated_at))}</small></div>${link('/admin/decisions/','Open')}</li>`).join('')}</ul>`:'<p>No open items were returned by this source. Acquisition follow-ups are shown separately in the queue.</p>');
+  const current=(data||[]).filter(r=>!r.expires_at||Date.parse(r.expires_at)>Date.now());
+  const unclassified=current.filter(r=>scopeForTask(r)==='unclassified').length;
+  const rows=current.filter(r=>pv?scopeForTask(r)==='plugverse':scopeForTask(r)!=='plugverse').slice(0,5);
+  el.innerHTML='<h2>What needs you</h2>'+(rows.length?`<ul class="ws-list">${rows.map(r=>`<li><div><strong>${esc(r.title)}</strong><small>${scopeForTask(r)==='unclassified'?'Scope needs review · ':''}${esc(r.kind||'Action')}${r.due?' · due '+esc(date(r.due)):''}</small><small>${esc(r.source_path||'Source not recorded')} · updated ${esc(date(r.updated_at))}</small></div>${link('/admin/decisions/','Open')}</li>`).join('')}</ul>`:'<p>No open items were returned by this source. Acquisition follow-ups are shown separately in the queue.</p>')+(unclassified?`<p class="ws-note">${unclassified} open items need a scope review in Personal. They have not been silently assigned to PlugVerse.</p>`:'');
  }catch(e){el.innerHTML='<h2>What needs you</h2><p class="ws-error">Could not load current priorities. Your existing list is still available.</p>'+link('/admin/decisions/','Open decisions');}
 }
 async function strategy(pv){

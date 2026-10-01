@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="robots" content="noindex, nofollow, noarchive" />
+<meta name="theme-color" content="#0C0B0A" />
+<title>Finance · CD Admin</title>
+<link rel="stylesheet" href="/admin/_shell/admin-shell.css" />
+<style>@media (max-width: 600px) { table.data th:nth-child(3), table.data td:nth-child(3), table.data th:nth-child(4), table.data td:nth-child(4) { display: none; } }</style>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+</head>
+<body>
+  <main><p class="sv-muted" style="padding:16px;border:1px solid var(--line)">Detailed ledger reports: funding allocations are not reconciled and are not available cash. <a href="/admin/finance/">See bank balances and dated confirmations</a>.</p>
+    <header class="page-head">
+      <h1>Finance</h1>
+      <div class="actions">
+        <span class="live-dot" id="live-indicator">Live</span>
+        <a class="btn" href="/admin/finance/transactions.html">Transactions</a>
+        <a class="btn ghost small" href="/admin/finance/entry.html" title="Mercury and card-alert emails fill transactions automatically">Add missing</a>
+      </div>
+    </header>
+
+    <section class="stat-row" id="hero" style="--n:4">
+      <div class="stat" id="hsBiz"><div class="shimmer" style="height:100%"></div></div>
+      <div class="stat" id="hsPers"><div class="shimmer" style="height:100%"></div></div>
+      <div class="stat" id="hsPv"><div class="shimmer" style="height:100%"></div></div>
+      <div class="stat" id="hsMtd"><div class="shimmer" style="height:100%"></div></div>
+    </section>
+
+    <section class="grid">
+      <div class="sv-card span-8">
+        <div class="sv-h"><h2>In and out</h2><span class="mono">12 months · all entities</span></div>
+        <div class="chart-canvas-wrap tall"><canvas id="chart-flow"></canvas></div>
+      </div>
+      <div class="sv-card span-4">
+        <div class="sv-h"><h2>Where it went</h2><span class="mono">90 days</span></div>
+        <div id="cats" class="rows"></div>
+      </div>
+    </section>
+
+    <section class="grid">
+      <div class="sv-card span-8">
+        <div class="sv-h"><h2>PlugVerse recorded net</h2><span class="mono">Cumulative net · all time</span></div>
+        <div class="chart-canvas-wrap"><canvas id="chart-runway"></canvas></div>
+      </div>
+      <div class="sv-card span-4" id="balances"><div class="shimmer" style="height:200px"></div></div>
+    </section>
+
+    <section class="grid">
+      <div class="span-8">
+        <div class="tbl-wrap">
+          <table class="data">
+            <thead><tr><th>Date</th><th>What</th><th>Entity</th><th>Category</th><th class="right">Amount</th></tr></thead>
+            <tbody id="recent-tbody"><tr><td colspan="5" class="empty">Loading</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="sv-card span-4" id="kpis">
+        <div class="sv-h"><h2>This year</h2></div>
+        <div class="rows">
+          <div class="row"><div class="grow"><div class="t">1789 ledger remainder (unreconciled)</div><div class="s" data-k="fund_delta"></div></div><span class="r" data-k="fund_remaining">–</span></div>
+          <div class="row"><div class="grow"><div class="t">Food this month</div><div class="s">Ledger</div></div><span class="r" data-k="food_mtd">–</span></div>
+          <div class="row"><div class="grow"><div class="t">Tax deductible</div><div class="s" data-k="ded_delta"></div></div><span class="r" data-k="ded_ytd">–</span></div>
+          <div class="row"><div class="grow"><div class="t">Transactions</div><div class="s" data-k="tx_recent"></div></div><span class="r" data-k="tx_count">–</span></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="/admin/finance/_js/dashboard.js"></script>
+</body>
+</html>

@@ -23,7 +23,7 @@ app.innerHTML = pageHead('Grow', 'Content') + `
   <section class="sv-section" style="margin-top:0" aria-label="All posts">
     <label for="brand-scope">Accounts</label>
     <select id="brand-scope" class="btn" style="margin:0 0 20px 12px"><option value="all">All content</option><option value="personal">Personal</option><option value="plugverse">PlugVerse</option><option value="rubber-band">Rubber Band</option></select>
-    <p class="sv-muted" id="feed-coverage">Latest 400 imported posts. Missing accounts and older posts may not be represented.</p>
+    <p class="sv-muted" id="feed-coverage">Loading imported posts and their observation dates…</p>
     <div class="pf-bar" id="chips" role="tablist"></div>
     <div class="pfeed" id="feed"><div class="shimmer" style="height:320px"></div><div class="shimmer" style="height:320px"></div><div class="shimmer" style="height:320px"></div></div>
     <div class="pf-more" id="more" hidden><button class="btn">Show more</button></div>
@@ -36,7 +36,8 @@ app.innerHTML = pageHead('Grow', 'Content') + `
   </section>`;
 spotlight(document);
 
-let posts = [], filter = 'all', shown = PAGE, brand = 'all';
+let posts = [], filter = 'all', shown = PAGE, brand = 'all', offset = 0, hasOlder = true, loading = false;
+const BATCH = 96;
 const scopedPosts = () => brand === 'all' ? posts : posts.filter(p => accountScope(p.account_handle) === brand);
 document.getElementById('brand-scope').onchange = e => {brand=e.target.value; filter='all'; shown=PAGE; drawChips(); drawFeed(true); drawCal();};
 const cursor = toDate(todayET()); cursor.setDate(1);
@@ -44,16 +45,25 @@ const inFeed = (p) => (FEED_ACCOUNTS[p.platform] || []).includes(String(p.accoun
 const firstLine = (s) => String(s || '').split('\n').map(x => x.trim()).find(Boolean) || '';
 
 async function load() {
+  if (loading || !hasOlder) return;
+  loading = true;
   try {
-    const rows = await socialPostsLatest({ limit: 400 });
+    const rows = await socialPostsLatest({ limit: BATCH, offset });
+    offset += rows.length;
+    hasOlder = rows.length === BATCH;
     // Only real posts: a link to the live post and a real post time.
-    posts = rows.filter(p => inFeed(p) && p.posted_at && p.permalink)
+    posts = [...new Map([...posts, ...rows.filter(p => inFeed(p) && p.posted_at && p.permalink)].map(p=>[p.id,p])).values()]
       .sort((a, b) => new Date(b.posted_at) - new Date(a.posted_at));
   } catch (e) {
     console.error(e);
-    document.getElementById('feed').innerHTML = emptyState("Couldn't load posts", esc(e?.message || String(e)));
+    document.getElementById('feed-coverage').textContent = "Couldn't load older posts. Previously loaded posts are preserved. Try Show more again.";
+    if (!posts.length) document.getElementById('feed').innerHTML = emptyState("Couldn't load posts", esc(e?.message || String(e)));
+    const retry = document.getElementById('more'); retry.hidden = false; retry.querySelector('button').onclick = load;
     return;
+  } finally {
+    loading = false;
   }
+  document.getElementById('feed-coverage').textContent = `${posts.length} imported posts loaded${hasOlder ? '; Show more loads older records' : '; end of imported history'}. Calendar shows loaded posts. Each metric carries its observation date; missing accounts are not zero activity.`;
   drawChips(); drawFeed(true); drawCal();
 }
 
@@ -102,8 +112,8 @@ function drawFeed(reset) {
   fresh.slice(12).forEach(c => onVisible(c, () => reveal(c, { y: 8, dur: 520 })));
   pop(fresh.slice(0, 12).map(c => c.querySelector('.km')).filter(Boolean), { delay: 200, stagger: 30 });
   const more = document.getElementById('more');
-  more.hidden = list.length <= shown;
-  more.querySelector('button').onclick = () => { shown += PAGE; drawFeed(false); };
+  more.hidden = list.length <= shown && !hasOlder;
+  more.querySelector('button').onclick = async () => { shown += PAGE; if (shown > list.length && hasOlder) await load(); else drawFeed(false); };
 }
 
 function drawCal() {

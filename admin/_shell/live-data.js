@@ -85,10 +85,13 @@ export async function socialPostsLatest(opts = {}) {
     rows = ((await snap())?.posts || []).map(([platform, account_handle, posted_at, caption, thumb, permalink, as_of, views, impressions, likes, comments, shares]) =>
       ({ id: permalink || posted_at + platform, platform, account_handle, posted_at, caption, thumb_url: thumb ? thumb.replace(/^~/, THUMB_BASE) : null, permalink, as_of, views, impressions, likes, comments, shares }));
     if (opts.platform) rows = rows.filter(r => r.platform === opts.platform);
+    if (opts.handles) rows = rows.filter(r => opts.handles.includes(r.account_handle));
+    rows = rows.slice(opts.offset || 0, (opts.offset || 0) + (opts.limit || 300));
   } else {
-    let q = sb.from('v_social_posts_latest').select('*').order('posted_at', { ascending: false, nullsFirst: false }).limit(opts.limit || 300);
+    let q = sb.from('v_social_posts_latest').select('*').order('posted_at', { ascending: false, nullsFirst: false }).order('id').range(opts.offset || 0, (opts.offset || 0) + (opts.limit || 300) - 1);
     if (opts.platform) q = q.eq('platform', opts.platform);
     if (opts.handle) q = q.ilike('account_handle', opts.handle);
+    if (opts.handles) q = q.in('account_handle', opts.handles);
     const { data, error } = await q;
     if (error) throw error;
     rows = data || [];

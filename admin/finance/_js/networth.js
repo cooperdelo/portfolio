@@ -58,9 +58,9 @@ const data = {
     { name: 'Tax reserve owed', meta: '~25–30% of band 1099 + $20K prize, set aside', cls: 'flag', value: null, include: true },
   ],
   biz: [
-    { name: 'Luby Pitch prize', meta: 'NOT in Mercury (bal $137.48), confirm location; taxable', cls: 'flag', value: 20000, include: true },
-    { name: 'Mercury business checking', meta: 'live balance ' + SNAPSHOT, cls: 'plugverse', value: 137.48, include: true },
-    { name: 'Mercury savings', meta: 'live balance', cls: 'plugverse', value: 0, include: true },
+    { name: 'Luby Pitch prize (historical award)', meta: 'Cooper confirmed Sep 30: remaining award cash is already in Mercury. Excluded to prevent double counting.', cls: 'flag', value: 20000, include: false, locked: true },
+    { name: 'Mercury business checking', meta: 'Awaiting bank snapshot; not zero', cls: 'plugverse', value: null, include: true },
+    { name: 'Mercury savings', meta: 'Awaiting bank snapshot; not zero', cls: 'plugverse', value: null, include: true },
     { name: 'PlugVerse LLC equity', meta: 'book ~$0, speculative upside', cls: 'plugverse', value: 0, include: true },
     { name: 'Codebase / IP / brand / domain', meta: 'real but unvalued', cls: 'plugverse', value: 0, include: true },
   ],
@@ -142,10 +142,10 @@ async function syncBalances() {
     const b = await balances();
     const pick = (re) => b.business.find(r => re.test(r.account_label || ''));
     const chk = pick(/checking/i), sav = pick(/saving/i);
-    const d = (x) => new Date(x + 'T12:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    const d = (x) => new Date(String(x).length===10?x+'T12:00':x).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     if (chk) { data.biz[1].value = Number(chk.balance); data.biz[1].meta = `Mercury API · as of ${d(chk.as_of)}`; }
     if (sav) { data.biz[2].value = Number(sav.balance); data.biz[2].meta = `Mercury API · as of ${d(sav.as_of)}`; }
-    if (chk) data.biz[0].meta = `REVIEW: Mercury checking is now ${fmt(chk.balance)} (as of ${d(chk.as_of)}). If the prize was deposited there, untick this row so it isn't counted twice.`;
+    data.biz[0].include = false;
     const personal = b.personal.filter(r => /check/i.test(r.account || '') && r.balance != null);
     if (personal.length) {
       data.liquid[1].value = Math.round(personal.reduce((a, r) => a + Number(r.balance), 0));

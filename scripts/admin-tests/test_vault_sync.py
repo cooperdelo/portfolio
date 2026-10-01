@@ -19,15 +19,16 @@ function Invoke-RestMethod {
 '''
 
 class SyncTests(unittest.TestCase):
- def run_case(self,script,local,remote,conflict=False,local_new=False):
+ def run_case(self,script,local,remote,conflict=False,local_new=False,remote_path=REL):
   with tempfile.TemporaryDirectory(prefix='admin-sync-test-') as temp:
    root=Path(temp); disk=root/REL; disk.parent.mkdir(parents=True); disk.write_text(local)
    os.utime(disk,(1800000000,1800000000) if local_new else (1600000000,1600000000))
    envfile=root/'Projects/personal-brand/factory/.env'; envfile.parent.mkdir(parents=True); envfile.write_text('SUPABASE_SERVICE_KEY=fixture-only')
-   state=root/'state.json'; state.write_text(json.dumps(dict(path=REL,content=remote,direction='in' if script=='push-inputs' else 'out',owner_task='original-owner',updated_at='2026-09-30T12:00:00Z',synced_to_vault_at='2026-09-29T12:00:00Z')))
+   state=root/'state.json'; state.write_text(json.dumps(dict(path=remote_path,content=remote,direction='in' if script=='push-inputs' else 'out',owner_task='original-owner',updated_at='2026-09-30T12:00:00Z',synced_to_vault_at='2026-09-29T12:00:00Z')))
    calls=root/'calls.txt'
    original=(SOURCE/(script+'.ps1')).read_text(encoding='utf-8-sig')
    original=original.replace("'C:\\Users\\coope\\Desktop\\Claude'", "'"+str(root)+"'")
+   (root/'sync-guard.ps1').write_text((SOURCE/'sync-guard.ps1').read_text(),encoding='utf-8-sig')
    copied=root/(script+'.ps1'); copied.write_text(original,encoding='utf-8-sig')
    runner=root/'run.ps1'; runner.write_text(MOCK+f"\n& '{copied}'"+(f" -Auto -OnlyPath '{REL}'" if script=='push-inputs' else '')+'\n',encoding='utf-8-sig')
    env={**os.environ,'SYNC_FIXTURE_STATE':str(state),'SYNC_FIXTURE_CALLS':str(calls),'SYNC_FIXTURE_CONFLICT':'1' if conflict else '0'}
@@ -51,5 +52,9 @@ class SyncTests(unittest.TestCase):
  def test_pull_conflict_does_not_acknowledge_newer_cloud(self):
   r,state,disk,calls=self.run_case('pull-outputs','old','new',conflict=True)
   self.assertIn('Cloud changed during pull',r.stdout); self.assertEqual(state['synced_to_vault_at'],'2026-09-29T12:00:00Z')
+ def test_pull_refuses_traversal_and_executable_outputs(self):
+  for path in ['../escape.md','Context/unsafe.ps1','Context/file.md:stream','Context/alias./file.md']:
+   r,state,disk,calls=self.run_case('pull-outputs','original','untrusted',remote_path=path)
+   self.assertIn('REFUSED',r.stdout);self.assertEqual(disk,'original');self.assertEqual(calls,['Get'])
 
 if __name__=='__main__': unittest.main()
