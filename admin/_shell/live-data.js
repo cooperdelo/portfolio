@@ -50,7 +50,7 @@ export async function accountSnapshotsLatest() {
 /** Personal brand + PlugVerse accounts that belong in the "All posts" feed. */
 export const FEED_ACCOUNTS = {
   linkedin: ['cooperdelo', 'plugverseapp'],
-  instagram: ['cooperdelo', 'plugverse.app'],
+  instagram: ['cooperdelo', 'cooperdelo_', 'plugverse.app', 'the.band.rubber'],
   tiktok: ['cooperdelo', 'cooper delo', 'plugverse.app'],
   youtube: ['cooperdelo'],
 };

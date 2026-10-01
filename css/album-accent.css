@@ -1,0 +1,14 @@
+.record-collection{max-width:1440px;margin:clamp(48px,8vw,120px) auto 0;padding:0 clamp(20px,5vw,80px) 40px;color:#eee9df}
+.record-heading{display:flex;justify-content:space-between;align-items:baseline;gap:20px;border-top:1px solid #ffffff24;padding-top:24px;margin-bottom:32px}
+.record-heading>p:last-child{font-size:14px;opacity:.6}
+.record-shelves{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:36px 24px;perspective:1400px}
+.album-sleeve{margin:0;min-width:0;transform:rotateY(-12deg) rotateZ(-2deg);transform-style:preserve-3d;transition:transform .45s ease}
+.album-sleeve:nth-child(2n){transform:rotateY(-12deg) rotateZ(2deg)}
+.frames .album-sleeve{will-change:auto}
+.frames .album-sleeve img{display:block;position:static;width:100%;height:auto;aspect-ratio:1;object-fit:cover;border-radius:1px;box-shadow:3px 1px 0 #c6bfb1,5px 2px 0 #514e49,10px 16px 23px #0008}
+.frames .album-sleeve figcaption{display:block;font-size:11px;line-height:1.5;margin-top:14px;letter-spacing:.01em}
+.album-sleeve small{display:block;opacity:.5;font-size:10px}
+@media(hover:hover) and (prefers-reduced-motion:no-preference){.album-sleeve:hover{transform:translateY(-7px) rotateY(0deg) rotateZ(0deg)}}
+@media(max-width:900px){.record-shelves{grid-template-columns:repeat(4,minmax(0,1fr));gap:28px 20px}}
+@media(max-width:540px){.record-heading{display:block}.record-heading>p:last-child{margin-top:8px}.record-shelves{grid-template-columns:repeat(3,minmax(0,1fr));gap:24px 16px}.album-sleeve figcaption{font-size:10px}.album-sleeve small{font-size:9px}}
+@media(prefers-reduced-motion:reduce){.album-sleeve{transition:none}}

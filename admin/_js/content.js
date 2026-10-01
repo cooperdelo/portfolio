@@ -11,6 +11,7 @@ import { requireFullAdminOrRedirect } from '/admin/_shell/supabase.js';
 import { esc, fmtDay, fmtNum, fmtCompact, emptyState, pageHead, ymd, toDate, todayET, platName, pmIcon } from '/admin/_shell/ui.js';
 import { socialPostsLatest, FEED_ACCOUNTS, isPlugverseHandle, isDemo } from '/admin/_shell/live-data.js';
 import { reveal, onVisible, pop, spotlight } from '/admin/_shell/motion.js';
+import { accountScope } from '/admin/_shell/workspace-model.mjs';
 
 if (!isDemo() && !(await requireFullAdminOrRedirect())) throw new Error('not full admin');
 await mountShell({ title: 'Content', demo: true });
@@ -20,6 +21,9 @@ const PAGE = 24;
 
 app.innerHTML = pageHead('Grow', 'Content') + `
   <section class="sv-section" style="margin-top:0" aria-label="All posts">
+    <label for="brand-scope">Accounts</label>
+    <select id="brand-scope" class="btn" style="margin:0 0 20px 12px"><option value="all">All content</option><option value="personal">Personal</option><option value="plugverse">PlugVerse</option><option value="rubber-band">Rubber Band</option></select>
+    <p class="sv-muted" id="feed-coverage">Latest 400 imported posts. Missing accounts and older posts may not be represented.</p>
     <div class="pf-bar" id="chips" role="tablist"></div>
     <div class="pfeed" id="feed"><div class="shimmer" style="height:320px"></div><div class="shimmer" style="height:320px"></div><div class="shimmer" style="height:320px"></div></div>
     <div class="pf-more" id="more" hidden><button class="btn">Show more</button></div>
@@ -32,7 +36,9 @@ app.innerHTML = pageHead('Grow', 'Content') + `
   </section>`;
 spotlight(document);
 
-let posts = [], filter = 'all', shown = PAGE;
+let posts = [], filter = 'all', shown = PAGE, brand = 'all';
+const scopedPosts = () => brand === 'all' ? posts : posts.filter(p => accountScope(p.account_handle) === brand);
+document.getElementById('brand-scope').onchange = e => {brand=e.target.value; filter='all'; shown=PAGE; drawChips(); drawFeed(true); drawCal();};
 const cursor = toDate(todayET()); cursor.setDate(1);
 const inFeed = (p) => (FEED_ACCOUNTS[p.platform] || []).includes(String(p.account_handle || '').toLowerCase());
 const firstLine = (s) => String(s || '').split('\n').map(x => x.trim()).find(Boolean) || '';
@@ -52,7 +58,7 @@ async function load() {
 }
 
 function drawChips() {
-  const n = (p) => p === 'all' ? posts.length : posts.filter(x => x.platform === p).length;
+  const n = (p) => p === 'all' ? scopedPosts().length : scopedPosts().filter(x => x.platform === p).length;
   const list = ['all', ...PLATS.filter(p => n(p))];
   const el = document.getElementById('chips');
   el.innerHTML = list.map(p => `<button class="pf-chip${p === filter ? ' on' : ''}" role="tab" aria-selected="${p === filter}" data-p="${p}">${p === 'all' ? 'All' : esc(platName(p))}<span class="n">${n(p)}</span></button>`).join('');
@@ -84,7 +90,7 @@ function card(p) {
 }
 
 function drawFeed(reset) {
-  const list = filter === 'all' ? posts : posts.filter(p => p.platform === filter);
+  const list = filter === 'all' ? scopedPosts() : scopedPosts().filter(p => p.platform === filter);
   const feed = document.getElementById('feed');
   const from = reset ? 0 : feed.querySelectorAll('.pcard').length;
   const html = list.slice(from, shown).map(card).join('');
@@ -105,7 +111,7 @@ function drawCal() {
   const start = new Date(cursor); start.setDate(1 - start.getDay());
   const today = todayET();
   const byDay = {};
-  posts.forEach(p => (byDay[ymd(p.posted_at)] = byDay[ymd(p.posted_at)] || []).push(p));
+  scopedPosts().forEach(p => (byDay[ymd(p.posted_at)] = byDay[ymd(p.posted_at)] || []).push(p));
   let html = '<div style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px">' + ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(d => `<div class="sv-muted" style="font-size:.72rem;padding:.2rem .3rem">${d}</div>`).join('');
   for (let i = 0; i < 42; i++) {
     const d = new Date(start); d.setDate(start.getDate() + i);

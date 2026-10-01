@@ -39,7 +39,7 @@ async function verifyAdminJwt(jwt) {
     { headers: { Authorization: `Bearer ${jwt}`, apikey: ADMIN_ANON } });
   if (!a.ok) return { ok: false, status: 403, error: 'forbidden' };
   const rows = await a.json();
-  if (!rows.length) return { ok: false, status: 403, error: 'forbidden' };
+  if (!rows.length || !['full', 'plugverse'].includes(rows[0].admin_role)) return { ok: false, status: 403, error: 'forbidden' };
   return { ok: true, user: u, role: rows[0].admin_role };
 }
 
