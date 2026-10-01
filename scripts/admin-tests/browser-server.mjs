@@ -10,10 +10,12 @@ const raw=fs.readFileSync('C:/Users/coope/Desktop/Claude/Projects/personal-brand
 const key=/^SUPABASE_SERVICE_KEY\s*=\s*(.+?)\s*$/m.exec(raw)[1].replace(/^['"]|['"]$/g,'');
 process.env.SUPABASE_ADMIN_SERVICE_ROLE_KEY=key;
 const base='https://eibtnkaoqsgwiqttiwjo.supabase.co',headers={apikey:key,Authorization:'Bearer '+key,'Content-Type':'application/json'};
+const auditRole=process.env.ADMIN_TEST_ROLE||'full';
+if(!['full','acquisition'].includes(auditRole))throw Error('Unsupported audit role');
 async function request(p,method='GET',body){const r=await fetch(base+p,{method,headers,body:body?JSON.stringify(body):undefined,signal:AbortSignal.timeout(20000)});if(!r.ok)throw Error('Audit request failed '+r.status);const s=await r.text();return s?JSON.parse(s):null;}
 const email='codex-media-audit-'+crypto.randomUUID()+'@example.invalid',password=crypto.randomBytes(32).toString('base64url');
 const user=await request('/auth/v1/admin/users','POST',{email,password,email_confirm:true,user_metadata:{purpose:'disposable admin integration audit'}});
-await request('/rest/v1/admin_allowlist','POST',{email,admin_role:'full'});
+await request('/rest/v1/admin_allowlist','POST',{email,admin_role:auditRole});
 const session=await request('/auth/v1/token?grant_type=password','POST',{email,password});
 const root=path.resolve('.'),nonce=crypto.randomUUID();
 let stopped=false;

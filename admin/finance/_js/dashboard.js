@@ -49,7 +49,7 @@ async function loadAll() {
   ]);
   if (tx.error) { toast('Failed to load transactions', 'err'); console.error(tx.error); return; }
   const rows = tx.data || [];
-  renderKpis(rows, fund.data || { total_received: 0, total_spent: 0, remaining: 0 });
+  renderKpis(rows, fund.error ? null : fund.data);
   renderFlow(rows);
   renderCategories(rows);
   renderRunway(rows);
@@ -72,8 +72,8 @@ function renderKpis(rows, fund) {
   setStat('hsPv', { k: 'PlugVerse net', v: `<span data-usd="${pvNet}">$0</span>`, d: `In ${fmtUSDCompact(pvIncome)} · out ${fmtUSDCompact(pvExpense)}`, src: `Ledger · all time${newest ? ' · as of ' + dayLbl(newest) : ''}` });
   setStat('hsMtd', { k: 'Spent this month', v: `<span data-usd="${personalMtd}">$0</span>`, d: personalPrev ? `<span class="chip ${personalMtd > personalPrev ? 'up' : 'down'}">${fmtUSDCompact(personalPrev)} last month</span>` : '', src: `Personal · card alerts + Mercury${newest ? ' · as of ' + dayLbl(newest) : ''}` });
   document.querySelectorAll('#hsPv [data-usd], #hsMtd [data-usd]').forEach((n, i) => countUp(n, Number(n.dataset.usd), { delay: i * 90, format: usd0 }));
-  setK('fund_remaining', fmtUSDCompact(fund.remaining));
-  setK('fund_delta', `${fmtUSD(fund.total_spent)} of $1,850 spent`);
+  setK('fund_remaining', fund ? fmtUSDCompact(fund.remaining) : 'Unavailable');
+  setK('fund_delta', fund ? `${fmtUSD(fund.total_spent)} tagged expenses; not cash available` : 'Funding ledger could not be loaded');
   setK('food_mtd', fmtUSDCompact(foodMtd));
   setK('ded_ytd', fmtUSDCompact(deductYtd));
   setK('ded_delta', String(year));

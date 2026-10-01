@@ -7,6 +7,7 @@ import assert from 'node:assert/strict';
 import band from '../../api/band-review.mjs';
 import outcomes from '../../api/acquisition-results.mjs';
 import money from '../../api/money-overview.mjs';
+import kpi from '../../api/plugverse-kpi.mjs';
 import {createOAuthState,verifyOAuthOwner} from '../../api/_lib/oauth-state.mjs';
 const networkFetch=globalThis.fetch;
 globalThis.fetch=(url,options={})=>networkFetch(url,{signal:AbortSignal.timeout(20000),...options});
@@ -32,7 +33,7 @@ if(deployment){
  const project=await p.json();bypass=Object.keys(project.protectionBypass||{})[0];assert(bypass);
 }
 async function invoke(handler,method='GET',body,query={},jwt=token){
- let status,data;const headers={};const route=handler===band?'band-review':handler===money?'money-overview':'acquisition-results';
+ let status,data;const headers={};const route=handler===band?'band-review':handler===money?'money-overview':handler===kpi?'plugverse-kpi':'acquisition-results';
  if(deployment){
   const r=await fetch(deployment+'/api/'+route+'?'+new URLSearchParams(query),{method,headers:{Authorization:jwt?'Bearer '+jwt:'','x-vercel-protection-bypass':bypass,'Content-Type':'application/json'},body:body?JSON.stringify(body):undefined});status=r.status;data=await r.json();
  }else await handler({method,body,query,headers:{authorization:jwt?'Bearer '+jwt:''}},{setHeader(k,v){headers[k]=v;},status(s){status=s;return this;},json(d){data=d;return this;}});
@@ -57,6 +58,11 @@ try{
  const finances=await invoke(money);assert.equal(finances.status,200);assert(finances.data.bank.every(x=>x.as_of));assert(finances.data.confirmation?.content.includes('6,851.23'));assert(finances.data.personal.some(x=>x.account==='wells_fargo_checking'&&Number(x.balance)===6851.23&&x.source==='cooper_reported'));proof.push('live money sources and canonical dated owner confirmation');
  const state=createOAuthState('ig',user.id);const oauthReq={headers:{cookie:state.cookie.split(';')[0]},query:{state:state.state}};assert.equal(await verifyOAuthOwner(oauthReq,'ig'),true);proof.push('OAuth callback verifies current full owner');
  console.log(JSON.stringify({product_observed_at:product.data.observed_at,product_groups:product.data.rows.length,artist_accounts:product.data.rows.reduce((n,r)=>n+r.accounts,0)},null,2));
+ if(process.env.ADMIN_TEST_KPI==='1'){
+  assert(deployment,'KPI audit uses existing deployed provider credentials');
+  const live=await invoke(kpi);assert.equal(live.status,200);
+  console.log(JSON.stringify({kpi_observed_at:live.data.captured_at,snapshot_written:live.data.snapshot_written,failed_sources:(live.data.errors||[]).map(e=>({source:e.source,error:e.error?.slice(0,350)})),posthog_events:live.data.data?.top_events_7d?.length??null},null,2));
+ }
  await call('/rest/v1/admin_allowlist?email=eq.'+encodeURIComponent(email),'DELETE');
  const revoked=await invoke(band);assert.equal(revoked.status,403);proof.push('access revocation takes effect immediately');assert.equal(await verifyOAuthOwner(oauthReq,'ig'),false);proof.push('OAuth state stops working after owner revocation');
  const loggedOut=await invoke(band,'GET',undefined,{},null);assert.equal(loggedOut.status,401);proof.push('logged-out denied');

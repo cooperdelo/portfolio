@@ -1,4 +1,4 @@
-import { sb, fmtUSD, subscribeTransactions } from '/admin/_shell/supabase.js';
+import { sb, fmtUSD, subscribeTransactions, getSession } from '/admin/_shell/supabase.js';
 import { mountShell, toast } from '/admin/_shell/admin-shell.js';
 
 await mountShell({ title: '1789 Fund · Finance' });
@@ -29,12 +29,12 @@ function render(totals, rows) {
   setK('spent',     fmtUSD(spent));
   setK('spent_pct', `${pct.toFixed(1)}% of ${fmtUSD(award)}`);
   setK('remaining', fmtUSD(remaining));
-  setK('rem_pct',   `${(100 - pct).toFixed(1)}% available`);
+  setK('rem_pct', 'Unreconciled - not available cash');
   setK('entries',   rows.length);
 
   document.getElementById('burn-bar').style.width = `${pct}%`;
-  document.getElementById('burn-spent').textContent     = `${fmtUSD(spent)} spent`;
-  document.getElementById('burn-remaining').textContent = `${fmtUSD(remaining)} remaining`;
+  document.getElementById('burn-spent').textContent     = `${fmtUSD(spent)} tagged expenses`;
+  document.getElementById('burn-remaining').textContent = `${fmtUSD(remaining)} unmatched ledger remainder`;
 
   const tbody = document.getElementById('fund-tbody');
   if (!rows.length) { tbody.innerHTML = `<tr><td colspan="5" class="empty">No fund expenses logged yet</td></tr>`; return; }
@@ -53,3 +53,13 @@ function escapeHtml(s) { return String(s || '').replace(/[&<>"']/g, c => ({ '&':
 
 subscribeTransactions(() => load());
 await load();
+
+// Confirmation stays in its existing private vault owner, not a public asset.
+try {
+ const session=await getSession();
+ const response=await fetch('/api/money-overview',{headers:{Authorization:'Bearer '+session.access_token},cache:'no-store'});
+ if(response.ok){const data=await response.json();
+  if(/1789 Venture Fund: fully spent; actual remaining allocation is \$0/.test(data.confirmation?.content||''))
+   document.querySelector('#fund-confirmation').textContent='Fully spent: $0 remaining, confirmed by Cooper September 30. Tagged ledger coverage below still needs reconciliation.';
+ }
+} catch { /* Keep explicit unreconciled label; never substitute a cash value. */ }
