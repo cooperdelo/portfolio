@@ -26,9 +26,10 @@
       <div>
         <h1>Net worth</h1>
       </div>
-      <div class="actions"><span class="live-dot" id="nw-stamp">Snapshot</span><button class="btn ghost small" type="button" id="nw-edit" aria-pressed="false" onclick="var on=document.body.classList.toggle('nw-edit');this.setAttribute('aria-pressed',on);this.textContent=on?'Done':'Edit';">Edit</button></div>
+      <div class="actions"><span id="nw-stamp">Historical valuation worksheet</span></div>
     </div>
 
+    <p class="sv-muted">Historical estimates with current recorded balances where available. Changes below are temporary what-if calculations and are not saved. This is not a reconciled net-worth statement. <a href="/admin/finance/">Return to Money</a>.</p>
     <div class="kpi-grid">
       <div class="card"><div class="label">Personal net worth</div><div class="value" data-k="net">–</div><div class="delta flat">Personal · live + hand-valued</div></div>
       <div class="card"><div class="label">Liquid</div><div class="value" data-k="liq">–</div><div class="delta flat">Cash · brokerage · crypto</div></div>
