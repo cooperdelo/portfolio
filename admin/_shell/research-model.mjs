@@ -24,7 +24,7 @@ export function makeBrief({plan,goal,cta,adaptation,payoff,rawIntent,format,refe
  if(cta&&!safeURL(cta))throw Error('Use an HTTPS destination, or leave it blank.');
  for(const r of references){
   if(format==='M09'){if(!r.review?.review_basis)throw Error('Silent work needs a reviewed visual reference.');}
-  else if(!r.source||!r.opening||r.transcript_conflict||r.review?.spoken_hook_eligible===false)throw Error('This reference lacks eligible spoken source evidence.');
+  else if(!r.source||!r.opening||r.transcript_conflict||r.review?.spoken_hook_eligible===false||['music_or_sample','sample_or_aphorism','fragment'].includes(r.review?.family))throw Error('This reference lacks eligible spoken source evidence.');
   if(!r.snapshot)throw Error('This reference lacks a source snapshot.');
  }
  return {version:1,idea_source:plan.source_path||`content_plan:${plan.id}`,raw_intent:rawIntent.trim(),format,audience_response:GOALS[goal],adaptation:adaptation.trim(),payoff:payoff.trim(),status:'draft',goal,cta_destination:cta||null,plan_id:plan.id,created_at:new Date().toISOString(),references:references.map(r=>({id:r.id,opening:r.opening,snapshot:r.snapshot,mechanism:r.review?.mechanism||r.analysis?.labels?.mechanism?.value||'manual review required',payoff_evidence:r.review?.payoff_evidence||(r.transcript||'').slice(-500),fit_limit:r.review?.fit_limit||'Transcript classification; delivery and transfer to my audience still require review.',follower_conversion:null,...(format==='M09'?{evidence_type:'visual_review',visual_source:r.review.review_basis}:{})}))};
