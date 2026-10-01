@@ -49,6 +49,7 @@ const today = todayKey();
 const rowsOfWeek = () => ALL.filter(r => weekKey(r) === WEEK);
 
 app.innerHTML = pageHead('', 'Schedule', `<span class="sc-week" id="scWeek"></span><span class="sc-wk-tabs" id="scTabs" role="tablist"></span>`) + `
+  <p><a href="/admin/content/research">Find references for a piece</a> · <a href="/admin/content/intent">What each piece is building toward</a></p>
   <section class="sc-brand" id="scBrand" aria-label="What the personal account is for"></section>
   <section class="sc-streaks" id="scStreaks" aria-label="Posted this week"></section>
   <section class="sc-grid" id="scGrid" aria-label="Posting schedule"><div class="shimmer" style="height:320px;grid-column:1/-1"></div></section>`;

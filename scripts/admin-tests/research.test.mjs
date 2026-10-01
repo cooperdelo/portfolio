@@ -1,0 +1,10 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import {makeBrief,searchReferences,summarizeReferences,safeURL} from '../../admin/_shell/research-model.mjs';
+const ref={id:'real',creator:'creator',opening:'A real opening.',transcript:'A real opening. An earned ending.',source:'raw/source.json',snapshot:{as_of:'2026-09-21',views:100,plays:500},analysis:{labels:{topic:{value:'mindset'},mechanism:{value:'recognition'}}}};
+const input={plan:{id:7,lane:'personal',source_path:'real.md'},goal:'opportunity',cta:'https://cooperdelo.com/work-with-me',adaptation:'Use the unanswered choice, in my scene.',payoff:'Show the actual decision.',rawIntent:'My supplied experience.',format:'M01',references:[ref]};
+test('brief preserves source evidence without approving a plan',()=>{const b=makeBrief(input);assert.equal(b.status,'draft');assert.deepEqual(b.references[0].snapshot,ref.snapshot);assert.equal(b.references[0].follower_conversion,null);assert.equal(b.raw_intent,input.rawIntent);assert.equal(b.answer,undefined);});
+test('silent work cannot pass on transcript tags alone',()=>assert.throws(()=>makeBrief({...input,format:'M09'}),/visual/));
+test('invalid destinations fail; account and product purpose stay distinct',()=>{assert.throws(()=>makeBrief({...input,cta:'javascript:alert(1)'}));assert.equal(makeBrief({...input,goal:'plugverse'}).goal,'plugverse');assert.equal(safeURL('data:text/html,x'),'');});
+test('conflicted speech cannot become a spoken reference',()=>assert.throws(()=>makeBrief({...input,references:[{...ref,transcript_conflict:true}]}),/eligible/));
+test('comparison deduplicates speech and keeps views separate from plays',()=>{assert.equal(summarizeReferences([ref,{...ref,id:'repeat'}])[0].n,1);assert.equal(summarizeReferences([ref],'plays')[0].median,500);assert.equal(summarizeReferences([{...ref,snapshot:{views:999}}]).length,0);});
+test('search consumes the analysis labels',()=>assert.equal(searchReferences([ref],{topic:'mindset',mechanism:'recognition'}).length,1));
