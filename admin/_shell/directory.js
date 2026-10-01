@@ -50,4 +50,3 @@ export const DIRECTORY = [
     { href: '/admin/integrations/',             label: 'Integrations', ic: 'plug', roles: ['full'] },
   ]},
 ];
-
