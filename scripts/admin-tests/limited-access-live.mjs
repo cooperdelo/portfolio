@@ -1,6 +1,7 @@
 ﻿// Real disposable Auth identity. No messages, invitations or provider syncs.
 import fs from 'node:fs';
 import crypto from 'node:crypto';
+import path from 'node:path';
 import assert from 'node:assert/strict';
 import acquisition from '../../api/acquisition.mjs';
 import money from '../../api/money-overview.mjs';
@@ -18,12 +19,25 @@ process.env.SUPABASE_ADMIN_SERVICE_ROLE_KEY=key;
 const email='codex-access-audit-'+crypto.randomUUID()+'@example.invalid';
 const password=crypto.randomBytes(32).toString('base64url');
 let user,token;
+const deployment=process.env.ADMIN_TEST_DEPLOYMENT;
+let bypass;
+if(deployment){
+ assert.equal(deployment,'https://portfolio-git-admin-unified-preview-cooper-delos-projects.vercel.app');
+ const cli=JSON.parse(fs.readFileSync(path.join(process.env.APPDATA,'com.vercel.cli/Data/auth.json'),'utf8'));
+ const response=await fetch('https://api.vercel.com/v9/projects/prj_67rsUcnpXKDfzK31pgacI3UM0NzA?teamId=team_iHBwC5FxqaLUwd4cO7Bz8x4W',{headers:{Authorization:'Bearer '+cli.token},signal:AbortSignal.timeout(20000)});
+ assert(response.ok);bypass=Object.keys((await response.json()).protectionBypass||{})[0];assert(bypass);
+}
 async function call(route,method='GET',body,jwt=key){
  const r=await fetch(base+route,{method,headers:{apikey:key,Authorization:'Bearer '+jwt,'Content-Type':'application/json'},body:body?JSON.stringify(body):undefined,signal:AbortSignal.timeout(20000)});
  const text=await r.text();return {status:r.status,data:text?JSON.parse(text):null};
 }
 async function invoke(handler,method='GET'){
  let status,data;
+ if(deployment){
+  const route=new Map([[acquisition,'acquisition'],[money,'money-overview'],[band,'band-review'],[source,'band-media-source'],[ig,'instagram-auth-start'],[tt,'tiktok-auth-start'],[investments,'investments-sync'],[kpi,'plugverse-kpi'],[igSync,'instagram-sync'],[ttSync,'tiktok-sync']]).get(handler);
+  const response=await fetch(deployment+'/api/'+route,{method,headers:{Authorization:'Bearer '+token,'x-vercel-protection-bypass':bypass},signal:AbortSignal.timeout(20000)});
+  return {status:response.status,data:await response.json()};
+ }
  await handler({method,headers:{authorization:'Bearer '+token},query:{},body:{}},{setHeader(){},status(s){status=s;return this;},json(d){data=d;return this;},send(d){data=d;return this;},end(){}});
  return {status,data};
 }
