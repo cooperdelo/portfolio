@@ -27,4 +27,3 @@ end $$;
 reset role;
 select 'PASS: limited role reads no private table rows; all accessible views use caller RLS; guarded mutations denied; fixture rolled back' result;
 rollback;
-

@@ -1,3 +1,4 @@
+import {verifyOAuthOwner,clearOAuthCookie} from './_lib/oauth-state.mjs';
 // =====================================================================
 // /api/instagram-oauth.mjs
 // Handles Meta's OAuth callback for the Instagram API (Instagram Login).
@@ -129,6 +130,8 @@ async function logRun(status, note) {
 // ---- Handler ----
 
 export default async function handler(req, res) {
+  if(req.method!=='GET'||!(await verifyOAuthOwner(req,'ig'))){res.setHeader('Content-Type','text/html; charset=utf-8');return res.status(403).send(pageError('Link expired','Start again from your signed-in Integrations page.'));}
+  res.setHeader('Set-Cookie',clearOAuthCookie('ig'));
   res.setHeader('Cache-Control', 'no-store');
 
   // Surface Meta-reported errors (user denied permission, etc.)
@@ -137,15 +140,8 @@ export default async function handler(req, res) {
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     return res.status(400).send(pageError(
       'Authorization cancelled',
-      `Instagram returned: ${String(errReason)} — ${String(req.query.error_description || '').replace(/</g,'&lt;')}`
+      'The account connection was cancelled. You can try again from Integrations.'
     ));
-  }
-
-  // CSRF: when the flow started at /api/instagram-auth-start, the state must match its cookie.
-  const cookieState = /(?:^|;\s*)ig_oauth_state=([^;]+)/.exec(req.headers.cookie || '')?.[1];
-  if (cookieState && req.query.state !== cookieState) {
-    res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    return res.status(400).send(pageError('Link expired', 'Press Connect Instagram again on the Integrations page.'));
   }
 
   const code = req.query.code;
@@ -193,12 +189,11 @@ export default async function handler(req, res) {
     // per-post pull within 10 minutes, ig_token_refresh() keeps the token alive.
     await logRun('ok', `Connected @${username || igUserId}. Token stored server-side, expires ${expiresAt.slice(0, 10)}, auto-refresh on.`).catch(() => {});
 
-    res.setHeader('Set-Cookie', 'ig_oauth_state=; Path=/api; Max-Age=0; HttpOnly; Secure; SameSite=Lax');
     res.statusCode = 302;
     res.setHeader('Location', `/admin/integrations/?connected=instagram&handle=${encodeURIComponent(username || '')}`);
     return res.end();
   } catch (e) {
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    return res.status(500).send(pageError('Token exchange failed', String(e?.message || e).replace(/</g,'&lt;')));
+    return res.status(500).send(pageError('Token exchange failed', 'The provider did not finish the connection. Try again from Integrations.'));
   }
 }

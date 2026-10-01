@@ -1,3 +1,4 @@
+import {verifyOAuthOwner,clearOAuthCookie} from './_lib/oauth-state.mjs';
 // =====================================================================
 // /api/tiktok-oauth.mjs
 // Handles TikTok's OAuth callback for the Login Kit / Display API.
@@ -100,6 +101,8 @@ async function upsertCredentials(row) {
 }
 
 export default async function handler(req, res) {
+  if(req.method!=='GET'||!(await verifyOAuthOwner(req,'tt'))){res.setHeader('Content-Type','text/html; charset=utf-8');return res.status(403).send(pageError('Link expired','Start again from your signed-in Integrations page.'));}
+  res.setHeader('Set-Cookie',clearOAuthCookie('tt'));
   res.setHeader('Cache-Control', 'no-store');
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
 
@@ -107,7 +110,7 @@ export default async function handler(req, res) {
   if (errReason) {
     return res.status(400).send(pageError(
       'Authorization cancelled',
-      `TikTok returned: ${String(errReason)} — ${String(req.query.error_description || '').replace(/</g, '&lt;')}`
+      'The account connection was cancelled. You can try again from Integrations.'
     ));
   }
 
@@ -146,6 +149,6 @@ export default async function handler(req, res) {
 
     return res.status(200).send(pageSuccess(user.display_name, tok.open_id));
   } catch (e) {
-    return res.status(500).send(pageError('Token exchange failed', String(e?.message || e).replace(/</g, '&lt;')));
+    return res.status(500).send(pageError('Token exchange failed', 'The provider did not finish the connection. Try again from Integrations.'));
   }
 }

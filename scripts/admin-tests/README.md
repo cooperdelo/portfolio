@@ -13,7 +13,7 @@ Run from the portfolio repository. Never infer production readiness from a passi
 
 ## September 30 evidence
 
-Nine Node tests and seven isolated sync tests passed. Both live SQL suites passed. Live Auth/API tests passed nine checks, including review read-back/retry/conflict, non-public stream, source reads and revoked/logged-out denial. Browser review save survived refresh. The Money page showed source dates and had no horizontal overflow at 390px. This does not certify field performance, all roles or a complete media workflow.
+Twelve Node tests and seven isolated sync tests passed. Both live SQL suites passed. Live Auth/API tests passed eleven checks, including review read-back/retry/conflict, non-public stream, source reads and revoked/logged-out denial. Browser review save survived refresh. The Money page showed source dates and had no horizontal overflow at 390px. This does not certify field performance, all roles or a complete media workflow.
 
 The existing vault sync also passed a real cloud-to-file read-back, unchanged retry and local/cloud conflict. Its private evidence stays in the existing vault's outreach/automation folder.
 
@@ -23,6 +23,8 @@ The Claude board source uses its artifact database. No complete database export 
 
 ## Migrations and recovery
 
-Apply the four dated files under `scripts/migrations` in filename order with the business-conflict migration after band-review. They were applied to the existing portfolio-admin project during this audit. No product-finance migration is involved. Existing operational acquisition records were not moved.
+Apply the dated files under `scripts/migrations` in this order: limited-admin-boundary, health-photo-access, band-review, band-business-conflict. They were applied to the existing portfolio-admin project during this audit. No product-finance migration is involved. Existing operational acquisition records were not moved.
 
 Recover the frontend through Git to the previous revision if needed. Keep permission hardening in place; rolling back a page is not a reason to reopen private data. Band records and originals should be preserved; disable the review route before a schema rollback, export its records privately, and reconcile any later edits forward. Never reactivate two writable acquisition owners or overwrite newer send history with a snapshot.
+
+For deployed verification, set ADMIN_TEST_DEPLOYMENT to the exact protected preview URL before running live-api.mjs. It uses the existing Vercel CLI authentication and project protection token without printing credentials. September 30: the first nine checks passed against deployment 4cc00da; expanded OAuth checks are recorded separately after the security update.

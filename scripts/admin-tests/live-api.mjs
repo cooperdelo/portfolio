@@ -2,10 +2,12 @@
 // fixtures, removes them in finally, and never sends email or touches originals.
 import fs from 'node:fs';
 import crypto from 'node:crypto';
+import path from 'node:path';
 import assert from 'node:assert/strict';
 import band from '../../api/band-review.mjs';
 import outcomes from '../../api/acquisition-results.mjs';
 import money from '../../api/money-overview.mjs';
+import {createOAuthState,verifyOAuthOwner} from '../../api/_lib/oauth-state.mjs';
 const networkFetch=globalThis.fetch;
 globalThis.fetch=(url,options={})=>networkFetch(url,{signal:AbortSignal.timeout(20000),...options});
 const env=p=>Object.fromEntries(fs.readFileSync(p,'utf8').split(/\r?\n/).map(s=>/^([A-Z0-9_]+)\s*=\s*(.*?)\s*$/.exec(s)).filter(Boolean).map(m=>[m[1],m[2].replace(/^['"]|['"]$/g,'')]));
@@ -21,7 +23,21 @@ async function call(path,method='GET',body){const r=await fetch(base+path,{metho
 const email='codex-media-audit-'+crypto.randomUUID()+'@example.invalid',password=crypto.randomBytes(32).toString('base64url');
 let user,asset,token;
 const proof=[];
-async function invoke(handler,method='GET',body,query={},jwt=token){let status;let data;const headers={};await handler({method,body,query,headers:{authorization:jwt?'Bearer '+jwt:''}},{setHeader(k,v){headers[k]=v;},status(s){status=s;return this;},json(d){data=d;return this;}});console.log('API check:',handler===band?'band':'outcomes',method,status);return{status,data,headers};}
+const deployment=process.env.ADMIN_TEST_DEPLOYMENT;
+let bypass;
+if(deployment){
+ assert.equal(deployment,'https://portfolio-git-admin-unified-preview-cooper-delos-projects.vercel.app');
+ const cli=JSON.parse(fs.readFileSync(path.join(process.env.APPDATA,'com.vercel.cli/Data/auth.json'),'utf8'));
+ const p=await fetch('https://api.vercel.com/v9/projects/prj_67rsUcnpXKDfzK31pgacI3UM0NzA?teamId=team_iHBwC5FxqaLUwd4cO7Bz8x4W',{headers:{Authorization:'Bearer '+cli.token}});assert(p.ok);
+ const project=await p.json();bypass=Object.keys(project.protectionBypass||{})[0];assert(bypass);
+}
+async function invoke(handler,method='GET',body,query={},jwt=token){
+ let status,data;const headers={};const route=handler===band?'band-review':handler===money?'money-overview':'acquisition-results';
+ if(deployment){
+  const r=await fetch(deployment+'/api/'+route+'?'+new URLSearchParams(query),{method,headers:{Authorization:jwt?'Bearer '+jwt:'','x-vercel-protection-bypass':bypass,'Content-Type':'application/json'},body:body?JSON.stringify(body):undefined});status=r.status;data=await r.json();
+ }else await handler({method,body,query,headers:{authorization:jwt?'Bearer '+jwt:''}},{setHeader(k,v){headers[k]=v;},status(s){status=s;return this;},json(d){data=d;return this;}});
+ console.log('API check:',route,method,status);return{status,data,headers};
+}
 try{
  user=await call('/auth/v1/admin/users','POST',{email,password,email_confirm:true,user_metadata:{purpose:'disposable admin integration audit'}});
  await call('/rest/v1/admin_allowlist','POST',{email,admin_role:'full'}).catch(e=>{if(!/failed/.test(e.message))throw e;throw e;});
@@ -38,10 +54,11 @@ try{
  const bytes=await fetch(stream.data.url,{headers:{Range:'bytes=0-31'}});assert([200,206].includes(bytes.status));assert((await bytes.arrayBuffer()).byteLength>0);proof.push('authenticated signed video streams');
  const publicAttempt=await fetch(base+'/storage/v1/object/public/band-review/'+video.proxy_path);assert(!publicAttempt.ok);proof.push('video not publicly downloadable');
  const product=await invoke(outcomes);assert.equal(product.status,200);assert(Array.isArray(product.data.rows));proof.push('live product signup aggregation');
- const finances=await invoke(money);assert.equal(finances.status,200);assert(finances.data.bank.every(x=>x.as_of));assert(finances.data.confirmation?.content.includes('6,851.23'));proof.push('live money sources and dated owner confirmation');
+ const finances=await invoke(money);assert.equal(finances.status,200);assert(finances.data.bank.every(x=>x.as_of));assert(finances.data.confirmation?.content.includes('6,851.23'));assert(finances.data.personal.some(x=>x.account==='wells_fargo_checking'&&Number(x.balance)===6851.23&&x.source==='cooper_reported'));proof.push('live money sources and canonical dated owner confirmation');
+ const state=createOAuthState('ig',user.id);const oauthReq={headers:{cookie:state.cookie.split(';')[0]},query:{state:state.state}};assert.equal(await verifyOAuthOwner(oauthReq,'ig'),true);proof.push('OAuth callback verifies current full owner');
  console.log(JSON.stringify({product_observed_at:product.data.observed_at,product_groups:product.data.rows.length,artist_accounts:product.data.rows.reduce((n,r)=>n+r.accounts,0)},null,2));
  await call('/rest/v1/admin_allowlist?email=eq.'+encodeURIComponent(email),'DELETE');
- const revoked=await invoke(band);assert.equal(revoked.status,403);proof.push('access revocation takes effect immediately');
+ const revoked=await invoke(band);assert.equal(revoked.status,403);proof.push('access revocation takes effect immediately');assert.equal(await verifyOAuthOwner(oauthReq,'ig'),false);proof.push('OAuth state stops working after owner revocation');
  const loggedOut=await invoke(band,'GET',undefined,{},null);assert.equal(loggedOut.status,401);proof.push('logged-out denied');
  console.log(JSON.stringify({passed:proof},null,2));
 }catch(error){console.error('Integration assertion:',error.message);throw error;}finally{
@@ -50,4 +67,3 @@ try{
  if(user?.id)await call('/auth/v1/admin/users/'+user.id,'DELETE');
  console.log('Disposable audit identities and records removed.');
 }
-
