@@ -113,9 +113,10 @@ function tabbarHTML(activePath, role) {
 
 function normalizePath(p) {
   if (!p) return '';
-  let n = p.replace(/index\.html$/, '');
+  const url = new URL(p, location.origin);
+  let n = url.pathname.replace(/index\.html$/, '');
   if (!n.endsWith('/') && !n.endsWith('.html')) n += '/';
-  return n.toLowerCase();
+  return n.toLowerCase() + (url.searchParams.has('view') ? '?view=' + url.searchParams.get('view') : '');
 }
 
 /**
@@ -277,7 +278,7 @@ export async function mountShell({ title, demo = false } = {}) {
 
   const wrap = document.createElement('div');
   wrap.className = 'admin-app';
-  wrap.innerHTML = railHTML(location.pathname, email, role) + '<div class="main" id="top"></div>';
+  wrap.innerHTML = railHTML(location.pathname + location.search, email, role) + '<div class="main" id="top"></div>';
   document.body.prepend(wrap);
 
   const mainSlot = wrap.querySelector('.main');
@@ -312,7 +313,7 @@ export async function mountShell({ title, demo = false } = {}) {
   addEventListener('keydown', (e) => { if (e.key === 'Escape' && railEl.classList.contains('menu-open')) setMenu(false); });
 
   // 4c) Mobile bottom tab pill; "More" slides the full menu up as a glass sheet
-  const tabbar = el(tabbarHTML(location.pathname, role));
+  const tabbar = el(tabbarHTML(location.pathname + location.search, role));
   document.body.appendChild(tabbar);
   tabMenu = tabbar.querySelector('[data-tabmenu]');
   tabMenu?.setAttribute('aria-expanded', 'false');

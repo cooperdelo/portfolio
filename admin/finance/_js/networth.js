@@ -20,7 +20,7 @@ const SNAPSHOT = '2026-07-24';
 const data = {
   liquid: [
     // [0] filled live from Investments; [1] checking lives nowhere else.
-    { name: 'Investments, Roth · brokerage · crypto · cash', meta: 'live from the Investments page', cls: 'personal', value: 7661, include: true, locked: true },
+    { name: 'Investments, Roth · brokerage · crypto · cash', meta: 'live from the Investments page', cls: 'personal', value: null, include: true, locked: true },
     { name: 'Personal checking', meta: 'Wells Fargo + Truist, not tracked elsewhere; get current number', cls: 'personal', value: null, include: true },
   ],
   phys: [
@@ -58,7 +58,7 @@ const data = {
     { name: 'Tax reserve owed', meta: '~25–30% of band 1099 + $20K prize, set aside', cls: 'flag', value: null, include: true },
   ],
   biz: [
-    { name: 'Luby Pitch prize (historical award)', meta: 'Cooper confirmed Sep 30: remaining award cash is already in Mercury. Excluded to prevent double counting.', cls: 'flag', value: 20000, include: false, locked: true },
+    { name: 'Luby Pitch prize (historical award)', meta: 'Cooper confirmed Sep 30: remaining award cash is already in Mercury. Excluded to prevent double counting.', cls: 'flag', value: 20000, include: false, locked: true, historical: true },
     { name: 'Mercury business checking', meta: 'Awaiting bank snapshot; not zero', cls: 'plugverse', value: null, include: true },
     { name: 'Mercury savings', meta: 'Awaiting bank snapshot; not zero', cls: 'plugverse', value: null, include: true },
     { name: 'PlugVerse LLC equity', meta: 'book ~$0, speculative upside', cls: 'plugverse', value: 0, include: true },
@@ -80,7 +80,7 @@ async function syncLiquidFromInvestments() {
     let total = 0;
     (posRes.data || []).forEach(r => { total += Number(r.shares || 0) * Number(r.current_price || 0); });
     (acctRes.data || []).forEach(a => { total += Number(a.cash_balance || 0); });
-    if (total > 0) {
+    if (Number.isFinite(total)) {
       data.liquid[0].value = Math.round(total);
       data.liquid[0].meta = 'Investments page · live';
     }
@@ -89,11 +89,11 @@ async function syncLiquidFromInvestments() {
 
 function rowHTML(r, key, i) {
   const c = []; if (r.value === null) c.push('tbd'); if (!r.include) c.push('off');
-  const valueCell = r.locked
+  const valueCell = r.historical ? `<span class="locked-val">${fmt(r.value)}</span> <span class="synced-tag">historical ? excluded</span>` : r.locked
     ? `<span class="locked-val">${r.value === null ? '–' : fmt(r.value)}</span> <a class="synced-tag" href="/admin/finance/investments.html">synced ↗</a>`
     : `<input type="number" step="1" data-k="${key}" data-i="${i}" value="${r.value === null ? '' : r.value}" placeholder="TBD">`;
   return `<tr class="${c.join(' ')}">
-    <td class="chk"><input type="checkbox" data-k="${key}" data-i="${i}" ${r.include ? 'checked' : ''}></td>
+    <td class="chk"><input type="checkbox" data-k="${key}" data-i="${i}" ${r.include ? 'checked' : ''} ${r.historical ? 'disabled' : ''}></td>
     <td><span class="desc">${r.name}</span>${r.meta ? `<span class="meta">${r.meta}</span>` : ''}</td>
     <td><span class="pill ${r.cls}">${clsLabel[r.cls]}</span></td>
     <td class="right">${valueCell}</td>
@@ -108,7 +108,7 @@ function renderAll() {
   recompute();
 }
 
-const sum = (k) => data[k].reduce((s, r) => s + (r.include && typeof r.value === 'number' && !isNaN(r.value) ? r.value : 0), 0);
+const sum = (k) => data[k].reduce((s, r) => s + (!r.historical && r.include && typeof r.value === 'number' && !isNaN(r.value) ? r.value : 0), 0);
 
 function recompute() {
   const liq = sum('liquid'), phys = sum('phys'), liab = sum('liab'), biz = sum('biz');
@@ -121,7 +121,7 @@ function recompute() {
 
 document.addEventListener('input', (e) => {
   const k = e.target.dataset.k, i = e.target.dataset.i;
-  if (k === undefined) return;
+  if (k === undefined || i === undefined || !data[k]?.[i] || data[k][i].historical) return;
   const row = e.target.closest('tr');
   if (e.target.type === 'checkbox') { data[k][i].include = e.target.checked; row.classList.toggle('off', !e.target.checked); }
   else { const v = e.target.value === '' ? null : parseFloat(e.target.value); data[k][i].value = v; row.classList.toggle('tbd', v === null); }

@@ -33,3 +33,5 @@ export async function verifyOAuthOwner(req,provider,fetcher=fetch){
   const rows=await role.json();return rows.length===1&&rows[0].admin_role==='full';
  }catch{return false;}
 }
+
+export const escapeHtml=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));

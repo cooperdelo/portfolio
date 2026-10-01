@@ -1,4 +1,4 @@
-import {verifyOAuthOwner,clearOAuthCookie} from './_lib/oauth-state.mjs';
+import {verifyOAuthOwner,clearOAuthCookie,escapeHtml} from './_lib/oauth-state.mjs';
 // =====================================================================
 // /api/instagram-oauth.mjs
 // Handles Meta's OAuth callback for the Instagram API (Instagram Login).
@@ -29,7 +29,7 @@ const REDIRECT_URI = process.env.IG_OAUTH_REDIRECT || `${PUBLIC_URL}/api/instagr
 // ---- HTML renderers (no template engine, just strings) ----
 
 function htmlOk(title, body) {
-  return `<!doctype html><html><head><meta charset="utf-8"/><title>${title}</title>
+  return `<!doctype html><html><head><meta charset="utf-8"/><title>${escapeHtml(title)}</title>
 <style>
 body{margin:0;min-height:100vh;background:#0A0908;color:#F4EFE6;font-family:Geist,sans-serif;display:grid;place-items:center;padding:2rem;}
 .card{max-width:520px;width:100%;padding:2.6rem 2.2rem;border:1px solid rgba(244,239,230,0.14);border-radius:22px;background:rgba(244,239,230,0.03);backdrop-filter:blur(28px);}
@@ -44,18 +44,18 @@ pre{font-family:"Geist Mono",monospace;font-size:0.72rem;padding:0.7rem 0.9rem;b
 function pageSuccess(username, igUserId) {
   return htmlOk('Instagram connected', `
     <div class="eyebrow">Instagram · Connected</div>
-    <h1>Linked to @${username}</h1>
+    <h1>Linked to @${escapeHtml(username)}</h1>
     <p>Long-lived access token stored. Auto-refresh runs before expiry. You can close this tab.</p>
     <p><a href="/admin/">← Back to admin</a></p>
-    <pre>ig_user_id: ${igUserId}</pre>
+    <pre>ig_user_id: ${escapeHtml(igUserId)}</pre>
   `);
 }
 
 function pageError(title, detail) {
   return htmlOk('Instagram connection failed', `
     <div class="eyebrow" style="color:#FF4D2E">Instagram · Failed</div>
-    <h1>${title}</h1>
-    <p>${detail}</p>
+    <h1>${escapeHtml(title)}</h1>
+    <p>${escapeHtml(detail)}</p>
     <p><a href="/admin/">← Back to admin</a></p>
   `);
 }

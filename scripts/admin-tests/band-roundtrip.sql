@@ -23,6 +23,10 @@ do $$ declare a jsonb; b jsonb; n int; begin
   perform public.band_review_save('00000000-0000-4000-8000-000000000088',1,'favorite','invalid range',null,20,10,'00000000-0000-4000-8000-000000000055');
   raise exception 'Invalid range accepted';
  exception when check_violation then null; end;
+ begin
+  perform public.band_review_save('00000000-0000-4000-8000-000000000088',1,'favorite','half range',null,10,null,'00000000-0000-4000-8000-000000000054');
+  raise exception 'Half range accepted';
+ exception when check_violation then null; end;
 end $$;
 reset role;
 select set_config('request.jwt.claims','{"email":"unrelated@example.invalid","role":"authenticated","sub":"00000000-0000-4000-8000-000000000044"}',true);

@@ -1,4 +1,4 @@
-import {verifyOAuthOwner,clearOAuthCookie} from './_lib/oauth-state.mjs';
+import {verifyOAuthOwner,clearOAuthCookie,escapeHtml} from './_lib/oauth-state.mjs';
 // =====================================================================
 // /api/tiktok-oauth.mjs
 // Handles TikTok's OAuth callback for the Login Kit / Display API.
@@ -25,7 +25,7 @@ const PUBLIC_URL   = 'https://www.cooperdelo.com';
 const REDIRECT_URI = process.env.TIKTOK_OAUTH_REDIRECT || `${PUBLIC_URL}/api/tiktok-oauth`;
 
 function htmlOk(title, body) {
-  return `<!doctype html><html><head><meta charset="utf-8"/><title>${title}</title>
+  return `<!doctype html><html><head><meta charset="utf-8"/><title>${escapeHtml(title)}</title>
 <style>
 body{margin:0;min-height:100vh;background:#0A0908;color:#F4EFE6;font-family:Geist,sans-serif;display:grid;place-items:center;padding:2rem;}
 .card{max-width:520px;width:100%;padding:2.6rem 2.2rem;border:1px solid rgba(244,239,230,0.14);border-radius:22px;background:rgba(244,239,230,0.03);backdrop-filter:blur(28px);}
@@ -40,18 +40,18 @@ pre{font-family:"Geist Mono",monospace;font-size:0.72rem;padding:0.7rem 0.9rem;b
 function pageSuccess(username, openId) {
   return htmlOk('TikTok connected', `
     <div class="eyebrow">TikTok · Connected</div>
-    <h1>Linked to @${username || 'tiktok'}</h1>
+    <h1>Linked to @${escapeHtml(username || 'tiktok')}</h1>
     <p>Access + refresh tokens stored. Refresh runs automatically before expiry. You can close this tab.</p>
     <p><a href="/admin/social/">→ Open social dashboard</a></p>
-    <pre>open_id: ${openId}</pre>
+    <pre>open_id: ${escapeHtml(openId)}</pre>
   `);
 }
 
 function pageError(title, detail) {
   return htmlOk('TikTok connection failed', `
     <div class="eyebrow" style="color:#FF4D2E">TikTok · Failed</div>
-    <h1>${title}</h1>
-    <p>${detail}</p>
+    <h1>${escapeHtml(title)}</h1>
+    <p>${escapeHtml(detail)}</p>
     <p><a href="/admin/">← Back to admin</a></p>
   `);
 }

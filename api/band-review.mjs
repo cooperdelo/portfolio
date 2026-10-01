@@ -7,6 +7,7 @@ export default async function handler(req,res){
   if(!auth.ok)return privateResponse(res,auth.status,{error:auth.error});
   const headers={apikey:process.env.SUPABASE_ADMIN_SERVICE_ROLE_KEY,Authorization:req.headers.authorization,'Content-Type':'application/json'};
   const read=async path=>{const r=await fetch(BASE+'/rest/v1/'+path,{headers,signal:AbortSignal.timeout(12000)});if(!r.ok)throw Error('Read failed');return r.json();};
+  const all=async path=>{const rows=[];for(let offset=0;offset<5000;offset+=500){const batch=await read(path+'&limit=500&offset='+offset);rows.push(...batch);if(batch.length<500)return rows;}throw Error('Media collection exceeds safe response size');};
   if(req.method==='GET'){
    if(req.query?.asset){
     if(!uuid(req.query.asset))return privateResponse(res,400,{error:'Invalid media ID'});
@@ -18,7 +19,7 @@ export default async function handler(req,res){
     const signed=await r.json();
     return privateResponse(res,200,{url:BASE+'/storage/v1'+signed.signedURL,expires_at:new Date(Date.now()+900000).toISOString()});
    }
-   const [assets,reviews]=await Promise.all([read('band_media_assets?select=*&retired_at=is.null&order=gig,name&limit=500'),read('band_media_reviews?select=*&reviewer=eq.'+auth.userId+'&limit=500')]);
+   const [assets,reviews]=await Promise.all([all('band_media_assets?select=*&retired_at=is.null&order=gig,name,id'),all('band_media_reviews?select=*&reviewer=eq.'+auth.userId+'&order=asset_id')]);
    return privateResponse(res,200,{assets,reviews,reviewer:auth.userId,access:'owner_only',source:'Google Drive originals; private review previews',observed_at:new Date().toISOString()});
   }
   if(req.method!=='POST')return privateResponse(res,405,{error:'Method not allowed'});
