@@ -461,6 +461,7 @@ if __name__ == "__main__":
     album_markup = runpy.run_path(str(ROOT / 'scripts/build-album-accent.py'))['markup']()
     page = page.replace('{ALBUMS}', album_markup).replace('</head>', '<link rel="stylesheet" href="/css/album-accent.css">\n</head>')
     (ROOT / "index.html").write_text(page, encoding="utf-8")
-    urls = ["/", "/resume", "/plugverse", "/rubber-band", "/privacy", "/terms"] + [f"/work/{w['slug']}" for w in WORK]
+    urls = ["/", "/work-with-me", "/resources/film-plan", "/resume", "/plugverse", "/rubber-band", "/privacy", "/terms"] + [f"/work/{w['slug']}" for w in WORK]
     (ROOT / "sitemap.xml").write_text('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + "".join(f"  <url><loc>https://cooperdelo.com{u}</loc></url>\n" for u in urls) + "</urlset>\n", encoding="utf-8")
+    runpy.run_path(str(ROOT / "scripts/brand-pages.py"))["build"]()
     print("built", len(WORK), "pieces + index + plugverse + sitemap")
