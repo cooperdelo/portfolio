@@ -153,7 +153,7 @@ PROMPTS = [
 
 
 def resources():
-    peek = "".join(f"<li>{h}</li>" for h, _, _ in PROMPTS)
+    sheet = "".join(f"<li><span>{h}</span><i></i><i></i></li>" for h, _, _ in PROMPTS)
     body = f"""  <section class="pg-hero light" aria-labelledby="pg-h">
     <p class="label">Resources</p>
     <h1 id="pg-h" data-hero><span class="line"><span>Take what</span></span><span class="line"><span>helps.</span></span></h1>
@@ -162,14 +162,27 @@ def resources():
   <section class="shelf light" aria-label="Resources">
     <article class="res" data-rv>
       <div class="top label"><span class="state live">Ready, free</span><span>No email needed</span></div>
-      <div class="plate"><ol class="peek" aria-label="What the planner asks">{peek}</ol></div>
+      <div class="plate desk">
+        <div class="sheet" aria-label="What the planner asks">
+          <p class="sheet-h">My film plan</p>
+          <ol>{sheet}</ol>
+          <p class="sheet-foot label">cooperdelo.com/resources/film-plan</p>
+        </div>
+        <figure class="taped"><img src="/img/p-launch-film-640.webp" width="640" height="360" alt="A still from the PlugVerse launch film" loading="lazy" decoding="async" /><figcaption>PlugVerse launch film</figcaption></figure>
+      </div>
       <h2>Film planner</h2>
       <p>The questions I answer before I shoot anything. Fill them in, it saves in your browser, and you can download or print the plan when you're done.</p>
       <div class="acts"><a class="pill" href="/resources/film-plan">Open the planner {ARROW}</a></div>
     </article>
     <article class="res" data-rv>
       <div class="top label"><span class="state">In progress</span><span>Not ready yet</span></div>
-      <div class="plate"><video src="/videos/work/bioswap-final.mp4" poster="/videos/work/bioswap-final.jpg" muted loop playsinline autoplay preload="none" aria-label="Bioswap, loop"></video></div>
+      <div class="plate anatomy">
+        <picture><source type="image/webp" srcset="/img/resources/motion-anatomy-720.webp 720w, /img/resources/motion-anatomy-1200.webp 1200w" sizes="(max-width: 900px) 92vw, 46vw" /><img src="/img/resources/motion-anatomy-720.webp" width="720" height="720" alt="A frame from Bioswap: a glass music card floating over a blurred band page" loading="lazy" decoding="async" /></picture>
+        <span class="pin r" style="--x:96%;--y:80%"><b>Glass card</b>blur, lit top edge, soft inner shadow</span>
+        <span class="pin r" style="--x:96%;--y:5%"><b>Depth</b>the page stays behind it, out of focus</span>
+        <span class="pin" style="--x:4%;--y:5%"><b>One camera</b>the whole scene moves, never a cut</span>
+        <span class="wip label">What I'm pulling out</span>
+      </div>
       <h2>Motion starter</h2>
       <p>The camera rig, the glass cards and the spring timings from Bioswap, pulled out so you can drop them into your own Remotion project. I'm still building it, so there's nothing to download yet.</p>
       <div class="acts"><a class="pill" href="mailto:cooper@plugverse.app?subject=Motion%20starter">Email me when it's ready</a><a class="pill" href="/#motion">How Bioswap moves</a></div>

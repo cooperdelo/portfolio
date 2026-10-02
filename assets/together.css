@@ -106,3 +106,25 @@
   .planner form { grid-column: 1 / -1; }
   .field textarea { border-bottom: 1px solid #999; min-height: 0; }
 }
+
+/* ---------- resource previews: show what's actually inside ---------- */
+.res .plate { aspect-ratio: 5 / 4; }
+.res .plate.desk { background: radial-gradient(120% 90% at 30% 20%, #2a241d 0%, var(--ink) 70%); display: grid; place-items: center; overflow: hidden; }
+.sheet { position: relative; width: 62%; aspect-ratio: 8.5 / 11; background: #F6F2E9; color: var(--ink); padding: 5.5% 6% 4%; transform: rotate(-2.2deg) translateX(-12%); box-shadow: 0 1px 0 rgba(255,255,255,.6) inset, 0 2px 3px rgba(0,0,0,.35), 0 18px 40px -12px rgba(0,0,0,.65), 0 40px 70px -30px rgba(0,0,0,.6); display: flex; flex-direction: column; }
+.sheet::after { content: ""; position: absolute; inset: 0; background: linear-gradient(115deg, rgba(255,255,255,.18), transparent 40%, rgba(0,0,0,.05)); pointer-events: none; }
+.sheet-h { font-family: var(--display); text-transform: uppercase; font-size: clamp(11px, 1.35vw, 19px); line-height: .9; letter-spacing: -.01em; padding-bottom: 6%; border-bottom: 1.5px solid var(--ink); }
+.sheet ol { list-style: none; counter-reset: s; flex: 1; display: flex; flex-direction: column; justify-content: space-between; padding-top: 4%; }
+.sheet li { counter-increment: s; font-size: clamp(6.5px, .62vw, 9.5px); font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
+.sheet li span::before { content: "0" counter(s) "  "; opacity: .5; }
+.sheet li i { display: block; height: 0; border-bottom: 1px solid rgba(22, 19, 15, .16); margin-top: 1.05em; }
+.sheet-foot { font-size: clamp(5.5px, .5vw, 8px) !important; opacity: .45; margin-top: 4%; }
+.taped { position: absolute; right: 7%; top: 13%; width: 38%; margin: 0; background: #F6F2E9; padding: 2.4% 2.4% 0; transform: rotate(4deg); box-shadow: 0 2px 3px rgba(0,0,0,.3), 0 20px 40px -14px rgba(0,0,0,.7); }
+.taped img { position: static !important; width: 100%; height: auto !important; aspect-ratio: 16 / 9; object-fit: cover; filter: var(--film); }
+.taped figcaption { font-size: clamp(7px, .62vw, 10px); color: var(--ink); opacity: .6; padding: 6% 0 7%; }
+.taped::before { content: ""; position: absolute; left: 50%; top: -7%; width: 34%; height: 14%; transform: translateX(-50%) rotate(-3deg); background: rgba(236, 229, 216, .62); box-shadow: 0 1px 2px rgba(0,0,0,.12); backdrop-filter: blur(1px); }
+.res .plate.anatomy img { filter: none; }
+.pin { position: absolute; left: var(--x); top: var(--y); max-width: 34%; font-size: clamp(10px, .82vw, 13px); line-height: 1.35; color: rgba(244, 240, 231, .78); padding: 8px 10px 9px; background: rgba(12, 11, 10, .62); border: 1px solid rgba(244, 240, 231, .16); border-radius: 10px; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+.pin.r { left: auto; right: calc(100% - var(--x)); }
+.pin b { display: block; color: var(--bone); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; margin-bottom: 2px; }
+.res .plate .wip { position: absolute; left: 14px; bottom: 12px; opacity: .7; }
+@media (max-width: 560px) { .pin { max-width: 46%; font-size: 0; padding: 5px 8px; } .pin b { font-size: 9px; margin: 0; } .sheet { width: 64%; } }
