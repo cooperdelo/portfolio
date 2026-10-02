@@ -8,6 +8,7 @@ const STATUSES=['new','approved','contacted','replied','signed_up','rejected'];
 const LEAD_TEXT=['notes','ruling','owner','finder_note','draft_text'];
 const TAGS=['Setup was confusing',"Doesn't see the point yet",'Already has a system','Wants a feature','Worried about cost',"Worried it's a scam",'Likes the booking link','Will put the link in bio','Got a request through it','Booked through it','Wants a call'];
 const NAMES={'delocooper6@gmail.com':'Cooper'};
+const SENT=['contacted','replied','signed_up'];
 
 function rest(key){
   const h={apikey:key,Authorization:`Bearer ${key}`,'Content-Type':'application/json'};
@@ -32,7 +33,12 @@ export function shapeLead(row){
 export function planLeadChange(lead,patch,actor){
   const now=new Date().toISOString(),data={...(lead.data||{})},cols={};
   let kind='edit',detail='';
+  const draftBefore=String(lead.data?.draft_text??'');
   for(const k of LEAD_TEXT)if(k in patch){data[k]=clip(patch[k],k==='draft_text'?2000:3000);if(k==='owner')cols.owner=data.owner;}
+  // An approval covers the exact words approved. Editing them afterwards needs a fresh approval.
+  const reworded='draft_text' in patch&&data.draft_text!==draftBefore;
+  if(reworded&&lead.draft_verdict==='approved'&&patch.draft_verdict!=='approved'){cols.draft_verdict=null;if(lead.status==='approved')cols.status='new';kind='edit';detail='message changed after approval';}
+  if('followup_sent_at' in patch){data.followup_sent_at=now;data.followup_by=actor.email;kind='followup';}
   if('finder_verdict' in patch){
     const v=patch.finder_verdict;if(v!==null&&!['right','wrong'].includes(v))throw Object.assign(Error('Unknown finder verdict'),{status:400});
     if(v!==lead.finder_verdict){cols.finder_verdict=v;data.finder_verdict_by=actor.email;data.finder_verdict_at=now;kind=v?'finder_'+v:'edit';detail=clip(patch.finder_note,200);}
@@ -44,8 +50,11 @@ export function planLeadChange(lead,patch,actor){
   }
   if('status' in patch){
     const s=patch.status;if(!STATUSES.includes(s))throw Object.assign(Error('Unknown status'),{status:400});
-    if(s==='contacted'&&lead.draft_verdict!=='approved'&&cols.draft_verdict!=='approved'&&actor.role!=='full')throw Object.assign(Error('Only approved drafts can be sent'),{status:403});
-    if(s!==lead.status){cols.status=s;if(['contacted','replied','signed_up'].includes(s)){kind=s==='contacted'?'sent':s;if(s==='contacted'){data.sent_by=actor.email;data.sent_at=now;}}}
+    if(s==='contacted'&&SENT.includes(lead.status))throw Object.assign(Error('Already marked sent'),{status:409});
+    const approvedNow=cols.draft_verdict==='approved'||(lead.draft_verdict==='approved'&&!('draft_verdict' in cols));
+    if(s==='contacted'&&!approvedNow&&actor.role!=='full')throw Object.assign(Error('Only approved drafts can be sent'),{status:403});
+    if(s!==lead.status){cols.status=s;if(['contacted','replied','signed_up'].includes(s)){kind=s==='contacted'?'sent':s;if(s==='contacted'){data.sent_by=actor.email;data.sent_at=now;data.sent_text=data.draft_text||'';}
+        if(s==='replied')data.reply_at=now;}}
   }
   return {update:{...cols,data,updated_at:now,updated_by:actor.email},activity:{at:now,by_email:actor.email,by_name:actor.name,kind,handle:lead.handle,detail}};
 }

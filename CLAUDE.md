@@ -21,7 +21,7 @@ Static HTML portfolio site (Vercel-hosted at cooperdelo.com) plus a private admi
   more/
     index.html                   ← "More tools": full route directory filtered by role (from _shell/directory.js)
   acquisition/
-    index.html                   ← PlugVerse sending queue + experiment results (_js/acquisition.js → /api/acquisition, /api/acquisition-results)
+    index.html                   ← Acquisition board: sending queue, prospects, replies & follow-ups, results (_js/acquisition.js → /api/acquisition, /api/acquisition-results). `?demo` on localhost loads invented data from _js/acquisition-demo.js
   assets/
     index.html                   ← Band media review (_js/band-media.js → /api/band-review), full role only
   _shell/
@@ -61,7 +61,7 @@ Static HTML portfolio site (Vercel-hosted at cooperdelo.com) plus a private admi
   tiktok-sync.mjs                ← Pulls TikTok user info + videos with auto-refresh → social_* tables
   investments-sync.mjs           ← Pulls quotes from Yahoo Finance (stocks) + Coinbase spot (crypto, keyless) → updates investment_positions
   money-overview.mjs             ← Read-only Money payload (bank balances, recent txns; personal snapshots + reconciliation doc for full only)
-  acquisition.mjs                ← Acquisition board connection status. Fails closed (not_connected, writes rejected) until the owner is connected
+  acquisition.mjs                ← Acquisition board on the acq_* tables (GET board, POST lead.update / lead.add / conversation.add). Answers not_connected and rejects writes (409 OWNER_NOT_CONNECTED) while the tables are absent
   acquisition-results.mjs        ← 30-day artist signup outcomes by signup_utm, read from PlugVerse `users`
   band-review.mjs                ← Band media list, signed preview URLs from `band-review` bucket, review saves via band_review_save()
   band-media-source.mjs          ← Returns the confirmed Rubber Band Drive folder URL from vault_documents
@@ -197,6 +197,7 @@ WHERE slug = 'luby_pitch';
 | `plugverse_contacts` | ALL | ALL | none | Plugverse pipeline |
 | `playbook_items` | ALL | ALL filtered by `scope IN ('plugverse','both')` | none | Personal-brand items hidden |
 | `band_media_assets`, `band_media_reviews`, `band_media_operations` | SELECT (writes via `band_review_save`) | none | none | Full-only band media review |
+| `acq_leads`, `acq_conversations`, `acq_activity`, `acq_reference` | ALL | none | via `/api/acquisition` only | Acquisition board (migration `20261002-acquisition-board.sql`, not applied yet) |
 | Any other `public` table, `storage.objects` | per table | per table | none | `limited_role_boundary` denies acquisition everywhere |
 
 The acquisition role's only data path is the two role-checked API routes `/api/acquisition` and `/api/acquisition-results`.
@@ -224,8 +225,18 @@ They sign in via `/admin/login.html` with their email + the shared password. The
 - `/api/investments-sync.mjs` — requires `admin_role = 'full'`. Verifies via PostgREST `admin_allowlist?email=eq...` using the caller's JWT (works because of the self-read policy).
 - Newer routes use `authorize(req, roles)` from `api/_lib/admin-auth.mjs` (verifies the JWT at `/auth/v1/user`, then reads the role with `SUPABASE_ADMIN_SERVICE_ROLE_KEY`) and reply via `privateResponse()` (`Cache-Control: no-store, private`):
   - `/api/money-overview` — `full`, `plugverse`. Reads with the caller's JWT so RLS still applies; personal snapshots + reconciliation doc are only fetched for `full`.
-  - `/api/acquisition`, `/api/acquisition-results` — `full`, `acquisition`. GET only.
+  - `/api/acquisition` — `full`, `acquisition`. GET the board; POST one whitelisted change, stamped with who and when. Only `full` approves or rejects messages; the acquisition role can mark approved messages sent, label the finder, edit notes, follow up and log conversations. Rewording an approved message clears the approval; a second send is refused; stale edits (`if_updated_at`) get 409.
+  - `/api/acquisition-results` — `full`, `acquisition`. GET only.
   - `/api/band-review`, `/api/band-media-source` — `full` only.
+
+### Acquisition board cutover
+
+The Claude artifact board (https://claude.ai/artifact/5SoV39QXz4NghVwKvmzSN6) is the writable owner until cutover. Never run it and the acq_* tables as two writable owners.
+
+1. Set the Claude board to view-only.
+2. Export every collection fresh (ArtifactData `list` with `out_dir` for leads, drafts, conversations, activity, runs, lanes, venue_acts, plus `get` reference/artists).
+3. Apply `scripts/migrations/20261002-acquisition-board.sql`, then `python scripts/import-acquisition-board.py <export> <out.sql> --who u_UNuw6mYl9jbXhHEuxTsHbw=delocooper6@gmail.com:Cooper` (add Karthik's board id once he has acted there) and run the SQL. Leads upsert; conversations and activity skip by `source_id`.
+4. Deploy. Until step 3 the page shows "Board not connected" and accepts nothing.
 
 ### Common queries
 

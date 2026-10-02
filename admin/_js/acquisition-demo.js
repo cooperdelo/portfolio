@@ -17,7 +17,7 @@ const db = {
     handle, name, bucket, bio, reason, followers, queue_day, queue_order: i, platform: 'instagram', area: 'triangle', status: i === 6 ? 'contacted' : 'new',
     draft_verdict: i === 1 ? 'approved' : i === 6 ? 'approved' : null, finder_verdict: i < 2 ? 'right' : null, last_post: '2026-09-2' + (i % 9),
     draft_text: `hey, came across ${name.toLowerCase()} while looking at nc shows. i play in a band in chapel hill and built plugverse for our gigs. here's ours if you want to see it: plugverse.app/a/rubberband, and you can make yours here: plugverse.app/?s=dm`,
-    owner: i % 2 ? 'Karthik' : 'Cooper', notes: '', updated_at: iso(i + 2), updated_by: i % 3 ? 'cooper@example.invalid' : 'karthik@example.invalid',
+    owner: i % 2 ? 'Karthik' : 'Cooper', notes: '', sent_at: i === 6 ? iso(150) : undefined, sent_by: i === 6 ? 'karthik@example.invalid' : undefined, updated_at: iso(i + 2), updated_by: i % 3 ? 'cooper@example.invalid' : 'karthik@example.invalid',
   })),
   conversations: [
     { id: 'c1', at: iso(20), by_email: 'karthik@example.invalid', by_name: 'Karthik', name: 'Sunroom Radio', handle: 'sunroomradio', kind: 'Artist on PlugVerse', channel: 'Call', date: '2026-10-01', outcome: 'Wants help setting up', quote: 'we mostly book through instagram and it gets messy when two people answer', notes: 'Hasn\'t sent the link to anyone yet. Wants to see an example offer.', tags: ['Setup was confusing', 'Wants a call'], next_step: 'Send an example offer', next_date: '2026-10-03' },

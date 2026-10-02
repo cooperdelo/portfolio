@@ -107,7 +107,8 @@ function renderQueue(host){
   host.querySelector('[data-act="skip"]').onclick=()=>{by.queue.i=(by.queue.i+1)%items.length;render();};
   host.querySelector('[data-act="approve"]')?.addEventListener('click',async()=>{if(await saveLead(l.handle,{...edited(),draft_verdict:'approved'}))render();});
   host.querySelector('[data-act="reject"]')?.addEventListener('click',async()=>{if(await saveLead(l.handle,{draft_verdict:'rejected'}))render();});
-  host.querySelector('[data-act="sent"]').onclick=async()=>{if(await saveLead(l.handle,{...edited(),status:'contacted'},{quiet:true})){toast('Marked sent');render();}};
+  // Cooper editing then sending approves the words that actually went out.
+  host.querySelector('[data-act="sent"]').onclick=async()=>{const e=edited();if(await saveLead(l.handle,{...e,...(e.draft_text?{draft_verdict:'approved'}:{}),status:'contacted'},{quiet:true})){toast('Marked sent');render();}};
   host.querySelectorAll('[data-fv]').forEach(b=>b.onclick=async()=>{const v=b.dataset.fv===l.finder_verdict?null:b.dataset.fv;if(await saveLead(l.handle,{finder_verdict:v}))render();});
   host.querySelectorAll('[data-jump]').forEach(b=>b.onclick=()=>{by.queue.i=+b.dataset.jump;render();});
   wire(host);
@@ -170,6 +171,9 @@ function renderReplies(host){
   const talked=new Set(S.conversations.map(c=>(c.name||'').toLowerCase()));
   const artists=(S.artists?.rows||[]);
   const replied=S.leads.filter(l=>l.status==='replied');
+  const DAYS={instagram:5,email:4},day=864e5;
+  const due=S.leads.filter(l=>l.status==='contacted'&&l.sent_at&&!l.followup_sent_at&&DAYS[l.platform]&&Date.now()-Date.parse(l.sent_at)>=DAYS[l.platform]*day)
+    .sort((a,b)=>Date.parse(a.sent_at)-Date.parse(b.sent_at));
   host.innerHTML=`<div class="ws-grid">
   <section class="ws-card"><h2>Log a conversation</h2><p>Every DM thread, call or chat at a show. Their exact words matter more than a summary.</p>
     <form class="aq-form" id="cf">
@@ -189,6 +193,7 @@ function renderReplies(host){
     <p class="ws-note" style="margin-top:12px">Ask about what already happened, never “would you use this”. Don't promise features, prices or dates.</p>
     <h2 style="margin-top:28px">Follow-ups</h2><p>Instagram: one follow-up after at least five days without a reply. Email: one after four days in the same thread. Any reply or decline stops it.</p></section>
   </div>
+  <section class="ws-card" style="margin-bottom:18px"><h2>Follow-ups due</h2><p>Sent with no reply yet: Instagram after five days, email after four. One follow-up each, and any reply stops it.</p><ul class="ws-list">${due.map(l=>`<li><div><strong>@${esc(l.handle)}</strong><small>${esc(l.name)} · sent ${esc(ago(l.sent_at))}${l.sent_by?' by '+esc(who(l.sent_by)):''}</small></div><div class="aq-controls"><a class="aq-btn sm" href="${profileUrl(l)}" target="_blank" rel="noopener">Open ↗</a><button class="aq-btn sm" type="button" data-fu="${esc(l.handle)}">Followed up</button><button class="aq-btn sm" type="button" data-rep="${esc(l.handle)}">They replied</button></div></li>`).join('')||'<li><small>Nothing due. Sends show up here once they pass the wait.</small></li>'}</ul></section>
   ${replied.length?`<section class="ws-card" style="margin-bottom:18px"><h2>Replied, not logged yet</h2><ul class="ws-list">${replied.filter(l=>!talked.has((l.name||'').toLowerCase())).map(l=>`<li><div><strong>${esc(l.name)}</strong><small>@${esc(l.handle)}</small></div><button class="aq-btn sm" type="button" data-talk="${esc(l.name)}|${esc(l.handle)}|Prospect who replied">Log it</button></li>`).join('')||'<li><small>Every reply has a logged conversation.</small></li>'}</ul></section>`:''}
   <section class="ws-card" style="margin-bottom:18px"><h2>Artists already on PlugVerse</h2><p>They signed up, so they'll tell you what worked and what didn't. Talk to them first.${S.artists?.pulled_at?` Pulled ${esc(S.artists.pulled_at)}, read-only, no emails.`:''}</p>
     <div class="aq-table"><table style="min-width:720px"><thead><tr><th>Artist</th><th>City</th><th>Signed up</th><th style="text-align:right">Links sent</th><th style="text-align:right">Requests in</th><th>Talked to</th><th></th></tr></thead><tbody>
@@ -201,6 +206,8 @@ function renderReplies(host){
   fm.onsubmit=async e=>{e.preventDefault();const fd=new FormData(fm),doc=Object.fromEntries(fd);doc.tags=fd.getAll('tags');
     try{const r=await api('POST',{op:'conversation.add',conversation:doc});S.conversations.unshift(r.conversation);toast('Saved for everyone');render();}catch(err){toast(err.message,'err');}};
   host.querySelectorAll('[data-talk]').forEach(b=>b.onclick=()=>{const [n,h,k]=b.dataset.talk.split('|');fm.name.value=n;fm.handle.value=h;fm.kind.value=k;fm.scrollIntoView({behavior:'smooth',block:'start'});setTimeout(()=>fm.quote.focus(),400);});
+  host.querySelectorAll('[data-rep]').forEach(b=>b.onclick=async()=>{if(await saveLead(b.dataset.rep,{status:'replied'}))render();});
+  host.querySelectorAll('[data-fu]').forEach(b=>b.onclick=async()=>{if(await saveLead(b.dataset.fu,{followup_sent_at:new Date().toISOString()}))render();});
   host.querySelector('#cw').onchange=e=>{f.who=e.target.value;render();};
   host.querySelector('#ct').onchange=e=>{f.tag=e.target.value;render();};
 }
@@ -221,7 +228,7 @@ function renderResults(host){
     <section class="ws-card"><h2>Finder accuracy and spend</h2><div class="aq-rows"><div><span>High-fit calls after the code rules</span><span>${hf}</span></div><div><span>Confirmed right by a human read</span><span>${rt}</span></div><div><span>Precision</span><span>${hf?Math.round(100*rt/hf)+'%':'—'}</span></div><div><span>Finder labels on the board</span><span>${count(l=>l.finder_verdict)}</span></div><div><span>Scraper spend, all runs</span><span>$${spend.toFixed(2)}</span></div></div>
       <div class="aq-table" style="margin-top:16px"><table style="min-width:520px"><thead><tr><th>Date</th><th>Source</th><th style="text-align:right">Pulled</th><th style="text-align:right">High fit</th><th style="text-align:right">Spend</th></tr></thead><tbody>${(S.runs||[]).map(r=>`<tr><td><small>${esc(r.date)}</small></td><td>${esc(r.source)}<br><small>${esc(r.note||'')}</small></td><td class="aq-num">${fmt(r.pulled)}</td><td class="aq-num">${fmt(r.high_fit)}</td><td class="aq-num">$${Number(r.spend_usd||0).toFixed(3)}</td></tr>`).join('')}</tbody></table></div></section>
   </div>
-  <section class="ws-card" style="margin-bottom:18px"><h2>Recent activity</h2><ul class="ws-list">${S.activity.slice(0,25).map(a=>`<li><div><strong>${esc(a.by_name||who(a.by_email))} ${esc({finder_right:'marked the finder right on',finder_wrong:'marked the finder wrong on',draft_approved:'approved the message for',draft_rejected:'rejected the message for',sent:'sent the first message to',replied:'logged a reply from',signed_up:'logged a signup from',edit:'edited',conversation:'logged a conversation with',added:'added'}[a.kind]||a.kind)} ${a.handle?'@'+esc(a.handle):esc(a.detail)}</strong></div><small>${esc(ago(a.at))}</small></li>`).join('')||'<li><small>No activity yet.</small></li>'}</ul></section>
+  <section class="ws-card" style="margin-bottom:18px"><h2>Recent activity</h2><ul class="ws-list">${S.activity.slice(0,25).map(a=>`<li><div><strong>${esc(a.by_name||who(a.by_email))} ${esc({finder_right:'marked the finder right on',finder_wrong:'marked the finder wrong on',draft_approved:'approved the message for',draft_rejected:'rejected the message for',sent:'sent the first message to',replied:'logged a reply from',followup:'followed up with',signed_up:'logged a signup from',edit:'edited',conversation:'logged a conversation with',added:'added'}[a.kind]||a.kind)} ${a.handle?'@'+esc(a.handle):esc(a.detail)}</strong></div><small>${esc(ago(a.at))}</small></li>`).join('')||'<li><small>No activity yet.</small></li>'}</ul></section>
   <section class="ws-card" id="aq-outcomes"><h2>Product outcomes · last 30 days</h2><p role="status">Reading existing signup attribution…</p></section>`;
   outcomes(host.querySelector('#aq-outcomes'));
 }

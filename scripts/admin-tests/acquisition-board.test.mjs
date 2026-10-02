@@ -82,3 +82,13 @@ test('database errors never leak raw messages',async()=>{
   const r=await run('full',[['acq_leads',[500,{message:'relation secret_internal does not exist'}]]],{method:'GET'});
   assert.equal(r.status,503);assert(!JSON.stringify(r.body).includes('secret_internal'));
 });
+
+test('rewording an approved message needs a fresh approval, and sends record the words used',()=>{
+  const approved={...lead,status:'approved',draft_verdict:'approved',data:{draft_text:'hey'}};
+  const p=planLeadChange(approved,{draft_text:'hey there'},karthik);
+  assert.equal(p.update.draft_verdict,null);assert.equal(p.update.status,'new');
+  assert.throws(()=>planLeadChange({...approved,draft_verdict:null},{status:'contacted'},karthik),e=>e.status===403);
+  const sent=planLeadChange(approved,{status:'contacted'},karthik);
+  assert.equal(sent.update.data.sent_text,'hey');
+  assert.throws(()=>planLeadChange({...approved,status:'contacted'},{status:'contacted'},cooper),e=>e.status===409);
+});
