@@ -1,3 +1,4 @@
+// GET  /api/kit?list=1                            the catalog (titles, gates, prices), no kit content
 // GET  /api/kit?slug=design                       teaser for anyone, full kit if the bearer token unlocks it
 // POST /api/kit {slug, email}                      email gate: returns a token and the full kit
 // POST /api/kit {slug, session_id}                 after Stripe Checkout: verifies payment, returns a token and the kit
@@ -20,6 +21,11 @@ export default async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store, private');
   const kits = loadKits();
   if (!kits) return res.status(503).json({ error: 'not_configured' });
+  if (req.method === 'GET' && req.query?.list) {
+    const list = Object.entries(KITS).filter(([k]) => kits[k]).map(([k, m]) => ({ slug: k, title: kits[k].title, pillar: kits[k].pillar,
+      result: kits[k].result, count: kits[k].steps?.length || 0, gate: m.gate, price: m.price || 0, draft: !!m.draft, href: m.shop || m.guide }));
+    return res.status(200).json({ kits: list });
+  }
   const slug = String((req.method === 'GET' ? req.query?.slug : readBody(req)?.slug) || '');
   const meta = KITS[slug], kit = kits[slug];
   if (!meta || !kit) return res.status(404).json({ error: 'unknown_kit' });

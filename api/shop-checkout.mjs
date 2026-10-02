@@ -17,7 +17,7 @@ export default async function handler(req, res) {
 
   if (!key) {
     if (!demoAllowed()) return res.status(503).json({ error: 'checkout_not_configured' });
-    return res.status(200).json({ demo: true, url: `${page}?demo=1` });
+    return res.status(200).json({ demo: true, url: `${meta.shop}?demo=1` });
   }
 
   const form = {

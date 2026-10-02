@@ -99,3 +99,11 @@ test('responses are never cached', async () => {
   assert.match(r.headers['Cache-Control'], /no-store/);
   assert.equal(r.body.locked, false);
 });
+
+test('the catalog lists kits without their steps', async () => {
+  const r = await call(kitApi, { query: { list: '1' } });
+  assert.equal(r.code, 200);
+  assert.ok(r.body.kits.find((k) => k.slug === 'design' && k.gate === 'paid'));
+  assert.equal(JSON.stringify(r.body).includes('secret'), false);
+  assert.equal(JSON.stringify(r.body).includes('MP'), false);
+});

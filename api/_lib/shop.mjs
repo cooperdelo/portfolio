@@ -87,6 +87,7 @@ export function readBody(req) {
 }
 export function origin(req) {
   const host = String(req.headers?.['x-forwarded-host'] || req.headers?.host || 'cooperdelo.com');
-  const proto = String(req.headers?.['x-forwarded-proto'] || 'https');
+  const local = /^(localhost|127\.0\.0\.1)(:\d+)?$/.test(host);
+  const proto = String(req.headers?.['x-forwarded-proto'] || (local ? 'http' : 'https'));
   return `${proto}://${host}`;
 }
