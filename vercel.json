@@ -2,7 +2,6 @@
   "cleanUrls": true,
   "trailingSlash": false,
   "redirects": [
-    { "source": "/work", "destination": "/#index", "permanent": false },
     { "source": "/world", "destination": "/", "permanent": false },
     { "source": "/world/:path*", "destination": "/", "permanent": false }
   ],
