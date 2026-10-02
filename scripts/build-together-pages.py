@@ -163,6 +163,15 @@ def resources():
     <p class="lede">Things I actually use, cleaned up so you can use them too. One is ready. One I'm still pulling apart.</p>
   </section>
   <section class="shelf light" aria-label="Resources">
+    <article class="res res-wide" data-rv>
+      <div class="top label"><span class="state live">Ready, free</span><span>Updated Oct 2026</span></div>
+      <a class="plate rig-mini" href="/gear" aria-label="Open the gear page">
+        <span class="rm-end">Tele or PRS</span><span class="rm-pod"><i class="off">Amp</i><i>EQ</i><i>Screamer</i><i>Chorus</i><i>Delay</i><i>Reverb</i></span><span class="rm-end">Marshall DSL40CR</span>
+      </a>
+      <h2>Gear</h2>
+      <p>The guitars, amp, camera and studio gear I actually use, with the Pod Go chain I run into the Marshall.</p>
+      <div class="acts"><a class="pill" href="/gear">See the gear {ARROW}</a></div>
+    </article>
     <article class="res" data-rv>
       <div class="top label"><span class="state live">Ready, free</span><span>No email needed</span></div>
       <div class="plate desk">
