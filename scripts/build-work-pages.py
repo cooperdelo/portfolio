@@ -131,7 +131,8 @@ NAV = f"""<header class="nav label">
 </header>"""
 
 SCRIPTS = """<script src="/assets/lenis.min.js" defer></script>
-<script src="/assets/site.js" defer></script>"""
+<script src="/assets/site.js" defer></script>
+<script src="/assets/beacon.js" defer></script>"""
 
 def footer(bg="footer"):
     return f"""<footer class="contact" id="contact">

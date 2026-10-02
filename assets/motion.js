@@ -37,6 +37,7 @@
   function go(i, force) {
     if (i === cur && !force) return;
     cur = i;
+    window.cdTrack?.("motion_beat", { beat: i + 1 }, { once: true });
     beats.forEach((b, k) => b.classList.toggle("on", k === i));
     ticks.forEach((t, k) => t.classList.toggle("on", k <= i));
     const b = beats[i];

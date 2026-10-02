@@ -13,7 +13,7 @@
   const now = document.querySelector("[data-records-now]");
   const RPM = (33 + 1 / 3) / 60 * 360; // degrees per second
   const state = items.map(() => ({ a: Math.random() * 360, v: 0 }));
-  let active = -1, raf = 0, last = 0, visible = false, capT = 0;
+  let active = -1, raf = 0, last = 0, visible = false, capT = 0, picked = 0; // the automatic first pull isn't counted
 
   items.forEach((li, i) => li.style.setProperty("--i", i));
 
@@ -40,6 +40,7 @@
     items[i].querySelector(".rx-hit").setAttribute("aria-pressed", "true");
     caption(i);
     spin();
+    if (picked++) window.cdTrack?.("record_pull", { album: items[i].dataset.title }, { once: true });
   }
 
   // Turntable physics, roughly: spin up in about half a second, coast down slower.

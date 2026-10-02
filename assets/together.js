@@ -25,6 +25,7 @@
         `Found you through: ${src}`,
       ].join("\n");
       const href = `mailto:cooper@plugverse.app?subject=${encodeURIComponent("Working together: " + kind)}&body=${encodeURIComponent(body)}`;
+      window.cdTrack?.("brief_drafted", { kind });
       const ready = brief.querySelector("[data-ready]");
       ready.querySelector("a").href = href;
       ready.hidden = false;
@@ -43,6 +44,7 @@
       Object.entries(saved).forEach(([k, val]) => { const f = plan.elements.namedItem(k); if (f && typeof val === "string") f.value = val; });
       if (Object.values(saved).some(Boolean)) say("Picked up where you left off. Saved in this browser only.");
     } catch (e) { say("This browser won't save notes. Download your plan to keep it."); }
+    plan.addEventListener("input", () => window.cdTrack?.("planner_started", {}, { once: true }));
     plan.addEventListener("input", () => {
       try { localStorage.setItem(KEY, JSON.stringify(Object.fromEntries(new FormData(plan)))); say("Saved in this browser only."); }
       catch (e) { say("This browser won't save notes. Download your plan to keep it."); }
@@ -57,6 +59,7 @@
       document.body.appendChild(a); a.click(); a.remove();
       setTimeout(() => URL.revokeObjectURL(url), 1000);
       say("Downloaded. Nothing was uploaded.");
+      window.cdTrack?.("planner_download", { filled: [...plan.querySelectorAll("textarea")].filter((t) => t.value.trim()).length });
     });
     document.querySelector("[data-plan-print]").addEventListener("click", () => window.print());
   }
