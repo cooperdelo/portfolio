@@ -234,7 +234,7 @@ def sleeve_material(cover_path):
     nt.links.new(rcut.outputs[0], ring_w.inputs[1])
     edge_w = node(nt, "ShaderNodeMath", (-250, -560)); edge_w.operation = "MULTIPLY"
     nt.links.new(edge.outputs[0], edge_w.inputs[0])
-    nt.links.new(wcut.outputs[0], edge_w.inputs[1])
+    nt.links.new(rcut.outputs[0], edge_w.inputs[1])
     wear = node(nt, "ShaderNodeMath", (-80, -400)); wear.operation = "ADD"
     wear.use_clamp = True
     nt.links.new(ring_w.outputs[0], wear.inputs[0])
@@ -349,22 +349,22 @@ def vinyl_material():
     music = node(nt, "ShaderNodeTexNoise", (-300, -1700), Scale=140.0, Detail=3.0, Roughness=0.5)
     music.noise_dimensions = "1D"
     nt.links.new(r.outputs["Value"], music.inputs["W"])
-    fine = node(nt, "ShaderNodeTexNoise", (-300, -1950), Scale=1100.0, Detail=1.0, Roughness=0.3)
+    fine = node(nt, "ShaderNodeTexNoise", (-300, -1950), Scale=2400.0, Detail=1.0, Roughness=0.3)
     fine.noise_dimensions = "1D"
     nt.links.new(r.outputs["Value"], fine.inputs["W"])
     blend = node(nt, "ShaderNodeMix", (-120, -1850))
     blend.data_type = "FLOAT"
-    blend.inputs["Factor"].default_value = 0.3
+    blend.inputs["Factor"].default_value = 0.42
     nt.links.new(music.outputs["Fac"], blend.inputs["A"])
     nt.links.new(fine.outputs["Fac"], blend.inputs["B"])
     mus = node(nt, "ShaderNodeMapRange", (-100, -1700))
-    mus.inputs["To Min"].default_value = 0.085
-    mus.inputs["To Max"].default_value = 0.16
+    mus.inputs["To Min"].default_value = 0.055
+    mus.inputs["To Max"].default_value = 0.12
     nt.links.new(blend.outputs["Result"], mus.inputs["Value"])
 
     rough = node(nt, "ShaderNodeMix", (500, 200))
     rough.data_type = "FLOAT"
-    rough.inputs["A"].default_value = 0.16   # land, run-out, rim: smoother cut, duller sheen
+    rough.inputs["A"].default_value = 0.05   # land, run-out, gaps: polished, black except where they catch the light
     nt.links.new(acc.outputs[0], rough.inputs["Factor"])
     nt.links.new(mus.outputs[0], rough.inputs["B"])
     nt.links.new(rough.outputs["Result"], bsdf.inputs["Roughness"])
