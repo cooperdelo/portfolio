@@ -2,8 +2,12 @@
    A random id lives in sessionStorage for this tab only. Do Not Track and Global Privacy Control
    switch it off. Other scripts call window.cdTrack(name, props). */
 (() => {
-  const off = navigator.doNotTrack === "1" || window.doNotTrack === "1" || navigator.globalPrivacyControl === true
-    || /^(localhost|127\.0\.0\.1)$/.test(location.hostname) && !/[?&]track=1/.test(location.search);
+  // Only the real site counts: previews and local copies send nothing unless ?track=1.
+  // Cooper's own browsers are marked by the admin (cd-notrack) so his visits don't inflate the numbers.
+  let mine = false;
+  try { mine = localStorage.getItem("cd-notrack") === "1"; } catch (e) { /* storage blocked */ }
+  const off = navigator.doNotTrack === "1" || window.doNotTrack === "1" || navigator.globalPrivacyControl === true || mine
+    || !/(^|\.)cooperdelo\.com$/.test(location.hostname) && !/[?&]track=1/.test(location.search);
   let session = "";
   try {
     session = sessionStorage.getItem("cd-s") || "";

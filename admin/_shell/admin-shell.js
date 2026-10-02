@@ -248,6 +248,8 @@ export function isLocalDemo() {
 }
 
 export async function mountShell({ title, demo = false } = {}) {
+  // Anyone signed in to the admin is on the team: keep their browser out of portfolio visit counts.
+  try { localStorage.setItem('cd-notrack', '1'); } catch (e) { /* storage blocked */ }
   // Pages that pass demo:true render their snapshot data. Since v6 every page also
   // skips the gate on localhost ?demo (design review of the chrome; queries then run
   // unauthenticated, so RLS returns nothing). Never true on any real host.
