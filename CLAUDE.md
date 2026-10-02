@@ -149,7 +149,7 @@ After insert, refresh `/admin/finance/entry.html` and "Luby Pitch Competition ($
 
 To retire a source (e.g. after it's fully spent), set `is_active = false` — it stays in historic rows and views but stops appearing in the form.
 
-**Pre-registered pending sources.** A source can be added with `is_active = false` *before* it's won, so transactions can be retroactively tagged the moment funds arrive. Currently pre-registered: `luby_pitch` ($20,000 estimated, awaiting result). When won:
+**Pre-registered pending sources.** A source can be added with `is_active = false` *before* it's won, so transactions can be retroactively tagged the moment funds arrive. `luby_pitch` was registered this way and has been active since 2026-07-31 (its `description` text still says "Pending"; tidy it when convenient). Pattern for the next one:
 
 ```sql
 UPDATE funding_sources
