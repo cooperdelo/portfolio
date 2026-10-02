@@ -13,19 +13,37 @@ Static HTML portfolio site (Vercel-hosted at cooperdelo.com) plus a private admi
   vercel.json                    ← Vercel routing + admin headers
 /admin/                          ← Private admin console
   login.html                     ← Password-gated magic-link sign-in
-  index.html                     ← Admin home (tool launcher)
+  index.html                     ← Workspace chooser (Personal / PlugVerse). Plugverse role is sent straight to /admin/plugverse/
+  _js/workspaces.js              ← Renders the workspace pages (body data-workspace = choose / personal / plugverse / more)
+  personal/
+    index.html                   ← Personal workspace page (full role only)
+    overview.html                ← Former admin home dashboard (home.js)
+  more/
+    index.html                   ← "More tools": full route directory filtered by role (from _shell/directory.js)
+  acquisition/
+    index.html                   ← PlugVerse sending queue + experiment results (_js/acquisition.js → /api/acquisition, /api/acquisition-results)
+  assets/
+    index.html                   ← Band media review (_js/band-media.js → /api/band-review), full role only
   _shell/
     admin-shell.css              ← Layout, tokens, components (left rail, cards, tables)
-    admin-shell.js               ← mountShell() — auth gate + sidebar + toast
-    supabase.js                  ← Shared sb client, isAdmin(), debounced realtime helpers
+    admin-shell.js               ← mountShell() — auth gate + sidebar + toast; confines acquisition role to /admin/plugverse/ + /admin/acquisition/
+    supabase.js                  ← Shared sb client, getAdminRole(), isAdmin(), debounced realtime helpers
+    directory.js                 ← DIRECTORY: every existing route with per-item `roles`, used by More tools
+    workspace-model.mjs          ← Pure helpers: accountScope(), scopeForTask(), cashAccounts() (personal vs PlugVerse split)
+    acquisition-model.mjs        ← Pure adapter contract for the acquisition queue (eligibility, conflicts); no store, no sends
+    workspaces.css               ← Styles for the workspace pages
   finance/                       ← Finance dashboard suite
-    index.html, transactions.html, entry.html, investments.html,
+    index.html                   ← Money (_js/money.js → /api/money-overview)
+    overview.html                ← Former finance dashboard (finance/_js/dashboard.js)
+    transactions.html, entry.html, investments.html, networth.html,
     plugverse.html, fund.html, funding.html, food-log.html, tax.html, export.html
     _js/                         ← Per-page logic
   merch/
     index.html                   ← Merch inventory + debt tracker (admin-styled)
   plugverse/
-    index.html                   ← Plugverse KPIs dashboard (MRR, users, payouts, top events)
+    index.html                   ← PlugVerse workspace page (workspaces.js)
+    metrics.html                 ← Plugverse KPIs dashboard (MRR, users, payouts, top events) → /api/plugverse-kpi
+    ops.html                     ← Plugverse ops
   social/
     index.html                   ← IG + TikTok unified dashboard (posts, engagement, account stats)
   playbook/
@@ -42,6 +60,12 @@ Static HTML portfolio site (Vercel-hosted at cooperdelo.com) plus a private admi
   tiktok-oauth.mjs               ← TikTok OAuth callback → upserts tiktok_credentials
   tiktok-sync.mjs                ← Pulls TikTok user info + videos with auto-refresh → social_* tables
   investments-sync.mjs           ← Pulls quotes from Yahoo Finance (stocks) + Coinbase spot (crypto, keyless) → updates investment_positions
+  money-overview.mjs             ← Read-only Money payload (bank balances, recent txns; personal snapshots + reconciliation doc for full only)
+  acquisition.mjs                ← Acquisition board connection status. Fails closed (not_connected, writes rejected) until the owner is connected
+  acquisition-results.mjs        ← 30-day artist signup outcomes by signup_utm, read from PlugVerse `users`
+  band-review.mjs                ← Band media list, signed preview URLs from `band-review` bucket, review saves via band_review_save()
+  band-media-source.mjs          ← Returns the confirmed Rubber Band Drive folder URL from vault_documents
+  _lib/admin-auth.mjs            ← authorize(req, roles): verifies the JWT + admin_allowlist role; privateResponse() no-store headers
 ```
 
 ---
@@ -56,7 +80,7 @@ Static HTML portfolio site (Vercel-hosted at cooperdelo.com) plus a private admi
 
 | Table | Purpose | Key columns |
 |---|---|---|
-| `admin_allowlist` | Email allowlist for the admin gate, with role | `email` (PK), `admin_role` (text, CHECK in `'full' / 'plugverse'`, default `'full'`), `added_at` |
+| `admin_allowlist` | Email allowlist for the admin gate, with role | `email` (PK), `admin_role` (text, CHECK in `'full' / 'plugverse' / 'acquisition'`, default `'full'`), `added_at` |
 | `finance_accounts` | Bank/card/investment account dictionary | `slug` (PK), `display_name`, `account_type`, `institution`, `is_active`, `cash_balance` (uninvested cash sitting in investment accounts — Schwab settlement, Coinbase USD — edited manually, not auto-synced) |
 | `financial_transactions` | Master ledger — personal, Plugverse LLC, 1789 Fund | `id`, `date`, `description`, `amount`, `type` (income/expense), `entity` (personal/plugverse/1789_fund), `funding_source` (FK → funding_sources.slug), `account`, `category`, `is_tax_deductible`, `tax_category`, `deductible_pct`, `is_food_log`, `merchant`, `external_source` (mercury/stripe/manual/NULL), `external_id` (provider-side id), `deleted_at` (soft-delete) |
 | `investment_positions` | Roth IRA + brokerage + crypto holdings. `current_price` is auto-synced by `/api/investments-sync` (Yahoo for stocks, Coinbase spot for crypto). Crypto sync uses `symbol` directly as the Coinbase ticker. | `id`, `account_slug` → finance_accounts, `symbol`, `shares`, `cost_basis`, `current_price`, `asset_type` (stock/crypto, CHECK), `coingecko_id` (legacy — kept for possible future fallback), `price_updated_at` |
@@ -72,6 +96,11 @@ Static HTML portfolio site (Vercel-hosted at cooperdelo.com) plus a private admi
 | `social_account_snapshots` | Daily account-level stats per platform | `date` + `platform` (composite PK), `followers`, `following`, `posts_total`, `total_views`, `total_likes`, `handle`, `raw`, `captured_at` |
 | `playbook_items` | Brand/strategy/voice vault — read by `/admin/playbook`. Auto-populated by chat sessions (post-response protocol writes atomic rows). `scope` is `personal-brand` / `plugverse` / `both`. `item_type` is `caption-idea` / `video-idea` / `philosophy-line` / `hook` / `decision` / `identity` / `pillar` / `strategy` / `rule` / `voice-rule` / `framework` / `prompt` (open-ended; new types are fine). | `id`, `scope`, `item_type`, `title`, `summary`, `body_markdown`, `category`, `subcategory`, `tags` (text[]), `priority` (lower=higher), `is_pinned`, `source_vault_path`, `source_anchor`, `status` (default `active`), `expires_at`, `last_synced_at`, `deleted_at` (soft-delete) |
 | `plugverse_contacts` | Pipeline + network vault — read by `/admin/contacts`. Auto-populated by chat sessions when contacts are added or updated. `pipeline_stage` flows `identified` → `engaged` → `contacted` → `demo` → `committed` (plus `team`, `dead`). `pipeline_type` is `artist`/`organizer`/`venue`/`partnership`/`team`. | `id`, `full_name`, `preferred_name`, `role`, `title`, `organization`, `college`, `org_type`, `email`, `phone`, `instagram`, `twitter`, `linkedin`, `other_links` (jsonb), `pipeline_stage`, `pipeline_type`, `warm_path`, `last_contacted` (date), `next_step`, `next_step_due` (date), `notes`, `tags` (text[]), `referral_credit_to` → plugverse_contacts.id, `bookings_attributed`, `payout_owed`, `source_vault_path`, `is_pinned`, `priority`, `status` (default `active`), `deleted_at` (soft-delete) |
+| `band_media_assets` | Rubber Band media catalog for `/admin/assets` (originals stay in Google Drive). Full-only SELECT; no direct writes from `authenticated`. Migration: `scripts/migrations/20260930-band-review.sql`. | `id`, `drive_file_id` (unique), `name`, `gig`, `mime_type`, `duration`, `proxy_path` (object in `band-review` bucket), `source_observed_at`, `retired_at` |
+| `band_media_reviews` | One review row per asset per reviewer. Written only through `band_review_save(...)` (SECURITY DEFINER, full admin, optimistic `revision` check). | `asset_id` → band_media_assets, `reviewer` (auth uid), `revision`, `verdict` (unreviewed/favorite/reject), `note`, `time_seconds`, `trim_start`, `trim_end`, `updated_at`. PK (asset_id, reviewer) |
+| `band_media_operations` | Idempotency log for `band_review_save` retries (same operation id + payload returns the stored result). | `operation_id` (PK), `reviewer`, `asset_id`, `request`, `result`, `created_at` |
+
+Storage: private bucket `band-review` (50 MB limit; mp4/jpeg/webp/json) holds review proxies. Pages never read it directly; `/api/band-review` returns 15-minute signed URLs.
 
 ### Views (read-only summaries)
 
@@ -88,11 +117,12 @@ Static HTML portfolio site (Vercel-hosted at cooperdelo.com) plus a private admi
 
 ### Functions
 
-- `is_admin()` — true iff `auth.jwt() ->> 'email'` is in `admin_allowlist` (any role).
+- `is_admin()` — true iff `auth.jwt() ->> 'email'` is in `admin_allowlist` with `admin_role IN ('full','plugverse')` (since `20260930-limited-admin-boundary.sql`; an `acquisition` row does NOT pass).
 - `is_full_admin()` — true iff the caller's `admin_role = 'full'`.
 - `is_plugverse_scope()` — true iff the caller's `admin_role IN ('full','plugverse')`.
-- `current_admin_role()` — returns the caller's `admin_role` (`'full' | 'plugverse' | NULL`).
+- `current_admin_role()` — returns the caller's `admin_role` (`'full' | 'plugverse' | 'acquisition' | NULL`).
 - All four are `SECURITY DEFINER` (bypass RLS on `admin_allowlist`) and called from every RLS policy. The detailed access matrix is in the "Auth model" section below.
+- `band_review_save(...)` — SECURITY DEFINER RPC, full admin only; the only write path into `band_media_reviews`.
 
 ### Dual-tag pattern: `entity` vs `funding_source`
 
@@ -138,32 +168,38 @@ WHERE slug = 'luby_pitch';
 - Magic-link only. The `admin/login.html` page asks for **email + shared password**. Password is a client-side soft gate; the real authn is the email-bound magic link.
 - Shared password (rotate by editing the constant in `admin/login.html`): currently `plugverse2026`.
 - Auth URL allowlist + Site URL configured in Supabase dashboard → Authentication → URL Configuration. Must include `https://cooperdelo.com/admin/**`.
-- **Two roles**, stored in `admin_allowlist.admin_role` (text, CHECK in `('full','plugverse')`):
+- **Three roles**, stored in `admin_allowlist.admin_role` (text, CHECK in `('full','plugverse','acquisition')` since `20261001-acquisition-role.sql`):
   - `full` — Cooper (`delocooper6@gmail.com`). Sees and writes everything.
-  - `plugverse` — Adler (`adlerrice@gmail.com`) and any future Plugverse cofounder. Sees and writes ONLY rows tied to Plugverse / the 1789 fund. Cannot touch personal finance, investments, merch, social analytics, IG/TikTok credentials, or the personal-brand playbook.
+  - `plugverse` — Adler (`adlerrice@gmail.com`) and any future Plugverse cofounder. Sees and writes ONLY rows tied to Plugverse / the 1789 fund. Cannot touch personal finance, investments, merch, social analytics, IG/TikTok credentials, or the personal-brand playbook. Lands on `/admin/plugverse/` (no Personal workspace).
+  - `acquisition` — narrow outreach contributor role. No table or storage access at all; only `/api/acquisition` and `/api/acquisition-results` (server-side, role-checked). `mountShell()` confines it to `/admin/plugverse/` and `/admin/acquisition/`.
 - **RLS is the source of truth.** Client-side nav filtering + `requireFullAdminOrRedirect()` are UX only — direct-URL navigation, raw API calls, and even the Supabase JS client are all blocked at the DB layer.
+- **`limited_role_boundary`** (`20260930-limited-admin-boundary.sql`): a RESTRICTIVE policy on every RLS-enabled `public` table except `admin_allowlist`, plus `storage.objects`, that denies any caller whose `current_admin_role()` is `acquisition` or `band`. It is ANDed with the normal permissive policies, so a broad `authenticated` policy can never leak to a limited role. Tables created later need it re-applied (the migration loops over existing tables only).
 - SQL helpers (all `SECURITY DEFINER` so they ignore RLS on `admin_allowlist`):
-  - `is_admin()` — true if the caller is in the allowlist with any role.
+  - `is_admin()` — true only for `full` or `plugverse` (not `acquisition`).
   - `is_full_admin()` — true only for `admin_role = 'full'`.
   - `is_plugverse_scope()` — true for `full` OR `plugverse`. Used in policies that both roles share.
-  - `current_admin_role()` — returns `'full' | 'plugverse' | NULL`.
+  - `current_admin_role()` — returns `'full' | 'plugverse' | 'acquisition' | NULL`.
 
 ### Access matrix
 
-| Table / view | full | plugverse | Notes |
-|---|---|---|---|
-| `admin_allowlist` | ALL | SELECT own row | Plugverse role can self-discover their role |
-| `financial_transactions` | ALL | ALL filtered by `entity IN ('plugverse','1789_fund') OR funding_source='1789_fund'` | Dual-tag boundary |
-| `budget_targets` | ALL | ALL filtered by `entity IN ('plugverse','1789_fund')` | |
-| `finance_accounts` | ALL | SELECT only | Lookup needed to render labels |
-| `funding_sources` | ALL | SELECT only | Lookup table |
-| `investment_positions` | ALL | none | Personal Roth + Coinbase |
-| `merch_items`, `merch_transactions` | ALL | none | Personal side hustle |
-| `social_posts`, `social_post_metrics`, `social_account_snapshots` | ALL | none | Personal IG/TikTok |
-| `instagram_credentials`, `tiktok_credentials` | ALL | none | Personal API tokens |
-| `plugverse_kpi_snapshots` | ALL | ALL | Plugverse data |
-| `plugverse_contacts` | ALL | ALL | Plugverse pipeline |
-| `playbook_items` | ALL | ALL filtered by `scope IN ('plugverse','both')` | Personal-brand items hidden |
+| Table / view | full | plugverse | acquisition | Notes |
+|---|---|---|---|---|
+| `admin_allowlist` | ALL | SELECT own row | SELECT own row | Limited roles can self-discover their role (table is exempt from `limited_role_boundary`) |
+| `financial_transactions` | ALL | ALL filtered by `entity IN ('plugverse','1789_fund') OR funding_source='1789_fund'` | none | Dual-tag boundary |
+| `budget_targets` | ALL | ALL filtered by `entity IN ('plugverse','1789_fund')` | none | |
+| `finance_accounts` | ALL | SELECT only | none | Lookup needed to render labels |
+| `funding_sources` | ALL | SELECT only | none | Lookup table |
+| `investment_positions` | ALL | none | none | Personal Roth + Coinbase |
+| `merch_items`, `merch_transactions` | ALL | none | none | Personal side hustle |
+| `social_posts`, `social_post_metrics`, `social_account_snapshots` | ALL | none | none | Personal IG/TikTok |
+| `instagram_credentials`, `tiktok_credentials` | ALL | none | none | Personal API tokens |
+| `plugverse_kpi_snapshots` | ALL | ALL | none | Plugverse data |
+| `plugverse_contacts` | ALL | ALL | none | Plugverse pipeline |
+| `playbook_items` | ALL | ALL filtered by `scope IN ('plugverse','both')` | none | Personal-brand items hidden |
+| `band_media_assets`, `band_media_reviews`, `band_media_operations` | SELECT (writes via `band_review_save`) | none | none | Full-only band media review |
+| Any other `public` table, `storage.objects` | per table | per table | none | `limited_role_boundary` denies acquisition everywhere |
+
+The acquisition role's only data path is the two role-checked API routes `/api/acquisition` and `/api/acquisition-results`.
 
 Views inherit RLS from their underlying tables, so `v_plugverse_pl`, `v_fund_1789`, `v_funding_balance`, `v_playbook_active`, `v_contacts_active`, `v_contacts_due_today`, `v_contacts_stale`, etc. all return the correct subset automatically.
 
@@ -175,14 +211,21 @@ INSERT INTO admin_allowlist (email, admin_role) VALUES ('person@example.com', 'f
 
 -- Plugverse-scoped admin (sees only Plugverse finance + plugverse-tagged data):
 INSERT INTO admin_allowlist (email, admin_role) VALUES ('person@example.com', 'plugverse');
+
+-- Acquisition contributor (no table access; sending queue + results APIs only):
+INSERT INTO admin_allowlist (email, admin_role) VALUES ('person@example.com', 'acquisition');
 ```
 
 They sign in via `/admin/login.html` with their email + the shared password. Their role is fetched once per session (cached in `getAdminRole()` in `supabase.js`) and drives nav rail + tile visibility.
 
 ### API auth (`/api/*`)
 
-- `/api/plugverse-kpi.mjs` — accepts any allowlisted email (both roles).
+- `/api/plugverse-kpi.mjs` — requires `admin_role IN ('full','plugverse')` (acquisition is rejected).
 - `/api/investments-sync.mjs` — requires `admin_role = 'full'`. Verifies via PostgREST `admin_allowlist?email=eq...` using the caller's JWT (works because of the self-read policy).
+- Newer routes use `authorize(req, roles)` from `api/_lib/admin-auth.mjs` (verifies the JWT at `/auth/v1/user`, then reads the role with `SUPABASE_ADMIN_SERVICE_ROLE_KEY`) and reply via `privateResponse()` (`Cache-Control: no-store, private`):
+  - `/api/money-overview` — `full`, `plugverse`. Reads with the caller's JWT so RLS still applies; personal snapshots + reconciliation doc are only fetched for `full`.
+  - `/api/acquisition`, `/api/acquisition-results` — `full`, `acquisition`. GET only.
+  - `/api/band-review`, `/api/band-media-source` — `full` only.
 
 ### Common queries
 
@@ -243,13 +286,13 @@ Static-site repo with a small `/api/` directory for serverless functions. Auto-d
 
 Aggregates Plugverse KPIs from three sources and persists daily snapshots:
 
-- **PlugVerse Supabase** (`yhemvsksnoojplnxirlv`, read via `PLUGVERSE_SUPABASE_SERVICE_ROLE` env var): users count, signups 24h/7d/30d, artist/fan counts, active subscriptions, churn 7d, MRR/ARR computed by joining `user_subscriptions` × `subscription_tiers`, total GMV cents, gigs completed.
+- **PlugVerse Supabase** (`yhemvsksnoojplnxirlv`, read via `SUPABASE_SERVICE_ROLE_KEY` env var): users count, signups 24h/7d/30d, artist/fan counts, active subscriptions, churn 7d, MRR/ARR computed by joining `user_subscriptions` × `subscription_tiers`, total GMV cents, gigs completed.
 - **Stripe** (`STRIPE_SECRET_KEY`): payouts pending + payouts paid month-to-date.
-- **PostHog** (`POSTHOG_API_KEY`, project `331986`, host defaults to `https://us.posthog.com`): top 5 events in the last 7 days via HogQL.
+- **PostHog** (`POSTHOG_PERSONAL_API_KEY`, project `331986`, host defaults to `https://us.posthog.com`): top 5 events in the last 7 days via HogQL.
 
 Each source is wrapped in `safe()` so a single outage doesn't blank the page — failed sources show up in the response's `errors` array and the corresponding KPI cards render `—`.
 
-**Auth model:** the page sends `Authorization: Bearer <admin-supabase-jwt>` (from `sb.auth.getSession()`). The function hits `${ADMIN_URL}/auth/v1/user` to verify the JWT and checks the email is the admin allowlist email. No service-role key required for the auth check.
+**Auth model:** the page sends `Authorization: Bearer <admin-supabase-jwt>` (from `sb.auth.getSession()`). The function hits `${ADMIN_URL}/auth/v1/user` to verify the JWT, then reads the caller's own `admin_allowlist` row (anon key + caller JWT) and requires `admin_role IN ('full','plugverse')`. No service-role key required for the auth check.
 
 **Snapshot UPSERT:** every successful call writes one row to `plugverse_kpi_snapshots` keyed by today's date (`Prefer: resolution=merge-duplicates`). The function uses the user's JWT for the write, so RLS still applies. The dashboard reads the last 30 days for sparkline rendering.
 
@@ -261,8 +304,8 @@ Every serverless function uses these — kept in one canonical table here so nam
 |---|---|---|
 | `STRIPE_SECRET_KEY` | plugverse-kpi | PlugVerse Stripe account → Developers → API keys (`sk_live_…`) |
 | `POSTHOG_PERSONAL_API_KEY` | plugverse-kpi | posthog.com → Settings → Personal API keys, scope "Performing analytics queries", project 331986 |
-| `SUPABASE_SERVICE_ROLE_KEY` | plugverse-kpi | Supabase project `yhemvsksnoojplnxirlv` (PlugVerse) → Settings → API → service_role |
-| `SUPABASE_ADMIN_SERVICE_ROLE_KEY` | instagram-oauth (and any future admin-DB writer) | Supabase project `eibtnkaoqsgwiqttiwjo` (admin) → Settings → API → service_role |
+| `SUPABASE_SERVICE_ROLE_KEY` | plugverse-kpi, acquisition-results (reads PlugVerse `users` for signup outcomes) | Supabase project `yhemvsksnoojplnxirlv` (PlugVerse) → Settings → API → service_role |
+| `SUPABASE_ADMIN_SERVICE_ROLE_KEY` | instagram-oauth, `_lib/admin-auth.mjs` (role check for money-overview, acquisition, acquisition-results, band-review, band-media-source), band-review (signed URLs), band-media-source (vault read) | Supabase project `eibtnkaoqsgwiqttiwjo` (admin) → Settings → API → service_role |
 | `INSTAGRAM_APP_ID` | instagram-oauth | developers.facebook.com → App → Settings → Basic → App ID |
 | `INSTAGRAM_APP_SECRET` | instagram-oauth | same place → App Secret (sensitive — function only) |
 | `IG_WEBHOOK_VERIFY_TOKEN` | instagram-webhook | Arbitrary string. Must match what's pasted into the Meta App webhook UI's "Verify token" field |
