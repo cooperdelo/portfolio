@@ -1,0 +1,56 @@
+/* Motion: Bioswap, one beat at a time. The plate holds still while the beats scroll;
+   each beat jumps the cut to its moment and plays it through. */
+
+.motion { position: relative; padding: clamp(96px, 14vh, 170px) var(--gutter) clamp(96px, 14vh, 170px); background: var(--ink-2); }
+.mo-top { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: var(--gutter); align-items: end; }
+.mo-top .label { grid-column: 1 / -1; opacity: .62; margin-bottom: clamp(18px, 3vh, 32px); }
+.mo-big { grid-column: 1 / 9; font-family: var(--display); font-weight: 700; text-transform: uppercase; font-size: clamp(46px, 9.2vw, 168px); line-height: .8; letter-spacing: -.03em; }
+.mo-big .line:nth-child(2) { padding-left: 1.1em; }
+.mo-lede { grid-column: 9 / 13; font-size: clamp(15px, 1.15vw, 18px); line-height: 1.45; max-width: 34ch; opacity: .82; padding-bottom: .4em; }
+
+.mo-body { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: var(--gutter); margin-top: clamp(56px, 9vh, 120px); }
+.mo-stage { grid-column: 6 / 13; grid-row: 1; position: sticky; top: max(84px, calc(50vh - min(23vw, 310px) - 24px)); align-self: start; }
+.mo-plate { position: relative; aspect-ratio: 1; width: min(46vw, 620px); margin-left: auto; background: #0b0a09; overflow: hidden; border-radius: 3px; box-shadow: 0 40px 80px -30px rgba(0, 0, 0, .7), 0 0 0 1px rgba(244, 240, 231, .06); }
+.mo-plate img, .mo-plate video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.mo-plate video { opacity: 0; transition: opacity .6s var(--ease); }
+.mo-plate.live video { opacity: 1; }
+
+.mo-meter { width: min(46vw, 620px); margin: 16px 0 0 auto; }
+.mo-rail { position: relative; height: 1px; background: var(--line-d); }
+.mo-fill { position: absolute; left: 0; top: 0; height: 1px; width: 100%; background: var(--bone); transform-origin: 0 50%; transform: scaleX(var(--p, 0)); }
+.mo-rail i { position: absolute; top: -4px; width: 1px; height: 9px; background: var(--bone); opacity: .38; left: calc(var(--t) * 100%); transition: opacity .4s var(--ease); }
+.mo-rail i.on { opacity: 1; }
+.mo-time { display: flex; justify-content: space-between; margin-top: 10px; opacity: .62; font-variant-numeric: tabular-nums; }
+
+.mo-beats { grid-column: 1 / 6; grid-row: 1; list-style: none; padding: 6vh 0 18vh; }
+.mo-beats li + li { margin-top: clamp(26vh, 34vh, 40vh); }
+.mo-beat { display: block; width: 100%; text-align: left; padding: 22px 0 0; border-top: 1px solid var(--line-d); opacity: .4; transition: opacity .8s var(--ease); }
+.mo-beat:hover, .mo-beat:focus-visible, li.on .mo-beat { opacity: 1; }
+.mo-beat .label { display: block; font-variant-numeric: tabular-nums; }
+.mo-beat h3 { font-family: var(--display); font-weight: 700; text-transform: uppercase; font-size: clamp(22px, 2.3vw, 38px); line-height: .92; letter-spacing: -.015em; margin-top: 14px; max-width: 13em; }
+.mo-beat p { margin-top: 14px; font-size: clamp(15px, 1.1vw, 17px); line-height: 1.5; max-width: 38ch; opacity: .82; }
+
+.mo-foot { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: var(--gutter); margin-top: clamp(40px, 7vh, 90px); padding-top: 22px; border-top: 1px solid var(--line-d); align-items: start; }
+.mo-foot .credit { grid-column: 1 / 5; opacity: .62; }
+.mo-foot .kit { grid-column: 5 / 10; font-size: 15px; line-height: 1.5; max-width: 46ch; }
+.mo-foot .kit strong { font-weight: 700; }
+.mo-foot .acts { grid-column: 10 / 13; display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
+
+@media (max-width: 900px) {
+  .mo-big { grid-column: 1 / -1; }
+  .mo-lede { grid-column: 1 / -1; margin-top: 22px; }
+  .mo-body { display: block; }
+  .mo-stage { position: sticky; top: 0; z-index: 2; background: var(--ink-2); padding: 68px var(--gutter) 14px; margin: 0 calc(var(--gutter) * -1); }
+  .mo-plate, .mo-meter { width: min(100%, 62vh); margin-inline: auto; }
+  .mo-beats { padding: 4vh 0 10vh; }
+  .mo-beats li + li { margin-top: 22vh; }
+  .mo-foot { display: block; }
+  .mo-foot .kit { margin-top: 18px; }
+  .mo-foot .acts { flex-direction: row; flex-wrap: wrap; justify-content: flex-start; margin-top: 22px; }
+}
+@media (max-width: 700px) {
+  .mo-plate, .mo-meter { width: min(100%, 40vh); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mo-plate video, .mo-beat, .mo-rail i { transition: none; }
+}
