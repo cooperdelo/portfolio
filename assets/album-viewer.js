@@ -73,16 +73,20 @@ function syncBar() {
   const b = els.bar.querySelector("button");
   b.innerHTML = audio.paused ? PLAY : PAUSE;
   b.setAttribute("aria-label", audio.paused ? "Play" : "Pause");
+  const pick = root.querySelector(".av-pick button");
+  if (pick && !pick.disabled) pick.querySelector("svg").outerHTML = !audio.paused && Number(pick.dataset.track) === playing ? PAUSE : PLAY;
 }
 
+let playing = -1;
 function markPlaying(i) {
+  playing = i;
   root.querySelectorAll(".av-tracks li").forEach((li, k) => li.classList.toggle("on", k === i));
 }
 
 function play(i) {
   const r = data[idx], t = r.tracks[i];
   if (!t || !t.p) return;
-  if (audio.src === t.p && !audio.paused) { audio.pause(); return; }
+  if (audio.src === t.p && i === playing) { audio.paused ? audio.play().catch(() => {}) : audio.pause(); return; }
   audio.src = t.p;
   audio.play().catch(() => {});
   els.bar.hidden = false;
