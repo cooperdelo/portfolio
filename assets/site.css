@@ -525,3 +525,11 @@ html.rm .cs-panel, html.rm .cs-scrim { clip-path: none; }
   .cs-track { transform: none !important; }
   .rows .row { translate: none !important; }
 }
+
+/* ---------- case notes: what I made, why, what's next ---------- */
+.case-body .notes { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: calc(var(--gutter) * 2); border-top: 1px solid var(--line-l); padding-top: 26px; margin-top: 8px; }
+.case-body .notes .label { opacity: .62; margin-bottom: 12px; }
+.case-body .notes p:not(.label) { font-size: clamp(15px, 1.1vw, 17px); line-height: 1.5; max-width: 40ch; }
+.case-body .notes-cta { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 10px; }
+.case-body .notes-cta .pill:hover { background: var(--ink); color: var(--bone); border-color: var(--ink); }
+@media (max-width: 900px) { .case-body .notes { grid-template-columns: 1fr; gap: 26px; } }

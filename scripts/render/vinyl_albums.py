@@ -1,4 +1,4 @@
-"""The On Repeat shelf, in display order. Slugs match img/albums/ and the cover files.
+"""The On Repeat shelf, in display order. Slugs name the cover files and the img/records/ exports.
 
 Label colours are picked by hand from each sleeve. Personal brand rule: no orange.
 """
