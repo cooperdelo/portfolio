@@ -100,6 +100,8 @@ function renderQueue(host){
   </div></section>
   <section class="ws-card" style="margin-top:18px"><h2>Up next</h2><ul class="aq-next">${items.slice(by.queue.i+1,by.queue.i+7).map((n,k)=>`<li><button type="button" data-jump="${by.queue.i+1+k}">@${esc(n.handle)}</button><small>${esc(n.name)} · ${esc(n.queue_day||'')}</small></li>`).join('')||'<li><small>Nothing after this one.</small></li>'}</ul></section>`;
   const ta=host.querySelector('#aq-draft');
+  const fit=()=>{ta.style.height='auto';ta.style.height=Math.max(190,ta.scrollHeight+4)+'px';};fit(); // the whole message, no inner scroll
+  ta.addEventListener('input',fit);
   ta.addEventListener('input',()=>{host.querySelector('#aq-checks').innerHTML=draftChecks(ta.value).map(([t,ok])=>`<span class="${ok?'':'bad'}">${ok?'✓':'✗'} ${esc(t)}</span>`).join('');});
   const edited=()=>approve&&ta.value!==text?{draft_text:ta.value}:{};
   host.querySelector('[data-act="copy-handle"]').onclick=()=>copy(l.handle,'Username');
