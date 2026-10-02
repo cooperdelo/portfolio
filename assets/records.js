@@ -13,7 +13,7 @@
   const now = document.querySelector("[data-records-now]");
   const RPM = (33 + 1 / 3) / 60 * 360; // degrees per second
   const state = items.map(() => ({ a: Math.random() * 360, v: 0 }));
-  let active = -1, raf = 0, last = 0, visible = false;
+  let active = -1, raf = 0, last = 0, visible = false, capT = 0;
 
   items.forEach((li, i) => li.style.setProperty("--i", i));
 
@@ -26,9 +26,10 @@
       now.querySelector("[data-a]").textContent = d.artist + ", " + d.year;
       now.classList.remove("out");
     };
+    clearTimeout(capT);
     if (RM) return fill();
     now.classList.add("out");
-    setTimeout(fill, 220);
+    capT = setTimeout(fill, 220);
   }
 
   function pick(i) {

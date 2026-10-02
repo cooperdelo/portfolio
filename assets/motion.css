@@ -22,8 +22,8 @@
 .mo-rail i.on { opacity: 1; }
 .mo-time { display: flex; justify-content: space-between; margin-top: 10px; opacity: .62; font-variant-numeric: tabular-nums; }
 
-.mo-beats { grid-column: 1 / 6; grid-row: 1; list-style: none; padding: 6vh 0 18vh; }
-.mo-beats li + li { margin-top: clamp(26vh, 34vh, 40vh); }
+.mo-beats { grid-column: 1 / 6; grid-row: 1; list-style: none; padding: 6vh 0 12vh; }
+.mo-beats li + li { margin-top: 24vh; }
 .mo-beat { display: block; width: 100%; text-align: left; padding: 22px 0 0; border-top: 1px solid var(--line-d); opacity: .4; transition: opacity .8s var(--ease); }
 .mo-beat:hover, .mo-beat:focus-visible, li.on .mo-beat { opacity: 1; }
 .mo-beat .label { display: block; font-variant-numeric: tabular-nums; }
