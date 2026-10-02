@@ -27,8 +27,8 @@
 .mo-beat { display: block; width: 100%; text-align: left; padding: 22px 0 0; border-top: 1px solid var(--line-d); opacity: .4; transition: opacity .8s var(--ease); }
 .mo-beat:hover, .mo-beat:focus-visible, li.on .mo-beat { opacity: 1; }
 .mo-beat .label { display: block; font-variant-numeric: tabular-nums; }
-.mo-beat h3 { font-family: var(--display); font-weight: 700; text-transform: uppercase; font-size: clamp(22px, 2.3vw, 38px); line-height: .92; letter-spacing: -.015em; margin-top: 14px; max-width: 13em; }
-.mo-beat p { margin-top: 14px; font-size: clamp(15px, 1.1vw, 17px); line-height: 1.5; max-width: 38ch; opacity: .82; }
+.mo-beat .h { display: block; font-family: var(--display); font-weight: 700; text-transform: uppercase; font-size: clamp(22px, 2.3vw, 38px); line-height: .92; letter-spacing: -.015em; margin-top: 14px; max-width: 13em; }
+.mo-beat .d { display: block; margin-top: 14px; font-size: clamp(15px, 1.1vw, 17px); line-height: 1.5; max-width: 38ch; opacity: .82; }
 
 .mo-foot { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: var(--gutter); margin-top: clamp(40px, 7vh, 90px); padding-top: 22px; border-top: 1px solid var(--line-d); align-items: start; }
 .mo-foot .credit { grid-column: 1 / 5; opacity: .62; }

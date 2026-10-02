@@ -26,7 +26,7 @@ BEATS = [
 def motion():
     ticks = "".join(f'<i style="--t:{a / DUR:.4f}"></i>' for a, *_ in BEATS)
     lis = "".join(f"""
-        <li data-t="{a}" data-end="{e}"><button class="mo-beat" type="button"><span class="label">{tc}</span><h3>{h}</h3><p>{t}</p></button></li>"""
+        <li data-t="{a}" data-end="{e}"><button class="mo-beat" type="button"><span class="label">{tc}</span><span class="h">{h}</span><span class="d">{t}</span></button></li>"""
                   for a, e, tc, h, t in BEATS)
     return f"""<section class="motion dark" id="motion" aria-labelledby="motion-h" data-motion data-duration="{DUR}">
     <div class="mo-top">
