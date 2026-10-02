@@ -46,7 +46,8 @@ test('unconnected acquisition rejects writes; contributor cannot retrieve band s
  const previous=globalThis.fetch;
  const response=()=>({headers:{},setHeader(k,v){this.headers[k]=v;},status(n){this.code=n;return this;},json(body){this.body=body;return this;}});
  try{
-  globalThis.fetch=async url=>({ok:true,json:async()=>url.includes('/auth/')?{id:'fixture',email:'fixture@example.invalid'}:[{admin_role:'acquisition'}]});
+  // acq_* tables absent: the state before the board cutover.
+  globalThis.fetch=async url=>url.includes('/acq_')?({ok:false,status:404,json:async()=>({code:'PGRST205'})}):({ok:true,json:async()=>url.includes('/auth/')?{id:'fixture',email:'fixture@example.invalid'}:[{admin_role:'acquisition'}]});
   const req={method:'POST',headers:{authorization:'Bearer fixture'}};
   const a=response();await acquisitionHandler(req,a);assert.equal(a.code,409);assert.equal(a.body.code,'OWNER_NOT_CONNECTED');assert.equal(a.headers['Cache-Control'],'no-store, private');
   const b=response();await bandHandler({...req,method:'GET'},b);assert.equal(b.code,403);

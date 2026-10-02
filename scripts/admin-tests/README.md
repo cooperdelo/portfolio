@@ -19,7 +19,7 @@ The existing vault sync also passed a real cloud-to-file read-back, unchanged re
 
 ## Release limitations
 
-The Claude board source uses its artifact database. No complete database export or supported external write adapter is connected. Acquisition writes intentionally remain disabled. Karthik's user-supplied identity is configured with acquisition-only membership; no invitation has been sent. Preview onboarding remains gated on the board connection and rollout. Product account creation is visible, but sender attribution, test-user registry and real-gig verification are incomplete. Forty-two band videos are indexed; one private proxy is prepared. Band sharing, automatic Drive refresh and rendered exports are pending. No production-ready claim is made.
+The Claude board source uses its artifact database. The admin board (acq_* tables, `/api/acquisition` reads and writes, `acquisition-board.test.mjs`) is built and unit-tested, and a read-only snapshot export of the board was taken on October 2, but the migration is not applied, so acquisition writes stay disabled until the cutover in CLAUDE.md. Karthik's user-supplied identity is configured with acquisition-only membership; no invitation has been sent. Preview onboarding remains gated on the board connection and rollout. Product account creation is visible, but sender attribution, test-user registry and real-gig verification are incomplete. Forty-two band videos are indexed; one private proxy is prepared. Band sharing, automatic Drive refresh and rendered exports are pending. No production-ready claim is made.
 
 ## Migrations and recovery
 
