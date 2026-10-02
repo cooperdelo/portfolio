@@ -127,7 +127,7 @@ def roll(t):
 NAV = f"""<header class="nav label">
   <a class="mark" href="/" aria-label="Cooper Delo, home">{roll("Cooper Delo")}</a>
   <span class="where">Chapel Hill, NC&nbsp;&nbsp;<span data-clock>--:--</span> ET</span>
-  <nav class="links" aria-label="Primary"><a href="/#work">{roll("Work")}</a><a href="/#about">{roll("About")}</a><a href="/#contact">{roll("Contact")}</a></nav>
+  <nav class="links" aria-label="Primary"><a href="/work">{roll("Work")}</a><a href="/resources">{roll("Resources")}</a><a href="/#about">{roll("About")}</a><a href="/#contact">{roll("Contact")}</a></nav>
 </header>"""
 
 SCRIPTS = """<script src="/assets/lenis.min.js" defer></script>
@@ -450,6 +450,96 @@ def resume_page():
 </html>
 """
 
+# ---------------------------------------------------------------- /work: every piece as a card, Gaku-style
+SYSTEM_CARD = dict(slug="ai-system", title="My AI system", disc="Systems", year="2026")
+
+def work_grid_page(diagram):
+    cards = []
+    order = ["chapter-one", "plugverse-launch-film", "bioswap", "plugverse-product", "ai-system", "the-start", "rubber-band", "plugverse"]
+    by = {w["slug"]: w for w in WORK}
+    for slug in order:
+        if slug == "ai-system":
+            w, href, media = SYSTEM_CARD, "/work/ai-system", f'<span class="wc-sys">{diagram}</span>'
+        elif slug == "plugverse":
+            w, href, media = COMPANY, "/plugverse", f'<span class="film">{spic("work-poster-plugverse-product", "", "(max-width: 800px) 100vw, 48vw")}</span>'
+        else:
+            w, href, media = by[slug], f"/work/{slug}", f'<span class="film">{spic("work-poster-" + slug, "", "(max-width: 800px) 100vw, 48vw")}</span>'
+        cards.append(f"""      <li data-rv><a class="wc" href="{href}" data-handoff>
+        <span class="wc-media">{media}</span>
+        <span class="wc-chip label">{E(w['disc'])}</span>
+        <span class="wc-foot"><span class="wc-t">{E(w['title'])}</span><span class="label">{E(w['year'])} {ARROW}</span></span>
+      </a></li>""")
+    css = '<link rel="stylesheet" href="/assets/showcase.css" />\n<link rel="stylesheet" href="/assets/work.css" />\n</head>'
+    return f"""{head("Work / Cooper Delo", "Films, motion, product and systems by Cooper Delo.", "https://cooperdelo.com/work").replace("</head>", css, 1)}
+<body class="page">
+{NAV}
+<main>
+  <section class="wg-hero light" aria-labelledby="wg-h">
+    <p class="label">Work</p>
+    <h1 id="wg-h" data-hero>{lines("Everything")}{lines("I've made.")}</h1>
+    <p class="lede">Films, motion, product, and the system I build it all with.</p>
+  </section>
+  <section class="wg light" aria-label="All work">
+    <ol class="wg-grid">
+{chr(10).join(cards)}
+    </ol>
+  </section>
+</main>
+{footer()}
+{SCRIPTS}
+</body>
+</html>
+"""
+
+# ---------------------------------------------------------------- /work/ai-system
+# Counts checked against the vault on 2026-10-02: Decisions/ (dated files), Context/auto-memory/,
+# Scheduled-Tasks/TASK-ROSTER.md (recurring tasks switched on), CLAUDE.md "Hard Rules", PlugVerse qa branch.
+SYS_FACTS = [("50", "decisions"), ("162", "memories"), ("45", "scheduled tasks"), ("28", "rules"), ("5,314", "PlugVerse commits")]
+SYS_TREE = [("CLAUDE.md", "28 rules, each written after something broke"), ("Context/", "who I am, how I write, 162 memories"),
+            ("Decisions/", "50 calls, one dated file each"), ("Projects/", "PlugVerse, music, this site"),
+            ("Scheduled-Tasks/", "45 jobs that run without me"), ("Skills/", "how-tos Claude can run"), ("Daily/", "what happened today")]
+SYS_SRC = [("Claude Code", "builds"), ("Claude Cowork", "runs the desk"), ("claude.ai", "thinks it through"), ("Jev", "sorts and scores in half a second")]
+SYS_STEPS = [("Read first", "Every session opens the same folder before it answers. It already knows my work."),
+             ("Decide once", "When I make a call, it becomes a dated file. Claude checks there before it guesses."),
+             ("Save after", "Every chat ends by writing what it learned back to the folder."),
+             ("Run without me", "Scheduled jobs pull the data, Jev sorts it, and I only see what needs me.")]
+
+def ai_system_page():
+    srcs = "".join(f'<li style="--d:{i * .5}s"><b>{a}</b><span>{b}</span></li>' for i, (a, b) in enumerate(SYS_SRC))
+    n = len(SYS_TREE)
+    tree = "".join(f'<li style="--d:{i * .12}s"><span class="f">{"&#9500;" if i < n - 1 else "&#9492;"} {E(a)}</span><span class="c">{E(b)}</span></li>' for i, (a, b) in enumerate(SYS_TREE))
+    facts = "".join(f'<li><b>{a}</b><span class="label">{b}</span></li>' for a, b in SYS_FACTS)
+    steps = "".join(f'<li data-rv><span class="label">0{i + 1}</span><h2>{E(a)}</h2><p>{E(b)}</p></li>' for i, (a, b) in enumerate(SYS_STEPS))
+    wires = "".join(f'<path d="M0 {y} C 50 {y}, 50 50, 100 50"/>' for y in (12, 37, 63, 88))
+    css = '<link rel="stylesheet" href="/assets/work.css" />\n</head>'
+    return f"""{head("My AI system / Cooper Delo", "One folder every Claude session reads before it answers. How Cooper Delo built PlugVerse solo.", "https://cooperdelo.com/work/ai-system").replace("</head>", css, 1)}
+<body class="page">
+{NAV}
+<main>
+  <section class="as-hero dark" aria-labelledby="as-h">
+    <p class="label">Work / Systems</p>
+    <h1 id="as-h" data-hero>{lines("One folder")}{lines("every Claude reads.")}</h1>
+    <p class="lede">It's how I built PlugVerse by myself. Every session starts already knowing my work, and ends by saving what it learned.</p>
+    <div class="as-map" aria-label="Claude Code, Claude Cowork, claude.ai and Jev all read and write one folder">
+      <ul class="as-src">{srcs}</ul>
+      <svg class="as-wires" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">{wires}</svg>
+      <div class="as-win"><div class="as-bar"><i></i><i></i><i></i><span>the vault</span></div><ul class="as-tree">{tree}</ul></div>
+    </div>
+  </section>
+  <section class="as-facts dark" aria-label="By the numbers"><ul>{facts}</ul></section>
+  <section class="as-steps light" aria-label="How it works"><ol>{steps}</ol></section>
+  <section class="as-next light" aria-labelledby="as-n">
+    <h2 id="as-n" data-rv>{lines("Want one")}{lines("of your own?")}</h2>
+    <p>I'm packaging the starter version of this folder. Until then, the free things I use are in Resources, and I'll help you set yours up.</p>
+    <div class="acts"><a class="pill" href="/resources">Resources {ARROW}</a><a class="pill" href="/work-with-me">Work with me {ARROW}</a></div>
+  </section>
+</main>
+{footer()}
+{SCRIPTS}
+</body>
+</html>
+"""
+
 if __name__ == "__main__":
     home_extras = runpy.run_path(str(ROOT / "scripts/build-home-extras.py"))
     for i, w in enumerate(WORK):
@@ -478,10 +568,12 @@ if __name__ == "__main__":
             .replace("{FRAMES}", frames_block()).replace("{FOOTER}", footer("home-footer")).replace("{ABOUTPIC}", spic("home-about", "Cooper Delo on the lawn at dusk", "(max-width: 900px) 100vw, 40vw")).replace("{SCRIPTS}", SCRIPTS)
             .replace("{CAL}", CAL).replace("{ARROW}", ARROW))
     extras = runpy.run_path(str(ROOT / "scripts/build-home-extras.py"))
-    page = (page.replace("{SHOWCASE}", extras["showcase"]()).replace("{RECORDS}", extras["records"]()).replace("{STRIP}", extras["strip"](frames_block()))
+    page = (page.replace("{SHOWCASE}", extras["showcase"]() + "\n  " + extras["take"]()).replace("{RECORDS}", extras["records"]()).replace("{STRIP}", extras["strip"](frames_block()))
             .replace("</head>", '<link rel="stylesheet" href="/assets/showcase.css" />\n<link rel="stylesheet" href="/assets/records.css" />\n<link rel="stylesheet" href="/assets/album-viewer.css" />\n</head>', 1)
             .replace('<script src="/assets/site.js" defer></script>', '<script src="/assets/site.js" defer></script>\n<script src="/assets/showcase.js" defer></script>\n<script src="/assets/records.js" defer></script>', 1))
     (ROOT / "index.html").write_text(page, encoding="utf-8")
-    urls = ["/", "/work-with-me", "/resources", "/resources/film-plan", "/gear", "/resume", "/plugverse", "/rubber-band", "/privacy", "/terms"] + [f"/work/{w['slug']}" for w in WORK]
+    (ROOT / "work" / "index.html").write_text(work_grid_page(extras["systems_diagram"]()), encoding="utf-8")
+    (ROOT / "work" / "ai-system.html").write_text(ai_system_page(), encoding="utf-8")
+    urls = ["/", "/work", "/work/ai-system", "/work-with-me", "/resources", "/resources/film-plan", "/gear", "/resume", "/plugverse", "/rubber-band", "/privacy", "/terms"] + [f"/work/{w['slug']}" for w in WORK]
     (ROOT / "sitemap.xml").write_text('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + "".join(f"  <url><loc>https://cooperdelo.com{u}</loc></url>\n" for u in urls) + "</urlset>\n", encoding="utf-8")
     print("built", len(WORK), "pieces + index + plugverse + sitemap")

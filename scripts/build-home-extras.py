@@ -83,20 +83,21 @@ SHOW = [
      "cta": ("See how it moves", "/work/bioswap"), "video": "bioswap-final", "ar": "1/1", "webm": True},
     {"tab": "Product", "title": "PlugVerse", "line": "I built it solo, then made the film that launched it.", "stat": "Live since Sep 23, 2026",
      "cta": ("See PlugVerse", "/work/plugverse-product"), "video": "launch-film", "ar": "16/9"},
-    {"tab": "Systems", "title": "My AI system", "line": "One set of files every AI reads, so it already knows my work.", "stat": "Built PlugVerse with it: 5,314 commits",
-     "cta": ("See what it built", "/work/plugverse-product"), "video": None},
+    {"tab": "Systems", "title": "My AI system", "line": "One folder every Claude reads, so it already knows my work.", "stat": "Built PlugVerse with it: 5,314 commits",
+     "cta": ("See how it works", "/work/ai-system"), "video": None},
 ]
-ALL_WORK = [("Chapter One", "/work/chapter-one"), ("PlugVerse launch film", "/work/plugverse-launch-film"), ("The Start", "/work/the-start"),
+ALL_WORK = [("My AI system", "/work/ai-system"), ("Chapter One", "/work/chapter-one"), ("PlugVerse launch film", "/work/plugverse-launch-film"), ("The Start", "/work/the-start"),
             ("Bioswap", "/work/bioswap"), ("PlugVerse product", "/work/plugverse-product"), ("Rubber Band", "/work/rubber-band")]
 
 
 def systems_diagram():
-    # Counts from the vault as of Oct 2, 2026 (commits, Decisions/, auto-memory/, TASK-ROSTER.md).
-    agents = "".join(f'<span class="ag" style="--d:{i * 0.6}s">{n}</span>' for i, n in enumerate(["Claude", "Codex", "ChatGPT"]))
-    facts = "".join(f'<li><b>{v}</b><span>{k}</span></li>' for v, k in [("50", "decisions"), ("162", "memories"), ("45", "scheduled tasks"), ("307", "saves since May")])
-    return f'''<div class="sys" aria-label="Claude, Codex and ChatGPT all read one vault of files">
+    # Counts checked against the vault on Oct 2, 2026: Decisions/ dated files, Context/auto-memory/,
+    # TASK-ROSTER.md recurring tasks switched on, CLAUDE.md Hard Rules.
+    agents = "".join(f'<span class="ag" style="--d:{i * 0.6}s">{n}</span>' for i, n in enumerate(["Claude Code", "Cowork", "claude.ai", "Jev"]))
+    facts = "".join(f'<li><b>{v}</b><span>{k}</span></li>' for v, k in [("50", "decisions"), ("162", "memories"), ("45", "scheduled tasks"), ("28", "rules")])
+    return f'''<div class="sys" aria-label="Claude Code, Cowork, claude.ai and Jev all read one vault of files">
         <div class="agents">{agents}</div>
-        <svg class="wires" viewBox="0 0 100 60" preserveAspectRatio="none" aria-hidden="true"><path d="M2 10 C 40 10, 45 30, 62 30"/><path d="M2 30 L 62 30"/><path d="M2 50 C 40 50, 45 30, 62 30"/></svg>
+        <svg class="wires" viewBox="0 0 100 60" preserveAspectRatio="none" aria-hidden="true"><path d="M2 8 C 40 8, 45 30, 62 30"/><path d="M2 23 C 40 23, 45 30, 62 30"/><path d="M2 37 C 40 37, 45 30, 62 30"/><path d="M2 52 C 40 52, 45 30, 62 30"/></svg>
         <div class="vault"><p class="label">The vault</p><ul>{facts}</ul><p class="loop label">Every chat ends by saving what it learned</p></div>
       </div>'''
 
@@ -126,7 +127,7 @@ def showcase():
       <div class="sc-copies">{copy}</div>
       <div class="sc-plate">{"".join(media)}</div>
     </div>
-    <p class="sc-all label"><span>All work</span> {allw}</p>
+    <p class="sc-all label"><a class="sc-allk" href="/work">All work</a> {allw}</p>
   </section>"""
 
 
@@ -136,3 +137,16 @@ def strip(frames_html):
       <p class="label strip-l">Chapel Hill, in frames</p>
       <div class="strip-track"><div class="strip-set">{frames_html}</div><div class="strip-set" aria-hidden="true">{frames_html}</div></div>
     </div>"""
+
+
+# ---------------------------------------------------------------- free things, right after the work
+TAKE = [("Gear", "Everything I shoot, play and record with.", "/gear", "The rig"),
+        ("Film planner", "The questions I answer before I shoot anything.", "/resources/film-plan", "Free, no email"),
+        ("Work with me", "Films, motion and product. Tell me what you're building.", "/work-with-me", "Hire me")]
+
+def take():
+    cards = "".join(f'''<li><a class="tk" href="{u}"><span class="label">{tag}</span><b>{t}</b><span>{d}</span><span class="go">{ARROW}</span></a></li>''' for t, d, u, tag in TAKE)
+    return f"""<section class="take light" aria-labelledby="tk-h">
+    <div class="tk-head"><p class="label" id="tk-h">Resources</p><p>Free things I actually use. <a href="/resources">See all {ARROW}</a></p></div>
+    <ol class="tk-grid">{cards}</ol>
+  </section>"""

@@ -79,3 +79,21 @@
   .strip-set[aria-hidden] { display: none; }
   .sys .ag, .sys .wires path { animation: none; }
 }
+
+/* Resources, right after the work: three free things, one line each */
+.take { padding: 0 var(--gutter) clamp(72px, 11vh, 128px); }
+.tk-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 18px; border-top: 1px solid var(--line-l); padding-top: 18px; }
+.tk-head .label { opacity: .62; }
+.tk-head p:last-child { font-size: 14px; }
+.tk-head a { display: inline-flex; align-items: center; gap: 6px; border-bottom: 1px solid currentColor; }
+.tk-head a svg, .tk .go svg { width: 12px; height: 12px; }
+.tk-grid { list-style: none; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(14px, 1.6vw, 24px); margin-top: clamp(22px, 3vh, 34px); }
+.tk { position: relative; display: grid; gap: 8px; height: 100%; padding: 22px 22px 52px; border: 1px solid var(--line-l); border-radius: 6px; transition: background-color .5s var(--ease), color .5s var(--ease), border-color .5s var(--ease); }
+.tk .label { opacity: .62; }
+.tk b { font-family: var(--display); font-weight: 700; text-transform: uppercase; font-size: clamp(22px, 2.2vw, 36px); line-height: .9; }
+.tk > span:not(.label):not(.go) { font-size: 15px; line-height: 1.45; max-width: 32ch; }
+.tk .go { position: absolute; right: 20px; bottom: 18px; transition: transform .5s var(--ease); }
+.tk:hover, .tk:focus-visible { background: var(--ink); color: var(--bone); border-color: var(--ink); }
+.tk:hover .go { transform: translateX(4px); }
+@media (max-width: 900px) { .tk-grid { grid-template-columns: minmax(0, 1fr); } }
+.sc-all .sc-allk { opacity: 1; margin-right: 6px; border-bottom: 1px solid currentColor; }
