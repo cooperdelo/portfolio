@@ -57,13 +57,13 @@
 .rx-now.out .swap { opacity: 0; transform: translateY(6px); }
 
 /* Phones: one sleeve at a time, swipe to the next, the centred one pulls. */
-@media (max-width: 700px) {
+@media (max-width: 900px) {
   .records .rx-head { display: block; }
   .records .rx-head p:last-child { margin-top: 8px; }
   .rx-strip {
-    --w: 60vw; --step: .86;
+    --w: clamp(220px, 60vw, 400px); --step: .86;
     justify-content: flex-start; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory;
-    scrollbar-width: none; padding: calc(var(--w) * .78) 20vw calc(var(--w) * .12); margin-inline: calc(var(--gutter) * -1);
+    scrollbar-width: none; padding: calc(var(--w) * .78) calc(50vw - var(--w) / 2) calc(var(--w) * .12); margin-inline: calc(var(--gutter) * -1);
   }
   .rx-strip::-webkit-scrollbar { display: none; }
   .rx { scroll-snap-align: center; }

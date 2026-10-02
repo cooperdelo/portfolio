@@ -8,7 +8,7 @@
   root.classList.add("rx-js");
   const RM = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const FINE = matchMedia("(hover: hover) and (pointer: fine)").matches;
-  const PHONE = matchMedia("(max-width: 700px)");
+  const PHONE = matchMedia("(max-width: 900px)"); // phones and tablets swipe one sleeve at a time
   const items = [...strip.querySelectorAll(".rx")];
   const now = document.querySelector("[data-records-now]");
   const RPM = (33 + 1 / 3) / 60 * 360; // degrees per second

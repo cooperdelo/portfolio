@@ -41,7 +41,7 @@
   .mo-lede { grid-column: 1 / -1; margin-top: 22px; }
   .mo-body { display: block; }
   .mo-stage { position: sticky; top: 0; z-index: 2; background: var(--ink-2); padding: 68px var(--gutter) 14px; margin: 0 calc(var(--gutter) * -1); }
-  .mo-plate, .mo-meter { width: min(100%, 62vh); margin-inline: auto; }
+  .mo-plate, .mo-meter { width: min(100%, 46vh); margin-inline: auto; }
   .mo-beats { padding: 4vh 0 10vh; }
   .mo-beats li + li { margin-top: 22vh; }
   .mo-foot { display: block; }

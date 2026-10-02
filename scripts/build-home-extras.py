@@ -58,8 +58,8 @@ def records(first=2):
             f'<li class="rx" data-title="{a["title"]}" data-artist="{a["artist"]}" data-year="{a["year"]}">'
             f'<button class="rx-hit" type="button" aria-pressed="false" aria-label="{a["title"]}, {a["artist"]}, {a["year"]}"><span class="rx-art"><span class="rx-disc">'
             f'<img class="rx-label" src="/img/records/label-{s}.webp" width="200" height="200" alt="" loading="lazy" decoding="async" />'
-            f'<img class="rx-vinyl" src="/img/records/record-640.webp" srcset="/img/records/record-640.webp 640w, /img/records/record-960.webp 960w" sizes="(max-width: 700px) 80vw, 280px" width="640" height="640" alt="" loading="lazy" decoding="async" />'
-            f'</span><img class="rx-sleeve" src="/img/records/sleeve-{s}-640.webp" srcset="/img/records/sleeve-{s}-640.webp 640w, /img/records/sleeve-{s}-960.webp 960w" sizes="(max-width: 700px) 80vw, 280px" width="640" height="640" alt="" loading="lazy" decoding="async" /></span></button></li>')
+            f'<img class="rx-vinyl" src="/img/records/record-640.webp" srcset="/img/records/record-640.webp 640w, /img/records/record-960.webp 960w" sizes="(max-width: 666px) 80vw, (max-width: 900px) 535px, 340px" width="640" height="640" alt="" loading="lazy" decoding="async" />'
+            f'</span><img class="rx-sleeve" src="/img/records/sleeve-{s}-640.webp" srcset="/img/records/sleeve-{s}-640.webp 640w, /img/records/sleeve-{s}-960.webp 960w" sizes="(max-width: 666px) 80vw, (max-width: 900px) 535px, 340px" width="640" height="640" alt="" loading="lazy" decoding="async" /></span></button></li>')
     f = ALBUMS[first]
     return f"""<section class="records dark" aria-labelledby="rx-h">
     <div class="rx-head"><p class="label" id="rx-h">On repeat</p><p>A few records I come back to.</p></div>
