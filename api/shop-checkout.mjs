@@ -41,7 +41,8 @@ export default async function handler(req, res) {
       const found = await stripe(`promotion_codes?active=true&limit=1&code=${encodeURIComponent(code)}`, { key });
       const promo = found?.data?.[0];
       if (!promo) return res.status(400).json({ error: 'bad_code' });
-      form['discounts[0][promotion_code]'] = promo.id; // Stripe doesn't allow this together with allow_promotion_codes
+      form['discounts[0][promotion_code]'] = promo.id;
+      form['metadata[promo]'] = code; // Stripe doesn't allow this together with allow_promotion_codes
     } else {
       form.allow_promotion_codes = 'true';
     }

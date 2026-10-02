@@ -107,3 +107,15 @@ test('the catalog lists kits without their steps', async () => {
   assert.equal(JSON.stringify(r.body).includes('secret'), false);
   assert.equal(JSON.stringify(r.body).includes('MP'), false);
 });
+
+const { verifySig } = await import('../../api/shop-webhook.mjs');
+const { createHmac } = await import('node:crypto');
+test('webhook signatures: valid passes, tampered, stale or unsigned fail', () => {
+  const secret = 'whsec_test', body = '{"type":"checkout.session.completed"}', t = Math.floor(Date.now() / 1000);
+  const sig = createHmac('sha256', secret).update(`${t}.${body}`).digest('hex');
+  assert.equal(verifySig(body, `t=${t},v1=${sig}`, secret), true);
+  assert.equal(verifySig(body + ' ', `t=${t},v1=${sig}`, secret), false);
+  assert.equal(verifySig(body, `t=${t - 4000},v1=${createHmac('sha256', secret).update(`${t - 4000}.${body}`).digest('hex')}`, secret), false);
+  assert.equal(verifySig(body, '', secret), false);
+  assert.equal(verifySig(body, `t=${t},v1=${sig}`, ''), false);
+});
