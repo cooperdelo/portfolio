@@ -19,6 +19,7 @@
     if (loaded) return;
     loaded = true;
     const base = matchMedia("(max-width: 700px)").matches ? vid.dataset.m : vid.dataset.d;
+    vid.preload = "auto"; // close to the section now: buffer the whole cut so beat jumps are instant
     vid.src = base + (vid.canPlayType('video/webm; codecs="vp9"') ? ".webm" : ".mp4");
     vid.load();
     vid.addEventListener("loadeddata", () => plate.classList.add("live"), { once: true });
