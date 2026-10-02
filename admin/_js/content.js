@@ -20,6 +20,7 @@ const PLATS = ['linkedin', 'instagram', 'tiktok', 'youtube'];
 const PAGE = 24;
 
 app.innerHTML = pageHead('Grow', 'Content') + `
+  <p><a class="btn" href="/admin/content/research">Research & references</a> <a class="btn" href="/admin/content/intent">Brand & next steps</a></p>
   <section class="sv-section" style="margin-top:0" aria-label="All posts">
     <label for="brand-scope">Accounts</label>
     <select id="brand-scope" class="btn" style="margin:0 0 20px 12px"><option value="all">All content</option><option value="personal">Personal</option><option value="plugverse">PlugVerse</option><option value="rubber-band">Rubber Band</option></select>
