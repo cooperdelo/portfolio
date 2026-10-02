@@ -21,7 +21,8 @@
     if (!now) return;
     const d = items[i].dataset;
     const fill = () => {
-      now.querySelector("[data-no]").textContent = "No. " + String(i + 1).padStart(2, "0");
+      const n = items.slice(0, i + 1).filter((x) => !x.classList.contains("mine")).length;
+      now.querySelector("[data-no]").textContent = items[i].classList.contains("mine") ? "Mine" : "No. " + String(n).padStart(2, "0");
       now.querySelector("[data-t]").textContent = d.title;
       now.querySelector("[data-a]").textContent = d.artist + ", " + d.year;
       now.classList.remove("out");
@@ -66,14 +67,25 @@
     if (FINE) li.addEventListener("pointerenter", () => pick(i));
     hit.addEventListener("focus", () => pick(i));
     hit.addEventListener("click", () => {
+      // Phones: the first tap brings a sleeve to the middle, a tap on the middle one opens it.
+      if (PHONE.matches && active !== i) { pick(i); li.scrollIntoView({ behavior: RM ? "auto" : "smooth", inline: "center", block: "nearest" }); return; }
       pick(i);
-      if (PHONE.matches) li.scrollIntoView({ behavior: RM ? "auto" : "smooth", inline: "center", block: "nearest" });
+      openRecord(li.dataset.slug, hit);
     });
     hit.addEventListener("keydown", (e) => {
       const n = e.key === "ArrowRight" ? i + 1 : e.key === "ArrowLeft" ? i - 1 : -1;
       if (n > -1 && n < items.length) { e.preventDefault(); items[n].querySelector(".rx-hit").focus(); }
     });
   });
+
+  // The viewer (and three.js) only load the first time someone opens a record.
+  let viewer = null;
+  function openRecord(slug, from) {
+    viewer = viewer || import("/assets/album-viewer.js");
+    viewer.then((m) => m.open(slug, from)).catch(() => {});
+  }
+  // Warm it up on intent, so the panel opens without a wait.
+  strip.addEventListener("pointerenter", () => { viewer = viewer || import("/assets/album-viewer.js"); }, { once: true });
 
   // A little depth: sleeves and vinyl drift apart against the pointer.
   if (FINE && !RM) {
@@ -105,7 +117,7 @@
     if (visible) {
       if (!strip.classList.contains("in")) {
         strip.classList.add("in");
-        setTimeout(() => { if (active < 0) pick(PHONE.matches ? 0 : 2); }, RM ? 0 : 900);
+        setTimeout(() => { if (active < 0) pick(PHONE.matches ? 0 : 3); }, RM ? 0 : 900);
       }
       spin();
     }

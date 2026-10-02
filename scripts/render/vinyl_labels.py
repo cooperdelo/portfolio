@@ -75,10 +75,10 @@ def build(album, idx, covers, fonts, out):
     tiny = ImageFont.truetype(bold, 46)
     d.text((c - SIZE * 0.24, c + 4), "SIDE A", font=tiny, fill=fg, anchor="mm")
     d.text((c + SIZE * 0.24, c + 4), "33 RPM", font=tiny, fill=fg, anchor="mm")
-    d.text((c, c + SIZE * 0.15), f"ON REPEAT  No. {idx:02d}", font=small, fill=fg, anchor="mm")
+    d.text((c, c + SIZE * 0.15), album.get("series") or f"ON REPEAT  No. {idx:02d}", font=small, fill=fg, anchor="mm")
     d.text((c, c + SIZE * 0.21), str(album["year"]), font=small, fill=fg, anchor="mm")
 
-    arc_text(img, "ON REPEAT  ·  CHAPEL HILL  ·  STEREO", ImageFont.truetype(reg, 40),
+    arc_text(img, ("COOPER DELO" if album.get("own") else "ON REPEAT") + "  ·  CHAPEL HILL  ·  STEREO", ImageFont.truetype(reg, 40),
              SIZE * 0.445, -90, fg, tracking=6)
 
     # Soft press texture so the flat colour isn't digital-flat.
@@ -97,5 +97,8 @@ def build(album, idx, covers, fonts, out):
 if __name__ == "__main__":
     covers, fonts, out = (Path(p) for p in sys.argv[1:4])
     out.mkdir(parents=True, exist_ok=True)
-    for i, a in enumerate(ALBUMS, 1):
-        build(a, i, covers, fonts, out)
+    n = 0
+    for a in ALBUMS:  # Cooper's own release isn't numbered in the On Repeat series
+        if not a.get("own"):
+            n += 1
+        build(a, n, covers, fonts, out)

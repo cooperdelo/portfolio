@@ -320,21 +320,7 @@ INDEX = """{HEAD}
     </div>
   </section>
 
-  <section class="index light" id="work" aria-label="Work">
-    <div class="top" data-rv><h2>{L1}</h2><span class="label">(0{COUNT})</span></div>
-    <div class="head label"><span>No.</span><span>Title</span><span>Discipline</span><span class="r">Year</span><span></span></div>
-    <div class="rule" data-rv></div>
-    <ol class="rows" data-index>
-{ROWS}
-    </ol>
-  </section>
-
-  {MOTION}
-
-  <section class="frames dark" aria-label="Chapel Hill, in frames">
-    <p class="big" data-rv>{L2}{L3}</p>
-    <div class="grid">{FRAMES}</div>
-  </section>
+  {SHOWCASE}
 
   {RECORDS}
 
@@ -361,6 +347,7 @@ INDEX = """{HEAD}
         <a class="pill" href="https://tiktok.com/@cooperdelo" target="_blank" rel="noreferrer">TikTok</a>
       </div>
     </div>
+    {STRIP}
   </section>
 </main>
 {FOOTER}
@@ -463,8 +450,14 @@ def resume_page():
 """
 
 if __name__ == "__main__":
+    home_extras = runpy.run_path(str(ROOT / "scripts/build-home-extras.py"))
     for i, w in enumerate(WORK):
-        (ROOT / "work" / f"{w['slug']}.html").write_text(case(w, WORK[(i + 1) % len(WORK)], f"{i + 1:02d}"), encoding="utf-8")
+        html_ = case(w, WORK[(i + 1) % len(WORK)], f"{i + 1:02d}")
+        if w["slug"] == "bioswap":  # the Motion breakdown lives with the piece it explains
+            html_ = (html_.replace('  <a class="next dark"', "  " + home_extras["motion"](in_case=True) + '\n  <a class="next dark"', 1)
+                     .replace("</head>", '<link rel="stylesheet" href="/assets/motion.css" />\n</head>', 1)
+                     .replace('<script src="/assets/beacon.js" defer></script>', '<script src="/assets/beacon.js" defer></script>\n<script src="/assets/motion.js" defer></script>', 1))
+        (ROOT / "work" / f"{w['slug']}.html").write_text(html_, encoding="utf-8")
     (ROOT / "plugverse.html").write_text(case(COMPANY, WORK[4], ""), encoding="utf-8")
     (ROOT / "resume.html").write_text(resume_page(), encoding="utf-8")
     hd, hm = K("home-hero-poster"), K("home-hero-poster-mobile")
@@ -484,9 +477,9 @@ if __name__ == "__main__":
             .replace("{FRAMES}", frames_block()).replace("{FOOTER}", footer("home-footer")).replace("{ABOUTPIC}", spic("home-about", "Cooper Delo on the lawn at dusk", "(max-width: 900px) 100vw, 40vw")).replace("{SCRIPTS}", SCRIPTS)
             .replace("{CAL}", CAL).replace("{ARROW}", ARROW))
     extras = runpy.run_path(str(ROOT / "scripts/build-home-extras.py"))
-    page = (page.replace("{MOTION}", extras["motion"]()).replace("{RECORDS}", extras["records"]())
-            .replace("</head>", '<link rel="stylesheet" href="/assets/motion.css" />\n<link rel="stylesheet" href="/assets/records.css" />\n</head>', 1)
-            .replace('<script src="/assets/site.js" defer></script>', '<script src="/assets/site.js" defer></script>\n<script src="/assets/motion.js" defer></script>\n<script src="/assets/records.js" defer></script>', 1))
+    page = (page.replace("{SHOWCASE}", extras["showcase"]()).replace("{RECORDS}", extras["records"]()).replace("{STRIP}", extras["strip"](frames_block()))
+            .replace("</head>", '<link rel="stylesheet" href="/assets/showcase.css" />\n<link rel="stylesheet" href="/assets/records.css" />\n<link rel="stylesheet" href="/assets/album-viewer.css" />\n</head>', 1)
+            .replace('<script src="/assets/site.js" defer></script>', '<script src="/assets/site.js" defer></script>\n<script src="/assets/showcase.js" defer></script>\n<script src="/assets/records.js" defer></script>', 1))
     (ROOT / "index.html").write_text(page, encoding="utf-8")
     urls = ["/", "/work-with-me", "/resources", "/resources/film-plan", "/resume", "/plugverse", "/rubber-band", "/privacy", "/terms"] + [f"/work/{w['slug']}" for w in WORK]
     (ROOT / "sitemap.xml").write_text('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + "".join(f"  <url><loc>https://cooperdelo.com{u}</loc></url>\n" for u in urls) + "</urlset>\n", encoding="utf-8")

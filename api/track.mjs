@@ -1,7 +1,7 @@
 // First-party portfolio events. Public, so it is strict: whitelisted names, short strings, no IP or
 // user agent stored, bots dropped. If the site_events table is not there yet, events are dropped (202).
 const URL_BASE='https://eibtnkaoqsgwiqttiwjo.supabase.co/rest/v1/site_events';
-export const NAMES=['page_view','record_pull','motion_beat','brief_drafted','planner_started','planner_download','cta_click','resource_open'];
+export const NAMES=['page_view','record_pull','record_open','preview_play','motion_beat','showcase_view','brief_drafted','planner_started','planner_download','cta_click','resource_open'];
 const BOT=/bot|crawl|spider|slurp|preview|facebookexternalhit|headless|lighthouse|pingdom|monitor/i;
 const str=(v,n)=>String(v??'').replace(/[\u0000-\u001f]/g,'').slice(0,n);
 

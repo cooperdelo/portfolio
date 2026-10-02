@@ -76,3 +76,9 @@
   .rx-art, .rx-sleeve, .rx-disc, .rx-now .swap { transition: none !important; }
   .rx-js .rx .rx-art { opacity: 1; transform: translate3d(0, var(--y, 0), 0) rotate(var(--r, 0deg)); }
 }
+
+/* "Pick one" and the sticker on Cooper's own record */
+.rx-tag { display: inline-block; margin-left: 10px; padding: 4px 10px 3px; border: 1px solid var(--bone); border-radius: 999px; font-weight: 700; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--bone); opacity: 1; transform: rotate(-3deg); }
+.rx-sticker { position: absolute; z-index: 3; right: 16%; top: 15%; padding: 6px 10px 5px; border-radius: 999px; background: var(--bone); color: var(--ink); font-weight: 700; font-size: clamp(9px, .8vw, 12px); letter-spacing: .06em; text-transform: uppercase; transform: rotate(8deg); box-shadow: 0 4px 10px rgba(0, 0, 0, .35); }
+.rx-hit { cursor: pointer; }
+@media (max-width: 666px) { .rx-tag { margin: 8px 0 0; } }
