@@ -1,24 +1,26 @@
-/* Record viewer: a panel slides in from the right. Left, the record in 3D; right, the tracklist and player. */
+/* Record viewer: full screen. Left, the sleeve in 3D (drag to turn, flip for the back); right, the tracklist and player. */
 .av { position: fixed; inset: 0; z-index: 120; }
 .av[hidden] { display: none; }
-.av-scrim { position: absolute; inset: 0; background: rgba(12, 10, 8, .62); opacity: 0; transition: opacity .7s var(--ease); }
+.av-scrim { position: absolute; inset: 0; background: var(--ink); opacity: 0; transition: opacity .6s var(--ease); }
 .av.open .av-scrim { opacity: 1; }
 .av-panel {
-  position: absolute; top: 0; right: 0; bottom: 0; width: min(1180px, 94vw);
-  display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
-  background: var(--ink); color: var(--bone);
-  transform: translateX(104%); transition: transform 1s var(--ease);
-  box-shadow: -40px 0 80px -30px rgba(0, 0, 0, .7);
+  position: absolute; inset: 0;
+  display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  background: transparent; color: var(--bone);
+  opacity: 0; transform: scale(.985); transition: opacity .7s var(--ease), transform .9s var(--ease);
 }
-.av.open .av-panel { transform: none; }
+.av.open .av-panel { opacity: 1; transform: none; }
 .av-stage { position: relative; min-width: 0; background: radial-gradient(80% 70% at 50% 46%, #2a241d 0%, #16130f 62%, #0f0d0b 100%); overflow: hidden; }
 .av-stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; cursor: grab; touch-action: none; }
 .av-stage canvas:active { cursor: grabbing; }
-.av-fallback { position: absolute; left: 50%; top: 50%; width: min(70%, 520px); transform: translate(-50%, -50%) rotate(-2deg); box-shadow: 0 30px 60px -20px rgba(0, 0, 0, .7); }
-.av-hint { position: absolute; left: 24px; bottom: 22px; opacity: .55; transition: opacity .8s var(--ease); }
+.av-fallback { position: absolute; left: 50%; top: 50%; width: min(64%, 520px); transform: translate(-50%, -50%) rotate(-2deg); box-shadow: 0 30px 60px -20px rgba(0, 0, 0, .7); }
+.av-flip { position: absolute; right: 24px; bottom: 20px; z-index: 2; color: var(--bone); border-color: var(--line-d); }
+.av-flip:hover { background: var(--bone); color: var(--ink); }
+.av-hint { position: absolute; left: 24px; bottom: 30px; opacity: .55; transition: opacity .8s var(--ease); }
 .av-hint.gone { opacity: 0; }
-.av-info { min-width: 0; overflow-y: auto; overscroll-behavior: contain; padding: clamp(64px, 9vh, 96px) clamp(22px, 3vw, 44px) 40px; display: flex; flex-direction: column; gap: 22px; }
-.av-close { position: absolute; top: 18px; right: 18px; z-index: 2; }
+.av-info { min-width: 0; overflow-y: auto; overscroll-behavior: contain; padding: clamp(72px, 11vh, 120px) clamp(22px, 4vw, 72px) 40px; border-left: 1px solid var(--line-d); display: flex; flex-direction: column; gap: 22px; }
+.av-close { position: fixed; top: 20px; right: 20px; z-index: 3; color: var(--bone); border-color: var(--line-d); }
+.av-close:hover { background: var(--bone); color: var(--ink); }
 .av-no { opacity: .6; }
 .av-title { font-family: var(--display); font-weight: 700; text-transform: uppercase; font-size: clamp(30px, 3.6vw, 56px); line-height: .86; letter-spacing: -.02em; margin-top: 10px; text-wrap: balance; }
 .av-artist { font-size: 16px; opacity: .72; margin-top: 10px; }
@@ -58,10 +60,13 @@
 html.av-lock, html.av-lock body { overflow: hidden; }
 
 @media (max-width: 800px) {
-  .av-panel { width: 100vw; grid-template-columns: minmax(0, 1fr); grid-template-rows: 44vh minmax(0, 1fr); transform: translateY(104%); }
-  .av-info { padding-top: 26px; }
+  .av-panel { grid-template-columns: minmax(0, 1fr); grid-template-rows: 46vh minmax(0, 1fr); }
+  .av-info { padding-top: 26px; border-left: 0; border-top: 1px solid var(--line-d); }
+  .av-flip { right: 14px; bottom: 14px; }
+  .av-hint { left: 16px; bottom: 24px; }
   .av-close { top: 14px; right: 14px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .av-scrim, .av-panel, .av-hint { transition: none; }
+  .av-panel { transform: none; }
 }

@@ -78,6 +78,7 @@ html.lenis, html.lenis body { height: auto; }
 .roll > span + span { position: absolute; left: 0; top: 100%; }
 a:hover > .roll > span, a:focus-visible > .roll > span { transform: translateY(-100%); }
 @media (max-width: 700px) { .nav { grid-template-columns: 1fr auto; } .nav .where { display: none; } .nav .links { gap: 16px; } }
+@media (max-width: 480px) { .nav .mark { white-space: nowrap; font-size: 12px; } .nav .links { gap: 12px; } .nav .links a[href="/#about"] { display: none; } }
 
 /* ---------- custom cursor (only over work and media) ---------- */
 .cur { position: fixed; left: 0; top: 0; z-index: 99; pointer-events: none; width: 96px; height: 96px; margin: -48px 0 0 -48px; border-radius: 50%; background: var(--bone); color: var(--ink); display: grid; place-items: center; transform: translate3d(-200px, -200px, 0) scale(0); box-shadow: 0 10px 40px -10px rgba(0, 0, 0, .4); }

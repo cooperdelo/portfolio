@@ -1,47 +1,27 @@
-/* On repeat: pull a record out and let the label turn.
-   Hover, focus or tap picks a record. On phones the centred sleeve is the pick.
-   The label spins up to 33 1/3 and coasts down when it's put back. */
+/* On repeat: a wall of records. Hover or focus pulls a record up out of its sleeve and the label spins up
+   to 33 1/3, then coasts down when it's put back. A click opens the record viewer. */
 (() => {
-  const strip = document.querySelector("[data-records]");
-  if (!strip) return;
-  const root = document.documentElement;
-  root.classList.add("rx-js");
+  const wall = document.querySelector("[data-records]");
+  if (!wall) return;
+  document.documentElement.classList.add("rx-js");
   const RM = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const FINE = matchMedia("(hover: hover) and (pointer: fine)").matches;
-  const PHONE = matchMedia("(max-width: 900px)"); // phones and tablets swipe one sleeve at a time
-  const items = [...strip.querySelectorAll(".rx")];
-  const now = document.querySelector("[data-records-now]");
+  const items = [...wall.querySelectorAll(".rx")];
   const RPM = (33 + 1 / 3) / 60 * 360; // degrees per second
   const state = items.map(() => ({ a: Math.random() * 360, v: 0 }));
-  let active = -1, raf = 0, last = 0, visible = false, capT = 0, picked = 0; // the automatic first pull isn't counted
+  let active = -1, raf = 0, last = 0, visible = false;
 
   items.forEach((li, i) => li.style.setProperty("--i", i));
 
-  function caption(i) {
-    if (!now) return;
-    const d = items[i].dataset;
-    const fill = () => {
-      const n = items.slice(0, i + 1).filter((x) => !x.classList.contains("mine")).length;
-      now.querySelector("[data-no]").textContent = items[i].classList.contains("mine") ? "Mine" : "No. " + String(n).padStart(2, "0");
-      now.querySelector("[data-t]").textContent = d.title;
-      now.querySelector("[data-a]").textContent = d.artist + ", " + d.year;
-      now.classList.remove("out");
-    };
-    clearTimeout(capT);
-    if (RM) return fill();
-    now.classList.add("out");
-    capT = setTimeout(fill, 220);
-  }
-
   function pick(i) {
-    if (i === active || i < 0 || i >= items.length) return;
-    if (active > -1) { items[active].classList.remove("on"); items[active].querySelector(".rx-hit").setAttribute("aria-pressed", "false"); }
+    if (i === active) return;
+    if (active > -1) items[active].classList.remove("on");
     active = i;
-    items[i].classList.add("on");
-    items[i].querySelector(".rx-hit").setAttribute("aria-pressed", "true");
-    caption(i);
+    if (i > -1) {
+      items[i].classList.add("on");
+      window.cdTrack?.("record_pull", { album: items[i].dataset.title }, { once: true });
+    }
     spin();
-    if (picked++) window.cdTrack?.("record_pull", { album: items[i].dataset.title }, { once: true });
   }
 
   // Turntable physics, roughly: spin up in about half a second, coast down slower.
@@ -62,64 +42,30 @@
   }
   function spin() { if (!RM && !raf) raf = requestAnimationFrame(tick); }
 
-  items.forEach((li, i) => {
-    const hit = li.querySelector(".rx-hit");
-    if (FINE) li.addEventListener("pointerenter", () => pick(i));
-    hit.addEventListener("focus", () => pick(i));
-    hit.addEventListener("click", () => {
-      // Phones: the first tap brings a sleeve to the middle, a tap on the middle one opens it.
-      if (PHONE.matches && active !== i) { pick(i); li.scrollIntoView({ behavior: RM ? "auto" : "smooth", inline: "center", block: "nearest" }); return; }
-      pick(i);
-      openRecord(li.dataset.slug, hit);
-    });
-    hit.addEventListener("keydown", (e) => {
-      const n = e.key === "ArrowRight" ? i + 1 : e.key === "ArrowLeft" ? i - 1 : -1;
-      if (n > -1 && n < items.length) { e.preventDefault(); items[n].querySelector(".rx-hit").focus(); }
-    });
-  });
-
   // The viewer (and three.js) only load the first time someone opens a record.
   let viewer = null;
-  function openRecord(slug, from) {
-    viewer = viewer || import("/assets/album-viewer.js");
-    viewer.then((m) => m.open(slug, from)).catch(() => {});
-  }
-  // Warm it up on intent, so the panel opens without a wait.
-  strip.addEventListener("pointerenter", () => { viewer = viewer || import("/assets/album-viewer.js"); }, { once: true });
+  const warm = () => { viewer = viewer || import("/assets/album-viewer.js"); return viewer; };
+  function openRecord(slug, from) { warm().then((m) => m.open(slug, from)).catch(() => {}); }
 
-  // A little depth: sleeves and vinyl drift apart against the pointer.
-  if (FINE && !RM) {
-    let px = 0, py = 0, q = 0;
-    strip.addEventListener("pointermove", (e) => {
-      const r = strip.getBoundingClientRect();
-      px = (e.clientX - r.left) / r.width * 2 - 1;
-      py = (e.clientY - r.top) / r.height * 2 - 1;
-      if (!q) q = requestAnimationFrame(() => { q = 0; strip.style.setProperty("--px", px.toFixed(3)); strip.style.setProperty("--py", py.toFixed(3)); });
-    });
-    strip.addEventListener("pointerleave", () => { strip.style.setProperty("--px", 0); strip.style.setProperty("--py", 0); });
-  }
+  items.forEach((li, i) => {
+    const hit = li.querySelector(".rx-hit");
+    if (FINE) {
+      li.addEventListener("pointerenter", () => pick(i));
+      li.addEventListener("pointerleave", () => { if (active === i) pick(-1); });
+    }
+    hit.addEventListener("focus", () => pick(i));
+    hit.addEventListener("blur", () => { if (active === i && !li.matches(":hover")) pick(-1); });
+    hit.addEventListener("click", () => { pick(i); openRecord(li.dataset.slug, hit); });
+  });
+  wall.addEventListener("pointerenter", warm, { once: true });
 
-  // Phones: whichever sleeve sits in the middle is the one playing.
-  let snapIO = null;
-  function phoneMode() {
-    if (snapIO) { snapIO.disconnect(); snapIO = null; }
-    if (!PHONE.matches) return;
-    snapIO = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) pick(items.indexOf(e.target)); }),
-      { root: strip, rootMargin: "0px -42% 0px -42%", threshold: 0 });
-    items.forEach((li) => snapIO.observe(li));
-  }
-  PHONE.addEventListener("change", phoneMode);
-  phoneMode();
-
-  // Deal the sleeves in, then pull the first record once they've landed.
+  // Deal the records onto the wall, then pull Cooper's own once they've landed (on touch screens nothing hovers).
   new IntersectionObserver(([e]) => {
     visible = e.isIntersecting;
-    if (visible) {
-      if (!strip.classList.contains("in")) {
-        strip.classList.add("in");
-        setTimeout(() => { if (active < 0) pick(PHONE.matches ? 0 : 3); }, RM ? 0 : 900);
-      }
-      spin();
+    if (visible && !wall.classList.contains("in")) {
+      wall.classList.add("in");
+      if (!FINE) setTimeout(() => { if (active < 0) pick(0); }, RM ? 0 : 1000);
     }
-  }, { rootMargin: "0px 0px -18% 0px" }).observe(strip);
+    spin();
+  }, { rootMargin: "0px 0px -15% 0px" }).observe(wall);
 })();
