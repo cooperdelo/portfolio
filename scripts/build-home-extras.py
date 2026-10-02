@@ -50,24 +50,28 @@ def motion(in_case=False):
   </section>"""
 
 
-def records(first=3):
+def records():
     items = []
+    n = 0
     for a in ALBUMS:
         s = a["slug"]
+        own = a.get("own")
+        if not own:
+            n += 1
+        no = "Mine" if own else f"No. {n:02d}"
         items.append(
-            f'<li class="rx{" mine" if a.get("own") else ""}" data-slug="{s}" data-title="{a["title"]}" data-artist="{a["artist"]}" data-year="{a["year"]}">'
-            f'<button class="rx-hit" type="button" aria-pressed="false" aria-haspopup="dialog" aria-label="Open {a["title"]}, {a["artist"]}, {a["year"]}"><span class="rx-art">{"<span class=rx-sticker>Mine</span>" if a.get("own") else ""}<span class="rx-disc">'
+            f'<li class="rx{" mine" if own else ""}" data-slug="{s}" data-title="{a["title"]}">'
+            f'<button class="rx-hit" type="button" aria-haspopup="dialog" aria-label="Open {a["title"]}, {a["artist"]}, {a["year"]}">'
+            f'<span class="rx-art">{"<span class=rx-sticker>Mine</span>" if own else ""}<span class="rx-disc">'
             f'<img class="rx-label" src="/img/records/label-{s}.webp" width="200" height="200" alt="" loading="lazy" decoding="async" />'
-            f'<img class="rx-vinyl" src="/img/records/record-640.webp" srcset="/img/records/record-640.webp 640w, /img/records/record-960.webp 960w" sizes="(max-width: 666px) 80vw, (max-width: 900px) 535px, 340px" width="640" height="640" alt="" loading="lazy" decoding="async" />'
-            f'</span><img class="rx-sleeve" src="/img/records/sleeve-{s}-640.webp" srcset="/img/records/sleeve-{s}-640.webp 640w, /img/records/sleeve-{s}-960.webp 960w" sizes="(max-width: 666px) 80vw, (max-width: 900px) 535px, 340px" width="640" height="640" alt="" loading="lazy" decoding="async" /></span></button></li>')
-    f = ALBUMS[first]
-    no = sum(1 for x in ALBUMS[: first + 1] if not x.get("own"))
+            f'<img class="rx-vinyl" src="/img/records/record-640.webp" srcset="/img/records/record-640.webp 640w, /img/records/record-960.webp 960w" sizes="(max-width: 700px) 60vw, 360px" width="640" height="640" alt="" loading="lazy" decoding="async" />'
+            f'</span><img class="rx-sleeve" src="/img/records/sleeve-{s}-640.webp" srcset="/img/records/sleeve-{s}-640.webp 640w, /img/records/sleeve-{s}-960.webp 960w" sizes="(max-width: 700px) 60vw, 360px" width="640" height="640" alt="" loading="lazy" decoding="async" /></span>'
+            f'<span class="rx-cap"><span class="label">{no}</span><b>{a["title"]}</b><span>{a["artist"]}, {a["year"]}</span></span></button></li>')
     return f"""<section class="records dark" aria-labelledby="rx-h">
-    <div class="rx-head"><p class="label" id="rx-h">On repeat</p><p>A few records I come back to, and one of mine. <span class="rx-tag">Pick one</span></p></div>
-    <ol class="rx-strip" data-records>
+    <div class="rx-head"><p class="label" id="rx-h">On repeat</p><p class="rx-sub">A few records I come back to, and one of mine. <span class="rx-tag">Pick one</span></p></div>
+    <ol class="rx-wall" data-records>
       {(chr(10) + "      ").join(items)}
     </ol>
-    <p class="rx-now" data-records-now aria-live="polite"><span class="label"><span class="swap" data-no>No. {no:02d}</span></span><span><span class="swap"><span class="t" data-t>{f["title"]}</span><span class="a" data-a>{f["artist"]}, {f["year"]}</span></span></span><span class="label">Open it ↗</span></p>
   </section>"""
 
 
