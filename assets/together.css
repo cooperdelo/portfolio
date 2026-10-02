@@ -128,3 +128,9 @@
 .pin b { display: block; color: var(--bone); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; margin-bottom: 2px; }
 .res .plate .wip { position: absolute; left: 14px; bottom: 12px; opacity: .7; }
 @media (max-width: 560px) { .pin { max-width: 46%; font-size: 0; padding: 5px 8px; } .pin b { font-size: 9px; margin: 0; } .sheet { width: 64%; } }
+@media (max-width: 900px) {
+  .planner aside { gap: 6px; padding-top: 10px; box-shadow: 0 -18px 24px -18px rgba(22, 19, 15, .25); }
+  .planner aside .note:last-child { display: none; }
+  .planner aside .pill { padding: 10px 14px 9px; font-size: 11px; }
+  .planner aside .note { font-size: 12px; }
+}
