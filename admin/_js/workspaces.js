@@ -1,9 +1,11 @@
 import {mountShell} from '/admin/_shell/admin-shell.js';
-import {sb} from '/admin/_shell/supabase.js';
+import {sb,getAdminRole} from '/admin/_shell/supabase.js';
 import {esc} from '/admin/_shell/ui.js';
 import {DIRECTORY} from '/admin/_shell/directory.js';
 import {scopeForTask} from '/admin/_shell/workspace-model.mjs';
 const mode=document.body.dataset.workspace;
+// Personal is full-only. A plugverse role has one workspace, so the chooser and Personal send it straight there.
+if(mode==='choose'||mode==='personal'){if(await getAdminRole()==='plugverse'){location.replace('/admin/plugverse/');throw new Error('PlugVerse workspace only');}}
 const ctx=await mountShell({title:mode==='choose'?'Your workspace':mode==='plugverse'?'PlugVerse':mode==='more'?'More tools':'Personal'});
 const app=document.querySelector('#workspace');
 const date=d=>d?new Date(d).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}):'Not recorded';
@@ -11,7 +13,7 @@ const card=(title,body,extra='')=>`<section class="ws-card ${extra}"><h2>${title
 const link=(href,label)=>`<a href="${href}">${label} ↗</a>`;
 const head=(title,description)=>`<header class="ws-head"><span class="ws-kicker">Cooper Delo / ${mode==='plugverse'?'PlugVerse':mode==='personal'?'Personal':'Admin'}</span><h1>${title}</h1><p>${description}</p></header>`;
 if(mode==='choose') {
-  app.innerHTML=head('A place for each part.','Choose what you’re working on. Your content stays together; your personal and business work stay separate.')+`<div class="ws-grid"><a class="ws-card ws-choice" href="/admin/personal/"><div><div class="ws-no">01 / Personal</div><h2>Your day, outside PlugVerse.</h2><p>Decisions, health, school, money and the things you’re making.</p></div><span class="ws-enter">Open Personal ↗</span></a><a class="ws-card ws-choice" href="/admin/plugverse/"><div><div class="ws-no">02 / PlugVerse</div><h2>Build something artists use.</h2><p>Your outreach, Karthik’s experiments, signups and real gig activity.</p></div><span class="ws-enter">Open PlugVerse ↗</span></a></div><div class="ws-shared"><div><strong>One content workspace.</strong><p>Personal, PlugVerse and Rubber Band. Separate accounts, together in one view.</p></div>${link('/admin/content/','Open all content')}</div><p class="ws-note">Existing tools and history are in ${link('/admin/more/','More tools')}.</p>`;
+  app.innerHTML=head('A place for each part.','Choose what you’re working on. Your content stays together; your personal and business work stay separate.')+`<div class="ws-grid">${ctx.role==='full'?`<a class="ws-card ws-choice" href="/admin/personal/"><div><div class="ws-no">01 / Personal</div><h2>Your day, outside PlugVerse.</h2><p>Decisions, health, school, money and the things you’re making.</p></div><span class="ws-enter">Open Personal ↗</span></a>`:''}<a class="ws-card ws-choice" href="/admin/plugverse/"><div><div class="ws-no">02 / PlugVerse</div><h2>Build something artists use.</h2><p>Your outreach, Karthik’s experiments, signups and real gig activity.</p></div><span class="ws-enter">Open PlugVerse ↗</span></a></div><div class="ws-shared"><div><strong>One content workspace.</strong><p>Personal, PlugVerse and Rubber Band. Separate accounts, together in one view.</p></div>${link('/admin/content/','Open all content')}</div><p class="ws-note">Existing tools and history are in ${link('/admin/more/','More tools')}.</p>`;
 } else if(mode==='more') {
   app.innerHTML=head('Everything still has a place.','The full directory, when you need it. Your daily work lives in Personal, PlugVerse and Content.')+`<div class="ws-grid">${DIRECTORY.map(section=>{const items=section.items.filter(x=>x.roles?x.roles.includes(ctx.role):['full','plugverse'].includes(ctx.role));return items.length?card(esc(section.section),`<ul class="ws-list">${items.map(x=>`<li>${link(x.href==='/admin/'?'/admin/personal/overview.html':x.href==='/admin/plugverse/'?'/admin/plugverse/metrics.html':x.href,esc(x.label))}</li>`).join('')}</ul>`):'';}).join('')}${ctx.role==='full'?card('Band media',`<p>Review photos, select favorites and mark video highlights without changing your originals.</p>${link('/admin/assets/','Open media review')}`):''}</div>`;
 } else {
