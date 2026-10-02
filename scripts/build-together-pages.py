@@ -10,7 +10,8 @@ CAL = "https://cal.com/cooper-delo1"
 PV = "https://plugverse.app/?utm_source=cooperdelo&utm_medium=portfolio&utm_campaign=artist_workflow"
 
 
-def page(path, title, desc, body, og="https://cooperdelo.com/img/poster-montage-1920-3a4824-1280.jpg"):
+def page(path, title, desc, body, og="https://cooperdelo.com/img/poster-montage-1920-3a4824-1280.jpg", css=()):
+    extra_css = "".join(f'\n<link rel="stylesheet" href="{c}" />' for c in css)
     url = "https://cooperdelo.com/" + path.removesuffix("/index")
     html = f"""<!doctype html>
 <html lang="en">
@@ -31,7 +32,7 @@ def page(path, title, desc, body, og="https://cooperdelo.com/img/poster-montage-
 <link rel="preload" href="/fonts/DrukWideBold.woff2" as="font" type="font/woff2" crossorigin />
 <link rel="preload" href="/fonts/NimbusSans-Bold.woff2" as="font" type="font/woff2" crossorigin />
 <link rel="stylesheet" href="/assets/site.css" />
-<link rel="stylesheet" href="/assets/together.css" />
+<link rel="stylesheet" href="/assets/together.css" />{extra_css}
 <script>(function(d){{var r=d.documentElement;try{{if(sessionStorage.getItem('cd-intro'))r.classList.add('seen')}}catch(e){{}}if(matchMedia('(prefers-reduced-motion: reduce)').matches)r.classList.add('rm')}})(document)</script>
 </head>
 <body class="page">
@@ -57,6 +58,7 @@ def page(path, title, desc, body, og="https://cooperdelo.com/img/poster-montage-
     <nav aria-label="Elsewhere">
       <a href="/resume">Resume</a>
       <a href="/resources">Resources</a>
+      <a href="/gear">Gear</a>
       <a href="https://instagram.com/cooperdelo" target="_blank" rel="noreferrer">Instagram</a>
       <a href="https://tiktok.com/@cooperdelo" target="_blank" rel="noreferrer">TikTok</a>
       <a href="/privacy">Privacy</a>
@@ -221,7 +223,73 @@ def film_plan():
     page("resources/film-plan", "Film planner", "Plan your next film: the questions Cooper Delo answers before he shoots anything.", body)
 
 
+# ---------- gear: only what Cooper confirmed on 2026-10-02 (vault Context/user.md). ----------
+# Links only where the page was checked in a browser. Unknown models stay generic and unlinked.
+CHAIN = [("Amp + Cab", "off"), ("EQ", ""), ("Screamer", ""), ("Chorus", ""), ("Delay", ""), ("Reverb", "")]
+GEAR = [
+    ("Guitars", [
+        ("Fender Telecaster", "American Professional II", "https://www.fender.com/search?q=american%20professional%20ii%20telecaster"),
+        ("PRS Custom 24-08", "Core, not the SE", "https://prsguitars.com/electrics/model/custom_24_08_2025"),
+        ("Takamine GN51CE", "Acoustic. Passive DI at gigs", "https://www.takamine.com/GN51CE-NAT"),
+    ]),
+    ("Amp and effects", [
+        ("Marshall DSL40CR", "Stealth Edition. All tubes", "https://www.marshall.com/us/en/product/dsl40-combo"),
+        ("Line 6 Pod Go", "Effects only. Amp block off", "https://line6.com/podgo/"),
+    ]),
+    ("Studio", [
+        ("Focusrite Scarlett 2i2", "Interface", "https://focusrite.com/products/scarlett-2i2"),
+        ("sE Electronics sE2200", "Condenser mic. Voiceover", "https://seelectronics.com/se2200"),
+        ("Shure SM58", "Dynamic mic", "https://www.shure.com/en-US/products/microphones/sm58"),
+        ("beyerdynamic DT 770 Pro X", "Headphones", "https://www.beyerdynamic.com/p/dt-770-pro-x-limited-edition"),
+        ("RØDE mic arm", "", ""),
+        ("Studio monitors", "", ""),
+    ]),
+    ("Camera", [
+        ("Sony A7C II", "Body", ""),
+        ("Sony FE 16mm F1.8 G", "Wide", ""),
+        ("Sony FE 24-50mm F2.8 G", "Zoom", ""),
+        ("K&F Concept VND", "67mm, 7-click. On both lenses", "https://www.kentfaith.com/feature_67mm-variable-nd-filter"),
+    ]),
+    ("When I'm on bass", [
+        ("Epiphone Embassy", "Green", "https://www.epiphone.com/en-US/p/Electric-Bass/EPIM96326/Graphite-Black"),
+        ("Fender Rumble 500", "Bass combo", "https://www.fender.com/products/rumble-500"),
+    ]),
+]
+
+
+def gear():
+    blocks = "".join(f'<li class="{"off" if st else ""}"><span>{n}</span>{"<em>off</em>" if st else ""}</li>' for n, st in CHAIN)
+    groups = []
+    for cat, items in GEAR:
+        rows = []
+        for name, note, url in items:
+            nm = f'<a href="{url}" target="_blank" rel="noreferrer">{name}<span class="go">{ARROW}</span></a>' if url else f"<span>{name}</span>"
+            rows.append(f'<li><span class="nm">{nm}</span><span class="nt">{note}</span></li>')
+        groups.append(f'<section class="gg" data-rv><p class="label">{cat}</p><ul>{"".join(rows)}</ul></section>')
+    body = f"""  <section class="pg-hero light" aria-labelledby="pg-h">
+    <p class="label">Gear</p>
+    <h1 id="pg-h" data-hero><span class="line"><span>What I</span></span><span class="line"><span>play through.</span></span></h1>
+    <p class="lede">The rig behind Rubber Band shows, the camera behind the films, and the desk I record at.</p>
+  </section>
+  <section class="chain dark" aria-labelledby="chain-h">
+    <p class="label" id="chain-h">Signal chain</p>
+    <div class="rig" role="img" aria-label="Guitar into the Line 6 Pod Go with the amp block off, through EQ, Screamer, Chorus, Delay and Reverb, into the Marshall DSL40CR">
+      <div class="end"><span class="label">In</span><b>Tele or PRS</b></div>
+      <div class="pod"><span class="label">Line 6 Pod Go</span><ol>{blocks}</ol></div>
+      <div class="end"><span class="label">Out</span><b>Marshall DSL40CR</b></div>
+      <i class="wire" aria-hidden="true"><i></i></i>
+    </div>
+    <p class="why">The amp block stays off. The Marshall is the amp.</p>
+  </section>
+  <section class="kit light" aria-label="Everything else">
+    {"".join(groups)}
+    <p class="fine">Links go to the maker's page. I don't earn anything from them.</p>
+  </section>"""
+    page("gear", "Gear", "The guitars, amp, camera and studio gear Cooper Delo actually uses.", body, css=("/assets/gear.css",))
+
+
 if __name__ == "__main__":
     work_with_me()
     resources()
     film_plan()
+    gear()

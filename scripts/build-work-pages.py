@@ -150,6 +150,7 @@ def footer(bg="footer"):
     <nav aria-label="Elsewhere">
       <a href="/resume">Resume</a>
       <a href="/resources">Resources</a>
+      <a href="/gear">Gear</a>
       <a href="https://instagram.com/cooperdelo" target="_blank" rel="noreferrer">Instagram</a>
       <a href="https://tiktok.com/@cooperdelo" target="_blank" rel="noreferrer">TikTok</a>
       <a href="/privacy">Privacy</a>
@@ -481,6 +482,6 @@ if __name__ == "__main__":
             .replace("</head>", '<link rel="stylesheet" href="/assets/showcase.css" />\n<link rel="stylesheet" href="/assets/records.css" />\n<link rel="stylesheet" href="/assets/album-viewer.css" />\n</head>', 1)
             .replace('<script src="/assets/site.js" defer></script>', '<script src="/assets/site.js" defer></script>\n<script src="/assets/showcase.js" defer></script>\n<script src="/assets/records.js" defer></script>', 1))
     (ROOT / "index.html").write_text(page, encoding="utf-8")
-    urls = ["/", "/work-with-me", "/resources", "/resources/film-plan", "/resume", "/plugverse", "/rubber-band", "/privacy", "/terms"] + [f"/work/{w['slug']}" for w in WORK]
+    urls = ["/", "/work-with-me", "/resources", "/resources/film-plan", "/gear", "/resume", "/plugverse", "/rubber-band", "/privacy", "/terms"] + [f"/work/{w['slug']}" for w in WORK]
     (ROOT / "sitemap.xml").write_text('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + "".join(f"  <url><loc>https://cooperdelo.com{u}</loc></url>\n" for u in urls) + "</urlset>\n", encoding="utf-8")
     print("built", len(WORK), "pieces + index + plugverse + sitemap")
