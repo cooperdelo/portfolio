@@ -9,7 +9,7 @@ create table if not exists public.site_events (
   id        bigint generated always as identity primary key,
   at        timestamptz not null default now(),
   session   text not null check (session ~ '^[a-z0-9]{8,32}$'),
-  name      text not null check (name in ('page_view','record_pull','record_open','preview_play','motion_beat','showcase_view','brief_drafted','planner_started','planner_download','cta_click','resource_open')),
+  name      text not null check (name in ('page_view','record_pull','record_open','preview_play','motion_beat','showcase_view','brief_drafted','planner_started','planner_download','cta_click','resource_open','gate_view','email_submit','checkout_start','kit_unlock')),
   path      text not null default '' check (length(path) <= 200),
   props     jsonb not null default '{}'::jsonb,
   referrer  text not null default '' check (length(referrer) <= 120),
