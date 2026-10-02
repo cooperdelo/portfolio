@@ -55,6 +55,12 @@
 
   beats.forEach((b, i) => b.querySelector(".mo-beat").addEventListener("click", () => go(i, true)));
 
+  // One camera into the case study: the plate itself becomes the Bioswap hero on the next page.
+  sec.querySelectorAll('a[href="/work/bioswap"]').forEach((a) => a.addEventListener("click", () => {
+    if (!RM) plate.style.viewTransitionName = "case-media";
+  }));
+  addEventListener("pageshow", () => { plate.style.viewTransitionName = ""; });
+
   new IntersectionObserver(([e]) => { if (e.isIntersecting) load(); }, { rootMargin: "60% 0px" }).observe(sec);
   // Start on the first beat the moment the plate is actually on screen.
   new IntersectionObserver(([e]) => { if (e.isIntersecting && cur < 0) go(0); }, { threshold: 0.5 }).observe(plate);
