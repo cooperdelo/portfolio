@@ -89,7 +89,7 @@ ALL_WORK = [("Chapter One", "/work/chapter-one"), ("PlugVerse launch film", "/wo
 def systems_diagram():
     # Counts from the vault as of Oct 2, 2026 (commits, Decisions/, auto-memory/, TASK-ROSTER.md).
     agents = "".join(f'<span class="ag" style="--d:{i * 0.6}s">{n}</span>' for i, n in enumerate(["Claude", "Codex", "ChatGPT"]))
-    facts = "".join(f'<li><b>{v}</b><span>{k}</span></li>' for v, k in [("53", "decisions"), ("161", "memories"), ("41", "scheduled tasks"), ("307", "saves since May")])
+    facts = "".join(f'<li><b>{v}</b><span>{k}</span></li>' for v, k in [("53", "decisions"), ("162", "memories"), ("45", "scheduled tasks"), ("307", "saves since May")])
     return f'''<div class="sys" aria-label="Claude, Codex and ChatGPT all read one vault of files">
         <div class="agents">{agents}</div>
         <svg class="wires" viewBox="0 0 100 60" preserveAspectRatio="none" aria-hidden="true"><path d="M2 10 C 40 10, 45 30, 62 30"/><path d="M2 30 L 62 30"/><path d="M2 50 C 40 50, 45 30, 62 30"/></svg>

@@ -1,0 +1,46 @@
+/* Gear: one signal chain, drawn like a pedalboard, then the rest as a rider sheet. */
+
+.chain { padding: clamp(84px, 12vh, 140px) var(--gutter); display: grid; gap: clamp(28px, 5vh, 56px); overflow: hidden; }
+.chain > .label { opacity: .62; }
+.rig { position: relative; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: clamp(18px, 3vw, 48px); }
+.rig .end { position: relative; z-index: 1; display: grid; gap: 8px; padding: 18px 20px 16px; border: 1px solid var(--line-d); border-radius: 4px; background: var(--ink); }
+.rig .end .label { opacity: .55; }
+.rig .end b { font-family: var(--display); font-weight: 700; text-transform: uppercase; font-size: clamp(16px, 1.6vw, 26px); line-height: .9; }
+.rig .pod { position: relative; z-index: 1; display: grid; gap: 14px; padding: 18px; border-radius: 10px; background: linear-gradient(180deg, #24201b, #1a1713); box-shadow: inset 0 1px 0 rgba(255, 250, 240, .1), 0 30px 60px -30px rgba(0, 0, 0, .8); }
+.rig .pod > .label { opacity: .55; }
+.rig .pod ol { list-style: none; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; }
+.rig .pod li { position: relative; display: grid; place-items: center; gap: 4px; min-height: 76px; padding: 10px 6px; border: 1px solid rgba(244, 240, 231, .22); border-radius: 6px; text-align: center; font-weight: 700; font-size: clamp(11px, .9vw, 14px); letter-spacing: .04em; text-transform: uppercase; animation: blk 3.2s var(--ease) infinite; animation-delay: calc(var(--i, 0) * .22s); }
+.rig .pod li:nth-child(2) { --i: 1; } .rig .pod li:nth-child(3) { --i: 2; } .rig .pod li:nth-child(4) { --i: 3; } .rig .pod li:nth-child(5) { --i: 4; } .rig .pod li:nth-child(6) { --i: 5; }
+.rig .pod li.off { animation: none; border-style: dashed; opacity: .42; }
+.rig .pod li.off span { text-decoration: line-through; text-decoration-thickness: 1px; }
+.rig .pod li em { font-style: normal; font-size: 10px; letter-spacing: .08em; opacity: .9; }
+@keyframes blk { 0%, 60%, 100% { border-color: rgba(244, 240, 231, .22); background: transparent; } 12% { border-color: rgba(244, 240, 231, .85); background: rgba(244, 240, 231, .06); } }
+.rig .wire { position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: var(--line-d); }
+.rig .wire i { position: absolute; top: -1px; left: 0; width: 18%; height: 3px; background: linear-gradient(90deg, transparent, var(--bone), transparent); animation: sig 3.2s linear infinite; }
+@keyframes sig { from { transform: translateX(-100%); } to { transform: translateX(560%); } }
+.chain .why { font-family: var(--display); font-weight: 700; text-transform: uppercase; font-size: clamp(22px, 2.6vw, 44px); line-height: .9; letter-spacing: -.02em; max-width: 22ch; }
+
+.kit { padding: clamp(84px, 12vh, 140px) var(--gutter); columns: 3; column-gap: var(--gutter); }
+.gg { display: grid; align-content: start; gap: 14px; break-inside: avoid; margin-bottom: clamp(40px, 6vh, 64px); }
+.gg > .label { opacity: .62; padding-bottom: 12px; border-bottom: 1px solid var(--line-l); }
+.gg ul { list-style: none; }
+.gg li { display: grid; gap: 3px; padding: 12px 0 13px; border-bottom: 1px solid var(--line-l); }
+.gg .nm { font-weight: 700; font-size: clamp(17px, 1.35vw, 21px); line-height: 1.2; }
+.gg .nm a { display: inline-flex; align-items: center; gap: 8px; }
+.gg .nm .go svg { width: 13px; height: 13px; opacity: .35; transition: opacity .4s var(--ease), transform .4s var(--ease); }
+.gg .nm a:hover .go svg, .gg .nm a:focus-visible .go svg { opacity: 1; transform: translateX(3px); }
+.gg .nt { font-size: 14px; opacity: .62; }
+.gg .nt:empty { display: none; }
+.kit .fine { column-span: all; font-size: 13px; opacity: .55; }
+
+@media (max-width: 900px) {
+  .rig { grid-template-columns: minmax(0, 1fr); }
+  .rig .pod ol { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .rig .wire { left: 50%; right: auto; top: 0; bottom: 0; width: 1px; height: auto; }
+  .rig .wire i { width: 3px; height: 18%; left: -1px; top: 0; background: linear-gradient(180deg, transparent, var(--bone), transparent); animation-name: sig-v; }
+  @keyframes sig-v { from { transform: translateY(-100%); } to { transform: translateY(560%); } }
+  .kit { columns: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rig .pod li, .rig .wire i { animation: none; }
+}
