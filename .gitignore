@@ -16,3 +16,4 @@ renders/
 
 # python bytecode from scripts/
 __pycache__/
+.env*

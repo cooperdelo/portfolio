@@ -3,7 +3,7 @@
 # v2 (2026-09-29): no view counts or stats anywhere public. The footage is the argument.
 # Photos: every photo slot lives in content/photos.json (see README-PHOTOS.md). This script runs scripts/images.py
 # first, so changing a slot's src and rerunning re-encodes that photo and swaps it into every page that shows the slot.
-import html, pathlib, json
+import html, pathlib, json, runpy
 import images
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
@@ -311,6 +311,7 @@ INDEX = """{HEAD}
   <section class="frames dark" aria-label="Chapel Hill, in frames">
     <p class="big" data-rv>{L2}{L3}</p>
     <div class="grid">{FRAMES}</div>
+    {ALBUMS}
   </section>
 
   <section class="about light" id="about" aria-label="About">
@@ -457,6 +458,8 @@ if __name__ == "__main__":
             .replace("{L1}", lines("Selected work")).replace("{L2}", lines("Chapel Hill,")).replace("{L3}", lines("in frames"))
             .replace("{FRAMES}", frames_block()).replace("{FOOTER}", footer("home-footer")).replace("{ABOUTPIC}", spic("home-about", "Cooper Delo on the lawn at dusk", "(max-width: 900px) 100vw, 40vw")).replace("{SCRIPTS}", SCRIPTS)
             .replace("{CAL}", CAL).replace("{ARROW}", ARROW))
+    album_markup = runpy.run_path(str(ROOT / 'scripts/build-album-accent.py'))['markup']()
+    page = page.replace('{ALBUMS}', album_markup).replace('</head>', '<link rel="stylesheet" href="/css/album-accent.css">\n</head>')
     (ROOT / "index.html").write_text(page, encoding="utf-8")
     urls = ["/", "/resume", "/plugverse", "/rubber-band", "/privacy", "/terms"] + [f"/work/{w['slug']}" for w in WORK]
     (ROOT / "sitemap.xml").write_text('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + "".join(f"  <url><loc>https://cooperdelo.com{u}</loc></url>\n" for u in urls) + "</urlset>\n", encoding="utf-8")

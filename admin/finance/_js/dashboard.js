@@ -9,6 +9,7 @@ import { balances } from '/admin/_shell/live-data.js';
 import { statTile, esc } from '/admin/_shell/ui.js';
 import { reveal, countUp, growX } from '/admin/_shell/motion.js';
 import { C, applyChartTheme, fillUnder } from '/admin/_shell/chart-theme.js';
+import { cashAccounts } from '/admin/_shell/workspace-model.mjs';
 
 await mountShell({ title: 'Finance · Overview', demo: true });
 applyChartTheme();
@@ -29,8 +30,9 @@ async function renderBalances() {
   const tot = (rows) => rows.reduce((a, r) => a + Number(r.balance || 0), 0);
   const asof = (rows) => rows.map(r => r.as_of).sort().pop();
   const staleChip = (d, h) => d && hrsOld(d) > h ? ' <span class="chip stale">stale</span>' : '';
+  const personalCash = cashAccounts(b.personal);
   setStat('hsBiz', { k: 'PlugVerse cash', v: b.business.length ? `<span data-usd="${tot(b.business)}">$0</span>` : '–', d: b.business.length ? `${b.business.length} Mercury accounts` : 'No balance yet', src: b.business.length ? `Mercury · available · as of ${dayLbl(asof(b.business))}${staleChip(asof(b.business), 48)}` : 'Mercury' });
-  setStat('hsPers', { k: 'Personal cash', v: b.personal.length ? `<span data-usd="${tot(b.personal)}">$0</span>` : '–', d: b.personal.map(r => acctName(r.account)).join(' · '), src: b.personal.length ? `Balance alert emails · as of ${dayLbl(asof(b.personal))}${staleChip(asof(b.personal), 168)}` : 'Balance alert emails' });
+  setStat('hsPers', { k: 'Personal cash', v: personalCash.length ? `<span data-usd="${tot(personalCash)}">$0</span>` : '–', d: personalCash.map(r => acctName(r.account)).join(' · '), src: personalCash.length ? `Recorded balances · as of ${dayLbl(asof(personalCash))}${staleChip(asof(personalCash), 168)}` : 'No checking or savings snapshot' });
   document.querySelectorAll('#hero [data-usd]').forEach((n, i) => countUp(n, Number(n.dataset.usd), { delay: i * 90, format: usd0 }));
   const group = (title, rows, name) => rows.length ? `<div class="t-label" style="color:var(--text-3);margin:14px 0 2px">${title}</div>${rows.map(r => `<div class="bal-row"><span class="n">${esc(name(r))}</span><span class="v">${fmtUSD(r.balance)}</span></div>`).join('')}` : '';
   el.innerHTML = `<div class="sv-h" style="margin-bottom:0"><h2>Accounts</h2></div>
@@ -47,7 +49,7 @@ async function loadAll() {
   ]);
   if (tx.error) { toast('Failed to load transactions', 'err'); console.error(tx.error); return; }
   const rows = tx.data || [];
-  renderKpis(rows, fund.data || { total_received: 0, total_spent: 0, remaining: 0 });
+  renderKpis(rows, fund.error ? null : fund.data);
   renderFlow(rows);
   renderCategories(rows);
   renderRunway(rows);
@@ -70,8 +72,8 @@ function renderKpis(rows, fund) {
   setStat('hsPv', { k: 'PlugVerse net', v: `<span data-usd="${pvNet}">$0</span>`, d: `In ${fmtUSDCompact(pvIncome)} · out ${fmtUSDCompact(pvExpense)}`, src: `Ledger · all time${newest ? ' · as of ' + dayLbl(newest) : ''}` });
   setStat('hsMtd', { k: 'Spent this month', v: `<span data-usd="${personalMtd}">$0</span>`, d: personalPrev ? `<span class="chip ${personalMtd > personalPrev ? 'up' : 'down'}">${fmtUSDCompact(personalPrev)} last month</span>` : '', src: `Personal · card alerts + Mercury${newest ? ' · as of ' + dayLbl(newest) : ''}` });
   document.querySelectorAll('#hsPv [data-usd], #hsMtd [data-usd]').forEach((n, i) => countUp(n, Number(n.dataset.usd), { delay: i * 90, format: usd0 }));
-  setK('fund_remaining', fmtUSDCompact(fund.remaining));
-  setK('fund_delta', `${fmtUSD(fund.total_spent)} of $1,850 spent`);
+  setK('fund_remaining', fund ? fmtUSDCompact(fund.remaining) : 'Unavailable');
+  setK('fund_delta', fund ? `${fmtUSD(fund.total_spent)} tagged expenses; not cash available` : 'Funding ledger could not be loaded');
   setK('food_mtd', fmtUSDCompact(foodMtd));
   setK('ded_ytd', fmtUSDCompact(deductYtd));
   setK('ded_delta', String(year));

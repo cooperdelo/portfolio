@@ -4,7 +4,7 @@
 // Tokens never load into this page. Connect buttons hand off to server-side OAuth:
 //   Instagram -> /api/instagram-auth-start (Vercel)  -> /api/instagram-oauth
 //   YouTube   -> edge function youtube-oauth (POST for the URL, Google redirects back to it)
-import { sb } from '/admin/_shell/supabase.js';
+import { sb, getSession } from '/admin/_shell/supabase.js';
 import { mountShell, isLocalDemo } from '/admin/_shell/admin-shell.js';
 import { requireFullAdminOrRedirect } from '/admin/_shell/supabase.js';
 import { esc, ago, fmtDay, emptyState, pageHead, platMark, staleChip, statusChip, freshStrip } from '/admin/_shell/ui.js';
@@ -61,7 +61,7 @@ const day = (d) => esc(fmtDay(d, { month: 'short', day: 'numeric' }));
 function publicChip(plat) {
   const rows = publicRows.filter(p => p.platform === plat);
   if (!rows.length) return chip('quiet', 'no pull yet');
-  const bad = rows.find(p => !/ok/i.test(p.status || ''));
+  const bad = rows.find(p => p.status !== 'ok');
   const overdue = rows.find(p => p.last_successful_pull && (Date.now() - new Date(p.last_successful_pull)) > ((p.expected_cadence_days || 7) + 1) * 864e5);
   if (bad) return chip('fail', 'failing');
   if (overdue) return chip('stale', 'overdue');
@@ -75,12 +75,12 @@ const publicLast = (plat) => {
 // ---- Instagram ----
 const igLive = (S.instagram || []).filter(a => a.live);
 const igOld = (S.instagram || []).filter(a => !a.live);
-const connectIg = (label, primary) => `<a class="btn small ${primary ? 'primary' : 'ghost'}" href="/api/instagram-auth-start">${label}</a>`;
+const connectIg = (label, primary) => `<button class="btn small ${primary ? 'primary' : 'ghost'}" data-connect="instagram">${label}</button>`;
 const igRows = [
   row('instagram', null, 'Public pull (Apify + laptop)', `Views, likes, comments for every account, daily. ${publicLast('instagram')}.`, publicChip('instagram')),
   ...igLive.map(a => {
     const h = apiRow('instagram', a.username);
-    const failing = h && !/ok/i.test(h.status || '');
+    const failing = h && h.status !== 'ok';
     const pulled = h?.last_successful_pull ? `Last pull ${day(h.last_successful_pull)}` : 'First pull within 10 minutes';
     return row('instagram', a.username, 'Instagram API',
       `Reach, saves, shares and watch time per post, daily. ${pulled}. Token renews itself, good until ${day(a.expires_at)}.${failing ? ' ' + esc(h.failure_note || '') : ''}`,
@@ -99,7 +99,7 @@ let ytRow;
 if (yt.length) {
   ytRow = yt.map(c => {
     const h = apiRow('youtube', c.channel);
-    const failing = !!c.last_error || (h && !/ok/i.test(h.status || ''));
+    const failing = !!c.last_error || (h && h.status !== 'ok');
     return row('youtube', c.channel, 'YouTube Analytics',
       `Views, watch minutes, average view duration per video, daily. Last pull ${lastRun('youtube-analytics-pull')}.${failing ? ' ' + esc(c.last_error || h?.failure_note || '') : ''}`,
       failing ? chip('fail', 'failing') : chip('ok', 'Connected'));
@@ -157,7 +157,7 @@ document.getElementById('g-save')?.addEventListener('click', async () => {
 document.getElementById('pulls').innerHTML = publicRows.map(p => {
   const note = String(p.failure_note || '').split('||')[0].replace(/^\[|\]$/g, '').trim();
   const overdue = p.last_successful_pull && (Date.now() - new Date(p.last_successful_pull)) > ((p.expected_cadence_days || 7) + 1) * 864e5;
-  const ok = /ok/i.test(p.status || '');
+  const ok = p.status === 'ok';
   const every = p.expected_cadence_days == null ? '' : p.expected_cadence_days === 1 ? ' · daily' : ` · every ${p.expected_cadence_days} days`;
   return `<div class="sv-card pull">
     <div class="pull-h">${platMark(p.platform, p.handle)}${ok && !overdue ? '<span class="pull-ok">OK</span>' : `${ok ? '' : `<span class="chip fail">${esc(p.status || 'unknown')}</span>`}${overdue ? '<span class="chip stale">overdue</span>' : ''}`}</div>
@@ -172,3 +172,10 @@ document.getElementById('snaps').innerHTML = (sn.data || []).filter(r => r.follo
 const lastBy = {};
 (runs.data || []).forEach(r => { if (!lastBy[r.task]) lastBy[r.task] = r; });
 document.getElementById('watch').innerHTML = Object.values(lastBy).map(r => `<div class="row" style="align-items:flex-start"><div class="grow"><div class="t">${esc(r.task)} · ${esc(ago(r.ran_at))}</div><div class="sv-text clamp2" title="${esc(r.note || '')}">${esc((r.note || '').slice(0, 280))}</div></div>${statusChip(r.status)}</div>`).join('') || emptyState('No watcher runs yet.', '');
+
+// Start account connections with a verified owner JWT; never accept a public callback.
+document.querySelectorAll('[data-connect]').forEach(button=>button.addEventListener('click',async()=>{
+ button.disabled=true;
+ try{const session=await getSession();const r=await fetch('/api/'+button.dataset.connect+'-auth-start',{method:'POST',headers:{Authorization:'Bearer '+session?.access_token},cache:'no-store'});const data=await r.json();if(!r.ok)throw Error(data.error||'Connection could not start');location.assign(data.url);}
+ catch(e){document.getElementById('flash').textContent=e.message;button.disabled=false;}
+}));

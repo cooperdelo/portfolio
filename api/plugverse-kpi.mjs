@@ -39,7 +39,7 @@ async function verifyAdminJwt(jwt) {
     { headers: { Authorization: `Bearer ${jwt}`, apikey: ADMIN_ANON } });
   if (!a.ok) return { ok: false, status: 403, error: 'forbidden' };
   const rows = await a.json();
-  if (!rows.length) return { ok: false, status: 403, error: 'forbidden' };
+  if (!rows.length || !['full', 'plugverse'].includes(rows[0].admin_role)) return { ok: false, status: 403, error: 'forbidden' };
   return { ok: true, user: u, role: rows[0].admin_role };
 }
 
@@ -251,8 +251,9 @@ export default async function handler(req, res) {
     ...(posthog.value || {}),
   };
 
-  // Persist a snapshot row for today (UPSERT — latest visit wins).
-  try {
+  // An outage must not overwrite the last complete observation with nulls.
+  let snapshotWritten=false;
+  if(errors.length===0) try {
     await upsertSnapshot(jwt, {
       date: todayDate(),
       mrr_cents:                   data.mrr_cents ?? null,
@@ -267,6 +268,7 @@ export default async function handler(req, res) {
       top_events_7d:               data.top_events_7d ?? null,
       raw:                         data,
     });
+    snapshotWritten=true;
   } catch (e) {
     errors.push({ source: 'snapshot', error: e?.message || String(e) });
   }
@@ -275,6 +277,7 @@ export default async function handler(req, res) {
 
   return res.status(200).json({
     captured_at: new Date().toISOString(),
+    snapshot_written:snapshotWritten,
     data,
     history,
     errors: errors.length ? errors : undefined,

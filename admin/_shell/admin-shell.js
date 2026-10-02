@@ -23,61 +23,24 @@ window.__cv = (name, fallback) => getComputedStyle(document.documentElement).get
 // 2026-09-27 Stanley-style redesign: Today / Grow / System sections added on
 // top; every existing page is kept under its old section.
 const NAV = [
-  { section: 'Today', items: [
-    { href: '/admin/',                          label: 'Home', ic: 'home' },
-    { href: '/admin/schedule/',                 label: 'Schedule', ic: 'calendar', roles: ['full'] },
-    { href: '/admin/decisions/',                label: 'Decisions', ic: 'square-check', roles: ['full'] },
-    { href: '/admin/vault/',                    label: 'Vault', ic: 'archive', roles: ['full'] },
-    { href: '/admin/rituals/',                  label: 'Rituals', ic: 'repeat', roles: ['full'] },
+  {section: 'Workspaces', items: [
+    {href:'/admin/',label:'Choose workspace',ic:'home',roles:['full']},
+    {href:'/admin/personal/',label:'Personal',ic:'compass',roles:['full']},
+    {href:'/admin/plugverse/',label:'PlugVerse',ic:'workflow',roles:['full','plugverse','acquisition']},
+    {href:'/admin/content/',label:'All content',ic:'film',roles:['full']},
+    {href:'/admin/finance/',label:'Money',ic:'wallet',roles:['full','plugverse']},
+    {href:'/admin/more/',label:'More tools',ic:'archive',roles:['full','plugverse']}
   ]},
-  { section: 'Grow', items: [
-    { href: '/admin/content/',                  label: 'Content', ic: 'film', roles: ['full'] },
-    { href: '/admin/people/',                   label: 'People in orbit', ic: 'users', roles: ['full'] },
-    { href: '/admin/insights/',                 label: 'Insights', ic: 'chart-line', roles: ['full'] },
-    { href: '/admin/earn/',                     label: 'Earn', ic: 'coins', roles: ['full'] },
-  ]},
-  { section: 'Money', items: [
-    { href: '/admin/finance/',                  label: 'Overview', ic: 'dashboard' },
-    { href: '/admin/finance/networth.html',     label: 'Net worth', ic: 'wallet', roles: ['full'] },
-    { href: '/admin/finance/transactions.html', label: 'Transactions', ic: 'arrow-left-right' },
-    { href: '/admin/finance/investments.html',  label: 'Investments', ic: 'trending-up', roles: ['full'] },
-    { href: '/admin/finance/funding.html',      label: 'Funding', ic: 'landmark' },
-    { href: '/admin/finance/tax.html',          label: 'Tax prep', ic: 'receipt', roles: ['full'] },
-    { href: '/admin/finance/export.html',       label: 'Export', ic: 'download', roles: ['full'] },
-  ]},
-  { section: 'Health', items: [
-    { href: '/admin/health/dashboard.html',     label: 'Health', ic: 'activity', roles: ['full'] },
-    { href: '/admin/health/log.html',           label: 'Daily log', ic: 'clipboard', roles: ['full'] },
-  ]},
-  { section: 'PlugVerse', items: [
-    { href: '/admin/plugverse/',                label: 'KPIs', ic: 'gauge' },
-    { href: '/admin/plugverse/ops.html',        label: 'Ops', ic: 'workflow' },
-    { href: '/admin/finance/plugverse.html',    label: 'P&L', ic: 'chart-column' },
-    { href: '/admin/finance/fund.html',         label: '1789 Fund', ic: 'briefcase' },
-  ]},
-  { section: 'Life', items: [
-    { href: '/admin/life/',                     label: 'Weekly review', ic: 'compass', roles: ['full'] },
-    { href: '/admin/life/relationships.html',   label: 'Relationships', ic: 'heart', roles: ['full'] },
-    { href: '/admin/life/music.html',           label: 'Music', ic: 'music', roles: ['full'] },
-    { href: '/admin/academics/',                label: 'Academics', ic: 'graduation-cap', roles: ['full'] },
-  ]},
-  { section: 'Brand', items: [
-    { href: '/admin/social/',                   label: 'Social', ic: 'chart-bar' },
-    { href: '/admin/carousels/',                label: 'Carousels', ic: 'gallery', roles: ['full'] },
-    { href: '/admin/brain/',                    label: 'Brain', ic: 'lightbulb', roles: ['full'] },
-    { href: '/admin/playbook/',                 label: 'Playbook', ic: 'book-open' },
-    { href: '/admin/contacts/',                 label: 'Contacts', ic: 'contact' },
-    { href: '/admin/merch/',                    label: 'Merch', ic: 'shirt', roles: ['full'] },
-  ]},
-  { section: 'System', items: [
-    { href: '/admin/integrations/',             label: 'Integrations', ic: 'plug', roles: ['full'] },
-  ]},
+  {section: 'Acquisition', items: [
+    {href:'/admin/acquisition/',label:'Sending queue',ic:'users',roles:['full','acquisition']},
+    {href:'/admin/acquisition/?view=replies',label:'Replies & follow-ups',ic:'repeat',roles:['full','acquisition']},
+    {href:'/admin/acquisition/?view=results',label:'Experiments & results',ic:'chart-line',roles:['full','acquisition']}
+  ]}
 ];
-
-// Mobile bottom tabs (max 4 + Menu). Icon + label, same Lucide set as the rail.
 const TABS = {
-  full:      [['/admin/', 'Home', 'home'], ['/admin/schedule/', 'Schedule', 'calendar'], ['/admin/vault/', 'Vault', 'archive'], ['/admin/content/', 'Content', 'film']],
-  plugverse: [['/admin/', 'Home', 'home'], ['/admin/plugverse/', 'KPIs', 'gauge'], ['/admin/plugverse/ops.html', 'Ops', 'workflow'], ['/admin/finance/plugverse.html', 'P&L', 'chart-column']],
+  full:[['/admin/','Workspaces','home'],['/admin/personal/','Personal','compass'],['/admin/plugverse/','PlugVerse','workflow'],['/admin/content/','Content','film']],
+  plugverse:[['/admin/plugverse/','PlugVerse','workflow'],['/admin/finance/','Money','wallet']],
+  acquisition:[['/admin/plugverse/','PlugVerse','workflow'],['/admin/acquisition/','Queue','users'],['/admin/acquisition/?view=replies','Replies','repeat']]
 };
 
 // Pages that pin a theme in their own <html data-theme> (carousels, broll) are left alone.
@@ -102,7 +65,7 @@ function applyTheme() {
 
 
 function visibleForRole(item, role) {
-  if (!item.roles) return true;
+  if (!item.roles) return role === 'full' || role === 'plugverse';
   return item.roles.includes(role);
 }
 
@@ -121,7 +84,7 @@ function railHTML(activePath, email, role) {
             </div>`;
   }).join('');
 
-  const roleBadge = role === 'plugverse' ? '<small class="role-badge">Plugverse</small>' : '';
+  const roleBadge = role !== 'full' ? '<small class="role-badge">' + (role === 'acquisition' ? 'Acquisition' : 'PlugVerse') + '</small>' : '';
 
   return `
     <aside class="rail">
@@ -150,9 +113,10 @@ function tabbarHTML(activePath, role) {
 
 function normalizePath(p) {
   if (!p) return '';
-  let n = p.replace(/index\.html$/, '');
+  const url = new URL(p, location.origin);
+  let n = url.pathname.replace(/index\.html$/, '');
   if (!n.endsWith('/') && !n.endsWith('.html')) n += '/';
-  return n.toLowerCase();
+  return n.toLowerCase() + (url.searchParams.has('view') ? '?view=' + url.searchParams.get('view') : '');
 }
 
 /**
@@ -292,14 +256,21 @@ export async function mountShell({ title, demo = false } = {}) {
   // 1) Gate the page on auth (membership in admin_allowlist, any role)
   if (!demoMode) {
     const ok = await requireAdminOrRedirect();
-    if (!ok) return null;
+    if (!ok) throw new Error('Sign-in required');
   }
 
   // 2) Resolve role + email
   const session = demoMode ? null : await getSession();
   const email = demoMode ? 'demo · localhost only' : (session?.user?.email || '');
-  const role  = demoMode ? 'full' : ((await getAdminRole()) || 'full');
+  const role  = demoMode ? 'full' : (await getAdminRole());
 
+  const acquisitionRoutes = ['/admin/plugverse/', '/admin/acquisition/'];
+  if (!['full','plugverse','acquisition'].includes(role)) throw new Error('Access unavailable');
+  if (role === 'acquisition' && !acquisitionRoutes.includes(normalizePath(location.pathname))) {
+    location.replace('/admin/acquisition/');
+    throw new Error('Acquisition access only');
+  }
+  // Navigation is only a convenience. Server/RLS checks remain mandatory.
   // 3) Wrap existing main content
   const main = document.querySelector('main');
   if (!main) return null;
@@ -307,7 +278,7 @@ export async function mountShell({ title, demo = false } = {}) {
 
   const wrap = document.createElement('div');
   wrap.className = 'admin-app';
-  wrap.innerHTML = railHTML(location.pathname, email, role) + '<div class="main" id="top"></div>';
+  wrap.innerHTML = railHTML(location.pathname + location.search, email, role) + '<div class="main" id="top"></div>';
   document.body.prepend(wrap);
 
   const mainSlot = wrap.querySelector('.main');
@@ -342,7 +313,7 @@ export async function mountShell({ title, demo = false } = {}) {
   addEventListener('keydown', (e) => { if (e.key === 'Escape' && railEl.classList.contains('menu-open')) setMenu(false); });
 
   // 4c) Mobile bottom tab pill; "More" slides the full menu up as a glass sheet
-  const tabbar = el(tabbarHTML(location.pathname, role));
+  const tabbar = el(tabbarHTML(location.pathname + location.search, role));
   document.body.appendChild(tabbar);
   tabMenu = tabbar.querySelector('[data-tabmenu]');
   tabMenu?.setAttribute('aria-expanded', 'false');

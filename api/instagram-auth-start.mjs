@@ -1,3 +1,5 @@
+import {authorize,privateResponse} from './_lib/admin-auth.mjs';
+import {createOAuthState} from './_lib/oauth-state.mjs';
 // =====================================================================
 // /api/instagram-auth-start.mjs
 // "Connect Instagram" on /admin/integrations/ links here. Builds the
@@ -27,16 +29,12 @@ export function buildAuthorizeUrl(appId, state) {
 }
 
 export default async function handler(req, res) {
+  if(req.method!=='POST')return privateResponse(res,405,{error:'Start from the signed-in Integrations page'});
+  const auth=await authorize(req,['full']).catch(()=>({ok:false,status:503,error:'Permission check unavailable'}));if(!auth.ok)return privateResponse(res,auth.status,{error:auth.error});
   res.setHeader('Cache-Control', 'no-store');
   const appId = process.env.INSTAGRAM_APP_ID;
-  if (!appId) {
-    res.statusCode = 302;
-    res.setHeader('Location', '/admin/integrations/?oauth_error=' + encodeURIComponent('instagram: app id missing in Vercel env'));
-    return res.end();
-  }
-  const state = Math.random().toString(36).slice(2) + Date.now().toString(36);
-  res.setHeader('Set-Cookie', `ig_oauth_state=${state}; Path=/api; Max-Age=900; HttpOnly; Secure; SameSite=Lax`);
-  res.statusCode = 302;
-  res.setHeader('Location', buildAuthorizeUrl(appId, state));
-  res.end();
+  if (!appId) return privateResponse(res,503,{error:'Account connection is not configured'});
+  const {state,cookie}=createOAuthState('ig',auth.userId);
+  res.setHeader('Set-Cookie',cookie);
+  return privateResponse(res,200,{url:buildAuthorizeUrl(appId,state)});
 }

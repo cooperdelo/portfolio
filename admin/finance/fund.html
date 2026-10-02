@@ -13,17 +13,18 @@
   <main>
     <header class="page-head"><h1>1789 Fund</h1></header>
 
+    <p class="sv-muted"><span id="fund-confirmation">The tagged ledger below is incomplete and does not measure available cash.</span> <a href="/admin/finance/">View dated confirmations and bank balances</a>.</p>
     <div class="kpi-grid">
       <div class="card"><div class="label">Award</div><div class="value">$1,850</div><div class="delta flat">Received Mar 26, 2026</div></div>
-      <div class="card"><div class="label">Spent</div><div class="value" data-k="spent">–</div><div class="delta flat" data-k="spent_pct">of award</div></div>
-      <div class="card"><div class="label">Left</div><div class="value" data-k="remaining">–</div><div class="delta flat" data-k="rem_pct">v_fund_1789</div></div>
+      <div class="card"><div class="label">Tagged expenses</div><div class="value" data-k="spent">–</div><div class="delta flat" data-k="spent_pct">of award</div></div>
+      <div class="card"><div class="label">Ledger remainder</div><div class="value" data-k="remaining">–</div><div class="delta flat" data-k="rem_pct">v_fund_1789</div></div>
       <div class="card"><div class="label">Entries</div><div class="value" data-k="entries">–</div><div class="delta flat">Ledger · 1789 Fund</div></div>
     </div>
 
     <div class="sv-card" style="margin-bottom:14px">
-      <div class="sv-h"><h2>Burn down</h2><span class="mono">$1,850</span></div>
+      <div class="sv-h"><h2>Ledger coverage</h2><span class="mono">$1,850</span></div>
       <div class="meter" style="height:12px"><i id="burn-bar" style="--p:0%;transition:width 1.1s var(--ease)"></i></div>
-      <div style="display:flex;justify-content:space-between;margin-top:10px" class="mono"><span id="burn-spent">$0 spent</span><span id="burn-remaining">$1,850 left</span></div>
+      <div style="display:flex;justify-content:space-between;margin-top:10px" class="mono"><span id="burn-spent">Loading tagged expenses</span><span id="burn-remaining">Not available cash</span></div>
     </div>
 
     <h2 class="section-h">Expenses</h2>
