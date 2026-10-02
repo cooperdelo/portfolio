@@ -1,0 +1,28 @@
+{
+  "updated": "2026-10-01",
+  "positioning": "I'm building PlugVerse, making films, and playing music while I figure out what I want my life to look like.",
+  "instagram_bio": "building @plugverse.app\nfilms, music, and figuring it out at 20\nwhat i'm making + work with me ↓",
+  "tiktok_bio": "building @PlugVerse\nfilms, music, figuring it out at 20\nmy work ↓",
+  "bio_status": "Prepared copy; not applied to social accounts. Use the website CTA only where the profile has a usable website link.",
+  "opportunity": "I make films, motion, and product. If you're building something and need help showing people why it matters, tell me what you're working on.",
+  "career": "I'm also looking for summer 2027 opportunities in growth, creative, or product. SF first, NYC too.",
+  "plugverse": "I use PlugVerse for my band's gigs. When someone reaches out, I send an offer with the event details. They accept and sign in the same place.",
+  "routes": [
+    {"goal":"connection","label":"Stay for the person","purpose":"Music, films, and honest attempts people can see themselves in.","cta":"Follow along when there is a reason to return. A pitch is optional.","destination":"https://www.instagram.com/cooperdelo/","measure":"Returning viewers and attributed follows, when available"},
+    {"goal":"opportunity","label":"See what I can do","purpose":"Show the actual work and the decisions behind it.","cta":"Tell me what you're building.","destination":"https://www.cooperdelo.com/work-with-me","measure":"Relevant inquiries, conversations, interviews, paid projects"},
+    {"goal":"resource","label":"Make something","purpose":"Help someone turn one real idea into a film they can shoot.","cta":"Use the shot planner.","destination":"https://www.cooperdelo.com/resources/film-plan","measure":"Actual use and voluntary feedback; downloads aren't demand by themselves"},
+    {"goal":"plugverse","label":"Use it for a real gig","purpose":"Show the booking link and offer workflow to self-booking artists.","cta":"See PlugVerse.","destination":"https://plugverse.app/","measure":"Attributed artist activation, real offers, accepted offers and repeat use; revenue tracked separately"}
+  ],
+  "cases": {
+    "plugverse-launch-film": [
+      {"title":"What I made","body":"A one-minute film for PlugVerse's launch. I directed and edited it in DaVinci Resolve and Fusion."},
+      {"title":"Why it belongs here","body":"I built the product and made the film that introduced it. You can watch the full cut here, then see the product it was made for."},
+      {"title":"What I'm learning","body":"Making something I'm proud of is one part. Figuring out how to get it in front of the artists who need it is the next part."}
+    ],
+    "plugverse-product": [
+      {"title":"I use it myself","body":"I play in Rubber and handle our bookings. When someone reaches out about a gig, I use PlugVerse to send an offer with the event details. They accept and sign there."},
+      {"title":"What I built","body":"I built PlugVerse solo with Claude Code, working across the product, design, front end, and back end. The screens here are from the actual product."},
+      {"title":"What matters next","body":"Getting other artists to use it for their own gigs. That's what I'm working on now."}
+    ]
+  }
+}

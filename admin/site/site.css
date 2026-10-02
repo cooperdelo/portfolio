@@ -1,0 +1,17 @@
+/* Portfolio visitors. Workspace cards plus a range switch, a summary strip and ranked rows. */
+.st-tabs{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 26px}
+.st-tabs a{display:inline-flex;align-items:center;min-height:44px;border:1px solid var(--line-2);border-radius:30px;padding:9px 16px;color:var(--text);text-decoration:none}
+.st-tabs a[aria-current="page"]{background:var(--bone);color:#16130f;border-color:var(--bone)}
+.st-tabs a:not([aria-current]):hover{background:var(--fill-2)}
+.st-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));border:1px solid var(--line-2);border-radius:18px;overflow:hidden;margin-bottom:22px}
+.st-strip div{padding:18px 16px 14px;border-right:1px solid var(--line-2)}
+.st-strip div:last-child{border-right:0}
+.st-strip b{display:block;font-family:var(--f-display);font-size:28px;line-height:1;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.st-strip small{display:block;margin-top:8px;color:var(--text-3);font-size:12px}
+.st-rows>div{display:flex;justify-content:space-between;gap:14px;padding:11px 0;border-top:1px solid var(--line-2);font-size:14px}
+.st-rows>div:first-child{border-top:0}
+.st-rows>div>span:first-child{min-width:0;overflow-wrap:anywhere}
+.st-rows span:last-child{color:var(--text-3);font-variant-numeric:tabular-nums;white-space:nowrap}
+.st-bar{height:4px;border-radius:4px;background:var(--fill-2);margin-top:6px;overflow:hidden}
+.st-bar i{display:block;height:100%;background:var(--bone)}
+@media (max-width:900px){.st-strip div{border-bottom:1px solid var(--line-2)}}

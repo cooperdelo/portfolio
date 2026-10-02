@@ -10,6 +10,7 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 E = html.escape
 EMAIL = "cooper@plugverse.app"
 CAL = "https://cal.com/cooper-delo1"
+EXT = ' target="_blank" rel="noreferrer"'
 
 SLOTS, MAN = images.build()
 
@@ -54,6 +55,10 @@ WORK = [
        say="My first short film, made for my startup's launch.",
        credits=[("Role", "Director, editor"), ("Year", "2026"), ("Tools", "DaVinci Resolve Studio, Fusion"),
                 ("Link", [("Instagram", "https://www.instagram.com/p/Ddoy0gcTvp2/"), ("TikTok", "https://www.tiktok.com/@cooperdelo/video/7688777020007845151")])],
+       notes=[("What I made", "A one-minute film for PlugVerse's launch. I directed and edited it in DaVinci Resolve and Fusion."),
+              ("Why it's here", "I built the product and made the film that introduced it. Watch the full cut, then see the product it was made for."),
+              ("What I'm learning", "Making something I'm proud of is one part. Getting it in front of the artists who need it is the next part.")],
+       notes_cta=[("Work with me", "/work-with-me?kind=Film%20or%20motion"), ("See the product", "/work/plugverse-product")],
        stills=[("work-plugverse-launch-film-still-1", "wide"), ("work-plugverse-launch-film-still-2", ""), ("work-plugverse-launch-film-still-3", "drop"), ("work-plugverse-launch-film-still-4", "wide")]),
   dict(slug="the-start", title="The Start", disc="Short film, opening", year="2026", video="the-start", ar="16/9",
        full="the-start-full", full_ar="16/9", runtime="0:20",
@@ -71,6 +76,10 @@ WORK = [
        credits=[("Role", "Founder. Design, front end, back end"), ("Year", "Nov 2025 to now"),
                 ("Tools", "Next.js, React, Supabase, Stripe Connect, Claude Code"),
                 ("Link", [("plugverse.app", "https://plugverse.app"), ("The company", "/plugverse")])],
+       notes=[("I use it myself", "I play in Rubber Band and handle our bookings. When someone reaches out about a gig, I send an offer with the event details from PlugVerse. They accept and sign there."),
+              ("What I built", "I built PlugVerse solo with Claude Code, across the product, design, front end and back end. The screens here are from the actual product."),
+              ("What matters next", "Getting other artists to use it for their own gigs. That's what I'm working on now.")],
+       notes_cta=[("See PlugVerse", "https://plugverse.app/?utm_source=cooperdelo&utm_medium=portfolio&utm_campaign=product_case"), ("Work with me", "/work-with-me?kind=Product%20or%20creative")],
        stills=[]),
   dict(slug="rubber-band", title="Rubber Band", disc="Live, guitar", year="2025", video="rubber-band", ar="16/9",
        say="Chapel Hill cover band. I play guitar and run the bookings.",
@@ -122,7 +131,8 @@ NAV = f"""<header class="nav label">
 </header>"""
 
 SCRIPTS = """<script src="/assets/lenis.min.js" defer></script>
-<script src="/assets/site.js" defer></script>"""
+<script src="/assets/site.js" defer></script>
+<script src="/assets/beacon.js" defer></script>"""
 
 def footer(bg="footer"):
     return f"""<footer class="contact" id="contact">
@@ -131,6 +141,7 @@ def footer(bg="footer"):
   <a class="mail" href="mailto:{EMAIL}" data-rv><span class="line"><span data-fit>{EMAIL}</span></span></a>
   <div class="cta">
     <a class="pill solid" href="{CAL}" target="_blank" rel="noreferrer">Book a call {ARROW}</a>
+    <a class="pill" href="/work-with-me">Work with me</a>
     <a class="pill" href="mailto:{EMAIL}">Email</a>
     <a class="pill" href="https://www.linkedin.com/in/cooperdelo/" target="_blank" rel="noreferrer">LinkedIn</a>
   </div>
@@ -138,6 +149,7 @@ def footer(bg="footer"):
     <span>&copy; 2026 Cooper Delo</span>
     <nav aria-label="Elsewhere">
       <a href="/resume">Resume</a>
+      <a href="/resources">Resources</a>
       <a href="https://instagram.com/cooperdelo" target="_blank" rel="noreferrer">Instagram</a>
       <a href="https://tiktok.com/@cooperdelo" target="_blank" rel="noreferrer">TikTok</a>
       <a href="/privacy">Privacy</a>
@@ -185,6 +197,14 @@ def vsrc(name, webm, codec="av01.0.08M.08"):
         return "", f'<source src="/videos/work/{name}.webm" type="video/webm; codecs={codec}" /><source src="/videos/work/{name}.mp4" type="video/mp4" />'
     return f' src="/videos/work/{name}.mp4"', ""
 
+def notes_block(w):
+    if not w.get("notes"):
+        return ""
+    cols = "".join(f'<div><p class="label">{E(t)}</p><p>{E(b)}</p></div>' for t, b in w["notes"])
+    acts = "".join(f'<a class="pill" href="{E(u)}"{EXT if u.startswith("http") else ""}>{E(t)} {ARROW}</a>' for t, u in w.get("notes_cta", []))
+    return f'<div class="notes" data-rv>{cols}</div><div class="notes-cta">{acts}</div>'
+
+
 def case(w, nxt, no):
     poster = f"/videos/work/{w.get('video')}.jpg"
     la, li = vsrc(w.get("video"), w.get("webm"))
@@ -215,6 +235,7 @@ def case(w, nxt, no):
     body = f'''<section class="case-body light">
     <p class="say" data-rv>{lines(w["say"])}</p>
     {credits_table(w)}
+    {notes_block(w)}
   </section>'''
     extra = product_block() if w.get("product") else ""
     nposter = f"/videos/work/{nxt['video']}.jpg"
@@ -299,20 +320,9 @@ INDEX = """{HEAD}
     </div>
   </section>
 
-  <section class="index light" id="work" aria-label="Work">
-    <div class="top" data-rv><h2>{L1}</h2><span class="label">(0{COUNT})</span></div>
-    <div class="head label"><span>No.</span><span>Title</span><span>Discipline</span><span class="r">Year</span><span></span></div>
-    <div class="rule" data-rv></div>
-    <ol class="rows" data-index>
-{ROWS}
-    </ol>
-  </section>
+  {SHOWCASE}
 
-  <section class="frames dark" aria-label="Chapel Hill, in frames">
-    <p class="big" data-rv>{L2}{L3}</p>
-    <div class="grid">{FRAMES}</div>
-    {ALBUMS}
-  </section>
+  {RECORDS}
 
   <section class="about light" id="about" aria-label="About">
     <div class="pic" data-rv><div class="film clip float b">{ABOUTPIC}</div></div>
@@ -329,6 +339,7 @@ INDEX = """{HEAD}
         <li><span class="label">04</span><span>UNC Chapel Hill, class of 2028. CS and Business.</span></li>
       </ul>
       <div class="out">
+        <a class="pill" href="/work-with-me">Work with me</a>
         <a class="pill" href="/resume">Resume</a>
         <a class="pill" href="{CAL}" target="_blank" rel="noreferrer">Book a call</a>
         <a class="pill" href="https://www.linkedin.com/in/cooperdelo/" target="_blank" rel="noreferrer">LinkedIn</a>
@@ -336,6 +347,7 @@ INDEX = """{HEAD}
         <a class="pill" href="https://tiktok.com/@cooperdelo" target="_blank" rel="noreferrer">TikTok</a>
       </div>
     </div>
+    {STRIP}
   </section>
 </main>
 {FOOTER}
@@ -438,8 +450,14 @@ def resume_page():
 """
 
 if __name__ == "__main__":
+    home_extras = runpy.run_path(str(ROOT / "scripts/build-home-extras.py"))
     for i, w in enumerate(WORK):
-        (ROOT / "work" / f"{w['slug']}.html").write_text(case(w, WORK[(i + 1) % len(WORK)], f"{i + 1:02d}"), encoding="utf-8")
+        html_ = case(w, WORK[(i + 1) % len(WORK)], f"{i + 1:02d}")
+        if w["slug"] == "bioswap":  # the Motion breakdown lives with the piece it explains
+            html_ = (html_.replace('  <a class="next dark"', "  " + home_extras["motion"](in_case=True) + '\n  <a class="next dark"', 1)
+                     .replace("</head>", '<link rel="stylesheet" href="/assets/motion.css" />\n</head>', 1)
+                     .replace('<script src="/assets/beacon.js" defer></script>', '<script src="/assets/beacon.js" defer></script>\n<script src="/assets/motion.js" defer></script>', 1))
+        (ROOT / "work" / f"{w['slug']}.html").write_text(html_, encoding="utf-8")
     (ROOT / "plugverse.html").write_text(case(COMPANY, WORK[4], ""), encoding="utf-8")
     (ROOT / "resume.html").write_text(resume_page(), encoding="utf-8")
     hd, hm = K("home-hero-poster"), K("home-hero-poster-mobile")
@@ -458,9 +476,11 @@ if __name__ == "__main__":
             .replace("{L1}", lines("Selected work")).replace("{L2}", lines("Chapel Hill,")).replace("{L3}", lines("in frames"))
             .replace("{FRAMES}", frames_block()).replace("{FOOTER}", footer("home-footer")).replace("{ABOUTPIC}", spic("home-about", "Cooper Delo on the lawn at dusk", "(max-width: 900px) 100vw, 40vw")).replace("{SCRIPTS}", SCRIPTS)
             .replace("{CAL}", CAL).replace("{ARROW}", ARROW))
-    album_markup = runpy.run_path(str(ROOT / 'scripts/build-album-accent.py'))['markup']()
-    page = page.replace('{ALBUMS}', album_markup).replace('</head>', '<link rel="stylesheet" href="/css/album-accent.css">\n</head>')
+    extras = runpy.run_path(str(ROOT / "scripts/build-home-extras.py"))
+    page = (page.replace("{SHOWCASE}", extras["showcase"]()).replace("{RECORDS}", extras["records"]()).replace("{STRIP}", extras["strip"](frames_block()))
+            .replace("</head>", '<link rel="stylesheet" href="/assets/showcase.css" />\n<link rel="stylesheet" href="/assets/records.css" />\n<link rel="stylesheet" href="/assets/album-viewer.css" />\n</head>', 1)
+            .replace('<script src="/assets/site.js" defer></script>', '<script src="/assets/site.js" defer></script>\n<script src="/assets/showcase.js" defer></script>\n<script src="/assets/records.js" defer></script>', 1))
     (ROOT / "index.html").write_text(page, encoding="utf-8")
-    urls = ["/", "/resume", "/plugverse", "/rubber-band", "/privacy", "/terms"] + [f"/work/{w['slug']}" for w in WORK]
+    urls = ["/", "/work-with-me", "/resources", "/resources/film-plan", "/resume", "/plugverse", "/rubber-band", "/privacy", "/terms"] + [f"/work/{w['slug']}" for w in WORK]
     (ROOT / "sitemap.xml").write_text('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + "".join(f"  <url><loc>https://cooperdelo.com{u}</loc></url>\n" for u in urls) + "</urlset>\n", encoding="utf-8")
     print("built", len(WORK), "pieces + index + plugverse + sitemap")
