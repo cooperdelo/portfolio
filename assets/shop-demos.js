@@ -52,3 +52,47 @@
     run();
   });
 })();
+
+/* Guide demos: the vault tree, the posting week, the shot bank. */
+(() => {
+  // vault: click a folder, see what lives there
+  document.querySelectorAll('[data-demo="vault"]').forEach((d) => {
+    const btns = [...d.querySelectorAll("[data-v]")], panes = [...d.querySelectorAll("[data-vp]")];
+    btns.forEach((b) => b.addEventListener("click", () => {
+      btns.forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+      panes.forEach((p) => { p.hidden = p.dataset.vp !== b.dataset.v; });
+    }));
+  });
+
+  // week: six days, one topic each, one carousel
+  const TOPICS = ["Founder", "Mindset", "Music", "College", "Yours"];
+  document.querySelectorAll('[data-demo="week"]').forEach((d) => {
+    const days = [...d.querySelectorAll("[data-day]")], cars = [...d.querySelectorAll("[data-car]")], checks = d.querySelector("[data-checks]");
+    const pick = [0, 1, 0, 2, 3, 4]; let car = 3;
+    const draw = () => {
+      days.forEach((b, i) => { b.querySelector("[data-topic]").textContent = TOPICS[pick[i]]; b.querySelector("[data-fmt]").textContent = i === car ? "Carousel" : ""; b.classList.toggle("car", i === car); });
+      cars.forEach((b, i) => b.setAttribute("aria-pressed", String(i === car)));
+      const count = (t) => pick.filter((p) => TOPICS[p] === t).length;
+      const rows = [["Founder twice", count("Founder") === 2], ["Mindset, Music and College once each", ["Mindset", "Music", "College"].every((t) => count(t) === 1)],
+        ["One of your own", count("Yours") === 1], ["One carousel", car > -1], ["Filmed on Sunday", true]];
+      checks.innerHTML = rows.map(([t, ok]) => `<li class="${ok ? "ok" : ""}"><span class="dot" aria-hidden="true"></span>${t}<span class="label">${ok ? "Done" : "Not yet"}</span></li>`).join("");
+      d.classList.toggle("done", rows.every(([, ok]) => ok));
+    };
+    days.forEach((b, i) => b.addEventListener("click", () => { pick[i] = (pick[i] + 1) % TOPICS.length; draw(); }));
+    cars.forEach((b, i) => b.addEventListener("click", () => { car = i; draw(); }));
+    draw();
+  });
+
+  // shots: bank ten different ones in one spot
+  document.querySelectorAll('[data-demo="shots"]').forEach((d) => {
+    const cells = [...d.querySelectorAll(".sb")], n = d.querySelector("[data-n]"), bar = d.querySelector("[data-bar]"), say = d.querySelector("[data-say]");
+    const draw = () => {
+      const k = cells.filter((c) => c.getAttribute("aria-pressed") === "true").length;
+      n.textContent = Math.min(k, 99); bar.style.transform = `scaleX(${Math.min(1, k / 10)})`;
+      say.textContent = k >= 10 ? "That's one spot done. In the edit, use one or two." : k >= 5 ? "Keep going. Change something every time." : "Change the size, the height or the action. Not just the angle.";
+      d.classList.toggle("done", k >= 10);
+    };
+    cells.forEach((c) => c.addEventListener("click", () => { c.setAttribute("aria-pressed", String(c.getAttribute("aria-pressed") !== "true")); draw(); }));
+    draw();
+  });
+})();

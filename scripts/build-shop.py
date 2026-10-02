@@ -108,6 +108,41 @@ def demo_music():
       <p class="dm-note">Grouped by tuning so you retune as few times as possible. Your notes stay exactly as written.</p>
     </div>"""
 
+
+def demo_vault():
+    items = [("CLAUDE.md", "The rules Claude reads before anything else. Each one was written after something broke.", "CLAUDE.md"),
+             ("Context/", "Who you are, how you write, what you've committed to, and the memory log.", "Context/voice.md"),
+             ("Decisions/", "One dated file per call you make. Claude checks here before it guesses.", "Decisions/YYYY-MM-DD-topic.md"),
+             ("Projects/", "One folder per project, each with one front-door file.", "Projects/[name]/README.md"),
+             ("Skills/", "Step-by-step procedures Claude can run the same way every time.", "Skills/[job]/SKILL.md"),
+             ("Scheduled-Tasks/", "Jobs that run without you, listed on one roster.", "Scheduled-Tasks/TASK-ROSTER.md"),
+             ("Daily/", "What happened today. Chats get saved to Inbox when they end.", "Daily/YYYY-MM-DD.md")]
+    tree = "".join(f'<li><button type="button" data-v="{i}"{" aria-pressed=\"true\"" if i == 0 else " aria-pressed=\"false\""}><span class="vf">{"&#9500;" if i < len(items) - 1 else "&#9492;"} {E(n)}</span></button></li>' for i, (n, _, _) in enumerate(items))
+    panes = "".join(f'<div class="vp" data-vp="{i}"{"" if i == 0 else " hidden"}><p class="label">{E(n)}</p><p class="vd">{E(d)}</p><p class="vx"><span class="label">For example</span><code>{E(x)}</code></p></div>' for i, (n, d, x) in enumerate(items))
+    return f"""<div class="dm dm-vault" data-demo="vault">
+      <div class="vwin"><div class="win-bar"><i></i><i></i><i></i><span>~/vault</span></div><ul class="vtree">{tree}</ul></div>
+      <div class="dm-ctl" aria-live="polite">{panes}<p class="dm-note">Click a folder. This is the shape of mine.</p></div>
+    </div>"""
+
+def demo_week():
+    days = "".join(f'<li><button type="button" class="wk-day" data-day="{i}"><span class="label">{d}</span><b data-topic>Pick</b><span class="wk-fmt" data-fmt></span></button></li>' for i, d in enumerate(["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]))
+    return f"""<div class="dm dm-week" data-demo="week">
+      <div class="wk">
+        <ol class="wk-days"><li><div class="wk-day sun"><span class="label">Sun</span><b>Film + edit</b><span class="wk-fmt">No posting</span></div></li>{days}</ol>
+        <div class="wk-car" role="group" aria-label="Which day is the carousel"><span class="label">Carousel</span>{"".join(f'<button type="button" data-car="{i}" aria-pressed="false">{d}</button>' for i, d in enumerate(["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]))}</div>
+        <p class="dm-note">Tap a day to change its topic.</p>
+      </div>
+      <div class="dm-ctl"><p class="label">The week checks</p><ul class="wk-checks" data-checks></ul></div>
+    </div>"""
+
+def demo_shots():
+    sizes, heights, acts = ["Wide", "Medium", "Close"], ["Low", "Eye", "High"], ["Still", "Moving"]
+    cells = "".join(f'<li><button type="button" class="sb" aria-pressed="false"><b>{sz}</b><span>{h} · {a}</span></button></li>' for sz in sizes for h in heights for a in acts)
+    return f"""<div class="dm dm-shots" data-demo="shots">
+      <ol class="sb-grid">{cells}</ol>
+      <div class="dm-ctl"><p class="label">One spot</p><p class="sb-count"><b data-n>0</b>/10 banked</p><div class="sb-bar"><i data-bar></i></div><p class="sb-say" data-say>Change the size, the height or the action. Not just the angle.</p></div>
+    </div>"""
+
 # ---------------------------------------------------------------- storefront
 def storefront():
     collage = [("home-collage-5", "c1", "Might As Well"), ("work-chapter-one-still-1", "c2", "Chapter One"), ("home-collage-1", "c3", "At the laptop"),
@@ -202,7 +237,7 @@ def design_kit():
     page("shop/design-kit", "Design kit", "The references, rules and prompt Cooper Delo uses to build sites that don't look like AI.", body)
 
 # ---------------------------------------------------------------- gated guides on the main site
-GUIDE_DEMO = {"linkedin": demo_linkedin, "music": demo_music}
+GUIDE_DEMO = {"linkedin": demo_linkedin, "music": demo_music, "ai-system": demo_vault, "instagram-tiktok": demo_week, "film-motion": demo_shots}
 
 def guide(slug):
     demo = GUIDE_DEMO.get(slug)
