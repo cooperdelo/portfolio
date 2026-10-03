@@ -145,15 +145,42 @@ def work_with_me():
     page("work-with-me", "Work with me", "Films, motion and product by Cooper Delo. Tell me what you're building.", body)
 
 
-PROMPTS = [
-    ("The actual idea", "What happened? What do you want someone to feel?", "idea"),
-    ("The first thing we see or hear", "Give someone a reason to keep watching.", "opening"),
-    ("What are we waiting to find out", "A real unanswered question, not a vague promise.", "question"),
-    ("What changes", "The attempt, complication or detail that moves it forward.", "change"),
-    ("What the ending gives us", "Answer the question you opened. You don't need a life lesson.", "payoff"),
-    ("What you need to shoot", "The action, framing, location and sound. Use what you actually have.", "shots"),
-    ("What happens after someone watches", "Come back, see more of your work, try the thing, or just enjoy it.", "next_step"),
+# Cooper's playbook (vault: Projects/personal-brand CONTENT-OS, SCRIPT-SYSTEM, MECHANIC-LIBRARY, IDEATION-RULE,
+# CINEMATIC-FIELD-MANUAL). Public-safe: no private stats, names or topics. Each line: (rule, why it holds).
+PLAYBOOK = [
+    ("Hooks", "hooks", [
+        ("Start mid-thought.", "No intro. Delete your first sentence. Most people who leave, leave at 0:01."),
+        ("Confess, don't flex.", "A struggle holds people. A highlight reel loses them."),
+        ("Say I, not you.", "Earn we and you later. One creator went from 3,900 views to 15M on that switch alone."),
+        ("One detail nobody else could say.", "Themes are generic. Scenes are unforgeable."),
+    ]),
+    ("Story", "story", [
+        ("What does a stranger want answered?", "Open that question in the first seconds."),
+        ("But, or therefore.", "Every beat causes the next. Never and then."),
+        ("Hold the lesson.", "Until the story earns it. Sometimes it never needs one."),
+        ("Answer what you opened.", "Then give a true reason to come back."),
+    ]),
+    ("Retention", "retention", [
+        ("Finishes beat likes.", "On my account, a video 24.9% of people finished got 2.2x the views of one 8.7% finished."),
+        ("A new picture every second, for three seconds.", "Then cuts every 2 to 3. Only the point gets to breathe."),
+        ("Two lines of text, max.", "About 40 characters, upper middle, readable in frame one."),
+        ("Length isn't the problem.", "30 to 60 seconds of talking with no turn is. Never fade to black mid-video."),
+    ]),
 ]
+
+
+def film_prompt():
+    rules = "\n\n".join(f"{name.upper()}\n" + "\n".join(f"- {r} {why}" for r, why in items) for name, _, items in PLAYBOOK)
+    return ("I'm making a short video. Below is Cooper Delo's playbook: the hooks, story checks and retention rules he uses. "
+            "Use it to shape my idea, in my words. It's a toolbox, not a checklist. Use what fits.\n\n"
+            "MY IDEA: [one or two lines. What happened, and what footage you have or can get.]\n\n"
+            + rules +
+            "\n\nGIVE ME\n"
+            "1. Three opening lines for my idea, each from a different hook, in my voice. Pick one and say why in a sentence.\n"
+            "2. The story in 5 to 7 one-line beats, joined by but or therefore.\n"
+            "3. A cut map for the first 10 seconds: what we see, hear and read.\n"
+            "4. A shot list grouped by location, using only what I said I have.\n\n"
+            "Never invent anything about my life or my footage. If I didn't say what actually happened, ask me that one question and nothing else.")
 
 
 def resources():
@@ -170,29 +197,23 @@ def resources():
 
 
 def film_plan():
-    """Not a form. Cooper's framework, and one prompt you paste into your own AI so it interviews you."""
-    steps = "".join(f'<li><span class="label">{i + 1:02d}</span><b>{h}</b><span>{l}</span></li>' for i, (h, l, _) in enumerate(PROMPTS))
-    prompt = ("You're helping me plan a short video. Use Cooper Delo's film framework.\n\n"
-              "Ask me these one at a time, and wait for my answer before the next:\n"
-              + "\n".join(f"{i + 1}. {h}. {l}" for i, (h, l, _) in enumerate(PROMPTS))
-              + "\n\nRules: keep my answers in my words. If an answer is vague, ask one follow-up, not five. "
-                "Never invent details about my life or my footage.\n\n"
-                "When we're done, give me one page: the idea in one line, the opening shot, the question it holds, "
-                "what changes, the ending, and a shot list grouped by location (about 10 shots per location, each a different size, height or action).")
+    """Not a form, not an interview. Cooper's playbook on the page, and one prompt that carries it into your AI."""
+    cols = "".join(f'''<div class="fp-col"><p class="label">{name}</p><ul>{"".join(f"<li><b>{r}</b><span>{why}</span></li>" for r, why in items)}</ul></div>''' for name, _, items in PLAYBOOK)
+    prompt = html_escape(film_prompt()).replace("MY IDEA: [", '<mark>MY IDEA: [', 1).replace("can get.]", "can get.]</mark>", 1)
     body = f"""  <section class="fp-hero dark" aria-labelledby="pg-h">
     <video class="fp-vid" muted loop playsinline autoplay preload="metadata" poster="/videos/work/launch-film.jpg" aria-hidden="true"><source src="/videos/work/launch-film.mp4" type="video/mp4" /></video>
     <div class="fp-copy">
       <p class="label">Resources / Film planner</p>
-      <h1 id="pg-h" data-hero><span class="line"><span>Plan it</span></span><span class="line"><span>in one paste.</span></span></h1>
-      <p class="lede">The seven questions I answer before I shoot anything. Copy the prompt, paste it into ChatGPT or Claude, and it interviews you.</p>
+      <h1 id="pg-h" data-hero><span class="line"><span>Hooks that</span></span><span class="line"><span>hold.</span></span></h1>
+      <p class="lede">The hooks, story checks and retention rules I actually use. Paste them into ChatGPT or Claude with your idea, and it writes yours, your way.</p>
     </div>
   </section>
-  <section class="fp light" aria-label="The framework">
-    <ol class="fp-steps">{steps}</ol>
-    <div class="fp-prompt"><p class="label">The prompt</p><div class="cb"><pre>{html_escape(prompt)}</pre><button type="button" class="cp" aria-label="Copy the prompt">Copy</button></div>
-      <p class="note">This is how the <a href="/work/plugverse-launch-film">PlugVerse launch film</a> got planned.</p></div>
+  <section class="fp light" aria-label="The playbook">
+    <div class="fp-cols">{cols}</div>
+    <div class="fp-prompt"><p class="label">One paste. Change the highlighted line.</p><div class="cb"><pre>{prompt}</pre><button type="button" class="cp" aria-label="Copy the prompt">Copy</button></div>
+      <p class="note">Same rules behind the <a href="/work/plugverse-launch-film">PlugVerse launch film</a>.</p></div>
   </section>"""
-    page("resources/film-plan", "Film planner", "Cooper Delo's seven-question film framework, as one prompt you paste into your AI.", body, css=("/assets/gear.css",))
+    page("resources/film-plan", "Film planner", "Cooper Delo's hooks, story checks and retention rules, as one prompt you paste into your AI with your idea.", body, css=("/assets/gear.css",))
 
 
 def html_escape(s):

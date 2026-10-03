@@ -48,6 +48,13 @@
 .fp-steps .label { grid-row: 1 / 3; opacity: .55; padding-top: 3px; }
 .fp-steps b { font-weight: 700; font-size: 17px; }
 .fp-steps span:not(.label) { font-size: 14px; opacity: .72; }
+.fp-cols { display: grid; gap: clamp(28px, 4vh, 44px); }
+.fp-col > .label { opacity: .55; padding-bottom: 10px; border-bottom: 2px solid var(--ink); }
+.fp-col ul { list-style: none; display: grid; }
+.fp-col li { display: grid; gap: 3px; padding: 13px 0; border-bottom: 1px solid var(--line-l); }
+.fp-col b { font-family: var(--display); font-weight: 700; text-transform: uppercase; font-size: clamp(15px, 1.25vw, 19px); line-height: 1.05; letter-spacing: -.01em; }
+.fp-col span { font-size: 14px; line-height: 1.45; opacity: .72; max-width: 52ch; }
+.cb mark { background: #e9e1c9; color: var(--ink); border-radius: 3px; padding: 1px 3px; }
 .fp-prompt { position: sticky; top: 90px; display: grid; gap: 12px; }
 .fp-prompt .label { opacity: .6; }
 .cb { position: relative; border-radius: 8px; background: var(--ink); color: var(--bone); }

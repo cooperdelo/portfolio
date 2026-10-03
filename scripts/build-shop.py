@@ -147,7 +147,7 @@ def demo_shots():
 
 # ---------------------------------------------------------------- kits as objects (ref: 3D Book card + holographic sheen)
 KITS_SHELF = [  # slug, title, line, cover, href, state
-    ("design", "Design kit", "Sites that don't look like AI.", "/img/res/site-1200.webp", "/shop/design-kit", "$29 draft"),
+    ("design", "Design kit", "Sites that don't look like AI.", "/img/res/designkit-1200.webp", "/shop/design-kit", "$29 draft"),
     ("ai", "AI system kit", "The folder, the rules, the prompt.", "/img/res/ai-1200.webp", "/resources/ai-system", "Coming"),
     ("band", "Band kit", "Booking link, song notes, set builder.", "/img/res/stage-1200.webp", "/resources/guides/music", "Coming"),
     ("film", "Film kit", "Plan, shoot, grade in one pass.", "/img/res/ch1-1200.webp", "/resources/film-plan", "Coming"),
@@ -220,7 +220,7 @@ def storefront():
 def design_kit():
     body = f"""  <section class="kp-hero" data-kit="design" aria-labelledby="kp-h">
     <a class="kp-back label" href="/shop">{ARROW} Shop</a>
-    <div class="kp-obj" aria-hidden="true"><span class="bk big" data-tilt><span class="bk-3d"><span class="bk-cover"><img src="/img/res/site-1200.webp" alt="" /><span class="bk-sheen"></span><span class="bk-title"><span class="label">Cooper Delo</span><b>Design kit</b></span></span><span class="bk-spine"><b>Design kit</b></span><span class="bk-pages"></span></span></span></div>
+    <div class="kp-obj" aria-hidden="true"><span class="bk big" data-tilt><span class="bk-3d"><span class="bk-cover"><img src="/img/res/designkit-1200.webp" alt="" /><span class="bk-sheen"></span><span class="bk-title"><span class="label">Cooper Delo</span><b>Design kit</b></span></span><span class="bk-spine"><b>Design kit</b></span><span class="bk-pages"></span></span></span></div>
     <p class="label" data-k-pillar>Design kit</p>
     <h1 id="kp-h" data-k-title>&nbsp;</h1>
     <p class="kp-result" data-k-result></p>

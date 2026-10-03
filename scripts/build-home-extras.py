@@ -52,13 +52,9 @@ def motion(in_case=False):
 
 def records():
     items = []
-    n = 0
-    for a in ALBUMS:
+    for a in ALBUMS:  # not a ranking, so no numbers
         s = a["slug"]
         own = a.get("own")
-        if not own:
-            n += 1
-        no = "Mine" if own else f"No. {n:02d}"
         items.append(
             f'<li class="rx{" mine" if own else ""}" data-slug="{s}" data-title="{a["title"]}">'
             f'<button class="rx-hit" type="button" aria-haspopup="dialog" aria-label="Open {a["title"]}, {a["artist"]}, {a["year"]}">'
@@ -66,7 +62,7 @@ def records():
             f'<img class="rx-label" src="/img/records/label-{s}.webp" width="200" height="200" alt="" loading="lazy" decoding="async" />'
             f'<img class="rx-vinyl" src="/img/records/record-640.webp" srcset="/img/records/record-640.webp 640w, /img/records/record-960.webp 960w" sizes="(max-width: 700px) 60vw, 360px" width="640" height="640" alt="" loading="lazy" decoding="async" />'
             f'</span><img class="rx-sleeve" src="/img/records/sleeve-{s}-640.webp" srcset="/img/records/sleeve-{s}-640.webp 640w, /img/records/sleeve-{s}-960.webp 960w" sizes="(max-width: 700px) 60vw, 360px" width="640" height="640" alt="" loading="lazy" decoding="async" /></span>'
-            f'<span class="rx-cap"><span class="label">{no}</span><b>{a["title"]}</b><span>{a["artist"]}, {a["year"]}</span></span></button></li>')
+            f'<span class="rx-cap"><b>{a["title"]}</b><span>{a["artist"]}, {a["year"]}</span></span></button></li>')
     # A moving belt (ref: marquee that slows on hover). The set is drawn twice so it loops without a seam;
     # the copy is hidden from screen readers and keyboard.
     copy = [i.replace('<li class="rx', '<li aria-hidden="true" class="rx', 1).replace('<button class="rx-hit" type="button"', '<button class="rx-hit" type="button" tabindex="-1"', 1) for i in items]
