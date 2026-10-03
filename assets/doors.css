@@ -77,3 +77,6 @@
 }
 .rs-hero + .rbs { border-top: 0; padding-top: 0; }
 .rbs .rb-grid:not([class*=" n"]) .rb-5 { grid-column: span 2; }
+/* Homepage shows five: one big, four around it, no gaps. */
+.rb-grid.n5 .rb-3, .rb-grid.n5 .rb-4 { grid-column: span 1; }
+@media (max-width: 900px) { .rb-grid.n5 .rb-4 { grid-column: 1 / -1; } }
