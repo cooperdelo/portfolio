@@ -18,6 +18,7 @@
 <link rel="stylesheet" href="/assets/site.css" />
 <script>(function(d){var r=d.documentElement;try{if(sessionStorage.getItem('cd-intro'))r.classList.add('seen')}catch(e){}if(matchMedia('(prefers-reduced-motion: reduce)').matches)r.classList.add('rm')})(document)</script>
 <link rel="stylesheet" href="/assets/shop.css" />
+<link rel="stylesheet" href="/assets/shop-v2.css" />
 <meta name="robots" content="noindex" />
 </head>
 <body class="shop">
@@ -37,47 +38,39 @@
     </div>
   </section>
 
-  <section class="sh-folder" id="folder" aria-labelledby="fd-h">
-    <div class="sh-head"><h2 id="fd-h">The whole shop is one folder.</h2><p>Click a file. Paid kits, and guides that are free with an email.</p></div>
-    <div class="win" data-folder>
-      <div class="win-bar"><i></i><i></i><i></i><span>~/cooperdelo/shop</span></div>
-      <div class="win-body">
-        <aside class="win-side label"><p>Show</p>
-          <button type="button" class="on" data-filter="all">All</button><button type="button" data-filter="paid">Paid</button><button type="button" data-filter="email">Free with email</button><button type="button" data-filter="free">Free</button>
-        </aside>
-        <ol class="files" data-files><li class="files-wait label">Loading the folder</li></ol>
-      </div>
-      <div class="win-status label"><span data-count>&nbsp;</span><span>Instant access · tax at checkout · promo codes welcome</span></div>
-    </div>
+  <section class="kits" id="folder" aria-labelledby="kt-h">
+    <div class="sh-head"><p class="label">The kits</p><h2 id="kt-h">Pick one up.</h2></div>
+    <ol class="kit-shelf"><li><a class="bk" href="/shop/design-kit" data-tilt>
+        <span class="bk-3d"><span class="bk-cover"><img src="/img/res/code-1200.webp" alt="" loading="lazy" decoding="async" /><span class="bk-sheen" aria-hidden="true"></span>
+          <span class="bk-title"><span class="label">Cooper Delo</span><b>Design kit</b></span></span><span class="bk-spine" aria-hidden="true"><b>Design kit</b></span><span class="bk-pages" aria-hidden="true"></span></span>
+        <span class="bk-cap"><b>Design kit</b><span>Sites that don't look like AI.</span><span class="label bk-state">$29 draft</span></span></a></li><li><a class="bk soon" href="/resources/ai-system" data-tilt>
+        <span class="bk-3d"><span class="bk-cover"><img src="/img/res/ai-1200.webp" alt="" loading="lazy" decoding="async" /><span class="bk-sheen" aria-hidden="true"></span>
+          <span class="bk-title"><span class="label">Cooper Delo</span><b>AI system kit</b></span></span><span class="bk-spine" aria-hidden="true"><b>AI system kit</b></span><span class="bk-pages" aria-hidden="true"></span></span>
+        <span class="bk-cap"><b>AI system kit</b><span>The folder, the rules, the prompt.</span><span class="label bk-state">Coming</span></span></a></li><li><a class="bk soon" href="/resources/guides/music" data-tilt>
+        <span class="bk-3d"><span class="bk-cover"><img src="/img/res/stage-1200.webp" alt="" loading="lazy" decoding="async" /><span class="bk-sheen" aria-hidden="true"></span>
+          <span class="bk-title"><span class="label">Cooper Delo</span><b>Band kit</b></span></span><span class="bk-spine" aria-hidden="true"><b>Band kit</b></span><span class="bk-pages" aria-hidden="true"></span></span>
+        <span class="bk-cap"><b>Band kit</b><span>Booking link, song notes, set builder.</span><span class="label bk-state">Coming</span></span></a></li><li><a class="bk soon" href="/resources/film-plan" data-tilt>
+        <span class="bk-3d"><span class="bk-cover"><img src="/img/res/ch1-1200.webp" alt="" loading="lazy" decoding="async" /><span class="bk-sheen" aria-hidden="true"></span>
+          <span class="bk-title"><span class="label">Cooper Delo</span><b>Film kit</b></span></span><span class="bk-spine" aria-hidden="true"><b>Film kit</b></span><span class="bk-pages" aria-hidden="true"></span></span>
+        <span class="bk-cap"><b>Film kit</b><span>Plan, shoot, grade in one pass.</span><span class="label bk-state">Coming</span></span></a></li></ol>
   </section>
 
-  <section class="sh-demo" aria-labelledby="d1-h">
-    <div class="sh-head"><p class="label">Design kit · try it</p><h2 id="d1-h">Make it not look like AI.</h2></div>
-    <div class="dm dm-design" data-demo="design">
-      <div class="dm-stage" aria-live="polite">
-        <div class="mock" data-mock>
-          <span class="mk-blob" aria-hidden="true"></span>
-          <span class="mk-photo"><picture><source type="image/avif" srcset="/img/bar-gig-640.avif 640w, /img/bar-gig-1280.avif 1280w, /img/bar-gig-1600.avif 1600w" sizes="(max-width: 900px) 90vw, 40vw" /><source type="image/webp" srcset="/img/bar-gig-640.webp 640w, /img/bar-gig-1280.webp 1280w, /img/bar-gig-1600.webp 1600w" sizes="(max-width: 900px) 90vw, 40vw" /><img src="/img/bar-gig-1280.jpg" srcset="/img/bar-gig-640.jpg 640w, /img/bar-gig-1280.jpg 1280w, /img/bar-gig-1600.jpg 1600w" sizes="(max-width: 900px) 90vw, 40vw" width="1600" height="900" alt="" loading="lazy" decoding="async" /></picture></span>
-          <div class="mk-ico" aria-hidden="true"><i></i><i></i><i></i></div>
-          <p class="mk-kick">Creative studio</p>
-          <h3 class="mk-h"><span class="bad">Unlock your creative potential.</span><span class="good">Sites that don't look like AI.</span></h3>
-          <p class="mk-p"><span class="bad">We craft innovative digital experiences that elevate your brand to the next level and drive real results.</span><span class="good">Made from real references, real photos and real rules.</span></p>
-          <div class="mk-btns"><span>Get started</span><span>Learn more</span><span>Book a demo</span></div>
-        </div>
-      </div>
-      <div class="dm-ctl">
-        <p class="label">Flip the rules on</p>
-        <ul><li><label><input type="checkbox" data-rule="photo" /><span class="sw" aria-hidden="true"></span><span>A real photo, not a gradient blob</span></label></li><li><label><input type="checkbox" data-rule="type" /><span class="sw" aria-hidden="true"></span><span>One display font, one text font</span></label></li><li><label><input type="checkbox" data-rule="icons" /><span class="sw" aria-hidden="true"></span><span>No icon circles on the headers</span></label></li><li><label><input type="checkbox" data-rule="copy" /><span class="sw" aria-hidden="true"></span><span>Say the real thing, no hype words</span></label></li><li><label><input type="checkbox" data-rule="less" /><span class="sw" aria-hidden="true"></span><span>Less on screen</span></label></li></ul>
-        <p class="dm-score label"><b data-score>0</b>/5 rules on <button type="button" class="dm-all" data-all>Turn them all on</button></p>
-        <p class="dm-note">An illustration of five of the rules in the kit.</p>
-      </div>
+  <section class="ba-sec" aria-labelledby="ba-h">
+    <div class="sh-head"><p class="label">Design kit · drag it</p><h2 id="ba-h">Same idea. Different rules.</h2><p>Left is what a plain prompt gives you. Right is this site, built with the kit.</p></div>
+    <div class="ba" data-ba style="--x:50%">
+      <img src="/img/shop/ba-mine-1440.webp" srcset="/img/shop/ba-mine-900.webp 900w, /img/shop/ba-mine-1440.webp 1440w" sizes="(max-width: 900px) 100vw, 80vw" alt="cooperdelo.com, built with the kit" loading="lazy" decoding="async" draggable="false" />
+      <div class="ba-l"><img src="/img/shop/ba-plain-1440.webp" srcset="/img/shop/ba-plain-900.webp 900w, /img/shop/ba-plain-1440.webp 1440w" sizes="(max-width: 900px) 100vw, 80vw" alt="A generic landing page from a plain prompt" loading="lazy" decoding="async" draggable="false" /></div>
+      <span class="ba-tag label l">Plain prompt</span><span class="ba-tag label r">With the kit</span>
+      <span class="ba-bar" aria-hidden="true"><i><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1 8h13M9 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></i></span>
+      <input class="ba-in" type="range" min="0" max="100" value="50" aria-label="Compare the plain prompt with the kit" />
     </div>
     <div class="sh-cta"><a class="pill solid" href="/shop/design-kit">See the Design kit <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1 8h13M9 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></a></div>
   </section>
 
-  <section class="sh-demo" aria-labelledby="d2-h">
-    <div class="sh-head"><p class="label">LinkedIn guide · free with email</p><h2 id="d2-h">Score your first line.</h2></div>
-    <div class="dm dm-li" data-demo="linkedin">
+  <section class="stk-sec" aria-label="Try the free ones">
+    <div class="sh-head"><p class="label">Free, right now</p><h2>Try before you buy anything.</h2></div>
+    <ol class="stk-list">
+      <li class="stk-card" style="--i:0"><div class="stk-copy"><p class="label">LinkedIn · free with email</p><h3>Score your first line.</h3><p>The four checks I run before I post. Tick what's true.</p><a class="pill" href="/resources/guides/linkedin">Get the guide <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1 8h13M9 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></a></div><div class="stk-demo"><div class="dm dm-li" data-demo="linkedin">
       <div class="li-card">
         <div class="li-top"><span class="li-av" aria-hidden="true"></span><div><b>You</b><span>Your headline · 1h</span></div></div>
         <label class="li-line"><span class="label">Your first line</span><textarea rows="3" maxlength="300" data-line placeholder="Paste the first line of your next post."></textarea></label>
@@ -88,13 +81,8 @@
         <ul class="li-checks"><li><label><input type="checkbox" data-check="them" /><b>Them</b><span>Is line one a claim about other people, not about me?</span></label></li><li><label><input type="checkbox" data-check="fight" /><b>Fight</b><span>Could a smart person say "no, that's wrong"? Is there a losing side?</span></label></li><li><label><input type="checkbox" data-check="proof" /><b>Proof</b><span>Does the image hold evidence or a joke? A face alone fails.</span></label></li><li><label><input type="checkbox" data-check="odd" /><b>Odd</b><span>Would a stranger stop because this never shows up on LinkedIn?</span></label></li></ul>
         <p class="li-verdict" data-verdict aria-live="polite"><b data-li-score>0</b><span data-li-say>Keep the idea, change the wrapper.</span></p>
       </div>
-    </div>
-    <div class="sh-cta"><a class="pill" href="/resources/guides/linkedin">Get the full guide <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1 8h13M9 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></a></div>
-  </section>
-
-  <section class="sh-demo" aria-labelledby="d3-h">
-    <div class="sh-head"><p class="label">Music guide · free with email</p><h2 id="d3-h">Sort a setlist.</h2></div>
-    <div class="dm dm-set" data-demo="setlist">
+    </div></div></li>
+      <li class="stk-card" style="--i:1"><div class="stk-copy"><p class="label">Music · free with email</p><h3>Sort a setlist.</h3><p>Paste your set. It groups by tuning so you retune less.</p><a class="pill" href="/resources/guides/music">Get the guide <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1 8h13M9 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></a></div><div class="stk-demo"><div class="dm dm-set" data-demo="setlist">
       <label class="set-in"><span class="label">Paste a setlist, tuning in brackets</span><textarea rows="8" data-set>Song one (drop d)
 Song two
 Song three (step down)
@@ -103,8 +91,12 @@ Song five (double drop d)
 Song six (drop d)</textarea></label>
       <div class="set-out" data-set-out aria-live="polite"></div>
       <p class="dm-note">Grouped by tuning so you retune as few times as possible. Your notes stay exactly as written.</p>
-    </div>
-    <div class="sh-cta"><a class="pill" href="/resources/guides/music">Get the full guide <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1 8h13M9 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></a></div>
+    </div></div></li>
+      <li class="stk-card" style="--i:2"><div class="stk-copy"><p class="label">AI system · free with email</p><h3>One folder Claude reads.</h3><p>The setup behind everything on this site.</p><a class="pill" href="/resources/ai-system">See the system <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1 8h13M9 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></a></div><div class="stk-demo"><div class="dm dm-vault" data-demo="vault">
+      <div class="vwin"><div class="win-bar"><i></i><i></i><i></i><span>~/vault</span></div><ul class="vtree"><li><button type="button" data-v="0" aria-pressed="true"><span class="vf">&#9500; CLAUDE.md</span></button></li><li><button type="button" data-v="1" aria-pressed="false"><span class="vf">&#9500; Context/</span></button></li><li><button type="button" data-v="2" aria-pressed="false"><span class="vf">&#9500; Decisions/</span></button></li><li><button type="button" data-v="3" aria-pressed="false"><span class="vf">&#9500; Projects/</span></button></li><li><button type="button" data-v="4" aria-pressed="false"><span class="vf">&#9500; Skills/</span></button></li><li><button type="button" data-v="5" aria-pressed="false"><span class="vf">&#9500; Scheduled-Tasks/</span></button></li><li><button type="button" data-v="6" aria-pressed="false"><span class="vf">&#9492; Daily/</span></button></li></ul></div>
+      <div class="dm-ctl" aria-live="polite"><div class="vp" data-vp="0"><p class="label">CLAUDE.md</p><p class="vd">The rules Claude reads before anything else. Each one was written after something broke.</p><p class="vx"><span class="label">For example</span><code>CLAUDE.md</code></p></div><div class="vp" data-vp="1" hidden><p class="label">Context/</p><p class="vd">Who you are, how you write, what you&#x27;ve committed to, and the memory log.</p><p class="vx"><span class="label">For example</span><code>Context/voice.md</code></p></div><div class="vp" data-vp="2" hidden><p class="label">Decisions/</p><p class="vd">One dated file per call you make. Claude checks here before it guesses.</p><p class="vx"><span class="label">For example</span><code>Decisions/YYYY-MM-DD-topic.md</code></p></div><div class="vp" data-vp="3" hidden><p class="label">Projects/</p><p class="vd">One folder per project, each with one front-door file.</p><p class="vx"><span class="label">For example</span><code>Projects/[name]/README.md</code></p></div><div class="vp" data-vp="4" hidden><p class="label">Skills/</p><p class="vd">Step-by-step procedures Claude can run the same way every time.</p><p class="vx"><span class="label">For example</span><code>Skills/[job]/SKILL.md</code></p></div><div class="vp" data-vp="5" hidden><p class="label">Scheduled-Tasks/</p><p class="vd">Jobs that run without you, listed on one roster.</p><p class="vx"><span class="label">For example</span><code>Scheduled-Tasks/TASK-ROSTER.md</code></p></div><div class="vp" data-vp="6" hidden><p class="label">Daily/</p><p class="vd">What happened today. Chats get saved to Inbox when they end.</p><p class="vx"><span class="label">For example</span><code>Daily/YYYY-MM-DD.md</code></p></div><p class="dm-note">Click a folder. This is the shape of mine.</p></div>
+    </div></div></li>
+    </ol>
   </section>
 
   <section class="sh-faq" aria-labelledby="fq-h">
@@ -132,5 +124,6 @@ Song six (drop d)</textarea></label>
 <script src="/assets/contact.js" defer></script>
 <script src="/assets/kit.js" defer></script>
 <script src="/assets/shop-demos.js" defer></script>
+<script src="/assets/shop-v2.js" defer></script>
 </body>
 </html>

@@ -36,7 +36,7 @@ SHOP_FOOT = f"""<footer class="sh-foot">
   </div>
 </footer>"""
 
-def page(path, title, desc, body, css=("/assets/shop.css",), js=("/assets/kit.js", "/assets/shop-demos.js"), shop=True, extra_head=""):
+def page(path, title, desc, body, css=("/assets/shop.css", "/assets/shop-v2.css"), js=("/assets/kit.js", "/assets/shop-demos.js", "/assets/shop-v2.js"), shop=True, extra_head=""):
     h = head(f"{title} / Cooper Delo", desc, f"https://cooperdelo.com/{path}")
     links = "".join(f'<link rel="stylesheet" href="{c}" />\n' for c in css)
     h = h.replace("</head>", f'{links}<meta name="robots" content="noindex" />\n{extra_head}</head>', 1)
@@ -143,6 +143,33 @@ def demo_shots():
       <div class="dm-ctl"><p class="label">One spot</p><p class="sb-count"><b data-n>0</b>/10 banked</p><div class="sb-bar"><i data-bar></i></div><p class="sb-say" data-say>Change the size, the height or the action. Not just the angle.</p></div>
     </div>"""
 
+
+# ---------------------------------------------------------------- kits as objects (ref: 3D Book card + holographic sheen)
+KITS_SHELF = [  # slug, title, line, cover, href, state
+    ("design", "Design kit", "Sites that don't look like AI.", "/img/res/code-1200.webp", "/shop/design-kit", "$29 draft"),
+    ("ai", "AI system kit", "The folder, the rules, the prompt.", "/img/res/ai-1200.webp", "/resources/ai-system", "Coming"),
+    ("band", "Band kit", "Booking link, song notes, set builder.", "/img/res/stage-1200.webp", "/resources/guides/music", "Coming"),
+    ("film", "Film kit", "Plan, shoot, grade in one pass.", "/img/res/ch1-1200.webp", "/resources/film-plan", "Coming"),
+]
+
+
+def shelf():
+    return "".join(f'''<li><a class="bk{" soon" if st == "Coming" else ""}" href="{href}" data-tilt>
+        <span class="bk-3d"><span class="bk-cover"><img src="{cov}" alt="" loading="lazy" decoding="async" /><span class="bk-sheen" aria-hidden="true"></span>
+          <span class="bk-title"><span class="label">Cooper Delo</span><b>{t}</b></span></span><span class="bk-spine" aria-hidden="true"><b>{t}</b></span><span class="bk-pages" aria-hidden="true"></span></span>
+        <span class="bk-cap"><b>{t}</b><span>{line}</span><span class="label bk-state">{st}</span></span></a></li>''' for slug, t, line, cov, href, st in KITS_SHELF)
+
+
+def before_after():
+    img = lambda n, alt: f'<img src="/img/shop/ba-{n}-1440.webp" srcset="/img/shop/ba-{n}-900.webp 900w, /img/shop/ba-{n}-1440.webp 1440w" sizes="(max-width: 900px) 100vw, 80vw" alt="{alt}" loading="lazy" decoding="async" draggable="false" />'
+    return f'''<div class="ba" data-ba style="--x:50%">
+      {img("mine", "cooperdelo.com, built with the kit")}
+      <div class="ba-l">{img("plain", "A generic landing page from a plain prompt")}</div>
+      <span class="ba-tag label l">Plain prompt</span><span class="ba-tag label r">With the kit</span>
+      <span class="ba-bar" aria-hidden="true"><i>{ARROW}</i></span>
+      <input class="ba-in" type="range" min="0" max="100" value="50" aria-label="Compare the plain prompt with the kit" />
+    </div>'''
+
 # ---------------------------------------------------------------- storefront
 def storefront():
     # The hero is a ring of real frames turning in 3D behind the headline (reference: "3D Orbit Gallery",
@@ -162,36 +189,24 @@ def storefront():
     </div>
   </section>
 
-  <section class="sh-folder" id="folder" aria-labelledby="fd-h">
-    <div class="sh-head"><h2 id="fd-h">The whole shop is one folder.</h2><p>Click a file. Paid kits, and guides that are free with an email.</p></div>
-    <div class="win" data-folder>
-      <div class="win-bar"><i></i><i></i><i></i><span>~/cooperdelo/shop</span></div>
-      <div class="win-body">
-        <aside class="win-side label"><p>Show</p>
-          <button type="button" class="on" data-filter="all">All</button><button type="button" data-filter="paid">Paid</button><button type="button" data-filter="email">Free with email</button><button type="button" data-filter="free">Free</button>
-        </aside>
-        <ol class="files" data-files><li class="files-wait label">Loading the folder</li></ol>
-      </div>
-      <div class="win-status label"><span data-count>&nbsp;</span><span>Instant access · tax at checkout · promo codes welcome</span></div>
-    </div>
+  <section class="kits" id="folder" aria-labelledby="kt-h">
+    <div class="sh-head"><p class="label">The kits</p><h2 id="kt-h">Pick one up.</h2></div>
+    <ol class="kit-shelf">{shelf()}</ol>
   </section>
 
-  <section class="sh-demo" aria-labelledby="d1-h">
-    <div class="sh-head"><p class="label">Design kit · try it</p><h2 id="d1-h">Make it not look like AI.</h2></div>
-    {demo_design()}
+  <section class="ba-sec" aria-labelledby="ba-h">
+    <div class="sh-head"><p class="label">Design kit · drag it</p><h2 id="ba-h">Same idea. Different rules.</h2><p>Left is what a plain prompt gives you. Right is this site, built with the kit.</p></div>
+    {before_after()}
     <div class="sh-cta"><a class="pill solid" href="/shop/design-kit">See the Design kit {ARROW}</a></div>
   </section>
 
-  <section class="sh-demo" aria-labelledby="d2-h">
-    <div class="sh-head"><p class="label">LinkedIn guide · free with email</p><h2 id="d2-h">Score your first line.</h2></div>
-    {demo_linkedin()}
-    <div class="sh-cta"><a class="pill" href="/resources/guides/linkedin">Get the full guide {ARROW}</a></div>
-  </section>
-
-  <section class="sh-demo" aria-labelledby="d3-h">
-    <div class="sh-head"><p class="label">Music guide · free with email</p><h2 id="d3-h">Sort a setlist.</h2></div>
-    {demo_music()}
-    <div class="sh-cta"><a class="pill" href="/resources/guides/music">Get the full guide {ARROW}</a></div>
+  <section class="stk-sec" aria-label="Try the free ones">
+    <div class="sh-head"><p class="label">Free, right now</p><h2>Try before you buy anything.</h2></div>
+    <ol class="stk-list">
+      <li class="stk-card" style="--i:0"><div class="stk-copy"><p class="label">LinkedIn · free with email</p><h3>Score your first line.</h3><p>The four checks I run before I post. Tick what's true.</p><a class="pill" href="/resources/guides/linkedin">Get the guide {ARROW}</a></div><div class="stk-demo">{demo_linkedin()}</div></li>
+      <li class="stk-card" style="--i:1"><div class="stk-copy"><p class="label">Music · free with email</p><h3>Sort a setlist.</h3><p>Paste your set. It groups by tuning so you retune less.</p><a class="pill" href="/resources/guides/music">Get the guide {ARROW}</a></div><div class="stk-demo">{demo_music()}</div></li>
+      <li class="stk-card" style="--i:2"><div class="stk-copy"><p class="label">AI system · free with email</p><h3>One folder Claude reads.</h3><p>The setup behind everything on this site.</p><a class="pill" href="/resources/ai-system">See the system {ARROW}</a></div><div class="stk-demo">{demo_vault()}</div></li>
+    </ol>
   </section>
 
   <section class="sh-faq" aria-labelledby="fq-h">
@@ -210,7 +225,7 @@ def storefront():
 def design_kit():
     body = f"""  <section class="kp-hero" data-kit="design" aria-labelledby="kp-h">
     <a class="kp-back label" href="/shop">{ARROW} Shop</a>
-    <div class="kp-art" aria-hidden="true"><div class="fold"><b>design-kit/</b><ul><li>references</li><li>anti-slop rules</li><li>type + color</li><li>the one prompt</li></ul></div><span class="tag">Kit</span></div>
+    <div class="kp-obj" aria-hidden="true"><span class="bk big" data-tilt><span class="bk-3d"><span class="bk-cover"><img src="/img/res/code-1200.webp" alt="" /><span class="bk-sheen"></span><span class="bk-title"><span class="label">Cooper Delo</span><b>Design kit</b></span></span><span class="bk-spine"><b>Design kit</b></span><span class="bk-pages"></span></span></span></div>
     <p class="label" data-k-pillar>Design kit</p>
     <h1 id="kp-h" data-k-title>&nbsp;</h1>
     <p class="kp-result" data-k-result></p>
@@ -228,9 +243,9 @@ def design_kit():
     <ol class="kp-outline" data-outline></ol>
   </section>
 
-  <section class="sh-demo" aria-labelledby="d1-h">
-    <div class="sh-head"><p class="label">Try it</p><h2 id="d1-h">Make it not look like AI.</h2></div>
-    {demo_design()}
+  <section class="ba-sec" aria-labelledby="d1-h">
+    <div class="sh-head"><p class="label">The proof</p><h2 id="d1-h">Drag it.</h2><p>Left is a plain prompt. Right is this site, built with these rules.</p></div>
+    {before_after()}
   </section>
 
   <section class="kp-full" data-full hidden aria-label="The kit"></section>"""

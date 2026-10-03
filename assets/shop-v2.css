@@ -1,0 +1,58 @@
+/* Shop, second pass. Kits are objects (ref: 3D Book card + holographic sheen), the Design kit proves itself with a
+   before/after slider (ref: Image Comparison Slider), and the free demos stack as sticky cards (ref: Sticky Scroll Cards). */
+
+/* ---------- kits as objects ---------- */
+.kits { padding: clamp(88px, 13vh, 150px) var(--gutter) 0; }
+.kit-shelf { list-style: none; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(18px, 3vw, 48px); max-width: 1320px; margin: 0 auto; }
+.bk { display: grid; gap: 22px; perspective: 1200px; }
+.bk-3d { position: relative; display: block; aspect-ratio: 3 / 4; transform-style: preserve-3d; transform: rotateY(calc(-18deg + var(--ry, 0deg))) rotateX(var(--rx, 0deg)); transition: transform .7s var(--ease); }
+.bk:hover .bk-3d { transform: rotateY(calc(-4deg + var(--ry, 0deg))) rotateX(var(--rx, 0deg)) translateY(-6px); }
+.bk-cover { position: absolute; inset: 0; border-radius: 3px 8px 8px 3px; overflow: hidden; transform: translateZ(14px); box-shadow: 0 40px 60px -30px rgba(0, 0, 0, .9); }
+.bk-cover img { width: 100%; height: 100%; object-fit: cover; filter: var(--film) brightness(.72); }
+.bk-cover::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 14px; z-index: 2; background: linear-gradient(90deg, rgba(0, 0, 0, .45), rgba(255, 255, 255, .12) 60%, transparent); }
+.bk-sheen { position: absolute; inset: 0; z-index: 2; background: linear-gradient(115deg, transparent 30%, rgba(255, 245, 225, .22) 45%, transparent 60%); background-size: 250% 100%; background-position: 100% 0; transition: background-position .9s var(--ease); mix-blend-mode: screen; }
+.bk:hover .bk-sheen { background-position: 0% 0; }
+.bk-title { position: absolute; z-index: 3; left: 12%; right: 10%; bottom: 9%; display: grid; gap: 6px; color: var(--bone); }
+.bk-title .label { opacity: .7; font-size: 10px; }
+.bk-title b { font-family: var(--display); font-weight: 700; text-transform: uppercase; font-size: clamp(22px, 2.3vw, 40px); line-height: .86; }
+.bk-spine { position: absolute; top: 0; bottom: 0; left: 0; width: 28px; transform-origin: left; transform: rotateY(-90deg) translateX(-14px); background: linear-gradient(90deg, #0e0c0a, #2a241d); display: grid; place-items: center; }
+.bk-spine b { writing-mode: vertical-rl; transform: rotate(180deg); font-family: var(--display); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; opacity: .8; }
+.bk-pages { position: absolute; top: 3%; bottom: 3%; right: 0; width: 26px; transform-origin: right; transform: rotateY(90deg) translateX(13px); background: repeating-linear-gradient(90deg, #e9e3d6 0 1px, #cfc7b6 1px 2px); }
+.bk-cap { display: grid; gap: 4px; }
+.bk-cap b { font-weight: 700; font-size: 17px; }
+.bk-cap > span:not(.label) { font-size: 14px; opacity: .72; }
+.bk-state { margin-top: 4px; justify-self: start; padding: 4px 9px 3px; border-radius: 999px; background: var(--bone); color: var(--ink); font-size: 10px; }
+.bk.soon .bk-state { background: transparent; color: inherit; border: 1px solid var(--line-d); opacity: .8; }
+.bk.soon .bk-cover img { filter: var(--film) brightness(.5) saturate(.6); }
+
+/* ---------- before / after ---------- */
+.ba-sec { padding: clamp(88px, 13vh, 150px) var(--gutter) 0; }
+.ba { position: relative; max-width: 1180px; margin: 0 auto; aspect-ratio: 16 / 10; border-radius: 12px; overflow: hidden; box-shadow: 0 50px 100px -50px rgba(0, 0, 0, .95); user-select: none; }
+.ba > img, .ba-l img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top; }
+.ba-l { position: absolute; inset: 0; clip-path: inset(0 calc(100% - var(--x)) 0 0); }
+.ba-bar { position: absolute; top: 0; bottom: 0; left: var(--x); width: 2px; margin-left: -1px; background: var(--bone); pointer-events: none; }
+.ba-bar i { position: absolute; top: 50%; left: 50%; width: 46px; height: 46px; margin: -23px 0 0 -23px; border-radius: 50%; background: var(--bone); color: var(--ink); display: grid; place-items: center; box-shadow: 0 8px 24px rgba(0, 0, 0, .4); }
+.ba-bar i svg { width: 16px; height: 16px; }
+.ba-tag { position: absolute; top: 16px; padding: 6px 11px 5px; border-radius: 999px; background: rgba(16, 13, 10, .7); color: var(--bone); backdrop-filter: blur(8px); }
+.ba-tag.l { left: 16px; } .ba-tag.r { right: 16px; }
+.ba-in { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: ew-resize; margin: 0; }
+
+/* ---------- free demos as stacking sticky cards ---------- */
+.stk-sec { padding: clamp(88px, 13vh, 150px) var(--gutter) 0; }
+.stk-list { list-style: none; max-width: 1180px; margin: 0 auto; display: grid; gap: 28px; }
+.stk-card { position: sticky; top: calc(90px + var(--i) * 22px); display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 7fr); gap: clamp(20px, 3vw, 48px); align-items: center; padding: clamp(22px, 3vw, 40px); border-radius: 16px; background: #1e1a15; border: 1px solid rgba(244, 240, 231, .1); box-shadow: 0 -20px 60px -30px rgba(0, 0, 0, .8); min-height: 440px; }
+.stk-copy { display: grid; gap: 12px; align-content: start; justify-items: start; }
+.stk-copy .label { opacity: .6; }
+.stk-copy h3 { font-family: var(--display); font-weight: 700; text-transform: uppercase; font-size: clamp(26px, 3vw, 48px); line-height: .88; }
+.stk-copy p:not(.label) { opacity: .8; max-width: 32ch; }
+.stk-demo .dm { max-width: none; }
+.stk-demo .dm-li, .stk-demo .dm-vault, .stk-demo .dm-set { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+.kp-obj { position: absolute; right: 0; top: clamp(140px, 20vh, 210px); width: clamp(220px, 22vw, 320px); }
+.kp-obj .bk-3d { transform: rotateY(calc(-24deg + var(--ry, 0deg))) rotateX(var(--rx, 0deg)); }
+
+@media (max-width: 900px) {
+  .kit-shelf { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .stk-card { position: static; grid-template-columns: minmax(0, 1fr); min-height: 0; }
+  .stk-demo .dm-li, .stk-demo .dm-vault, .stk-demo .dm-set { grid-template-columns: minmax(0, 1fr); }
+  .kp-obj { display: none; }
+}
