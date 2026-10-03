@@ -45,8 +45,14 @@ for asset in assets:
     with tempfile.TemporaryDirectory() as td:
         out = Path(td) / "p.mp4"
         # 720p, frequent keyframes so scrubbing the timeline is instant, small enough to stream on a phone.
-        subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", str(src), "-vf", "scale=-2:720", "-c:v", "libx264", "-preset", "veryfast", "-crf", "27",
+        # The bucket caps a file at 50 MB, so long clips get a lower bitrate (aim for about 40 MB at most).
+        src_dur = float(subprocess.check_output(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "default=nw=1:nk=1", str(src)], text=True))
+        kbps = int(max(400, min(2500, 40e6 * 8 / max(src_dur, 1) / 1000 - 96)))
+        subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", str(src), "-vf", "scale=-2:720", "-c:v", "libx264", "-preset", "veryfast",
+                        "-b:v", f"{kbps}k", "-maxrate", f"{int(kbps * 1.3)}k", "-bufsize", f"{kbps * 2}k",
                         "-g", "25", "-c:a", "aac", "-b:a", "96k", "-movflags", "+faststart", str(out)], check=True)
+        if out.stat().st_size > 49e6:
+            print("     too big after encode, skipped"); continue
         data = out.read_bytes()
         digest = hashlib.sha256(data).hexdigest()
         path = f"{asset['drive_file_id']}/{digest[:16]}.mp4"
