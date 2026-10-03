@@ -20,7 +20,9 @@ images.build = lambda verbose=True: (images.resolve_names(images.load_slots()), 
 W = runpy.run_path(str(ROOT / "scripts" / "build-work-pages.py"), run_name="shop")
 head, NAV, footer, spic, E, ARROW, SCRIPTS = W["head"], W["NAV"], W["footer"], W["spic"], W["E"], W["ARROW"], W["SCRIPTS"]
 
-QA = '<div class="qa-bar label" role="note">QA preview · test mode · prices are drafts · nothing here is live</div>'
+# Only previews say they're previews. On cooperdelo.com the bar stays hidden.
+QA = ('<div class="qa-bar label" role="note" hidden>QA preview · test mode · prices are drafts · nothing here is live</div>'
+      '<script>if (!/(^|\\.)cooperdelo\\.com$/.test(location.hostname)) document.currentScript.previousElementSibling.hidden = false;</script>')
 
 SHOP_NAV = f"""<header class="sh-nav label">
   <a class="sh-mark" href="/shop"><span>Cooper Delo</span><i>Shop</i></a>

@@ -59,7 +59,7 @@
     if (shelf) {
       shelf.innerHTML = kits.map((k) => `<li><a class="gd-card" href="${k.href}"><span class="label">${esc(k.pillar)} · ${badge(k)}</span><b>${esc(k.title)}</b><span>${esc(k.result)}</span><span class="go">${ARROW}</span></a></li>`).join("");
     }
-  }).catch(() => { if (files) files.innerHTML = '<li class="files-wait label">The shop is not switched on here yet.</li>'; if (shelf) shelf.innerHTML = ""; });
+  }).catch(() => { if (files) files.innerHTML = '<li class="files-wait label">Almost ready. Check back soon.</li>'; if (shelf) shelf.innerHTML = ""; });
 
   // ------------------------------------------------------------ one kit (paid product page or gated guide)
   const root = document.querySelector("[data-kit]");
@@ -172,7 +172,7 @@
     if (q.get("session_id")) { msg("Checking your payment"); const ok = await unlock({ session_id: q.get("session_id") }); msg(ok === true ? "" : "We couldn't confirm that payment yet. Refresh in a moment, or email me."); clean(); if (ok === true) return; }
     else if (q.get("demo") === "1") { const ok = await unlock({ demo: true }); clean(); if (ok === true) { msg(""); return; } }
     else if (q.get("canceled")) { msg("Checkout canceled. Nothing was charged."); clean(); }
-    try { render(await getKit(slug)); } catch { $("[data-k-title]").textContent = "This isn't switched on here yet."; }
+    try { render(await getKit(slug)); } catch { $("[data-k-title]").textContent = "This one's almost ready. Check back soon."; }
   }
 
   const gateForm = document.querySelector("[data-email-gate]");
