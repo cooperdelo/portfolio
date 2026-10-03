@@ -347,3 +347,21 @@ button.wk-day:hover { border-color: rgba(244, 240, 231, .5); }
 .gd-bar .pill.solid { background: var(--bone); color: var(--ink); border-color: var(--bone); flex: none; }
 html.gm-lock, html.gm-lock body { overflow: hidden; }
 @media (prefers-reduced-motion: reduce) { .gm-scrim, .gm-card { transition: none; } .gd-bar { animation: none; } }
+
+/* ---------- hero: a ring of real frames turning behind the headline ---------- */
+.sh-hero { min-height: auto; height: clamp(620px, 100svh, 1000px); padding: 0 var(--gutter); background: radial-gradient(60% 55% at 50% 50%, #241f19, #120f0c 75%); display: grid; place-items: center; overflow: hidden; }
+.orbit { position: absolute; inset: 0; perspective: 1400px; perspective-origin: 50% 46%; cursor: grab; touch-action: pan-y; }
+.orbit:active { cursor: grabbing; }
+.orbit-ring { --r: clamp(380px, 46vw, 820px); --w: clamp(150px, 15vw, 270px); list-style: none; position: absolute; left: 50%; top: 50%; width: 0; height: 0; transform-style: preserve-3d; transform: translateZ(calc(var(--r) * -1)) rotateX(-6deg) rotateY(var(--spin, 0deg)); }
+.orbit-ring li { position: absolute; width: var(--w); aspect-ratio: 4 / 5; left: calc(var(--w) / -2); top: calc(var(--w) * -.625); transform: rotateY(calc(360deg / var(--n) * var(--i))) translateZ(var(--r)); backface-visibility: hidden; border-radius: 6px; overflow: hidden; box-shadow: 0 30px 60px -30px rgba(0, 0, 0, .9); }
+.orbit-ring img { width: 100%; height: 100%; object-fit: cover; filter: var(--film) brightness(.82); user-select: none; -webkit-user-drag: none; }
+.sh-hero::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(42% 46% at 50% 50%, rgba(18, 15, 12, .78), rgba(18, 15, 12, 0) 72%), linear-gradient(to bottom, rgba(18, 15, 12, .7), transparent 18%, transparent 82%, rgba(18, 15, 12, .9)); }
+.sh-copy { z-index: 2; background: none; padding: 0; pointer-events: none; }
+.sh-copy a { pointer-events: auto; }
+.sh-copy h1 { text-shadow: 0 6px 40px rgba(0, 0, 0, .6); }
+@media (max-width: 900px) { .orbit-ring { --r: 300px; --w: 120px; } .sh-hero { height: clamp(560px, 92svh, 820px); } }
+@media (prefers-reduced-motion: reduce) { .orbit-ring { transform: translateZ(calc(var(--r) * -1)) rotateX(-6deg); } }
+.orbit-ring { top: 66%; }
+.sh-hero { place-items: start center; padding-top: clamp(90px, 14vh, 150px); }
+@media (max-width: 900px) { .orbit-ring { top: 72%; } }
+@media (min-width: 901px) { .sh-hero .sh-copy h1 { font-size: clamp(40px, 5.2vw, 88px); } .sh-hero .sh-copy { gap: 14px; } .orbit-ring { top: 70%; } }

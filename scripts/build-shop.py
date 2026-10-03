@@ -145,15 +145,15 @@ def demo_shots():
 
 # ---------------------------------------------------------------- storefront
 def storefront():
-    collage = [("home-collage-5", "c1", "Might As Well"), ("work-chapter-one-still-1", "c2", "Chapter One"), ("home-collage-1", "c3", "At the laptop"),
-               ("home-collage-2", "c4", "Porch show"), ("work-plugverse-product-render-1", "c5", "PlugVerse")]
-    prints = "".join(f'<figure class="pr {c}"><span class="tape" aria-hidden="true"></span>{spic(s, "", "(max-width: 900px) 46vw, 22vw")}<figcaption class="label">{cap}</figcaption></figure>' for s, c, cap in collage)
+    # The hero is a ring of real frames turning in 3D behind the headline (reference: "3D Orbit Gallery",
+    # wundercorp/awesome-components). Drag to spin. Every frame is Cooper's own footage or photos.
+    ring = ["/videos/work/chapter-one.jpg", "/img/chapters/stage-color-720.webp", "/img/ai/code-720.webp", "/videos/work/bioswap-final.jpg",
+            "/img/chapters/bass-720.webp", "/videos/work/the-start.jpg", "/img/gear/rig-marshall-480.webp", "/videos/work/launch-film.jpg",
+            "/img/chapters/desk-720.webp", "/videos/work/pv-turntable.jpg", "/img/chapters/bar-720.webp", "/img/ai/pc-720.webp",
+            "/img/chapters/ep-720.webp", "/videos/work/rubber-band.jpg", "/img/gear/rig-pedals-480.webp", "/img/chapters/deck-720.webp"]
+    cards = "".join(f'<li style="--i:{i}"><img src="{u}" alt="" loading="{"eager" if i < 6 else "lazy"}" decoding="async" draggable="false" /></li>' for i, u in enumerate(ring))
     body = f"""  <section class="sh-hero" aria-labelledby="sh-h">
-    <div class="sh-collage" aria-hidden="true">{prints}
-      <img class="rec" src="/img/records/record-640.webp" width="640" height="640" alt="" />
-      <img class="slv" src="/img/records/sleeve-cooper-delo-flicker-of-time-640.webp" width="640" height="640" alt="" />
-      <span class="stk s1">design-kit.md</span><span class="stk s2">one folder</span><span class="stk s3">no AI images</span>
-    </div>
+    <div class="orbit" data-orbit aria-hidden="true" style="--n:{len(ring)}"><ul class="orbit-ring">{cards}</ul></div>
     <div class="sh-copy">
       <p class="label">Shop</p>
       <h1 id="sh-h" data-hero><span class="line"><span>Tools I made</span></span><span class="line"><span>for my own work.</span></span></h1>

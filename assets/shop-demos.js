@@ -96,3 +96,23 @@
     draw();
   });
 })();
+
+/* The shop hero ring: turns slowly on its own, drag to spin it, eases back to the slow turn. */
+(() => {
+  const o = document.querySelector("[data-orbit]"); if (!o) return;
+  const ring = o.querySelector(".orbit-ring");
+  const RM = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let a = 0, v = RM ? 0 : 0.05, drag = null, last = 0, on = true;
+  new IntersectionObserver(([e]) => { on = e.isIntersecting; }).observe(o);
+  const tick = (t) => {
+    const dt = Math.min(48, t - (last || t)); last = t;
+    if (on && !drag) { const base = RM ? 0 : 0.05; v += (base - v) * 0.04; a += v * dt / 16; }
+    ring.style.setProperty("--spin", a.toFixed(2) + "deg");
+    requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+  o.addEventListener("pointerdown", (e) => { drag = { x: e.clientX, a }; o.setPointerCapture(e.pointerId); });
+  o.addEventListener("pointermove", (e) => { if (!drag) return; const na = drag.a + (e.clientX - drag.x) * 0.25; v = (na - a) * 0.5; a = na; });
+  const end = () => { drag = null; };
+  o.addEventListener("pointerup", end); o.addEventListener("pointercancel", end);
+})();
