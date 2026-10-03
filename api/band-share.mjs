@@ -50,7 +50,9 @@ export default async function handler(req, res) {
       const [assets, reviews] = await Promise.all([
         get('band_media_assets?select=id,name,gig,duration,proxy_path&retired_at=is.null&order=gig,name'),
         get(`band_media_reviews?select=*&reviewer=eq.${BAND}`)]);
-      const paths = assets.filter((a) => a.proxy_path).map((a) => a.proxy_path);
+      // Each preview has a still next to it (<drive id>/poster.jpg) so phones show a real frame in the list.
+      const poster = (p) => p.replace(/[^/]+$/, 'poster.jpg');
+      const paths = assets.filter((a) => a.proxy_path).flatMap((a) => [a.proxy_path, poster(a.proxy_path)]);
       const urls = {};
       if (paths.length) {
         const r = await fetch(`${BASE}/storage/v1/object/sign/band-review`, { method: 'POST', headers: H, body: JSON.stringify({ expiresIn: 3600, paths }), signal: AbortSignal.timeout(12000) });
@@ -58,7 +60,7 @@ export default async function handler(req, res) {
       }
       return res.status(200).json({
         you: who.n,
-        clips: assets.map((a) => ({ id: a.id, name: a.name, gig: a.gig, duration: a.duration, url: urls[a.proxy_path] || null })),
+        clips: assets.map((a) => ({ id: a.id, name: a.name, gig: a.gig, duration: a.duration, url: urls[a.proxy_path] || null, poster: (a.proxy_path && urls[poster(a.proxy_path)]) || null })),
         marks: reviews.map((r) => ({ asset: r.asset_id, revision: r.revision, verdict: OUT[r.verdict] || 'unreviewed', note: r.note, start: r.trim_start, end: r.trim_end, by: r.updated_by || null, at: r.updated_at })),
       });
     }

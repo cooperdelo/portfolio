@@ -16,6 +16,8 @@ async function load() {
   const gigs = [...new Set(clips.map((c) => c.gig))];
   $("[data-gig]").innerHTML = '<option value="">Every gig</option>' + gigs.map((g) => `<option>${esc(g)}</option>`).join("");
   list(); progress();
+  // On a laptop the player sits beside the list, so start on the first clip nobody has marked yet.
+  if (cur < 0 && matchMedia("(min-width: 901px)").matches) { const first = clips.find((c) => c.url && mk(c).verdict === "unreviewed") || clips.find((c) => c.url); if (first) open(clips.indexOf(first)); }
 }
 const mk = (c) => marks[c.id] || { asset: c.id, revision: 0, verdict: "unreviewed", note: "", start: null, end: null };
 const visible = () => clips.filter((c) => (!gig || c.gig === gig) && (show === "all" || mk(c).verdict === show));
@@ -24,7 +26,7 @@ function list() {
   $("[data-list]").innerHTML = visible().map((c) => {
     const m = mk(c);
     return `<li><button type="button" class="br-item v-${m.verdict}${clips[cur]?.id === c.id ? " on" : ""}" data-id="${c.id}">
-      <span class="br-thumb">${c.url ? `<video muted preload="metadata" src="${c.url}#t=0.5"></video>` : ""}<i>${m.verdict === "unreviewed" ? "" : m.verdict}</i></span>
+      <span class="br-thumb">${c.poster ? `<img src="${c.poster}" alt="" loading="lazy" />` : ""}<i>${m.verdict === "unreviewed" ? "" : m.verdict}</i></span>
       <span class="br-meta"><b>${esc(c.name.replace(/\.[^.]+$/, ""))}</b><span>${esc(c.gig)}${m.start != null ? ` · trim ${fmt(m.start)}–${fmt(m.end)}` : ""}</span>${m.note ? `<em>${esc(m.note)}</em>` : ""}</span></button></li>`;
   }).join("") || '<li class="br-empty label">Nothing here.</li>';
   document.querySelectorAll(".br-item").forEach((b) => b.addEventListener("click", () => open(clips.findIndex((c) => c.id === b.dataset.id))));
@@ -41,7 +43,7 @@ function open(i) {
   $("[data-player]").hidden = false; document.body.classList.add("playing");
   $("[data-gigname]").textContent = c.gig; $("[data-name]").textContent = c.name.replace(/\.[^.]+$/, "");
   $("[data-note]").value = m.note || "";
-  v.src = c.url || ""; v.currentTime = 0;
+  v.poster = c.poster || ""; v.src = c.url || ""; v.currentTime = 0;
   status(c.url ? (m.by ? `Last marked by ${m.by}` : "") : "No preview for this clip yet.");
   paint(); list();
   if (matchMedia("(max-width: 900px)").matches) window.scrollTo({ top: 0 });

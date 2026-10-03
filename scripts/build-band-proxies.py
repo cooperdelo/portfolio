@@ -3,6 +3,7 @@ band-review bucket, and record proxy_path. Originals are never touched. Re-runs 
 
     python scripts/build-band-proxies.py            # all missing
     python scripts/build-band-proxies.py --dry-run  # show the matches only
+    python scripts/build-band-proxies.py --posters  # add a still (poster.jpg) next to every preview that lacks one
 """
 import argparse, hashlib, json, re, subprocess, tempfile
 from pathlib import Path
@@ -12,12 +13,42 @@ GIGS = Path("G:/Videos/03_GIGS")
 FOLDER = {"MAW": "maw_9-11-26", "Pi Kapp": "pikapp_8-26-26", "Chi Phi": "chiphi_9-12-26"}
 BASE = "https://eibtnkaoqsgwiqttiwjo.supabase.co"
 
-ap = argparse.ArgumentParser(); ap.add_argument("--dry-run", action="store_true"); a = ap.parse_args()
+ap = argparse.ArgumentParser(); ap.add_argument("--dry-run", action="store_true"); ap.add_argument("--posters", action="store_true"); a = ap.parse_args()
 env = Path("C:/Users/coope/Desktop/Claude/Projects/personal-brand/factory/.env").read_text()
 key = re.search(r"^SUPABASE_SERVICE_KEY\s*=\s*(.+?)\s*$", env, re.M).group(1).strip("\"'")
 H = {"apikey": key, "Authorization": "Bearer " + key}
 
 assets = requests.get(BASE + "/rest/v1/band_media_assets?select=id,drive_file_id,name,gig,proxy_path&retired_at=is.null", headers=H, timeout=30).json()
+
+
+def poster(proxy_path, at=2.0):
+    """Grab one frame from the uploaded preview (ffmpeg reads only what it needs over a signed URL) and store it beside it."""
+    r = requests.post(f"{BASE}/storage/v1/object/sign/band-review/{proxy_path}", headers=H, json={"expiresIn": 600}, timeout=30)
+    r.raise_for_status()
+    url = f"{BASE}/storage/v1{r.json()['signedURL']}"
+    with tempfile.TemporaryDirectory() as td:
+        out = Path(td) / "poster.jpg"
+        subprocess.run(["ffmpeg", "-v", "error", "-y", "-ss", str(at), "-i", url, "-frames:v", "1", "-vf", "scale=480:-2", "-q:v", "5", str(out)], check=True)
+        if not out.exists():  # clip shorter than `at`
+            subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", url, "-frames:v", "1", "-vf", "scale=480:-2", "-q:v", "5", str(out)], check=True)
+        path = proxy_path.rsplit("/", 1)[0] + "/poster.jpg"
+        requests.post(f"{BASE}/storage/v1/object/band-review/{path}", headers={**H, "Content-Type": "image/jpeg", "x-upsert": "true"},
+                      data=out.read_bytes(), timeout=60).raise_for_status()
+        return path, out.stat().st_size
+
+
+if a.posters:
+    have = set()
+    for asset in assets:
+        if not asset["proxy_path"]:
+            continue
+        folder = asset["proxy_path"].rsplit("/", 1)[0]
+        listed = requests.post(f"{BASE}/storage/v1/object/list/band-review", headers=H, json={"prefix": folder + "/", "limit": 20}, timeout=30).json()
+        if any(o["name"] == "poster.jpg" for o in listed):
+            continue
+        path, size = poster(asset["proxy_path"])
+        print("POSTER", asset["name"], path, f"{size / 1e3:.0f} KB")
+    raise SystemExit
 
 
 def original(asset):
@@ -68,6 +99,7 @@ for asset in assets:
         r = requests.patch(BASE + "/rest/v1/band_media_assets", params={"id": "eq." + asset["id"]}, headers={**H, "Prefer": "return=representation"},
                            json={"proxy_path": path, "duration": round(dur, 2)}, timeout=30)
         r.raise_for_status(); assert r.json()[0]["proxy_path"] == path
+        poster(path)
         done += 1
         print(f"     uploaded {len(data) / 1e6:.1f} MB, {dur:.1f}s, verified")
 print("built", done)
