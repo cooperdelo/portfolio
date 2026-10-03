@@ -58,3 +58,16 @@
   .rx-js .rx { opacity: 1; transform: none; transition: none; }
   .rx-disc, .rx-sleeve { transition: none; }
 }
+
+/* ---------- the belt (replaces the wall) ---------- */
+.rx-belt { --w: clamp(170px, 15vw, 250px); margin: clamp(30px, 5vh, 56px) calc(var(--gutter) * -1) 0; overflow: hidden; padding-top: calc(var(--w) * .34 + 20px); cursor: grab; touch-action: pan-y; user-select: none; -webkit-user-select: none;
+  mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent); -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent); }
+.rx-belt:active { cursor: grabbing; }
+.rx-track { list-style: none; display: flex; gap: clamp(26px, 3vw, 52px); width: max-content; padding: 0 var(--gutter); will-change: transform; }
+.rx-belt .rx { --lift: .34; flex: none; width: var(--w); opacity: 1; transform: none; }
+.rx-belt .rx-art img, .rx-belt .rx-hit { -webkit-user-drag: none; }
+@media (max-width: 700px) { .rx-belt { --w: 150px; } .rx-belt .rx { --lift: .22; } }
+/* Belt spacing: the render canvas is bigger than the sleeve, so make room for it on every side. */
+.rx-belt { --c: calc(var(--w) / .7476); }
+.rx-belt .rx-track { gap: clamp(36px, 4vw, 64px); }
+.rx-belt .rx-hit { gap: 18px; }

@@ -67,11 +67,14 @@ def records():
             f'<img class="rx-vinyl" src="/img/records/record-640.webp" srcset="/img/records/record-640.webp 640w, /img/records/record-960.webp 960w" sizes="(max-width: 700px) 60vw, 360px" width="640" height="640" alt="" loading="lazy" decoding="async" />'
             f'</span><img class="rx-sleeve" src="/img/records/sleeve-{s}-640.webp" srcset="/img/records/sleeve-{s}-640.webp 640w, /img/records/sleeve-{s}-960.webp 960w" sizes="(max-width: 700px) 60vw, 360px" width="640" height="640" alt="" loading="lazy" decoding="async" /></span>'
             f'<span class="rx-cap"><span class="label">{no}</span><b>{a["title"]}</b><span>{a["artist"]}, {a["year"]}</span></span></button></li>')
+    # A moving belt (ref: marquee that slows on hover). The set is drawn twice so it loops without a seam;
+    # the copy is hidden from screen readers and keyboard.
+    copy = [i.replace('<li class="rx', '<li aria-hidden="true" class="rx', 1).replace('<button class="rx-hit" type="button"', '<button class="rx-hit" type="button" tabindex="-1"', 1) for i in items]
     return f"""<section class="records dark" aria-labelledby="rx-h">
     <div class="rx-head"><p class="label" id="rx-h">On repeat</p><p class="rx-sub">A few records I come back to, and one of mine. <span class="rx-tag">Pick one</span></p></div>
-    <ol class="rx-wall" data-records>
-      {(chr(10) + "      ").join(items)}
-    </ol>
+    <div class="rx-belt" data-records><ol class="rx-track">
+      {(chr(10) + "      ").join(items + copy)}
+    </ol></div>
   </section>"""
 
 
@@ -293,7 +296,7 @@ def res_bento(heading=True, limit=None, exclude=()):
     cards = "".join(f'''<li class="rb-{i}"><a class="rb" href="{href}">{res_img(key)}
         <span class="rb-cap"><span class="label">{ACCESS[acc]}</span><b>{title}</b><span>{line}</span></span><span class="rb-go">{ARROW}</span></a></li>'''
                     for i, (slug, title, line, key, href, acc) in enumerate(items))
-    head = f'''<div class="rb-head"><h2 data-rv><span class="line"><span>Curated insights</span></span><span class="line"><span>&amp; creative resources</span></span></h2>
+    head = f'''<div class="rb-head"><h2 data-rv><span class="line"><span>Resources</span></span></h2>
       <p>How I actually make things. Copy what helps, skip what doesn't. <a href="/resources">See all {ARROW}</a></p></div>''' if heading else ""
     return f'''<section class="rbs light" aria-label="Resources">
     {head}

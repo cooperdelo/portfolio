@@ -78,7 +78,8 @@ html.lenis, html.lenis body { height: auto; }
 .roll > span + span { position: absolute; left: 0; top: 100%; }
 a:hover > .roll > span, a:focus-visible > .roll > span { transform: translateY(-100%); }
 @media (max-width: 700px) { .nav { grid-template-columns: 1fr auto; } .nav .where { display: none; } .nav .links { gap: 16px; } }
-@media (max-width: 480px) { .nav .mark { white-space: nowrap; font-size: 12px; } .nav .links { gap: 12px; } .nav .links a[href="/#about"] { display: none; } }
+@media (max-width: 480px) { .nav { column-gap: 14px; } .nav .mark { white-space: nowrap; font-size: 11px; } .nav .links { gap: 11px; } .nav .links a { font-size: 10px; letter-spacing: .04em; } .nav .links a[href="/#about"] { display: none; } }
+@media (max-width: 360px) { .nav .mark { font-size: 10px; } .nav .links { gap: 9px; } .nav .links a { font-size: 9px; letter-spacing: .02em; } }
 
 /* ---------- custom cursor (only over work and media) ---------- */
 .cur { position: fixed; left: 0; top: 0; z-index: 99; pointer-events: none; width: 96px; height: 96px; margin: -48px 0 0 -48px; border-radius: 50%; background: var(--bone); color: var(--ink); display: grid; place-items: center; transform: translate3d(-200px, -200px, 0) scale(0); box-shadow: 0 10px 40px -10px rgba(0, 0, 0, .4); }
@@ -572,3 +573,25 @@ html.ct-lock, html.ct-lock body { overflow: hidden; }
 .made-go { padding-right: 10px; } .made-go svg { width: 16px; height: 16px; transition: transform .5s var(--ease); }
 .made:hover { background: var(--ink); color: var(--bone); } .made:hover .made-go svg { transform: translateX(4px); }
 @media (max-width: 700px) { .made { grid-template-columns: minmax(0, 1fr); } .made-go { display: none; } }
+.ct-kinds button { width: 100%; text-align: left; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 16px; padding: 16px 4px; border-bottom: 1px solid var(--line-d); transition: background-color .3s var(--ease), padding .4s var(--ease); }
+.ct-kinds button:hover, .ct-kinds button:focus-visible { background: rgba(244, 240, 231, .06); padding-left: 12px; }
+.ct-kinds button b { font-weight: 700; font-size: 18px; } .ct-kinds button span { grid-column: 1; font-size: 14px; opacity: .65; }
+.ct-kinds button i { grid-row: 1 / 3; grid-column: 2; align-self: center; } .ct-kinds button i svg { width: 14px; height: 14px; }
+.ct-step { display: grid; gap: 14px; } .ct-step[hidden] { display: none; }
+.ct-form label { display: grid; gap: 6px; }
+.ct-form .label { opacity: .6; }
+.ct-form input, .ct-form textarea { font: inherit; font-size: 16px; color: var(--bone); background: rgba(244, 240, 231, .05); border: 1px solid var(--line-d); border-radius: 8px; padding: 11px 12px; resize: vertical; }
+.ct-form input:focus, .ct-form textarea:focus { outline: none; border-color: var(--bone); }
+.ct-hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+.ct-back { justify-self: start; opacity: .65; }
+.ct-send { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; }
+.ct-msg { font-size: 14px; opacity: .85; } .ct-msg a, .ct-linkbtn { border-bottom: 1px solid currentColor; }
+.ct-done p:not(.label) { opacity: .8; } .ct-done .pill { justify-self: start; color: var(--bone); border-color: var(--line-d); }
+
+/* Images below the hero never fill the screen: a three-column gallery with a max width, so a page reads in seconds. */
+@media (min-width: 701px) {
+  .stills, .renders { grid-template-columns: repeat(3, minmax(0, 1fr)); padding-inline: max(var(--gutter), calc((100% - 1240px) / 2)); }
+  .stills figure.wide, .renders figure.wide { grid-column: span 2; }
+  .stills figure.drop, .renders figure.drop { margin-top: 6vh; }
+  .renders figure.turn { grid-column: span 1; width: 100%; }
+}

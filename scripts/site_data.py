@@ -27,10 +27,10 @@ RESOURCES = [
     ("instagram-tiktok", "Short videos from your real week", "One week, one topic a day, filmed on Sunday.", "phone", "/resources/guides/instagram-tiktok", "email"),
     ("music", "Get your band booked", "One booking link, one note per song, a set in minutes.", "stage", "/resources/guides/music", "email"),
     ("startup", "Shipping PlugVerse solo", "What actually worked, and what didn't.", "pv", "/resources/guides/startup", "free"),
-    ("design-kit", "Sites that don't look like AI", "The references, rules and prompt behind this site.", "code", "/shop/design-kit", "paid"),
+    ("design-kit", "Sites that don't look like AI", "The references, rules and prompt behind this site.", "site", "/shop/design-kit", "paid"),
 ]
 RES = {r[0]: r for r in RESOURCES}
-ACCESS = {"free": "Free", "email": "Free with email", "paid": "Kit"}
+ACCESS = {"free": "Free", "email": "Free", "paid": "Kit"}  # never say "with email"; people find the ask when they open it
 
 
 def res_img(key, alt="", sizes="(max-width: 900px) 100vw, 33vw", eager=False):

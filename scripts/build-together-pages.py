@@ -162,7 +162,7 @@ def resources():
     ex = runpy.run_path(str(ROOT / "scripts" / "build-home-extras.py"))
     body = f"""  <section class="pg-hero light rs-hero" aria-labelledby="pg-h">
     <p class="label">Resources</p>
-    <h1 id="pg-h" data-hero><span class="line"><span>Curated insights</span></span><span class="line"><span>&amp; resources.</span></span></h1>
+    <h1 id="pg-h" data-hero><span class="line"><span>Resources.</span></span></h1>
     <p class="lede">How I actually make things: films, content, the band, PlugVerse, the system behind it. Copy what helps. Nothing to sign up for unless you want the deep ones.</p>
   </section>
   {ex["res_bento"](heading=False)}"""
@@ -209,23 +209,23 @@ def amz(q):
 GEAR = [
     ("Guitars", "guitars", [
         ("tele", "Fender Telecaster", "American Professional II. Indie, funk, country.", amz("Fender American Professional II Telecaster")),
-        ("rig-prs", "PRS Custom 24-08", "The core one, not the SE. Big classic-rock leads.", amz("PRS Custom 24-08")),
-        ("rig-takamine", "Takamine GN51CE", "Acoustic. Passive DI to the PA at gigs.", amz("Takamine GN51CE")),
-        ("rig-bass", "Epiphone Embassy", "The green bass, for when I'm on bass.", amz("Epiphone Embassy Bass")),
+        ("prs-live", "PRS Custom 24-08", "The core one, not the SE. Big classic-rock leads.", amz("PRS Custom 24-08")),
+        ("acoustic", "Takamine GN51CE", "Acoustic. Passive DI to the PA at gigs.", amz("Takamine GN51CE")),
+        ("bass", "Epiphone Embassy", "The green bass, for when I'm on bass.", amz("Epiphone Embassy Bass")),
     ]),
     ("Amps and effects", "amp", [
-        ("rig-marshall", "Marshall DSL40CR", "Stealth Edition. All tubes. This is the tone.", amz("Marshall DSL40CR")),
-        ("rig-pedals", "Line 6 Pod Go", "Pedals only. The amp block stays off.", amz("Line 6 Pod Go")),
-        ("rig-amp", "Fender Rumble 500", "Bass combo.", amz("Fender Rumble 500")),
+        ("", "Marshall DSL40CR", "Stealth Edition. All tubes. This is the tone.", amz("Marshall DSL40CR")),
+        ("", "Line 6 Pod Go", "Pedals only. The amp block stays off.", amz("Line 6 Pod Go")),
+        ("", "Fender Rumble 500", "Bass combo.", amz("Fender Rumble 500")),
     ]),
     ("Camera", "camera", [
         ("camera", "Sony A7C II", "With the FE 16mm F1.8 G and the FE 24-50mm F2.8 G.", amz("Sony A7C II")),
-        ("camera-vnd-filter", "K&F Concept 67mm VND", "7-click variable ND. On both lenses.", amz("K&F Concept 67mm variable ND")),
+        ("", "K&F Concept 67mm VND", "7-click variable ND. On both lenses.", amz("K&F Concept 67mm variable ND")),
     ]),
     ("Studio", "studio", [
-        ("studio-interface", "Focusrite Scarlett 2i2", "Interface.", amz("Focusrite Scarlett 2i2")),
-        ("studio-mic", "sE Electronics sE2200", "Condenser. Vocals and voiceover.", amz("sE Electronics sE2200")),
-        ("studio-headphones", "beyerdynamic DT 770 Pro X", "Headphones.", amz("beyerdynamic DT 770 Pro X")),
+        ("desk", "Focusrite Scarlett 2i2", "Interface.", amz("Focusrite Scarlett 2i2")),
+        ("", "sE Electronics sE2200", "Condenser. Vocals and voiceover.", amz("sE Electronics sE2200")),
+        ("headphones", "beyerdynamic DT 770 Pro X", "Headphones.", amz("beyerdynamic DT 770 Pro X")),
     ]),
 ]
 ALSO = [("Shure SM58", amz("Shure SM58")), ("RØDE mic arm", amz("RODE PSA1+")), ("Sony FE 16mm F1.8 G", amz("Sony FE 16mm F1.8 G")), ("Sony FE 24-50mm F2.8 G", amz("Sony FE 24-50mm F2.8 G"))]
@@ -237,12 +237,12 @@ def gimg(key, alt, sizes="(max-width: 700px) 90vw, 30vw"):
 
 def gear():
     """Concise: a hero, three rendered pieces, then one list of everything (ref: services list with a hover image)."""
-    feat = [("rig-marshall", "Marshall DSL40CR", "The amp. All tubes."), ("rig-prs", "PRS Custom 24-08", "Big classic-rock leads."), ("rig-pedals", "Line 6 Pod Go", "Pedals only, amp block off.")]
+    feat = [("prs-live", "Live", "The PRS into the Marshall, Chi Phi."), ("tele", "At the desk", "The Tele, most nights."), ("headphones", "Recording", "DT 770s on, Scarlett 2i2 in.")]
     feats = "".join(f'''<figure class="gf" data-tilt><span class="gf-img">{gimg(k, n, "(max-width: 900px) 90vw, 32vw")}</span><figcaption><b>{n}</b><span>{d}</span></figcaption></figure>''' for k, n, d in feat)
     rows = []
     for cat, slug, items in GEAR:
         rows.append(f'<li class="gl-cat label">{cat}</li>')
-        rows += [f'''<li><a class="gl" href="{url}" target="_blank" rel="noreferrer sponsored" data-img="/img/gear/{key}-480.webp"><b>{name}</b><span>{note}</span><i class="label">Amazon {ARROW}</i></a></li>''' for key, name, note, url in items]
+        rows += [f'''<li><a class="gl" href="{url}" target="_blank" rel="noreferrer sponsored" {f' data-img="/img/gear/{key}-480.webp"' if key else ""}><b>{name}</b><span>{note}</span><i class="label">Amazon {ARROW}</i></a></li>''' for key, name, note, url in items]
     rows.append('<li class="gl-cat label">Color and edit</li>')
     rows.append(f'''<li><a class="gl" href="https://www.blackmagicdesign.com/products/davinciresolve" target="_blank" rel="noreferrer" data-img="/videos/work/chapter-one.jpg"><b>DaVinci Resolve Studio</b><span>Every film on this site is cut and graded here.</span><i class="label">Blackmagic {ARROW}</i></a></li>''')
     rows.append(f'''<li><a class="gl" href="https://shop.gakuyen.com/products/odyssey-powergrade" target="_blank" rel="noreferrer" data-img="/videos/work/the-start.jpg"><b>Odyssey PowerGrade</b><span>Gaku's grade, on one adjustment layer.</span><i class="label">shop.gakuyen.com {ARROW}</i></a></li>''')
@@ -255,7 +255,7 @@ def gear():
       <h1 id="pg-h" data-hero><span class="line"><span>My setup.</span></span></h1>
       <p class="lede">Everything I shoot, play and record with, in one place.</p></div>
   </section>
-  <section class="gfs dark" aria-label="The rig">{feats}</section>
+  <section class="gfs dark" aria-label="In use">{feats}</section>
   <section class="gls light" aria-label="Everything I use">
     <ul class="gl-list" data-glist>{"".join(rows)}</ul>
     <p class="fine">Amazon links are searches for the exact model. <span class="draft">Draft</span> If they become affiliate links, this line will say so.</p>

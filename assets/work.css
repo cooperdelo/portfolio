@@ -121,3 +121,7 @@
 @media (prefers-reduced-motion: reduce) { .ag-steps li { animation: none; } }
 .as-glass { background: linear-gradient(160deg, rgba(30, 26, 21, .55), rgba(16, 13, 10, .45)); }
 .ag-steps li > span:last-child { opacity: .9; }
+@media (min-width: 901px) {
+  .as-frames { grid-template-columns: repeat(3, minmax(0, 1fr)); max-width: 1240px; margin-inline: auto; }
+  .as-frames figure.wide { grid-column: span 1; aspect-ratio: 16 / 9; }
+}

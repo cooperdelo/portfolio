@@ -85,9 +85,11 @@
   if (list && img && FINE) {
     let x = 0, y = 0, tx = 0, ty = 0, raf = 0;
     const loop = () => { x += (tx - x) * 0.18; y += (ty - y) * 0.18; img.style.transform = `translate3d(${x + 36}px, ${y}px, 0) translate(0, -50%)`; raf = requestAnimationFrame(loop); };
-    list.addEventListener("pointermove", (e) => { tx = e.clientX; ty = e.clientY; if (!raf) { x = tx; y = ty; raf = requestAnimationFrame(loop); } });
+    // Scrolling a row under a still cursor fires pointerenter with no pointermove, so both start the follow.
+    const follow = (e) => { tx = e.clientX; ty = e.clientY; if (!raf) { x = tx; y = ty; raf = requestAnimationFrame(loop); } };
+    list.addEventListener("pointermove", follow);
     list.querySelectorAll(".gl[data-img]").forEach((a) => {
-      a.addEventListener("pointerenter", () => { img.src = a.dataset.img; img.classList.add("on"); });
+      a.addEventListener("pointerenter", (e) => { follow(e); img.src = a.dataset.img; img.classList.add("on"); });
       a.addEventListener("pointerleave", () => img.classList.remove("on"));
     });
     list.addEventListener("pointerleave", () => { cancelAnimationFrame(raf); raf = 0; img.classList.remove("on"); });

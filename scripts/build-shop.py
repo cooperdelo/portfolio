@@ -84,21 +84,22 @@ def demo_design():
     </div>"""
 
 def demo_linkedin():
-    checks = [("them", "Them", "Is line one a claim about other people, not about me?"), ("fight", "Fight", "Could a smart person say \"no, that's wrong\"? Is there a losing side?"),
-              ("proof", "Proof", "Does the image hold evidence or a joke? A face alone fails."), ("odd", "Odd", "Would a stranger stop because this never shows up on LinkedIn?")]
+    checks = [("them", "Them", "About other people?"), ("fight", "Fight", "Could someone disagree?"),
+              ("proof", "Proof", "Does the photo prove it?"), ("odd", "Odd", "Would a stranger stop?")]
     boxes = "".join(f'<li><label><input type="checkbox" data-check="{k}" /><b>{t}</b><span>{q}</span></label></li>' for k, t, q in checks)
     return f"""<div class="dm dm-li" data-demo="linkedin">
       <div class="li-card">
-        <div class="li-top"><span class="li-av" aria-hidden="true"></span><div><b>You</b><span>Your headline · 1h</span></div></div>
-        <label class="li-line"><span class="label">Your first line</span><textarea rows="3" maxlength="300" data-line placeholder="Paste the first line of your next post."></textarea></label>
-        <div class="li-img" aria-hidden="true"><span>The image</span></div>
+        <div class="li-top"><img class="li-av" src="/img/lawn-1280.webp" alt="" loading="lazy" /><div><b>Cooper Delo</b><span>Founder, PlugVerse · 1h</span></div></div>
+        <textarea class="li-text" rows="2" maxlength="300" data-line aria-label="Your first line">Nobody at the pitch cared about my slides. They cared about one number.</textarea>
+        <img class="li-photo" src="/img/res/pitch-1200.webp" alt="Cooper pitching PlugVerse at Innovate Carolina" loading="lazy" />
       </div>
       <div class="dm-ctl">
-        <p class="label">Score the first line and the image. One point each.</p>
+        <p class="label">One point each</p>
         <ul class="li-checks">{boxes}</ul>
         <p class="li-verdict" data-verdict aria-live="polite"><b data-li-score>0</b><span data-li-say>Keep the idea, change the wrapper.</span></p>
       </div>
     </div>"""
+
 
 def demo_music():
     sample = "Song one (drop d)\nSong two\nSong three (step down)\nSong four\nSong five (double drop d)\nSong six (drop d)"
@@ -146,7 +147,7 @@ def demo_shots():
 
 # ---------------------------------------------------------------- kits as objects (ref: 3D Book card + holographic sheen)
 KITS_SHELF = [  # slug, title, line, cover, href, state
-    ("design", "Design kit", "Sites that don't look like AI.", "/img/res/code-1200.webp", "/shop/design-kit", "$29 draft"),
+    ("design", "Design kit", "Sites that don't look like AI.", "/img/res/site-1200.webp", "/shop/design-kit", "$29 draft"),
     ("ai", "AI system kit", "The folder, the rules, the prompt.", "/img/res/ai-1200.webp", "/resources/ai-system", "Coming"),
     ("band", "Band kit", "Booking link, song notes, set builder.", "/img/res/stage-1200.webp", "/resources/guides/music", "Coming"),
     ("film", "Film kit", "Plan, shoot, grade in one pass.", "/img/res/ch1-1200.webp", "/resources/film-plan", "Coming"),
@@ -172,20 +173,14 @@ def before_after():
 
 # ---------------------------------------------------------------- storefront
 def storefront():
-    # The hero is a ring of real frames turning in 3D behind the headline (reference: "3D Orbit Gallery",
-    # wundercorp/awesome-components). Drag to spin. Every frame is Cooper's own footage or photos.
-    ring = ["/videos/work/chapter-one.jpg", "/img/chapters/stage-color-720.webp", "/img/ai/code-720.webp", "/videos/work/bioswap-final.jpg",
-            "/img/chapters/bass-720.webp", "/videos/work/the-start.jpg", "/img/gear/rig-marshall-480.webp", "/videos/work/launch-film.jpg",
-            "/img/chapters/desk-720.webp", "/videos/work/pv-turntable.jpg", "/img/chapters/bar-720.webp", "/img/ai/pc-720.webp",
-            "/img/chapters/ep-720.webp", "/videos/work/rubber-band.jpg", "/img/gear/rig-pedals-480.webp", "/img/chapters/deck-720.webp"]
-    cards = "".join(f'<li style="--i:{i}"><img src="{u}" alt="" loading="{"eager" if i < 6 else "lazy"}" decoding="async" draggable="false" /></li>' for i, u in enumerate(ring))
     body = f"""  <section class="sh-hero" aria-labelledby="sh-h">
-    <div class="orbit" data-orbit aria-hidden="true" style="--n:{len(ring)}"><ul class="orbit-ring">{cards}</ul></div>
+    <video class="sh-vid" muted loop playsinline autoplay preload="metadata" poster="/videos/work/shop-hero.jpg" aria-hidden="true">
+      <source src="/videos/work/shop-hero.webm" type="video/webm" /><source src="/videos/work/shop-hero.mp4" type="video/mp4" /></video>
     <div class="sh-copy">
       <p class="label">Shop</p>
       <h1 id="sh-h" data-hero><span class="line"><span>Tools I made</span></span><span class="line"><span>for my own work.</span></span></h1>
       <p>Kits, prompts and templates from the way I actually design, film, play and build. Try every one before you get it.</p>
-      <a class="pill solid" href="#folder">Open the folder {ARROW}</a>
+      <a class="pill solid" href="#folder">See the kits {ARROW}</a>
     </div>
   </section>
 
@@ -195,7 +190,7 @@ def storefront():
   </section>
 
   <section class="ba-sec" aria-labelledby="ba-h">
-    <div class="sh-head"><p class="label">Design kit · drag it</p><h2 id="ba-h">Same idea. Different rules.</h2><p>Left is what a plain prompt gives you. Right is this site, built with the kit.</p></div>
+    <div class="sh-head"><p class="label">Design kit · drag it</p><h2 id="ba-h">Same person. Same facts.</h2><p>Left is what a plain prompt builds. Right is the same thing, built with the kit.</p></div>
     {before_after()}
     <div class="sh-cta"><a class="pill solid" href="/shop/design-kit">See the Design kit {ARROW}</a></div>
   </section>
@@ -203,9 +198,9 @@ def storefront():
   <section class="stk-sec" aria-label="Try the free ones">
     <div class="sh-head"><p class="label">Free, right now</p><h2>Try before you buy anything.</h2></div>
     <ol class="stk-list">
-      <li class="stk-card" style="--i:0"><div class="stk-copy"><p class="label">LinkedIn · free with email</p><h3>Score your first line.</h3><p>The four checks I run before I post. Tick what's true.</p><a class="pill" href="/resources/guides/linkedin">Get the guide {ARROW}</a></div><div class="stk-demo">{demo_linkedin()}</div></li>
-      <li class="stk-card" style="--i:1"><div class="stk-copy"><p class="label">Music · free with email</p><h3>Sort a setlist.</h3><p>Paste your set. It groups by tuning so you retune less.</p><a class="pill" href="/resources/guides/music">Get the guide {ARROW}</a></div><div class="stk-demo">{demo_music()}</div></li>
-      <li class="stk-card" style="--i:2"><div class="stk-copy"><p class="label">AI system · free with email</p><h3>One folder Claude reads.</h3><p>The setup behind everything on this site.</p><a class="pill" href="/resources/ai-system">See the system {ARROW}</a></div><div class="stk-demo">{demo_vault()}</div></li>
+      <li class="stk-card" style="--i:0"><div class="stk-copy"><p class="label">LinkedIn</p><h3>Score your first line.</h3><p>The four checks I run before I post. Tick what's true.</p><a class="pill" href="/resources/guides/linkedin">Get the guide {ARROW}</a></div><div class="stk-demo">{demo_linkedin()}</div></li>
+      <li class="stk-card" style="--i:1"><div class="stk-copy"><p class="label">Music</p><h3>Sort a setlist.</h3><p>Paste your set. It groups by tuning so you retune less.</p><a class="pill" href="/resources/guides/music">Get the guide {ARROW}</a></div><div class="stk-demo">{demo_music()}</div></li>
+      <li class="stk-card" style="--i:2"><div class="stk-copy"><p class="label">AI system</p><h3>One folder Claude reads.</h3><p>The setup behind everything on this site.</p><a class="pill" href="/resources/ai-system">See the system {ARROW}</a></div><div class="stk-demo">{demo_vault()}</div></li>
     </ol>
   </section>
 
@@ -225,7 +220,7 @@ def storefront():
 def design_kit():
     body = f"""  <section class="kp-hero" data-kit="design" aria-labelledby="kp-h">
     <a class="kp-back label" href="/shop">{ARROW} Shop</a>
-    <div class="kp-obj" aria-hidden="true"><span class="bk big" data-tilt><span class="bk-3d"><span class="bk-cover"><img src="/img/res/code-1200.webp" alt="" /><span class="bk-sheen"></span><span class="bk-title"><span class="label">Cooper Delo</span><b>Design kit</b></span></span><span class="bk-spine"><b>Design kit</b></span><span class="bk-pages"></span></span></span></div>
+    <div class="kp-obj" aria-hidden="true"><span class="bk big" data-tilt><span class="bk-3d"><span class="bk-cover"><img src="/img/res/site-1200.webp" alt="" /><span class="bk-sheen"></span><span class="bk-title"><span class="label">Cooper Delo</span><b>Design kit</b></span></span><span class="bk-spine"><b>Design kit</b></span><span class="bk-pages"></span></span></span></div>
     <p class="label" data-k-pillar>Design kit</p>
     <h1 id="kp-h" data-k-title>&nbsp;</h1>
     <p class="kp-result" data-k-result></p>
@@ -244,7 +239,7 @@ def design_kit():
   </section>
 
   <section class="ba-sec" aria-labelledby="d1-h">
-    <div class="sh-head"><p class="label">The proof</p><h2 id="d1-h">Drag it.</h2><p>Left is a plain prompt. Right is this site, built with these rules.</p></div>
+    <div class="sh-head"><p class="label">The proof</p><h2 id="d1-h">Drag it.</h2><p>Same person, same facts. Left is a plain prompt. Right is built with the kit.</p></div>
     {before_after()}
   </section>
 

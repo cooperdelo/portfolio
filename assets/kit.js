@@ -13,7 +13,7 @@
   };
   const FILES = { design: "design-kit/", "ai-system": "one-folder.md", linkedin: "linkedin-checks.md", "instagram-tiktok": "short-videos.md",
     "film-motion": "one-camera.md", music: "gig-kit.md", startup: "shipping-solo.md" };
-  const badge = (k) => k.gate === "paid" ? `${money(k.price)}${k.draft ? ' <i class="draft">Draft</i>' : ""}` : k.gate === "email" ? "Free with email" : "Free";
+  const badge = (k) => k.gate === "paid" ? `${money(k.price)}${k.draft ? ' <i class="draft">Draft</i>' : ""}` : "Free";
 
   async function getKit(slug) {
     const t = store.get(slug);
