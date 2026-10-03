@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Rubber Band footage</title>
+<meta name="theme-color" content="#16130F" />
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+<link rel="stylesheet" href="/assets/site.css" />
+<link rel="stylesheet" href="/band/band.css" />
+</head>
+<body class="bandrev">
+<header class="br-top">
+  <div><p class="label">Rubber Band · footage</p><h1 data-hi>Loading</h1></div>
+  <div class="br-prog"><b data-done>0</b><span class="label">of <span data-total>0</span> marked</span><i><i data-bar></i></i></div>
+</header>
+<nav class="br-filters label" aria-label="Show">
+  <button type="button" class="on" data-show="all">All</button><button type="button" data-show="unreviewed">To review</button>
+  <button type="button" data-show="keep">Keep</button><button type="button" data-show="favorite">Favorite</button><button type="button" data-show="delete">Delete</button>
+  <select data-gig aria-label="Gig"><option value="">Every gig</option></select>
+</nav>
+<main class="br-main">
+  <ol class="br-list" data-list></ol>
+  <section class="br-player" data-player hidden aria-label="Review this clip">
+    <button type="button" class="br-back label" data-back>← All clips</button>
+    <div class="br-title"><p class="label" data-gigname></p><h2 data-name></h2></div>
+    <div class="br-video"><video data-video playsinline preload="auto"></video><button type="button" class="br-big" data-play aria-label="Play">▶</button></div>
+    <div class="tl" data-tl>
+      <div class="tl-track" data-track>
+        <div class="tl-range" data-range></div>
+        <div class="tl-head" data-head></div>
+        <button type="button" class="tl-h tl-in" data-h="start" aria-label="Trim start"><span></span></button>
+        <button type="button" class="tl-h tl-out" data-h="end" aria-label="Trim end"><span></span></button>
+      </div>
+      <div class="tl-times label"><span data-t-start>Start —</span><span data-t-now>0:00.0</span><span data-t-end>End —</span></div>
+      <div class="tl-btns"><button type="button" data-mark="start">Start here</button><button type="button" data-loop>Play the trim</button><button type="button" data-mark="end">End here</button><button type="button" data-clear>Clear trim</button></div>
+    </div>
+    <div class="br-verdict" role="group" aria-label="Verdict">
+      <button type="button" data-v="keep"><b>Keep</b><span>K</span></button>
+      <button type="button" data-v="favorite"><b>Favorite</b><span>F</span></button>
+      <button type="button" data-v="delete"><b>Delete</b><span>D</span></button>
+    </div>
+    <label class="br-note"><span class="label">Note</span><textarea data-note rows="2" maxlength="4000" placeholder="What's good here? Who nailed it?"></textarea></label>
+    <p class="br-status label" data-status role="status"></p>
+    <div class="br-nav"><button type="button" data-step="-1">← Previous</button><button type="button" data-step="1">Next →</button></div>
+  </section>
+</main>
+<p class="br-help label">Space play · drag the white handles to trim · K / F / D to mark · ← → next clip. Everything saves on its own.</p>
+<script src="/band/band.js" type="module"></script>
+</body>
+</html>
