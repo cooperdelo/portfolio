@@ -252,16 +252,23 @@ def guide(slug):
   {demo_html}
   <section class="gd-body light" aria-label="The guide">
     <ol class="gd-steps" data-steps></ol>
-    <div class="gd-gate" data-gate hidden>
-      <p class="label" data-gate-count></p>
-      <h2>Get the rest.</h2>
-      <p>Free. Put in your email and the whole guide opens right here.</p>
+    <div class="gd-more" data-gate hidden><button type="button" class="pill solid" data-gm-open>Unlock the rest, free {ARROW}</button><p class="label" data-gate-count></p></div>
+    <div class="gd-master" data-master hidden></div>
+  </section>
+  <div class="gm" data-gate-modal hidden data-lenis-prevent>
+    <div class="gm-scrim" data-gm-close></div>
+    <div class="gm-card" role="dialog" aria-modal="true" aria-labelledby="gm-h">
+      <button type="button" class="gm-x label" data-gm-close>Not now</button>
+      <p class="label" data-gm-count></p>
+      <h2 id="gm-h">Get the rest.</h2>
+      <p class="gm-sub">Free. Put in your email and the whole guide opens right here.</p>
+      <ol class="gm-list" data-gm-outline></ol>
       <form class="gd-form" data-email-gate><label><span class="label">Email</span><input type="email" name="email" required maxlength="254" autocomplete="email" placeholder="you@email.com" /></label><button class="pill solid" type="submit">Open the guide {ARROW}</button></form>
       <p class="kp-msg" data-msg role="status"></p>
       <p class="gd-fine">I'll only use it to send you new guides. <span class="draft">Draft</span></p>
     </div>
-    <div class="gd-master" data-master hidden></div>
-  </section>"""
+  </div>
+  <div class="gd-bar" data-gate-bar hidden><span data-bar-count></span><button type="button" class="pill solid" data-gm-open>Unlock free {ARROW}</button></div>"""
     page(f"resources/guides/{slug}", "Guide", "A free guide from Cooper Delo.", body, css=("/assets/together.css", "/assets/shop.css"), shop=False)
 
 def resources_shelf():

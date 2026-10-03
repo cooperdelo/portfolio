@@ -60,6 +60,7 @@
   function smooth() {
     if (RM || !window.Lenis) return;
     lenis = new window.Lenis({ lerp: 0.085, wheelMultiplier: 0.95, smoothWheel: true });
+    window.cdLenis = lenis; // so overlays (the guide gate) can pause page scroll
     const raf = (t) => { lenis.raf(t); requestAnimationFrame(raf); }; requestAnimationFrame(raf);
     document.querySelectorAll('a[href^="#"]').forEach((a) => a.addEventListener("click", (e) => {
       const t = document.querySelector(a.getAttribute("href"));

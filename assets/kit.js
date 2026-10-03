@@ -96,21 +96,69 @@
       if (!d.locked) fullEl.innerHTML = `<div class="sh-head"><p class="label">Your kit</p><h2>Here it is.</h2></div><ol class="gd-steps">${k.steps.map((s, i) => stepHTML(s, i, false)).join("")}</ol>${masterHTML(k)}`;
       return;
     }
-    // guide page
+    // guide page: step 1 open, the rest outlined and locked; the email ask comes up as a modal
     const steps = $("[data-steps]"), gate = $("[data-gate]"), master = $("[data-master]");
     if (d.locked) {
-      steps.innerHTML = stepHTML(k.first, 0, false) + (k.outline || []).slice(1).map((t, i) => stepHTML(t, i + 1, true)).join("");
+      const rest = (k.outline || []).slice(1);
+      steps.innerHTML = stepHTML(k.first, 0, false) + rest.map((t, i) => stepHTML(t, i + 1, true)).join("");
+      const count = `${Math.max(0, k.count - 1)} more steps and the one prompt`;
       gate.hidden = false;
-      $("[data-gate-count]").textContent = `${Math.max(0, k.count - 1)} more steps and the one prompt`;
+      $("[data-gate-count]").textContent = count;
+      $("[data-gm-count]").textContent = k.title;
+      $("[data-bar-count]").textContent = count;
+      $("[data-gm-outline]").innerHTML = rest.map((t, i) => `<li><span class="label">${String(i + 2).padStart(2, "0")}</span>${esc(t)}</li>`).join("") + '<li><span class="label">+</span>The one prompt</li>';
       master.hidden = true;
+      gm.arm();
       track("gate_view", { kit: slug });
     } else {
       steps.innerHTML = k.steps.map((s, i) => stepHTML(s, i, false)).join("");
       gate.hidden = true;
       master.hidden = !k.master_prompt;
       master.innerHTML = masterHTML(k);
+      gm.done();
     }
   }
+
+  // The email modal: opens once when someone scrolls into the locked steps, or any time they ask for it.
+  const gm = (() => {
+    const el = document.querySelector("[data-gate-modal]"), bar = document.querySelector("[data-gate-bar]");
+    if (!el) return { arm() {}, done() {} };
+    const key = "gate-shown:" + slug;
+    let last = null, io = null;
+    const seen = () => { try { return sessionStorage.getItem(key) === "1"; } catch { return false; } };
+    function open() {
+      if (!el.hidden) return;
+      last = document.activeElement;
+      el.hidden = false; bar.hidden = true;
+      requestAnimationFrame(() => el.classList.add("on"));
+      document.documentElement.classList.add("gm-lock"); window.cdLenis?.stop();
+      try { sessionStorage.setItem(key, "1"); } catch {}
+      setTimeout(() => el.querySelector("input")?.focus({ preventScroll: true }), 250);
+    }
+    function close(showBar = true) {
+      if (el.hidden) return;
+      el.classList.remove("on");
+      document.documentElement.classList.remove("gm-lock"); window.cdLenis?.start();
+      setTimeout(() => { el.hidden = true; }, 350);
+      if (showBar) bar.hidden = false;
+      last?.focus?.({ preventScroll: true });
+    }
+    el.addEventListener("click", (e) => { if (e.target.closest("[data-gm-close]")) close(); });
+    el.addEventListener("keydown", (e) => { if (e.key === "Escape") close(); });
+    document.querySelectorAll("[data-gm-open]").forEach((b) => b.addEventListener("click", open));
+    document.addEventListener("click", (e) => { if (e.target.closest(".st.locked")) open(); });
+    return {
+      arm() {
+        const first = document.querySelector(".st.locked");
+        if (!first) return;
+        if (seen()) { bar.hidden = false; return; }
+        io?.disconnect();
+        io = new IntersectionObserver(([en]) => { if (en.isIntersecting) { io.disconnect(); open(); } }, { rootMargin: "0px 0px -35% 0px" });
+        io.observe(first);
+      },
+      done() { io?.disconnect(); close(false); bar.hidden = true; },
+    };
+  })();
 
   async function unlock(body) {
     const [code, d] = await post(API, { slug, ...body });
