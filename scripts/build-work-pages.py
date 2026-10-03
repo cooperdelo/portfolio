@@ -310,7 +310,7 @@ INDEX = """{HEAD}
     </div>
     <div class="copy">
       <h1 data-hero><span class="line"><span>Founder of PlugVerse.</span></span><span class="line"><span>I make films, motion</span></span><span class="line"><span>and product.</span></span><span class="line"><span>CS + Business, UNC.</span></span></h1>
-      <div class="meta"><a class="pill" href="#work">See the work {ARROW}</a><a class="pill" href="{CAL}" target="_blank" rel="noreferrer">Book a call</a></div>
+      <div class="meta"><a class="pill" href="#films">See the work {ARROW}</a><a class="pill" href="{CAL}" target="_blank" rel="noreferrer">Book a call</a></div>
     </div>
     <div class="foot">
       <div class="bar label"><span>35.913N 79.056W</span><span>Chapel Hill, NC</span></div>
@@ -321,9 +321,7 @@ INDEX = """{HEAD}
     </div>
   </section>
 
-  {SHOWCASE}
-
-  {RECORDS}
+  {CHAPTERS}
 
   <section class="about light" id="about" aria-label="About">
     <div class="pic" data-rv><div class="film clip float b">{ABOUTPIC}</div></div>
@@ -464,9 +462,11 @@ def work_grid_page(diagram):
             w, href, media = COMPANY, "/plugverse", f'<span class="film">{spic("work-poster-plugverse-product", "", "(max-width: 800px) 100vw, 48vw")}</span>'
         else:
             w, href, media = by[slug], f"/work/{slug}", f'<span class="film">{spic("work-poster-" + slug, "", "(max-width: 800px) 100vw, 48vw")}</span>'
+        chip = {"chapter-one": "Films", "plugverse-launch-film": "Films", "the-start": "Films", "bioswap": "Motion", "plugverse-product": "Product",
+                "ai-system": "Product · how I built it", "plugverse": "Product · the company", "rubber-band": "Music"}[slug]
         cards.append(f"""      <li data-rv><a class="wc" href="{href}" data-handoff>
         <span class="wc-media">{media}</span>
-        <span class="wc-chip label">{E(w['disc'])}</span>
+        <span class="wc-chip label">{chip}</span>
         <span class="wc-foot"><span class="wc-t">{E(w['title'])}</span><span class="label">{E(w['year'])} {ARROW}</span></span>
       </a></li>""")
     css = '<link rel="stylesheet" href="/assets/showcase.css" />\n<link rel="stylesheet" href="/assets/work.css" />\n</head>'
@@ -477,7 +477,7 @@ def work_grid_page(diagram):
   <section class="wg-hero light" aria-labelledby="wg-h">
     <p class="label">Work</p>
     <h1 id="wg-h" data-hero>{lines("Everything")}{lines("I've made.")}</h1>
-    <p class="lede">Films, motion, product, and the system I build it all with.</p>
+    <p class="lede">Films, motion, product and music. Everything I make, in one place.</p>
   </section>
   <section class="wg light" aria-label="All work">
     <ol class="wg-grid">
@@ -517,7 +517,7 @@ def ai_system_page():
 {NAV}
 <main>
   <section class="as-hero dark" aria-labelledby="as-h">
-    <p class="label">Work / Systems</p>
+    <p class="label">Work / Product / How I built it</p>
     <h1 id="as-h" data-hero>{lines("One folder")}{lines("every Claude reads.")}</h1>
     <p class="lede">It's how I built PlugVerse by myself. Every session starts already knowing my work, and ends by saving what it learned.</p>
     <div class="as-map" aria-label="Claude Code, Claude Cowork, claude.ai and Jev all read and write one folder">
@@ -568,9 +568,9 @@ if __name__ == "__main__":
             .replace("{FRAMES}", frames_block()).replace("{FOOTER}", footer("home-footer")).replace("{ABOUTPIC}", spic("home-about", "Cooper Delo on the lawn at dusk", "(max-width: 900px) 100vw, 40vw")).replace("{SCRIPTS}", SCRIPTS)
             .replace("{CAL}", CAL).replace("{ARROW}", ARROW))
     extras = runpy.run_path(str(ROOT / "scripts/build-home-extras.py"))
-    page = (page.replace("{SHOWCASE}", extras["showcase"]() + "\n  " + extras["take"]()).replace("{RECORDS}", extras["records"]()).replace("{STRIP}", extras["strip"](frames_block()))
-            .replace("</head>", '<link rel="stylesheet" href="/assets/showcase.css" />\n<link rel="stylesheet" href="/assets/records.css" />\n<link rel="stylesheet" href="/assets/album-viewer.css" />\n</head>', 1)
-            .replace('<script src="/assets/site.js" defer></script>', '<script src="/assets/site.js" defer></script>\n<script src="/assets/showcase.js" defer></script>\n<script src="/assets/records.js" defer></script>', 1))
+    page = (page.replace("{CHAPTERS}", extras["chapters"](extras["records"](), extras["systems_diagram"]())).replace("{STRIP}", extras["strip"](frames_block()))
+            .replace("</head>", '<link rel="stylesheet" href="/assets/showcase.css" />\n<link rel="stylesheet" href="/assets/chapters.css" />\n<link rel="stylesheet" href="/assets/records.css" />\n<link rel="stylesheet" href="/assets/album-viewer.css" />\n</head>', 1)
+            .replace('<script src="/assets/site.js" defer></script>', '<script src="/assets/site.js" defer></script>\n<script src="/assets/chapters.js" defer></script>\n<script src="/assets/records.js" defer></script>', 1))
     (ROOT / "index.html").write_text(page, encoding="utf-8")
     (ROOT / "work" / "index.html").write_text(work_grid_page(extras["systems_diagram"]()), encoding="utf-8")
     (ROOT / "work" / "ai-system.html").write_text(ai_system_page(), encoding="utf-8")

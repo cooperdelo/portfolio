@@ -1,0 +1,118 @@
+/* The homepage as four chapters: Films, Motion, Product, Music. Same words as the hero, the nav index and /work.
+   Every chapter leads with real footage or real photos; each one is laid out differently so it reads as a story,
+   not a template. Videos load and play only while they're on screen (chapters.js). */
+
+/* ---------- chapter index, right under the hero ---------- */
+.ch-index { padding: clamp(28px, 4vh, 44px) var(--gutter); border-bottom: 1px solid var(--line-l); }
+.ch-index ol { list-style: none; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--gutter); }
+.ch-index a { display: grid; grid-template-columns: 64px minmax(0, 1fr); grid-template-rows: auto auto; column-gap: 14px; align-items: end; }
+.ci-thumb { grid-row: 1 / 3; width: 64px; height: 64px; border-radius: 4px; background-size: cover; background-position: center; filter: var(--film); transition: transform .6s var(--ease); }
+.ch-index a:hover .ci-thumb, .ch-index a:focus-visible .ci-thumb { transform: scale(1.06) rotate(-2deg); }
+.ch-index .label { opacity: .55; }
+.ch-index b { font-family: var(--display); font-weight: 700; text-transform: uppercase; font-size: clamp(18px, 2vw, 32px); line-height: .9; }
+
+/* ---------- shared chapter parts ---------- */
+.ch { position: relative; padding: clamp(84px, 13vh, 150px) var(--gutter) clamp(72px, 11vh, 130px); scroll-margin-top: 40px; }
+.ch-head { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 0 var(--gutter); align-items: end; margin-bottom: clamp(28px, 5vh, 56px); }
+.ch-no { grid-column: 1 / -1; opacity: .55; margin-bottom: 10px; }
+.ch-name { grid-column: 1 / -1; font-family: var(--display); font-weight: 700; text-transform: uppercase; font-size: clamp(52px, 11.5vw, 210px); white-space: nowrap; line-height: .78; letter-spacing: -.035em; }
+.ch-line { grid-column: 8 / 13; font-size: clamp(16px, 1.3vw, 20px); line-height: 1.4; max-width: 34ch; margin-top: clamp(14px, 2vh, 22px); }
+.ct { position: relative; display: block; overflow: hidden; border-radius: 6px; background: var(--ink); color: var(--bone); isolation: isolate; }
+.ct-media, .ct-media video, .ct-media picture, .ct-media img { display: block; width: 100%; height: 100%; }
+.ct-media video, .ct-media img { object-fit: cover; filter: var(--film); transition: transform 1.4s var(--ease); }
+.ct:hover .ct-media video, .ct:hover .ct-media img { transform: scale(1.035); }
+.ct::after { content: ""; position: absolute; inset: 0; z-index: 1; background: linear-gradient(to top, rgba(12, 10, 8, .8), rgba(12, 10, 8, 0) 50%); pointer-events: none; }
+.ct-cap { position: absolute; z-index: 2; left: clamp(14px, 1.6vw, 24px); right: clamp(14px, 1.6vw, 24px); bottom: clamp(12px, 1.4vw, 20px); display: grid; gap: 4px; }
+.ct-cap b { font-family: var(--display); font-weight: 700; text-transform: uppercase; font-size: clamp(18px, 2vw, 34px); line-height: .9; }
+.ct-cap span { font-size: 14px; opacity: .85; max-width: 40ch; }
+.ct-cap .label { opacity: .65; font-size: 11px; }
+.ch .acts { display: flex; flex-wrap: wrap; gap: 10px; }
+.light.ch .pill:hover { background: var(--ink); color: var(--bone); border-color: var(--ink); }
+.dark.ch .pill { color: var(--bone); border-color: var(--line-d); }
+.dark.ch .pill:hover { background: var(--bone); color: var(--ink); }
+
+/* ---------- 01 Films: one big, two stacked ---------- */
+.ct-grid { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); grid-template-rows: 1fr 1fr; gap: clamp(10px, 1.2vw, 18px); }
+.ct-grid .big { grid-row: 1 / 3; }
+.ct-grid .big .ct-media video { aspect-ratio: auto !important; height: 100%; }
+.ct-grid .big .ct-cap b { font-size: clamp(28px, 4vw, 64px); }
+
+/* ---------- 02 Motion: one square plate, lit from behind ---------- */
+.cm { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: clamp(24px, 4vw, 72px); align-items: center; }
+.cm-plate { position: relative; display: block; aspect-ratio: 1; max-height: 78vh; border-radius: 6px; overflow: hidden; }
+.cm-bg { position: absolute; inset: -60px; width: calc(100% + 120px); height: calc(100% + 120px); object-fit: cover; filter: blur(50px) brightness(.5) saturate(1.3); }
+.cm-plate video { position: absolute; inset: 7%; width: 86%; height: 86%; object-fit: cover; border-radius: 4px; box-shadow: 0 40px 80px -30px rgba(0, 0, 0, .9); }
+.cm-copy { display: grid; gap: 14px; }
+.cm-copy .label { opacity: .6; }
+.cm-copy h3 { font-family: var(--display); font-weight: 700; text-transform: uppercase; font-size: clamp(30px, 3.6vw, 64px); line-height: .88; }
+.cm-copy p:not(.label) { font-size: 16px; line-height: 1.5; max-width: 38ch; opacity: .85; }
+
+/* ---------- 03 Product: the product, then how it got built ---------- */
+.cp-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr); grid-template-rows: auto auto; gap: clamp(10px, 1.2vw, 18px); }
+.cp-turn { grid-row: 1 / 3; aspect-ratio: 1; }
+.cp-turn .ct-media video { height: 100%; }
+.cp-facts { list-style: none; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--gutter); align-content: end; padding: 16px 0 0; border-top: 1px solid var(--line-l); }
+.cp-facts b { display: block; font-family: var(--display); font-weight: 700; font-size: clamp(22px, 2.6vw, 44px); line-height: .9; white-space: nowrap; }
+.cp-facts .label { opacity: .6; }
+.cp-how { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 7fr); gap: clamp(24px, 4vw, 64px); align-items: center; margin-top: clamp(48px, 8vh, 96px); padding: clamp(22px, 3vw, 40px); border-radius: 10px; background: var(--ink); color: var(--bone); }
+.cp-how-copy { display: grid; gap: 12px; }
+.cp-how-copy .label { opacity: .6; }
+.cp-how-copy h3 { font-family: var(--display); font-weight: 700; text-transform: uppercase; font-size: clamp(24px, 2.6vw, 44px); line-height: .9; }
+.cp-how-copy p:not(.label) { opacity: .82; line-height: 1.5; max-width: 34ch; }
+.cp-how .pill { color: var(--bone); border-color: var(--line-d); }
+.cp-how .pill:hover { background: var(--bone); color: var(--ink); }
+.cp-how-plate { position: relative; aspect-ratio: 16 / 9; border-radius: 6px; overflow: hidden; }
+
+/* ---------- 04 Music: the stage, then the band, the EP, the records ---------- */
+.ch-music { padding-top: 0; padding-bottom: 0; }
+.cmu-hero { position: relative; margin: 0 calc(var(--gutter) * -1); min-height: clamp(460px, 82vh, 860px); display: grid; align-items: end; padding: 0 var(--gutter) clamp(28px, 5vh, 56px); overflow: hidden; }
+.cmu-hero picture, .cmu-hero img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: var(--film); }
+.cmu-hero::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to top, var(--ink) 4%, rgba(22, 19, 15, .1) 60%); }
+.cmu-hero .ch-head { position: relative; z-index: 1; margin: 0; }
+.cmu-grid { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr); gap: clamp(10px, 1.2vw, 18px); margin-top: clamp(28px, 5vh, 56px); }
+.cmu-grid .ct { aspect-ratio: auto; }
+.cmu-ep .ct-media, .cmu-bass .ct-media { aspect-ratio: 3 / 4; }
+.cmu-grid > .ct:first-child .ct-media { aspect-ratio: auto; height: 100%; }
+.cmu-grid > .ct:first-child video { height: 100%; }
+.cmu-bass { margin: 0; }
+.ch-music .records { padding-left: 0; padding-right: 0; }
+
+/* ---------- Resources: two pictures, not two boxes ---------- */
+.take2 { padding: clamp(72px, 11vh, 128px) var(--gutter); }
+.tk2-grid { list-style: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(14px, 1.6vw, 24px); margin-top: clamp(22px, 3vh, 34px); }
+.tk2 { position: relative; display: grid; grid-template-rows: auto auto; border-radius: 6px; overflow: hidden; border: 1px solid var(--line-l); transition: background-color .5s var(--ease), color .5s var(--ease); }
+.tk2-media { display: block; aspect-ratio: 16 / 9; overflow: hidden; }
+.tk2-media img { width: 100%; height: 100%; object-fit: cover; filter: var(--film); transition: transform 1.2s var(--ease); }
+.tk2:hover .tk2-media img { transform: scale(1.04); }
+.tk2-cap { display: grid; gap: 6px; padding: 18px 20px 22px; }
+.tk2-cap .label { opacity: .62; }
+.tk2-cap b { font-family: var(--display); font-weight: 700; text-transform: uppercase; font-size: clamp(22px, 2.2vw, 36px); line-height: .9; }
+.tk2 .go { position: absolute; right: 18px; bottom: 20px; }
+.tk2 .go svg { width: 13px; height: 13px; }
+.tk2:hover { background: var(--ink); color: var(--bone); }
+
+@media (max-width: 900px) {
+  .ch-index ol { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 16px; }
+  .ch-index a { grid-template-columns: 48px minmax(0, 1fr); }
+  .ci-thumb { width: 48px; height: 48px; }
+  .ch-name, .ch-line { grid-column: 1 / -1; }
+  .ch-line { margin-top: 14px; }
+  .ct-grid { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; }
+  .ct-grid .big { grid-row: auto; }
+  .ct-grid .big .ct-media video { aspect-ratio: 16 / 9 !important; }
+  .cm, .cp-how { grid-template-columns: minmax(0, 1fr); }
+  .cp-grid { grid-template-columns: minmax(0, 1fr); }
+  .cp-turn { grid-row: auto; }
+  .cmu-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .cmu-grid > .ct:first-child { grid-column: 1 / -1; }
+  .cmu-grid > .ct:first-child .ct-media { aspect-ratio: 16 / 9; }
+  .tk2-grid { grid-template-columns: minmax(0, 1fr); }
+}
+
+.cmu-ep .ct-cap b { display: none; }
+.cmu-ep .ct-media img { object-fit: cover; }
+@media (max-width: 900px) { .ch-name { font-size: clamp(44px, 13.5vw, 120px); } }
+@media (max-width: 900px) {
+  .ch-index b { font-size: clamp(15px, 4.6vw, 26px); }
+  .cmu-ep .ct-cap span { font-size: 12px; }
+}
