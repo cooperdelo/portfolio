@@ -58,7 +58,7 @@ WORK = [
        notes=[("What I made", "A one-minute film for PlugVerse's launch. I directed and edited it in DaVinci Resolve and Fusion."),
               ("Why it's here", "I built the product and made the film that introduced it. Watch the full cut, then see the product it was made for."),
               ("What I'm learning", "Making something I'm proud of is one part. Getting it in front of the artists who need it is the next part.")],
-       notes_cta=[("Work with me", "/work-with-me?kind=Film%20or%20motion"), ("See the product", "/work/plugverse-product")],
+       notes_cta=[("Send me a message", "#contact"), ("See the product", "/work/plugverse-product")],
        stills=[("work-plugverse-launch-film-still-1", "wide"), ("work-plugverse-launch-film-still-2", ""), ("work-plugverse-launch-film-still-3", "drop"), ("work-plugverse-launch-film-still-4", "wide")]),
   dict(slug="the-start", title="The Start", disc="Short film, opening", year="2026", video="the-start", ar="16/9",
        full="the-start-full", full_ar="16/9", runtime="0:20",
@@ -71,7 +71,7 @@ WORK = [
        say="What's your rate?",
        credits=[("Role", "Motion design"), ("Year", "2026"), ("Tools", "Remotion, React, DaVinci Resolve"), ("Link", [("plugverse.app", "https://plugverse.app")])],
        stills=[("work-bioswap-still-1", ""), ("work-bioswap-still-2", "drop"), ("work-bioswap-still-3", ""), ("work-bioswap-still-4", "drop")], still_ar="1/1"),
-  dict(slug="plugverse-product", title="PlugVerse product", disc="Product design, full stack", year="2025/26", video="pv-turntable", ar="1/1",
+  dict(slug="plugverse-product", title="PlugVerse app", disc="Product design, full stack", year="2025/26", video="pv-turntable", ar="1/1",
        say="Every show. One link.", product=True, hero_img="work-plugverse-product-hero",
        credits=[("Role", "Founder. Design, front end, back end"), ("Year", "Nov 2025 to now"),
                 ("Tools", "Next.js, React, Supabase, Stripe Connect, Claude Code"),
@@ -79,7 +79,7 @@ WORK = [
        notes=[("I use it myself", "I play in Rubber Band and handle our bookings. When someone reaches out about a gig, I send an offer with the event details from PlugVerse. They accept and sign there."),
               ("What I built", "I built PlugVerse solo with Claude Code, across the product, design, front end and back end. The screens here are from the actual product."),
               ("What matters next", "Getting other artists to use it for their own gigs. That's what I'm working on now.")],
-       notes_cta=[("See PlugVerse", "https://plugverse.app/?utm_source=cooperdelo&utm_medium=portfolio&utm_campaign=product_case"), ("Work with me", "/work-with-me?kind=Product%20or%20creative")],
+       notes_cta=[("See PlugVerse", "https://plugverse.app/?utm_source=cooperdelo&utm_medium=portfolio&utm_campaign=product_case"), ("Send me a message", "#contact")],
        stills=[]),
   dict(slug="rubber-band", title="Rubber Band", disc="Live, guitar", year="2025", video="rubber-band", ar="16/9",
        say="Chapel Hill cover band. I play guitar and run the bookings.",
@@ -92,7 +92,7 @@ COMPANY = dict(slug="plugverse", path="/plugverse", no="", title="PlugVerse", di
        say="I built PlugVerse solo so a band can get booked from one link.",
        credits=[("Role", "Founder. Design and engineering"), ("Year", "Nov 2025 to now. Live 23 Sep 2026"),
                 ("Tools", "Next.js, React, Supabase, Stripe Connect, Claude Code"),
-                ("Link", [("plugverse.app", "https://plugverse.app"), ("Product", "/work/plugverse-product"), ("Launch film", "/work/plugverse-launch-film")])],
+                ("Link", [("plugverse.app", "https://plugverse.app"), ("The app", "/work/plugverse-product"), ("Launch film", "/work/plugverse-launch-film")])],
        stills=[("plugverse-still-1", ""), ("plugverse-still-2", "drop"), ("plugverse-still-3", "wide")])
 
 HEAD_JS = "(function(d){var r=d.documentElement;try{if(sessionStorage.getItem('cd-intro'))r.classList.add('seen')}catch(e){}if(matchMedia('(prefers-reduced-motion: reduce)').matches)r.classList.add('rm')})(document)"

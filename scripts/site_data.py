@@ -9,7 +9,7 @@ PILLARS = [("films", "Films & content"), ("plugverse", "PlugVerse"), ("music", "
 # slug, title, pillar, line, year, href, media (video name in /videos/work or image path), how-I-made-this resource slug
 WORK_CARDS = [
     ("chapter-one", "Chapter One", "films", "Junior year, in 33 seconds.", "2026", "/work/chapter-one", ("video", "chapter-one"), "film-plan"),
-    ("plugverse-product", "PlugVerse", "plugverse", "I built it solo. Every show, one link.", "2025/26", "/work/plugverse-product", ("video", "pv-turntable"), "startup"),
+    ("plugverse-product", "PlugVerse app", "plugverse", "I built it solo. Every show, one link.", "2025/26", "/work/plugverse-product", ("video", "pv-turntable"), "startup"),
     ("rubber-band", "Rubber Band", "music", "Guitar, and I run the bookings.", "2025", "/work/rubber-band", ("video", "rubber-band"), "music"),
     ("the-start", "The Start", "films", "I am terrified of starting.", "2026", "/work/the-start", ("video", "the-start"), "film-motion"),
     ("plugverse-launch-film", "PlugVerse launch film", "plugverse", "My first short film, for my startup's launch.", "2026", "/work/plugverse-launch-film", ("video", "launch-film"), "film-plan"),
