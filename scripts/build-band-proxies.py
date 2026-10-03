@@ -1,0 +1,105 @@
+"""Build small review previews for every band clip from the originals on G:, upload them to the private
+band-review bucket, and record proxy_path. Originals are never touched. Re-runs skip clips that already have one.
+
+    python scripts/build-band-proxies.py            # all missing
+    python scripts/build-band-proxies.py --dry-run  # show the matches only
+    python scripts/build-band-proxies.py --posters  # add a still (poster.jpg) next to every preview that lacks one
+"""
+import argparse, hashlib, json, re, subprocess, tempfile
+from pathlib import Path
+import requests
+
+GIGS = Path("G:/Videos/03_GIGS")
+FOLDER = {"MAW": "maw_9-11-26", "Pi Kapp": "pikapp_8-26-26", "Chi Phi": "chiphi_9-12-26"}
+BASE = "https://eibtnkaoqsgwiqttiwjo.supabase.co"
+
+ap = argparse.ArgumentParser(); ap.add_argument("--dry-run", action="store_true"); ap.add_argument("--posters", action="store_true"); a = ap.parse_args()
+env = Path("C:/Users/coope/Desktop/Claude/Projects/personal-brand/factory/.env").read_text()
+key = re.search(r"^SUPABASE_SERVICE_KEY\s*=\s*(.+?)\s*$", env, re.M).group(1).strip("\"'")
+H = {"apikey": key, "Authorization": "Bearer " + key}
+
+assets = requests.get(BASE + "/rest/v1/band_media_assets?select=id,drive_file_id,name,gig,proxy_path&retired_at=is.null", headers=H, timeout=30).json()
+
+
+def poster(proxy_path, at=2.0):
+    """Grab one frame from the uploaded preview (ffmpeg reads only what it needs over a signed URL) and store it beside it."""
+    r = requests.post(f"{BASE}/storage/v1/object/sign/band-review/{proxy_path}", headers=H, json={"expiresIn": 600}, timeout=30)
+    r.raise_for_status()
+    url = f"{BASE}/storage/v1{r.json()['signedURL']}"
+    with tempfile.TemporaryDirectory() as td:
+        out = Path(td) / "poster.jpg"
+        subprocess.run(["ffmpeg", "-v", "error", "-y", "-ss", str(at), "-i", url, "-frames:v", "1", "-vf", "scale=480:-2", "-q:v", "5", str(out)], check=True)
+        if not out.exists():  # clip shorter than `at`
+            subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", url, "-frames:v", "1", "-vf", "scale=480:-2", "-q:v", "5", str(out)], check=True)
+        path = proxy_path.rsplit("/", 1)[0] + "/poster.jpg"
+        requests.post(f"{BASE}/storage/v1/object/band-review/{path}", headers={**H, "Content-Type": "image/jpeg", "x-upsert": "true"},
+                      data=out.read_bytes(), timeout=60).raise_for_status()
+        return path, out.stat().st_size
+
+
+if a.posters:
+    have = set()
+    for asset in assets:
+        if not asset["proxy_path"]:
+            continue
+        folder = asset["proxy_path"].rsplit("/", 1)[0]
+        listed = requests.post(f"{BASE}/storage/v1/object/list/band-review", headers=H, json={"prefix": folder + "/", "limit": 20}, timeout=30).json()
+        if any(o["name"] == "poster.jpg" for o in listed):
+            continue
+        path, size = poster(asset["proxy_path"])
+        print("POSTER", asset["name"], path, f"{size / 1e3:.0f} KB")
+    raise SystemExit
+
+
+def original(asset):
+    folder = next((GIGS / f for g, f in FOLDER.items() if asset["gig"].startswith(g)), None)
+    if not folder or not folder.exists():
+        return None
+    exact = folder / asset["name"]
+    if exact.exists():
+        return exact
+    stem = Path(asset["name"]).stem  # Pi Kapp originals are V1-00xx_<name>.mov; Drive copies are <name>.mp4
+    hits = [p for p in folder.iterdir() if p.stem == stem or p.stem.endswith("_" + stem)]
+    if not hits:
+        hits = [p for p in (GIGS.parent / "01_BROLL").iterdir() if p.stem == stem]
+    return hits[0] if len(hits) == 1 else None
+
+
+done = 0
+for asset in assets:
+    if asset["proxy_path"] or not asset["name"].lower().endswith((".mp4", ".mov")):
+        continue
+    src = original(asset)
+    print(("OK  " if src else "MISS"), asset["gig"], asset["name"], "->", src)
+    if a.dry_run or not src:
+        continue
+    with tempfile.TemporaryDirectory() as td:
+        out = Path(td) / "p.mp4"
+        # 720p, frequent keyframes so scrubbing the timeline is instant, small enough to stream on a phone.
+        # The bucket caps a file at 50 MB, so long clips get a lower bitrate (aim for about 40 MB at most).
+        src_dur = float(subprocess.check_output(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "default=nw=1:nk=1", str(src)], text=True))
+        kbps = int(min(2500, 40e6 * 8 / max(src_dur, 1) / 1000 - 96))
+        # Very long clips (a whole set on one camera) can't fit 720p under the cap, so they drop to 360p, mono audio.
+        height, abr, preset = (720, "96k", "veryfast") if kbps >= 400 else (360, "40k", "slow")
+        if height == 360:
+            kbps = int(40e6 * 8 / max(src_dur, 1) / 1000 - 44)
+        subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", str(src), "-vf", f"scale=-2:{height}", "-c:v", "libx264", "-preset", preset,
+                        "-b:v", f"{kbps}k", "-maxrate", f"{int(kbps * 1.3)}k", "-bufsize", f"{kbps * 2}k",
+                        "-g", "25", "-c:a", "aac", "-ac", "1" if height == 360 else "2", "-b:a", abr, "-movflags", "+faststart", str(out)], check=True)
+        if out.stat().st_size > 49e6:
+            print("     too big after encode, skipped"); continue
+        data = out.read_bytes()
+        digest = hashlib.sha256(data).hexdigest()
+        path = f"{asset['drive_file_id']}/{digest[:16]}.mp4"
+        r = requests.post(f"{BASE}/storage/v1/object/band-review/{path}", headers={**H, "Content-Type": "video/mp4", "x-upsert": "true"}, data=data, timeout=300)
+        r.raise_for_status()
+        back = requests.get(f"{BASE}/storage/v1/object/authenticated/band-review/{path}", headers=H, timeout=300)
+        back.raise_for_status(); assert hashlib.sha256(back.content).hexdigest() == digest, "readback mismatch"
+        dur = float(subprocess.check_output(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "default=nw=1:nk=1", str(out)], text=True))
+        r = requests.patch(BASE + "/rest/v1/band_media_assets", params={"id": "eq." + asset["id"]}, headers={**H, "Prefer": "return=representation"},
+                           json={"proxy_path": path, "duration": round(dur, 2)}, timeout=30)
+        r.raise_for_status(); assert r.json()[0]["proxy_path"] == path
+        poster(path)
+        done += 1
+        print(f"     uploaded {len(data) / 1e6:.1f} MB, {dur:.1f}s, verified")
+print("built", done)
