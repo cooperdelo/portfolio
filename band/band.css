@@ -4,7 +4,7 @@ body.bandrev { background: var(--ink); color: var(--bone); min-height: 100svh; p
 .br-top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 18px; padding: 28px 0 18px; border-bottom: 1px solid var(--line-d); }
 .br-top .label { opacity: .55; }
 .br-top h1 { font-family: var(--display); font-weight: 700; text-transform: uppercase; font-size: clamp(26px, 4vw, 56px); line-height: .88; margin-top: 8px; }
-.br-prog { display: grid; grid-template-columns: auto auto; align-items: baseline; gap: 4px 8px; min-width: 180px; }
+.br-prog { display: grid; grid-template-columns: auto auto; justify-content: start; align-items: baseline; gap: 4px 10px; min-width: 180px; }
 .br-prog b { font-family: var(--display); font-size: 36px; line-height: 1; }
 .br-prog > i { grid-column: 1 / -1; height: 3px; background: rgba(244, 240, 231, .15); border-radius: 3px; overflow: hidden; }
 .br-prog > i i { display: block; height: 100%; background: #a9c7a2; transform-origin: 0 50%; transform: scaleX(0); transition: transform .5s var(--ease); }
@@ -72,6 +72,7 @@ body.bandrev { background: var(--ink); color: var(--bone); min-height: 100svh; p
   .br-list { position: static; max-height: none; }
   body.playing .br-list, body.playing .br-filters, body.playing .br-help { display: none; }
   .br-back { display: inline-block; }
-  .br-verdict button { padding: 16px 12px; }
+  .br-verdict button { justify-content: center; padding: 16px 6px; }
+  .br-verdict b { font-size: clamp(11px, 3.4vw, 15px); }
   .br-verdict span { display: none; }
 }
