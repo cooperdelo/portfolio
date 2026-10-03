@@ -58,7 +58,7 @@ WORK = [
        notes=[("What I made", "A one-minute film for PlugVerse's launch. I directed and edited it in DaVinci Resolve and Fusion."),
               ("Why it's here", "I built the product and made the film that introduced it. Watch the full cut, then see the product it was made for."),
               ("What I'm learning", "Making something I'm proud of is one part. Getting it in front of the artists who need it is the next part.")],
-       notes_cta=[("Work with me", "/work-with-me?kind=Film%20or%20motion"), ("See the product", "/work/plugverse-product")],
+       notes_cta=[("Send me a message", "#contact"), ("See the product", "/work/plugverse-product")],
        stills=[("work-plugverse-launch-film-still-1", "wide"), ("work-plugverse-launch-film-still-2", ""), ("work-plugverse-launch-film-still-3", "drop"), ("work-plugverse-launch-film-still-4", "wide")]),
   dict(slug="the-start", title="The Start", disc="Short film, opening", year="2026", video="the-start", ar="16/9",
        full="the-start-full", full_ar="16/9", runtime="0:20",
@@ -66,12 +66,12 @@ WORK = [
        credits=[("Role", "Director, editor"), ("Year", "2026"), ("Tools", "DaVinci Resolve Studio"),
                 ("Link", [("Instagram", "https://www.instagram.com/p/Ddg7Hn2RAHP/"), ("TikTok", "https://www.tiktok.com/@cooperdelo/video/7687644625829498143")])],
        stills=[("work-the-start-still-1", ""), ("work-the-start-still-2", "drop"), ("work-the-start-still-3", ""), ("work-the-start-still-4", "drop")]),
-  dict(slug="bioswap", title="Bioswap", disc="Motion design", year="2026", video="bioswap-final", ar="1/1",
+  dict(slug="bioswap", title="What's your rate?", disc="PlugVerse ad, motion", year="2026", video="bioswap-final", ar="1/1",
        full="bioswap-final-full", full_ar="1/1", runtime="0:19", webm=True,  # motion_final.mov, 2026-09-30
        say="What's your rate?",
        credits=[("Role", "Motion design"), ("Year", "2026"), ("Tools", "Remotion, React, DaVinci Resolve"), ("Link", [("plugverse.app", "https://plugverse.app")])],
        stills=[("work-bioswap-still-1", ""), ("work-bioswap-still-2", "drop"), ("work-bioswap-still-3", ""), ("work-bioswap-still-4", "drop")], still_ar="1/1"),
-  dict(slug="plugverse-product", title="PlugVerse product", disc="Product design, full stack", year="2025/26", video="pv-turntable", ar="1/1",
+  dict(slug="plugverse-product", title="PlugVerse app", disc="Product design, full stack", year="2025/26", video="pv-turntable", ar="1/1",
        say="Every show. One link.", product=True, hero_img="work-plugverse-product-hero",
        credits=[("Role", "Founder. Design, front end, back end"), ("Year", "Nov 2025 to now"),
                 ("Tools", "Next.js, React, Supabase, Stripe Connect, Claude Code"),
@@ -79,7 +79,7 @@ WORK = [
        notes=[("I use it myself", "I play in Rubber Band and handle our bookings. When someone reaches out about a gig, I send an offer with the event details from PlugVerse. They accept and sign there."),
               ("What I built", "I built PlugVerse solo with Claude Code, across the product, design, front end and back end. The screens here are from the actual product."),
               ("What matters next", "Getting other artists to use it for their own gigs. That's what I'm working on now.")],
-       notes_cta=[("See PlugVerse", "https://plugverse.app/?utm_source=cooperdelo&utm_medium=portfolio&utm_campaign=product_case"), ("Work with me", "/work-with-me?kind=Product%20or%20creative")],
+       notes_cta=[("See PlugVerse", "https://plugverse.app/?utm_source=cooperdelo&utm_medium=portfolio&utm_campaign=product_case"), ("Send me a message", "#contact")],
        stills=[]),
   dict(slug="rubber-band", title="Rubber Band", disc="Live, guitar", year="2025", video="rubber-band", ar="16/9",
        say="Chapel Hill cover band. I play guitar and run the bookings.",
@@ -92,7 +92,7 @@ COMPANY = dict(slug="plugverse", path="/plugverse", no="", title="PlugVerse", di
        say="I built PlugVerse solo so a band can get booked from one link.",
        credits=[("Role", "Founder. Design and engineering"), ("Year", "Nov 2025 to now. Live 23 Sep 2026"),
                 ("Tools", "Next.js, React, Supabase, Stripe Connect, Claude Code"),
-                ("Link", [("plugverse.app", "https://plugverse.app"), ("Product", "/work/plugverse-product"), ("Launch film", "/work/plugverse-launch-film")])],
+                ("Link", [("plugverse.app", "https://plugverse.app"), ("The app", "/work/plugverse-product"), ("Launch film", "/work/plugverse-launch-film")])],
        stills=[("plugverse-still-1", ""), ("plugverse-still-2", "drop"), ("plugverse-still-3", "wide")])
 
 HEAD_JS = "(function(d){var r=d.documentElement;try{if(sessionStorage.getItem('cd-intro'))r.classList.add('seen')}catch(e){}if(matchMedia('(prefers-reduced-motion: reduce)').matches)r.classList.add('rm')})(document)"
@@ -127,12 +127,13 @@ def roll(t):
 NAV = f"""<header class="nav label">
   <a class="mark" href="/" aria-label="Cooper Delo, home">{roll("Cooper Delo")}</a>
   <span class="where">Chapel Hill, NC&nbsp;&nbsp;<span data-clock>--:--</span> ET</span>
-  <nav class="links" aria-label="Primary"><a href="/work">{roll("Work")}</a><a href="/resources">{roll("Resources")}</a><a href="/#about">{roll("About")}</a><a href="/#contact">{roll("Contact")}</a></nav>
+  <nav class="links" aria-label="Primary"><a href="/work">{roll("Work")}</a><a href="/resources">{roll("Resources")}</a><a href="/shop">{roll("Shop")}</a><a href="#contact" data-contact>{roll("Contact")}</a></nav>
 </header>"""
 
 SCRIPTS = """<script src="/assets/lenis.min.js" defer></script>
 <script src="/assets/site.js" defer></script>
-<script src="/assets/beacon.js" defer></script>"""
+<script src="/assets/beacon.js" defer></script>
+<script src="/assets/contact.js" defer></script>"""
 
 def footer(bg="footer"):
     return f"""<footer class="contact" id="contact">
@@ -141,7 +142,7 @@ def footer(bg="footer"):
   <a class="mail" href="mailto:{EMAIL}" data-rv><span class="line"><span data-fit>{EMAIL}</span></span></a>
   <div class="cta">
     <a class="pill solid" href="{CAL}" target="_blank" rel="noreferrer">Book a call {ARROW}</a>
-    <a class="pill" href="/work-with-me">Work with me</a>
+    <a class="pill" href="#contact" data-contact>Send me a message</a>
     <a class="pill" href="mailto:{EMAIL}">Email</a>
     <a class="pill" href="https://www.linkedin.com/in/cooperdelo/" target="_blank" rel="noreferrer">LinkedIn</a>
   </div>
@@ -206,6 +207,18 @@ def notes_block(w):
     return f'<div class="notes" data-rv>{cols}</div><div class="notes-cta">{acts}</div>'
 
 
+def made_this(w):
+    """Every piece points at the resource that shows how it was made (site_data.WORK_CARDS)."""
+    import sys as _s; _s.path.insert(0, str(ROOT / "scripts"))
+    from site_data import WORK_CARDS, RES, ACCESS, res_img
+    how = {c[0]: c[7] for c in WORK_CARDS}.get(w["slug"])
+    if not how or how not in RES:
+        return ""
+    slug, title, line, key, href, acc = RES[how]
+    return f'''<a class="made" href="{href}"><span class="made-img">{res_img(key, "", "(max-width: 900px) 100vw, 30vw")}</span>
+      <span class="made-cap"><span class="label">How I made this · {ACCESS[acc]}</span><b>{E(title)}</b><span>{E(line)}</span></span><span class="made-go">{ARROW}</span></a>'''
+
+
 def case(w, nxt, no):
     poster = f"/videos/work/{w.get('video')}.jpg"
     la, li = vsrc(w.get("video"), w.get("webm"))
@@ -237,6 +250,7 @@ def case(w, nxt, no):
     <p class="say" data-rv>{lines(w["say"])}</p>
     {credits_table(w)}
     {notes_block(w)}
+    {made_this(w)}
   </section>'''
     extra = product_block() if w.get("product") else ""
     nposter = f"/videos/work/{nxt['video']}.jpg"
@@ -309,8 +323,8 @@ INDEX = """{HEAD}
       <video class="hero-vid" muted loop playsinline autoplay preload="auto" data-d="/videos/hero/hero-montage-1920" data-m="/videos/hero/hero-montage-720x1280" aria-hidden="true"></video>
     </div>
     <div class="copy">
-      <h1 data-hero><span class="line"><span>Founder of PlugVerse.</span></span><span class="line"><span>I make films, motion</span></span><span class="line"><span>and product.</span></span><span class="line"><span>CS + Business, UNC.</span></span></h1>
-      <div class="meta"><a class="pill" href="#work">See the work {ARROW}</a><a class="pill" href="{CAL}" target="_blank" rel="noreferrer">Book a call</a></div>
+      <h1 data-hero><span class="line"><span>Founder of PlugVerse.</span></span><span class="line"><span>I make films and</span></span><span class="line"><span>play in a band.</span></span><span class="line"><span>CS + Business, UNC.</span></span></h1>
+      <div class="meta"><a class="pill" href="#work">See the work {ARROW}</a><a class="pill" href="#contact" data-contact>Send me a message</a></div>
     </div>
     <div class="foot">
       <div class="bar label"><span>35.913N 79.056W</span><span>Chapel Hill, NC</span></div>
@@ -321,9 +335,7 @@ INDEX = """{HEAD}
     </div>
   </section>
 
-  {SHOWCASE}
-
-  {RECORDS}
+  {WORKGRID}
 
   <section class="about light" id="about" aria-label="About">
     <div class="pic" data-rv><div class="film clip float b">{ABOUTPIC}</div></div>
@@ -340,7 +352,7 @@ INDEX = """{HEAD}
         <li><span class="label">04</span><span>UNC Chapel Hill, class of 2028. CS and Business.</span></li>
       </ul>
       <div class="out">
-        <a class="pill" href="/work-with-me">Work with me</a>
+        <a class="pill" href="#contact" data-contact>Send me a message</a>
         <a class="pill" href="/resume">Resume</a>
         <a class="pill" href="{CAL}" target="_blank" rel="noreferrer">Book a call</a>
         <a class="pill" href="https://www.linkedin.com/in/cooperdelo/" target="_blank" rel="noreferrer">LinkedIn</a>
@@ -350,6 +362,12 @@ INDEX = """{HEAD}
     </div>
     {STRIP}
   </section>
+
+  {RECORDS}
+
+  {RESOURCES}
+
+  {SHOP}
 </main>
 {FOOTER}
 {SCRIPTS}
@@ -453,50 +471,34 @@ def resume_page():
 # ---------------------------------------------------------------- /work: every piece as a card, Gaku-style
 SYSTEM_CARD = dict(slug="ai-system", title="My AI system", disc="Systems", year="2026")
 
-def work_grid_page(diagram):
-    cards = []
-    order = ["chapter-one", "plugverse-launch-film", "bioswap", "plugverse-product", "ai-system", "the-start", "rubber-band", "plugverse"]
-    by = {w["slug"]: w for w in WORK}
-    for slug in order:
-        if slug == "ai-system":
-            w, href, media = SYSTEM_CARD, "/work/ai-system", f'<span class="wc-sys">{diagram}</span>'
-        elif slug == "plugverse":
-            w, href, media = COMPANY, "/plugverse", f'<span class="film">{spic("work-poster-plugverse-product", "", "(max-width: 800px) 100vw, 48vw")}</span>'
-        else:
-            w, href, media = by[slug], f"/work/{slug}", f'<span class="film">{spic("work-poster-" + slug, "", "(max-width: 800px) 100vw, 48vw")}</span>'
-        cards.append(f"""      <li data-rv><a class="wc" href="{href}" data-handoff>
-        <span class="wc-media">{media}</span>
-        <span class="wc-chip label">{E(w['disc'])}</span>
-        <span class="wc-foot"><span class="wc-t">{E(w['title'])}</span><span class="label">{E(w['year'])} {ARROW}</span></span>
-      </a></li>""")
-    css = '<link rel="stylesheet" href="/assets/showcase.css" />\n<link rel="stylesheet" href="/assets/work.css" />\n</head>'
-    return f"""{head("Work / Cooper Delo", "Films, motion, product and systems by Cooper Delo.", "https://cooperdelo.com/work").replace("</head>", css, 1)}
+def work_grid_page(_unused=None):
+    extras = runpy.run_path(str(ROOT / "scripts/build-home-extras.py"))
+    css = '<link rel="stylesheet" href="/assets/doors.css" />\n</head>'
+    return f"""{head("Work / Cooper Delo", "Films, content, PlugVerse and music by Cooper Delo.", "https://cooperdelo.com/work").replace("</head>", css, 1)}
 <body class="page">
 {NAV}
 <main>
   <section class="wg-hero light" aria-labelledby="wg-h">
     <p class="label">Work</p>
     <h1 id="wg-h" data-hero>{lines("Everything")}{lines("I've made.")}</h1>
-    <p class="lede">Films, motion, product, and the system I build it all with.</p>
+    <p class="lede">Films and content, PlugVerse, and music.</p>
   </section>
-  <section class="wg light" aria-label="All work">
-    <ol class="wg-grid">
-{chr(10).join(cards)}
-    </ol>
-  </section>
+  {extras["work_grid"](heading=False)}
 </main>
 {footer()}
 {SCRIPTS}
+<script src="/assets/doors.js" defer></script>
 </body>
 </html>
 """
 
+
 # ---------------------------------------------------------------- /work/ai-system
 # Counts checked against the vault on 2026-10-02: Decisions/ (dated files), Context/auto-memory/,
 # Scheduled-Tasks/TASK-ROSTER.md (recurring tasks switched on), CLAUDE.md "Hard Rules", PlugVerse qa branch.
-SYS_FACTS = [("50", "decisions"), ("162", "memories"), ("45", "scheduled tasks"), ("28", "rules"), ("5,314", "PlugVerse commits")]
+SYS_FACTS = [("50", "decisions"), ("162", "memories"), ("45", "scheduled tasks"), ("28", "rules")]
 SYS_TREE = [("CLAUDE.md", "28 rules, each written after something broke"), ("Context/", "who I am, how I write, 162 memories"),
-            ("Decisions/", "50 calls, one dated file each"), ("Projects/", "PlugVerse, music, this site"),
+            ("Decisions/", "50 calls, one dated file each"), ("Projects/", "one folder per project"),
             ("Scheduled-Tasks/", "45 jobs that run without me"), ("Skills/", "how-tos Claude can run"), ("Daily/", "what happened today")]
 SYS_SRC = [("Claude Code", "builds"), ("Claude Cowork", "runs the desk"), ("claude.ai", "thinks it through"), ("Jev", "sorts and scores in half a second")]
 SYS_STEPS = [("Read first", "Every session opens the same folder before it answers. It already knows my work."),
@@ -512,26 +514,30 @@ def ai_system_page():
     steps = "".join(f'<li data-rv><span class="label">0{i + 1}</span><h2>{E(a)}</h2><p>{E(b)}</p></li>' for i, (a, b) in enumerate(SYS_STEPS))
     wires = "".join(f'<path d="M0 {y} C 50 {y}, 50 50, 100 50"/>' for y in (12, 37, 63, 88))
     css = '<link rel="stylesheet" href="/assets/work.css" />\n</head>'
-    return f"""{head("My AI system / Cooper Delo", "One folder every Claude session reads before it answers. How Cooper Delo built PlugVerse solo.", "https://cooperdelo.com/work/ai-system").replace("</head>", css, 1)}
+    return f"""{head("How I built my AI system / Cooper Delo", "One folder every Claude session reads before it answers.", "https://cooperdelo.com/resources/ai-system").replace("</head>", css, 1)}
 <body class="page">
 {NAV}
 <main>
   <section class="as-hero dark" aria-labelledby="as-h">
-    <p class="label">Work / Systems</p>
-    <h1 id="as-h" data-hero>{lines("One folder")}{lines("every Claude reads.")}</h1>
-    <p class="lede">It's how I built PlugVerse by myself. Every session starts already knowing my work, and ends by saving what it learned.</p>
-    <div class="as-map" aria-label="Claude Code, Claude Cowork, claude.ai and Jev all read and write one folder">
-      <ul class="as-src">{srcs}</ul>
-      <svg class="as-wires" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">{wires}</svg>
-      <div class="as-win"><div class="as-bar"><i></i><i></i><i></i><span>the vault</span></div><ul class="as-tree">{tree}</ul></div>
+    <video class="as-vid" muted loop playsinline autoplay preload="metadata" poster="/videos/work/ai-hero.jpg" aria-hidden="true">
+      <source src="/videos/work/ai-hero.webm" type="video/webm" /><source src="/videos/work/ai-hero.mp4" type="video/mp4" /></video>
+    <div class="as-copy">
+      <p class="label">Resources / How I built my AI system</p>
+      <h1 id="as-h" data-hero>{lines("One folder")}{lines("every Claude reads.")}</h1>
+    </div>
+    <div class="as-glass" aria-label="How the system works">
+      <div class="ag-bar"><i></i><i></i><i></i><span>~/vault</span></div>
+      <ol class="ag-steps">{"".join(f'<li style="--d:{i * 1.6}s"><span class="label">0{i + 1}</span><b>{E(a)}</b><span>{E(b)}</span></li>' for i, (a, b) in enumerate(SYS_STEPS))}</ol>
+      <ul class="ag-facts">{"".join(f'<li><b>{a}</b><span class="label">{b}</span></li>' for a, b in SYS_FACTS)}</ul>
     </div>
   </section>
-  <section class="as-facts dark" aria-label="By the numbers"><ul>{facts}</ul></section>
-  <section class="as-steps light" aria-label="How it works"><ol>{steps}</ol></section>
+  <section class="as-frames dark" aria-label="Where it happens">
+    {"".join(f'<figure class="{c}"><img src="/img/ai/{k}-1200.webp" srcset="/img/ai/{k}-720.webp 720w, /img/ai/{k}-1200.webp 1200w" sizes="(max-width: 900px) 100vw, 50vw" alt="{alt}" loading="lazy" decoding="async" /></figure>' for k, alt, c in [("desk-wide", "Cooper at his desk, the whole room", "wide"), ("code", "Code on the monitor", ""), ("pc", "The PC under the desk", "")])}
+  </section>
   <section class="as-next light" aria-labelledby="as-n">
-    <h2 id="as-n" data-rv>{lines("Want one")}{lines("of your own?")}</h2>
-    <p>I'm packaging the starter version of this folder. Until then, the free things I use are in Resources, and I'll help you set yours up.</p>
-    <div class="acts"><a class="pill" href="/resources">Resources {ARROW}</a><a class="pill" href="/work-with-me">Work with me {ARROW}</a></div>
+    <h2 id="as-n" data-rv>{lines("Set up")}{lines("your own.")}</h2>
+    <p>The folder layout, the rules file, the decision template and the one prompt that builds it for you.</p>
+    <div class="acts"><a class="pill solid" href="/resources/guides/ai-system">Get the guide {ARROW}</a><a class="pill" href="/resources">More resources</a></div>
   </section>
 </main>
 {footer()}
@@ -568,12 +574,12 @@ if __name__ == "__main__":
             .replace("{FRAMES}", frames_block()).replace("{FOOTER}", footer("home-footer")).replace("{ABOUTPIC}", spic("home-about", "Cooper Delo on the lawn at dusk", "(max-width: 900px) 100vw, 40vw")).replace("{SCRIPTS}", SCRIPTS)
             .replace("{CAL}", CAL).replace("{ARROW}", ARROW))
     extras = runpy.run_path(str(ROOT / "scripts/build-home-extras.py"))
-    page = (page.replace("{SHOWCASE}", extras["showcase"]() + "\n  " + extras["take"]()).replace("{RECORDS}", extras["records"]()).replace("{STRIP}", extras["strip"](frames_block()))
-            .replace("</head>", '<link rel="stylesheet" href="/assets/showcase.css" />\n<link rel="stylesheet" href="/assets/records.css" />\n<link rel="stylesheet" href="/assets/album-viewer.css" />\n</head>', 1)
-            .replace('<script src="/assets/site.js" defer></script>', '<script src="/assets/site.js" defer></script>\n<script src="/assets/showcase.js" defer></script>\n<script src="/assets/records.js" defer></script>', 1))
+    page = (page.replace("{WORKGRID}", extras["work_grid"](home=True)).replace("{RECORDS}", extras["records"]()).replace("{RESOURCES}", extras["res_bento"](limit=5)).replace("{SHOP}", extras["shop_teaser"]()).replace("{STRIP}", extras["strip"](frames_block()))
+            .replace("</head>", '<link rel="stylesheet" href="/assets/showcase.css" />\n<link rel="stylesheet" href="/assets/doors.css" />\n<link rel="stylesheet" href="/assets/records.css" />\n<link rel="stylesheet" href="/assets/album-viewer.css" />\n</head>', 1)
+            .replace('<script src="/assets/site.js" defer></script>', '<script src="/assets/site.js" defer></script>\n<script src="/assets/doors.js" defer></script>\n<script src="/assets/records.js" defer></script>', 1))
     (ROOT / "index.html").write_text(page, encoding="utf-8")
-    (ROOT / "work" / "index.html").write_text(work_grid_page(extras["systems_diagram"]()), encoding="utf-8")
-    (ROOT / "work" / "ai-system.html").write_text(ai_system_page(), encoding="utf-8")
-    urls = ["/", "/work", "/work/ai-system", "/work-with-me", "/resources", "/resources/film-plan", "/gear", "/resume", "/plugverse", "/rubber-band", "/privacy", "/terms"] + [f"/work/{w['slug']}" for w in WORK]
+    (ROOT / "work" / "index.html").write_text(work_grid_page(), encoding="utf-8")
+    (ROOT / "resources" / "ai-system.html").write_text(ai_system_page(), encoding="utf-8")
+    urls = ["/", "/work", "/resources/ai-system", "/resources", "/resources/film-plan", "/gear", "/resume", "/plugverse", "/rubber-band", "/privacy", "/terms"] + [f"/work/{w['slug']}" for w in WORK]
     (ROOT / "sitemap.xml").write_text('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + "".join(f"  <url><loc>https://cooperdelo.com{u}</loc></url>\n" for u in urls) + "</urlset>\n", encoding="utf-8")
     print("built", len(WORK), "pieces + index + plugverse + sitemap")

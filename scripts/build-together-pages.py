@@ -39,7 +39,7 @@ def page(path, title, desc, body, og="https://cooperdelo.com/img/poster-montage-
 <header class="nav label">
   <a class="mark" href="/" aria-label="Cooper Delo, home"><span class="roll"><span>Cooper Delo</span><span aria-hidden="true">Cooper Delo</span></span></a>
   <span class="where">Chapel Hill, NC&nbsp;&nbsp;<span data-clock>--:--</span> ET</span>
-  <nav class="links" aria-label="Primary"><a href="/work"><span class="roll"><span>Work</span><span aria-hidden="true">Work</span></span></a><a href="/resources"><span class="roll"><span>Resources</span><span aria-hidden="true">Resources</span></span></a><a href="/#about"><span class="roll"><span>About</span><span aria-hidden="true">About</span></span></a><a href="/#contact"><span class="roll"><span>Contact</span><span aria-hidden="true">Contact</span></span></a></nav>
+  <nav class="links" aria-label="Primary"><a href="/work"><span class="roll"><span>Work</span><span aria-hidden="true">Work</span></span></a><a href="/resources"><span class="roll"><span>Resources</span><span aria-hidden="true">Resources</span></span></a><a href="/shop"><span class="roll"><span>Shop</span><span aria-hidden="true">Shop</span></span></a><a href="#contact" data-contact><span class="roll"><span>Contact</span><span aria-hidden="true">Contact</span></span></a></nav>
 </header>
 <main>
 {body}
@@ -69,6 +69,7 @@ def page(path, title, desc, body, og="https://cooperdelo.com/img/poster-montage-
 <script src="/assets/lenis.min.js" defer></script>
 <script src="/assets/site.js" defer></script>
 <script src="/assets/beacon.js" defer></script>
+<script src="/assets/contact.js" defer></script>
 <script src="/assets/together.js" defer></script>
 </body>
 </html>
@@ -144,157 +145,144 @@ def work_with_me():
     page("work-with-me", "Work with me", "Films, motion and product by Cooper Delo. Tell me what you're building.", body)
 
 
-PROMPTS = [
-    ("The actual idea", "What happened? What do you want someone to feel?", "idea"),
-    ("The first thing we see or hear", "Give someone a reason to keep watching.", "opening"),
-    ("What are we waiting to find out", "A real unanswered question, not a vague promise.", "question"),
-    ("What changes", "The attempt, complication or detail that moves it forward.", "change"),
-    ("What the ending gives us", "Answer the question you opened. You don't need a life lesson.", "payoff"),
-    ("What you need to shoot", "The action, framing, location and sound. Use what you actually have.", "shots"),
-    ("What happens after someone watches", "Come back, see more of your work, try the thing, or just enjoy it.", "next_step"),
+# Cooper's playbook (vault: Projects/personal-brand CONTENT-OS, SCRIPT-SYSTEM, MECHANIC-LIBRARY, IDEATION-RULE,
+# CINEMATIC-FIELD-MANUAL). Public-safe: no private stats, names or topics. Each line: (rule, why it holds).
+PLAYBOOK = [
+    ("Hooks", "hooks", [
+        ("Start mid-thought.", "No intro. Delete your first sentence. Most people who leave, leave at 0:01."),
+        ("Confess, don't flex.", "A struggle holds people. A highlight reel loses them."),
+        ("Say I, not you.", "Earn we and you later. One creator went from 3,900 views to 15M on that switch alone."),
+        ("One detail nobody else could say.", "Themes are generic. Scenes are unforgeable."),
+    ]),
+    ("Story", "story", [
+        ("What does a stranger want answered?", "Open that question in the first seconds."),
+        ("But, or therefore.", "Every beat causes the next. Never and then."),
+        ("Hold the lesson.", "Until the story earns it. Sometimes it never needs one."),
+        ("Answer what you opened.", "Then give a true reason to come back."),
+    ]),
+    ("Retention", "retention", [
+        ("Finishes beat likes.", "On my account, a video 24.9% of people finished got 2.2x the views of one 8.7% finished."),
+        ("A new picture every second, for three seconds.", "Then cuts every 2 to 3. Only the point gets to breathe."),
+        ("Two lines of text, max.", "About 40 characters, upper middle, readable in frame one."),
+        ("Length isn't the problem.", "30 to 60 seconds of talking with no turn is. Never fade to black mid-video."),
+    ]),
 ]
+
+
+def film_prompt():
+    rules = "\n\n".join(f"{name.upper()}\n" + "\n".join(f"- {r} {why}" for r, why in items) for name, _, items in PLAYBOOK)
+    return ("I'm making a short video. Below is Cooper Delo's playbook: the hooks, story checks and retention rules he uses. "
+            "Use it to shape my idea, in my words. It's a toolbox, not a checklist. Use what fits.\n\n"
+            "MY IDEA: [one or two lines. What happened, and what footage you have or can get.]\n\n"
+            + rules +
+            "\n\nGIVE ME\n"
+            "1. Three opening lines for my idea, each from a different hook, in my voice. Pick one and say why in a sentence.\n"
+            "2. The story in 5 to 7 one-line beats, joined by but or therefore.\n"
+            "3. A cut map for the first 10 seconds: what we see, hear and read.\n"
+            "4. A shot list grouped by location, using only what I said I have.\n\n"
+            "Never invent anything about my life or my footage. If I didn't say what actually happened, ask me that one question and nothing else.")
 
 
 def resources():
-    sheet = "".join(f"<li><span>{h}</span><i></i><i></i></li>" for h, _, _ in PROMPTS)
-    body = f"""  <section class="pg-hero light" aria-labelledby="pg-h">
+    """Gaku's 'Curated insights & creative resources': every resource as a real cover, newest first."""
+    import runpy
+    ex = runpy.run_path(str(ROOT / "scripts" / "build-home-extras.py"))
+    body = f"""  <section class="pg-hero light rs-hero" aria-labelledby="pg-h">
     <p class="label">Resources</p>
-    <h1 id="pg-h" data-hero><span class="line"><span>Take what</span></span><span class="line"><span>helps.</span></span></h1>
-    <p class="lede">Things I actually use, cleaned up so you can use them too. One is ready. One I'm still pulling apart.</p>
+    <h1 id="pg-h" data-hero><span class="line"><span>Resources.</span></span></h1>
+    <p class="lede">How I actually make things: films, content, the band, PlugVerse, the system behind it. Copy what helps. Nothing to sign up for unless you want the deep ones.</p>
   </section>
-  <section class="shelf light" aria-label="Resources">
-    <article class="res res-wide" data-rv>
-      <div class="top label"><span class="state live">Ready, free</span><span>Updated Oct 2026</span></div>
-      <a class="plate rig-mini" href="/gear" aria-label="Open the gear page">
-        <span class="rm-end">Tele or PRS</span><span class="rm-pod"><i class="off">Amp</i><i>EQ</i><i>Screamer</i><i>Chorus</i><i>Delay</i><i>Reverb</i></span><span class="rm-end">Marshall DSL40CR</span>
-      </a>
-      <h2>Gear</h2>
-      <p>The guitars, amp, camera and studio gear I actually use, with the Pod Go chain I run into the Marshall.</p>
-      <div class="acts"><a class="pill" href="/gear">See the gear {ARROW}</a></div>
-    </article>
-    <article class="res" data-rv>
-      <div class="top label"><span class="state live">Ready, free</span><span>No email needed</span></div>
-      <div class="plate desk">
-        <div class="sheet" aria-label="What the planner asks">
-          <p class="sheet-h">My film plan</p>
-          <ol>{sheet}</ol>
-          <p class="sheet-foot label">cooperdelo.com/resources/film-plan</p>
-        </div>
-        <figure class="taped"><img src="/img/p-launch-film-640.webp" width="640" height="360" alt="A still from the PlugVerse launch film" loading="lazy" decoding="async" /><figcaption>PlugVerse launch film</figcaption></figure>
-      </div>
-      <h2>Film planner</h2>
-      <p>The questions I answer before I shoot anything. Fill them in, it saves in your browser, and you can download or print the plan when you're done.</p>
-      <div class="acts"><a class="pill" href="/resources/film-plan">Open the planner {ARROW}</a></div>
-    </article>
-    <article class="res" data-rv>
-      <div class="top label"><span class="state">In progress</span><span>Not ready yet</span></div>
-      <div class="plate anatomy">
-        <picture><source type="image/webp" srcset="/img/resources/motion-anatomy-720.webp 720w, /img/resources/motion-anatomy-1200.webp 1200w" sizes="(max-width: 900px) 92vw, 46vw" /><img src="/img/resources/motion-anatomy-720.webp" width="720" height="720" alt="A frame from Bioswap: a glass music card floating over a blurred band page" loading="lazy" decoding="async" /></picture>
-        <span class="pin r" style="--x:96%;--y:80%"><b>Glass card</b>blur, lit top edge, soft inner shadow</span>
-        <span class="pin r" style="--x:96%;--y:5%"><b>Depth</b>the page stays behind it, out of focus</span>
-        <span class="pin" style="--x:4%;--y:5%"><b>One camera</b>the whole scene moves, never a cut</span>
-        <span class="wip label">What I'm pulling out</span>
-      </div>
-      <h2>Motion starter</h2>
-      <p>The camera rig, the glass cards and the spring timings from Bioswap, pulled out so you can drop them into your own Remotion project. I'm still building it, so there's nothing to download yet.</p>
-      <div class="acts"><a class="pill" href="mailto:cooper@plugverse.app?subject=Motion%20starter">Email me when it's ready</a><a class="pill" href="/#motion">How Bioswap moves</a></div>
-      <p class="fine">That button just opens an email to me. There's no mailing list behind it.</p>
-    </article>
-  </section>
-  <section class="side light" aria-labelledby="side-h">
-    <p class="label">Booking your own shows</p>
-    <h2 id="side-h" data-rv><span class="line"><span>In a band?</span></span></h2>
-    <p>I use PlugVerse for my band's gigs. When someone reaches out, I send an offer with the event details. They accept and sign in the same place.</p>
-    <div class="acts"><a class="pill" href="{PV}" target="_blank" rel="noreferrer">See PlugVerse {ARROW}</a></div>
-  </section>"""
-    page("resources/index", "Resources", "Things Cooper Delo uses, cleaned up so you can use them too.", body)
+  {ex["res_bento"](heading=False)}"""
+    page("resources/index", "Resources", "How Cooper Delo actually makes things: films, content, music, PlugVerse and the AI system behind it.", body, css=("/assets/doors.css",))
 
 
 def film_plan():
-    qs = "".join(f"""
-      <section class="q"><div><h2>{h}</h2><label for="{n}">{l}</label><div class="field"><textarea id="{n}" name="{n}" maxlength="5000" rows="3"></textarea></div></div></section>"""
-                 for h, l, n in PROMPTS)
-    body = f"""  <section class="pg-hero light" aria-labelledby="pg-h">
-    <p class="label">Resources / Film planner</p>
-    <h1 id="pg-h" data-hero><span class="line"><span>Get it out</span></span><span class="line"><span>of your head.</span></span></h1>
-    <p class="lede">The questions I answer before I shoot anything. Fill in what matters, download it, and go shoot.</p>
-    <p class="lede">No account and no email. Your notes stay in this browser.</p>
+    """Not a form, not an interview. Cooper's playbook on the page, and one prompt that carries it into your AI."""
+    cols = "".join(f'''<div class="fp-col"><p class="label">{name}</p><ul>{"".join(f"<li><b>{r}</b><span>{why}</span></li>" for r, why in items)}</ul></div>''' for name, _, items in PLAYBOOK)
+    prompt = html_escape(film_prompt()).replace("MY IDEA: [", '<mark>MY IDEA: [', 1).replace("can get.]", "can get.]</mark>", 1)
+    body = f"""  <section class="fp-hero dark" aria-labelledby="pg-h">
+    <video class="fp-vid" muted loop playsinline autoplay preload="metadata" poster="/videos/work/launch-film.jpg" aria-hidden="true"><source src="/videos/work/launch-film.mp4" type="video/mp4" /></video>
+    <div class="fp-copy">
+      <p class="label">Resources / Film planner</p>
+      <h1 id="pg-h" data-hero><span class="line"><span>Hooks that</span></span><span class="line"><span>hold.</span></span></h1>
+      <p class="lede">The hooks, story checks and retention rules I actually use. Paste them into ChatGPT or Claude with your idea, and it writes yours, your way.</p>
+    </div>
   </section>
-  <section class="planner light" aria-label="Planner">
-    <form data-planner>{qs}
-    </form>
-    <aside>
-      <div class="acts"><button class="pill" type="button" data-plan-download>Download my plan</button><button class="pill" type="button" data-plan-print>Print</button></div>
-      <p class="note" data-plan-status role="status">Saved in this browser only.</p>
-      <p class="note">Want to see where this goes? <a href="/work/plugverse-launch-film">Watch the launch film</a>.</p>
-    </aside>
+  <section class="fp light" aria-label="The playbook">
+    <div class="fp-cols">{cols}</div>
+    <div class="fp-prompt"><p class="label">One paste. Change the highlighted line.</p><div class="cb"><pre>{prompt}</pre><button type="button" class="cp" aria-label="Copy the prompt">Copy</button></div>
+      <p class="note">Same rules behind the <a href="/work/plugverse-launch-film">PlugVerse launch film</a>.</p></div>
   </section>"""
-    page("resources/film-plan", "Film planner", "Plan your next film: the questions Cooper Delo answers before he shoots anything.", body)
+    page("resources/film-plan", "Film planner", "Cooper Delo's hooks, story checks and retention rules, as one prompt you paste into your AI with your idea.", body, css=("/assets/gear.css",))
+
+
+def html_escape(s):
+    return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
 
 
 # ---------- gear: only what Cooper confirmed on 2026-10-02 (vault Context/user.md). ----------
-# Links only where the page was checked in a browser. Unknown models stay generic and unlinked.
-CHAIN = [("Amp + Cab", "off"), ("EQ", ""), ("Screamer", ""), ("Chorus", ""), ("Delay", ""), ("Reverb", "")]
+# Every item leads with a picture: his renders (/photos/gear-*.jpg) or a frame from his own footage.
+AMAZON_TAG = ""  # add Cooper's Amazon Associates tag here when he has one
+def amz(q):
+    from urllib.parse import quote_plus
+    return f"https://www.amazon.com/s?k={quote_plus(q)}" + (f"&tag={AMAZON_TAG}" if AMAZON_TAG else "")
+
 GEAR = [
-    ("Guitars", [
-        ("Fender Telecaster", "American Professional II", "https://www.fender.com/search?q=american%20professional%20ii%20telecaster"),
-        ("PRS Custom 24-08", "Core, not the SE", "https://prsguitars.com/electrics/model/custom_24_08_2025"),
-        ("Takamine GN51CE", "Acoustic. Passive DI at gigs", "https://www.takamine.com/GN51CE-NAT"),
+    ("Guitars", "guitars", [
+        ("tele", "Fender Telecaster", "American Professional II. Indie, funk, country.", amz("Fender American Professional II Telecaster")),
+        ("prs-live", "PRS Custom 24-08", "The core one, not the SE. Big classic-rock leads.", amz("PRS Custom 24-08")),
+        ("acoustic", "Takamine GN51CE", "Acoustic. Passive DI to the PA at gigs.", amz("Takamine GN51CE")),
+        ("bass", "Epiphone Embassy", "The green bass, for when I'm on bass.", amz("Epiphone Embassy Bass")),
     ]),
-    ("Amp and effects", [
-        ("Marshall DSL40CR", "Stealth Edition. All tubes", "https://www.marshall.com/us/en/product/dsl40-combo"),
-        ("Line 6 Pod Go", "Effects only. Amp block off", "https://line6.com/podgo/"),
+    ("Amps and effects", "amp", [
+        ("", "Marshall DSL40CR", "Stealth Edition. All tubes. This is the tone.", amz("Marshall DSL40CR")),
+        ("", "Line 6 Pod Go", "Pedals only. The amp block stays off.", amz("Line 6 Pod Go")),
+        ("", "Fender Rumble 500", "Bass combo.", amz("Fender Rumble 500")),
     ]),
-    ("Studio", [
-        ("Focusrite Scarlett 2i2", "Interface", "https://focusrite.com/products/scarlett-2i2"),
-        ("sE Electronics sE2200", "Condenser mic. Voiceover", "https://seelectronics.com/se2200"),
-        ("Shure SM58", "Dynamic mic", "https://www.shure.com/en-US/products/microphones/sm58"),
-        ("beyerdynamic DT 770 Pro X", "Headphones", "https://www.beyerdynamic.com/p/dt-770-pro-x-limited-edition"),
-        ("RØDE mic arm", "", ""),
-        ("Studio monitors", "", ""),
+    ("Camera", "camera", [
+        ("camera", "Sony A7C II", "With the FE 16mm F1.8 G and the FE 24-50mm F2.8 G.", amz("Sony A7C II")),
+        ("", "K&F Concept 67mm VND", "7-click variable ND. On both lenses.", amz("K&F Concept 67mm variable ND")),
     ]),
-    ("Camera", [
-        ("Sony A7C II", "Body", ""),
-        ("Sony FE 16mm F1.8 G", "Wide", ""),
-        ("Sony FE 24-50mm F2.8 G", "Zoom", ""),
-        ("K&F Concept VND", "67mm, 7-click. On both lenses", "https://www.kentfaith.com/feature_67mm-variable-nd-filter"),
-    ]),
-    ("When I'm on bass", [
-        ("Epiphone Embassy", "Green", "https://www.epiphone.com/en-US/p/Electric-Bass/EPIM96326/Graphite-Black"),
-        ("Fender Rumble 500", "Bass combo", "https://www.fender.com/products/rumble-500"),
+    ("Studio", "studio", [
+        ("desk", "Focusrite Scarlett 2i2", "Interface.", amz("Focusrite Scarlett 2i2")),
+        ("", "sE Electronics sE2200", "Condenser. Vocals and voiceover.", amz("sE Electronics sE2200")),
+        ("headphones", "beyerdynamic DT 770 Pro X", "Headphones.", amz("beyerdynamic DT 770 Pro X")),
     ]),
 ]
+ALSO = [("Shure SM58", amz("Shure SM58")), ("RØDE mic arm", amz("RODE PSA1+")), ("Sony FE 16mm F1.8 G", amz("Sony FE 16mm F1.8 G")), ("Sony FE 24-50mm F2.8 G", amz("Sony FE 24-50mm F2.8 G"))]
+
+
+def gimg(key, alt, sizes="(max-width: 700px) 90vw, 30vw"):
+    return f'<img src="/img/gear/{key}-900.webp" srcset="/img/gear/{key}-480.webp 480w, /img/gear/{key}-900.webp 900w" sizes="{sizes}" alt="{alt}" loading="lazy" decoding="async" />'
 
 
 def gear():
-    blocks = "".join(f'<li class="{"off" if st else ""}"><span>{n}</span>{"<em>off</em>" if st else ""}</li>' for n, st in CHAIN)
-    groups = []
-    for cat, items in GEAR:
-        rows = []
-        for name, note, url in items:
-            nm = f'<a href="{url}" target="_blank" rel="noreferrer">{name}<span class="go">{ARROW}</span></a>' if url else f"<span>{name}</span>"
-            rows.append(f'<li><span class="nm">{nm}</span><span class="nt">{note}</span></li>')
-        groups.append(f'<section class="gg" data-rv><p class="label">{cat}</p><ul>{"".join(rows)}</ul></section>')
-    body = f"""  <section class="pg-hero light" aria-labelledby="pg-h">
-    <p class="label">Gear</p>
-    <h1 id="pg-h" data-hero><span class="line"><span>What I</span></span><span class="line"><span>play through.</span></span></h1>
-    <p class="lede">The rig behind Rubber Band shows, the camera behind the films, and the desk I record at.</p>
+    """Concise: a hero, three rendered pieces, then one list of everything (ref: services list with a hover image)."""
+    feat = [("prs-live", "Live", "The PRS into the Marshall, Chi Phi."), ("tele", "At the desk", "The Tele, most nights."), ("headphones", "Recording", "DT 770s on, Scarlett 2i2 in.")]
+    feats = "".join(f'''<figure class="gf" data-tilt><span class="gf-img">{gimg(k, n, "(max-width: 900px) 90vw, 32vw")}</span><figcaption><b>{n}</b><span>{d}</span></figcaption></figure>''' for k, n, d in feat)
+    rows = []
+    for cat, slug, items in GEAR:
+        rows.append(f'<li class="gl-cat label">{cat}</li>')
+        rows += [f'''<li><a class="gl" href="{url}" target="_blank" rel="noreferrer sponsored" {f' data-img="/img/gear/{key}-480.webp"' if key else ""}><b>{name}</b><span>{note}</span><i class="label">Amazon {ARROW}</i></a></li>''' for key, name, note, url in items]
+    rows.append('<li class="gl-cat label">Color and edit</li>')
+    rows.append(f'''<li><a class="gl" href="https://www.blackmagicdesign.com/products/davinciresolve" target="_blank" rel="noreferrer" data-img="/videos/work/chapter-one.jpg"><b>DaVinci Resolve Studio</b><span>Every film on this site is cut and graded here.</span><i class="label">Blackmagic {ARROW}</i></a></li>''')
+    rows.append(f'''<li><a class="gl" href="https://shop.gakuyen.com/products/odyssey-powergrade" target="_blank" rel="noreferrer" data-img="/videos/work/the-start.jpg"><b>Odyssey PowerGrade</b><span>Gaku's grade, on one adjustment layer.</span><i class="label">shop.gakuyen.com {ARROW}</i></a></li>''')
+    rows.append('<li class="gl-cat label">Also on the desk</li>')
+    rows += [f'<li><a class="gl" href="{u}" target="_blank" rel="noreferrer sponsored"><b>{n}</b><span></span><i class="label">Amazon {ARROW}</i></a></li>' for n, u in ALSO]
+    body = f"""  <section class="gh dark" aria-labelledby="pg-h">
+    <video class="gh-vid" muted loop playsinline autoplay preload="metadata" poster="/videos/work/gear-hero.jpg" aria-hidden="true">
+      <source src="/videos/work/gear-hero.webm" type="video/webm" /><source src="/videos/work/gear-hero.mp4" type="video/mp4" /></video>
+    <div class="gh-copy"><p class="label">Resources / Setup · always up to date</p>
+      <h1 id="pg-h" data-hero><span class="line"><span>My setup.</span></span></h1>
+      <p class="lede">Everything I shoot, play and record with, in one place.</p></div>
   </section>
-  <section class="chain dark" aria-labelledby="chain-h">
-    <p class="label" id="chain-h">Signal chain</p>
-    <div class="rig" role="img" aria-label="Guitar into the Line 6 Pod Go with the amp block off, through EQ, Screamer, Chorus, Delay and Reverb, into the Marshall DSL40CR">
-      <div class="end"><span class="label">In</span><b>Tele or PRS</b></div>
-      <div class="pod"><span class="label">Line 6 Pod Go</span><ol>{blocks}</ol></div>
-      <div class="end"><span class="label">Out</span><b>Marshall DSL40CR</b></div>
-      <i class="wire" aria-hidden="true"><i></i></i>
-    </div>
-    <p class="why">The amp block stays off. The Marshall is the amp.</p>
-  </section>
-  <section class="kit light" aria-label="Everything else">
-    {"".join(groups)}
-    <p class="fine">Links go to the maker's page. I don't earn anything from them.</p>
+  <section class="gfs dark" aria-label="In use">{feats}</section>
+  <section class="gls light" aria-label="Everything I use">
+    <ul class="gl-list" data-glist>{"".join(rows)}</ul>
+    <p class="fine">Amazon links are searches for the exact model. <span class="draft">Draft</span> If they become affiliate links, this line will say so.</p>
+    <img class="gl-float" data-gfloat alt="" aria-hidden="true" />
   </section>"""
-    page("gear", "Gear", "The guitars, amp, camera and studio gear Cooper Delo actually uses.", body, css=("/assets/gear.css",))
+    page("gear", "My setup", "The guitars, amp, camera, studio gear and grade Cooper Delo actually uses.", body, css=("/assets/gear.css",))
 
 
 if __name__ == "__main__":

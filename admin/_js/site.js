@@ -74,3 +74,13 @@ if(error){
     <section class="ws-card"><h2>Pages</h2>${bars(top(pages),views.length)}<h3 style="margin:18px 0 6px">Devices</h3>${bars(top(dev),visits.length)}</section>
   </div>`;
 }
+
+// Messages from the contact popup (/api/contact -> site_messages), newest first.
+if(!isLocalDemo()){
+  const {data,error}=await sb.from('site_messages').select('at,kind,name,reply,message').order('at',{ascending:false}).limit(30);
+  const grid=app.querySelector('.ws-grid')||app;
+  const card=document.createElement('section');card.className='ws-card';card.style.gridColumn='1 / -1';
+  card.innerHTML=error?`<h2>Messages</h2><span class="ws-state warn">Not switched on yet</span><p>Messages from the contact popup start saving once <code>scripts/migrations/20261003-site-messages.sql</code> is applied.</p>`
+   :`<h2>Messages</h2>${data.length?`<div class="st-rows">${data.map(m=>`<div style="display:block"><div style="display:flex;justify-content:space-between;gap:14px"><span><b>${esc(m.name)}</b> · ${esc(m.kind)} · ${esc(m.reply)}</span><span>${esc(ago(m.at))}</span></div><p style="margin:6px 0 0;white-space:pre-wrap">${esc(m.message)}</p></div>`).join('')}</div>`:'<p>No messages yet.</p>'}`;
+  grid.prepend(card);
+}

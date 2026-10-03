@@ -4,12 +4,12 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>Film planner / Cooper Delo</title>
-<meta name="description" content="Plan your next film: the questions Cooper Delo answers before he shoots anything." />
+<meta name="description" content="Cooper Delo's hooks, story checks and retention rules, as one prompt you paste into your AI with your idea." />
 <meta name="theme-color" content="#16130F" />
 <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 <link rel="manifest" href="/site.webmanifest" />
 <meta property="og:title" content="Film planner / Cooper Delo" />
-<meta property="og:description" content="Plan your next film: the questions Cooper Delo answers before he shoots anything." />
+<meta property="og:description" content="Cooper Delo's hooks, story checks and retention rules, as one prompt you paste into your AI with your idea." />
 <meta property="og:image" content="https://cooperdelo.com/img/poster-montage-1920-3a4824-1280.jpg" />
 <meta property="og:url" content="https://cooperdelo.com/resources/film-plan" />
 <meta name="twitter:card" content="summary_large_image" />
@@ -18,36 +18,56 @@
 <link rel="preload" href="/fonts/NimbusSans-Bold.woff2" as="font" type="font/woff2" crossorigin />
 <link rel="stylesheet" href="/assets/site.css" />
 <link rel="stylesheet" href="/assets/together.css" />
+<link rel="stylesheet" href="/assets/gear.css" />
 <script>(function(d){var r=d.documentElement;try{if(sessionStorage.getItem('cd-intro'))r.classList.add('seen')}catch(e){}if(matchMedia('(prefers-reduced-motion: reduce)').matches)r.classList.add('rm')})(document)</script>
 </head>
 <body class="page">
 <header class="nav label">
   <a class="mark" href="/" aria-label="Cooper Delo, home"><span class="roll"><span>Cooper Delo</span><span aria-hidden="true">Cooper Delo</span></span></a>
   <span class="where">Chapel Hill, NC&nbsp;&nbsp;<span data-clock>--:--</span> ET</span>
-  <nav class="links" aria-label="Primary"><a href="/work"><span class="roll"><span>Work</span><span aria-hidden="true">Work</span></span></a><a href="/resources"><span class="roll"><span>Resources</span><span aria-hidden="true">Resources</span></span></a><a href="/#about"><span class="roll"><span>About</span><span aria-hidden="true">About</span></span></a><a href="/#contact"><span class="roll"><span>Contact</span><span aria-hidden="true">Contact</span></span></a></nav>
+  <nav class="links" aria-label="Primary"><a href="/work"><span class="roll"><span>Work</span><span aria-hidden="true">Work</span></span></a><a href="/resources"><span class="roll"><span>Resources</span><span aria-hidden="true">Resources</span></span></a><a href="/shop"><span class="roll"><span>Shop</span><span aria-hidden="true">Shop</span></span></a><a href="#contact" data-contact><span class="roll"><span>Contact</span><span aria-hidden="true">Contact</span></span></a></nav>
 </header>
 <main>
-  <section class="pg-hero light" aria-labelledby="pg-h">
-    <p class="label">Resources / Film planner</p>
-    <h1 id="pg-h" data-hero><span class="line"><span>Get it out</span></span><span class="line"><span>of your head.</span></span></h1>
-    <p class="lede">The questions I answer before I shoot anything. Fill in what matters, download it, and go shoot.</p>
-    <p class="lede">No account and no email. Your notes stay in this browser.</p>
+  <section class="fp-hero dark" aria-labelledby="pg-h">
+    <video class="fp-vid" muted loop playsinline autoplay preload="metadata" poster="/videos/work/launch-film.jpg" aria-hidden="true"><source src="/videos/work/launch-film.mp4" type="video/mp4" /></video>
+    <div class="fp-copy">
+      <p class="label">Resources / Film planner</p>
+      <h1 id="pg-h" data-hero><span class="line"><span>Hooks that</span></span><span class="line"><span>hold.</span></span></h1>
+      <p class="lede">The hooks, story checks and retention rules I actually use. Paste them into ChatGPT or Claude with your idea, and it writes yours, your way.</p>
+    </div>
   </section>
-  <section class="planner light" aria-label="Planner">
-    <form data-planner>
-      <section class="q"><div><h2>The actual idea</h2><label for="idea">What happened? What do you want someone to feel?</label><div class="field"><textarea id="idea" name="idea" maxlength="5000" rows="3"></textarea></div></div></section>
-      <section class="q"><div><h2>The first thing we see or hear</h2><label for="opening">Give someone a reason to keep watching.</label><div class="field"><textarea id="opening" name="opening" maxlength="5000" rows="3"></textarea></div></div></section>
-      <section class="q"><div><h2>What are we waiting to find out</h2><label for="question">A real unanswered question, not a vague promise.</label><div class="field"><textarea id="question" name="question" maxlength="5000" rows="3"></textarea></div></div></section>
-      <section class="q"><div><h2>What changes</h2><label for="change">The attempt, complication or detail that moves it forward.</label><div class="field"><textarea id="change" name="change" maxlength="5000" rows="3"></textarea></div></div></section>
-      <section class="q"><div><h2>What the ending gives us</h2><label for="payoff">Answer the question you opened. You don't need a life lesson.</label><div class="field"><textarea id="payoff" name="payoff" maxlength="5000" rows="3"></textarea></div></div></section>
-      <section class="q"><div><h2>What you need to shoot</h2><label for="shots">The action, framing, location and sound. Use what you actually have.</label><div class="field"><textarea id="shots" name="shots" maxlength="5000" rows="3"></textarea></div></div></section>
-      <section class="q"><div><h2>What happens after someone watches</h2><label for="next_step">Come back, see more of your work, try the thing, or just enjoy it.</label><div class="field"><textarea id="next_step" name="next_step" maxlength="5000" rows="3"></textarea></div></div></section>
-    </form>
-    <aside>
-      <div class="acts"><button class="pill" type="button" data-plan-download>Download my plan</button><button class="pill" type="button" data-plan-print>Print</button></div>
-      <p class="note" data-plan-status role="status">Saved in this browser only.</p>
-      <p class="note">Want to see where this goes? <a href="/work/plugverse-launch-film">Watch the launch film</a>.</p>
-    </aside>
+  <section class="fp light" aria-label="The playbook">
+    <div class="fp-cols"><div class="fp-col"><p class="label">Hooks</p><ul><li><b>Start mid-thought.</b><span>No intro. Delete your first sentence. Most people who leave, leave at 0:01.</span></li><li><b>Confess, don't flex.</b><span>A struggle holds people. A highlight reel loses them.</span></li><li><b>Say I, not you.</b><span>Earn we and you later. One creator went from 3,900 views to 15M on that switch alone.</span></li><li><b>One detail nobody else could say.</b><span>Themes are generic. Scenes are unforgeable.</span></li></ul></div><div class="fp-col"><p class="label">Story</p><ul><li><b>What does a stranger want answered?</b><span>Open that question in the first seconds.</span></li><li><b>But, or therefore.</b><span>Every beat causes the next. Never and then.</span></li><li><b>Hold the lesson.</b><span>Until the story earns it. Sometimes it never needs one.</span></li><li><b>Answer what you opened.</b><span>Then give a true reason to come back.</span></li></ul></div><div class="fp-col"><p class="label">Retention</p><ul><li><b>Finishes beat likes.</b><span>On my account, a video 24.9% of people finished got 2.2x the views of one 8.7% finished.</span></li><li><b>A new picture every second, for three seconds.</b><span>Then cuts every 2 to 3. Only the point gets to breathe.</span></li><li><b>Two lines of text, max.</b><span>About 40 characters, upper middle, readable in frame one.</span></li><li><b>Length isn't the problem.</b><span>30 to 60 seconds of talking with no turn is. Never fade to black mid-video.</span></li></ul></div></div>
+    <div class="fp-prompt"><p class="label">One paste. Change the highlighted line.</p><div class="cb"><pre>I'm making a short video. Below is Cooper Delo's playbook: the hooks, story checks and retention rules he uses. Use it to shape my idea, in my words. It's a toolbox, not a checklist. Use what fits.
+
+<mark>MY IDEA: [one or two lines. What happened, and what footage you have or can get.]</mark>
+
+HOOKS
+- Start mid-thought. No intro. Delete your first sentence. Most people who leave, leave at 0:01.
+- Confess, don't flex. A struggle holds people. A highlight reel loses them.
+- Say I, not you. Earn we and you later. One creator went from 3,900 views to 15M on that switch alone.
+- One detail nobody else could say. Themes are generic. Scenes are unforgeable.
+
+STORY
+- What does a stranger want answered? Open that question in the first seconds.
+- But, or therefore. Every beat causes the next. Never and then.
+- Hold the lesson. Until the story earns it. Sometimes it never needs one.
+- Answer what you opened. Then give a true reason to come back.
+
+RETENTION
+- Finishes beat likes. On my account, a video 24.9% of people finished got 2.2x the views of one 8.7% finished.
+- A new picture every second, for three seconds. Then cuts every 2 to 3. Only the point gets to breathe.
+- Two lines of text, max. About 40 characters, upper middle, readable in frame one.
+- Length isn't the problem. 30 to 60 seconds of talking with no turn is. Never fade to black mid-video.
+
+GIVE ME
+1. Three opening lines for my idea, each from a different hook, in my voice. Pick one and say why in a sentence.
+2. The story in 5 to 7 one-line beats, joined by but or therefore.
+3. A cut map for the first 10 seconds: what we see, hear and read.
+4. A shot list grouped by location, using only what I said I have.
+
+Never invent anything about my life or my footage. If I didn't say what actually happened, ask me that one question and nothing else.</pre><button type="button" class="cp" aria-label="Copy the prompt">Copy</button></div>
+      <p class="note">Same rules behind the <a href="/work/plugverse-launch-film">PlugVerse launch film</a>.</p></div>
   </section>
 </main>
 <footer class="contact" id="contact">
@@ -75,6 +95,7 @@
 <script src="/assets/lenis.min.js" defer></script>
 <script src="/assets/site.js" defer></script>
 <script src="/assets/beacon.js" defer></script>
+<script src="/assets/contact.js" defer></script>
 <script src="/assets/together.js" defer></script>
 </body>
 </html>

@@ -327,6 +327,19 @@ NOTE on the two Supabase service-role keys: there are TWO separate Supabase proj
 
 If any required var is missing, the affected source returns an error message in the response payload — the page renders the other KPIs and shows the error banner.
 
+## Shop + gated guides (QA only, branch `qa-shop`)
+
+Modeled on gakuyen.com (vault: Projects/design-references/gakuyen-2026-10-02). Three doors: Work, Resources, Shop. The shop is `/shop/*` in this repo and is meant to be served at `shop.cooperdelo.com` through the host rewrites in `vercel.json` (inert until that domain is attached). Nothing here is on `main` until Cooper says go.
+
+- **No kit content in the repo** (it is public). Pages are shells; `/api/kit` serves everything from the `SHOP_KITS_GZ` env var (base64 of gzipped JSON keyed by slug; source: the vault-side publish-safe guides, `F:/Renders/cooper-corpus/guides/public`).
+- **Gates** (`api/_lib/shop.mjs` `KITS`): `free` (startup), `email` (ai-system, linkedin, instagram-tiktok, film-motion, music), `paid` (design, draft $29). Access = HMAC token (`SHOP_TOKEN_SECRET`) stored in the browser as `kit:<slug>`.
+- **Paid**: `/api/shop-checkout` creates a Stripe Checkout session (`automatic_tax` on, tax code `txcd_10000000`, `allow_promotion_codes`, or `?code=` applied up front, receipt via `invoice_creation`). The kit page verifies `session_id` with Stripe and unlocks. `/api/shop-webhook` (signed with `SHOP_STRIPE_WEBHOOK_SECRET`) records orders in `shop_orders`.
+- **Demo mode**: with `SHOP_DEMO=1`, no Stripe key and not production, checkout returns `?demo=1` and the paid kit unlocks without paying. Impossible in production (tested).
+- **Admin**: `/admin/shop` (full only): emails, orders, revenue, tax, gate steps. Tables come from `scripts/migrations/20261003-shop.sql` (NOT applied).
+- **Env vars (Preview, branch qa-shop)**: `SHOP_KITS_GZ`, `SHOP_TOKEN_SECRET`, `SHOP_DEMO=1`; later `SHOP_STRIPE_SECRET_KEY` (sk_test first), `SHOP_STRIPE_WEBHOOK_SECRET`.
+- **Build**: `python scripts/build-shop.py` after `build-together-pages.py` (it adds the guides shelf to `/resources`).
+- **Before go-live** (Cooper): prices, license + refund answers (FAQ shows Draft), Stripe Tax registrations, email sending for the gate, attach `shop.cooperdelo.com`, apply the shop migration, then merge.
+
 ## Public site notes
 
 - Each top-level page is its own HTML file with inline `<style>` blocks scoped by section.
