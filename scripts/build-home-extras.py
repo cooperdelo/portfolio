@@ -150,3 +150,105 @@ def take():
     <div class="tk-head"><p class="label" id="tk-h">Resources</p><p>Free things I actually use. <a href="/resources">See all {ARROW}</a></p></div>
     <ol class="tk-grid">{cards}</ol>
   </section>"""
+
+
+# ---------------------------------------------------------------- the homepage, as the hero promised it:
+# "I make films, motion and product." Four chapters prove it, the same four words everywhere: Films, Motion,
+# Product, Music. Systems is how the product got built, so it lives inside Product. The records live in Music.
+CH = [("films", "01", "Films"), ("motion", "02", "Motion"), ("product", "03", "Product"), ("music", "04", "Music")]
+CH_THUMB = {"films": "/videos/work/chapter-one.jpg", "motion": "/videos/work/bioswap-final.jpg", "product": "/videos/work/pv-turntable.jpg", "music": "/img/chapters/stage-color-720.webp"}
+
+
+def _vid(name, ar, webm=False, cls=""):
+    w = f' data-webm="/videos/work/{name}.webm"' if webm else ""
+    return (f'<video class="cv {cls}" muted loop playsinline preload="none" poster="/videos/work/{name}.jpg" '
+            f'data-src="/videos/work/{name}.mp4"{w} aria-hidden="true" style="aspect-ratio:{ar}"></video>')
+
+
+def _pic(key, alt, sizes="(max-width: 900px) 100vw, 50vw", cls=""):
+    return (f'<picture class="{cls}"><source type="image/webp" srcset="/img/chapters/{key}-720.webp 720w, /img/chapters/{key}-1440.webp 1440w" sizes="{sizes}" />'
+            f'<img src="/img/chapters/{key}-1440.jpg" alt="{alt}" loading="lazy" decoding="async" /></picture>')
+
+
+def _head(key, no, name, line):
+    return f'''<header class="ch-head"><p class="ch-no label">{no}</p><h2 class="ch-name" data-rv><span class="line"><span>{name}</span></span></h2><p class="ch-line">{line}</p></header>'''
+
+
+def chapter_index():
+    items = "".join(f'<li><a href="#{k}"><span class="ci-thumb" style="background-image:url({CH_THUMB[k]})" aria-hidden="true"></span><span class="label">{no}</span><b>{n}</b></a></li>' for k, no, n in CH)
+    return f'<nav class="ch-index light" aria-label="What I make"><ol>{items}</ol></nav>'
+
+
+def chapter_films():
+    tile = lambda slug, vid, title, say, meta, cls: f'''<a class="ct {cls}" href="/work/{slug}" data-handoff>
+          <span class="ct-media">{_vid(vid, "16/9")}</span>
+          <span class="ct-cap"><b>{title}</b><span>{say}</span><span class="label">{meta}</span></span></a>'''
+    return f'''<section class="ch ch-films light" id="films" aria-labelledby="films-h">
+    {_head("films", "01", "Films", "Short films I shoot and cut myself.").replace('class="ch-name"', 'class="ch-name" id="films-h"')}
+    <div class="ct-grid">
+      {tile("chapter-one", "chapter-one", "Chapter One", "Junior year, in 33 seconds.", "0:33 · 17.6K views on TikTok", "big")}
+      {tile("the-start", "the-start", "The Start", "I am terrified of starting.", "0:20 · 2026", "")}
+      {tile("plugverse-launch-film", "launch-film", "PlugVerse launch film", "My first short film, made for my startup's launch.", "1:00 · 2026", "")}
+    </div>
+  </section>'''
+
+
+def chapter_motion():
+    return f'''<section class="ch ch-motion dark" id="motion" aria-labelledby="motion-h">
+    {_head("motion", "02", "Motion", "Made in code. One camera, no cuts.").replace('class="ch-name"', 'class="ch-name" id="motion-h"')}
+    <div class="cm">
+      <a class="cm-plate" href="/work/bioswap" data-handoff><img class="cm-bg" src="/videos/work/bioswap-final.jpg" alt="" aria-hidden="true" />{_vid("bioswap-final", "1/1", webm=True)}</a>
+      <div class="cm-copy">
+        <p class="label">Bioswap · 0:19</p>
+        <h3>"What's your rate?"</h3>
+        <p>A band's bio swaps into a booking page without a single cut. Built in Remotion and React, finished in DaVinci Resolve.</p>
+        <div class="acts"><a class="pill" href="/work/bioswap" data-handoff>See how it moves {ARROW}</a></div>
+      </div>
+    </div>
+  </section>'''
+
+
+def chapter_product(diagram):
+    return f'''<section class="ch ch-product light" id="product" aria-labelledby="product-h">
+    {_head("product", "03", "Product", "I built PlugVerse by myself. Every show, one link.").replace('class="ch-name"', 'class="ch-name" id="product-h"')}
+    <div class="cp-grid">
+      <a class="ct cp-turn" href="/work/plugverse-product" data-handoff><span class="ct-media">{_vid("pv-turntable", "1/1", webm=True)}</span><span class="ct-cap"><b>PlugVerse</b><span>Design, front end, back end. All of it.</span></span></a>
+      <a class="ct cp-wide" href="/work/plugverse-product" data-handoff><span class="ct-media">{_vid("plugverse-product", "16/9")}</span><span class="ct-cap"><b>The product</b><span>The screens are from the live app.</span></span></a>
+      <ul class="cp-facts"><li><b>Solo</b><span class="label">built by me</span></li><li><b>Sep 23</b><span class="label">live since, 2026</span></li><li><b>5,314</b><span class="label">commits</span></li></ul>
+    </div>
+    <div class="cp-how">
+      <div class="cp-how-copy"><p class="label">How I built it</p><h3>One folder every Claude reads.</h3><p>Every session starts already knowing my work, and ends by saving what it learned.</p>
+        <div class="acts"><a class="pill" href="/work/ai-system">See the system {ARROW}</a><a class="pill" href="/plugverse">The company</a></div></div>
+      <div class="cp-how-plate">{diagram}</div>
+    </div>
+  </section>'''
+
+
+def chapter_music(records_html):
+    return f'''<section class="ch ch-music dark" id="music" aria-labelledby="music-h">
+    <div class="cmu-hero">{_pic("stage-color", "Rubber Band on a packed stage", "100vw")}
+      {_head("music", "04", "Music", "Guitar in Rubber Band. I run the bookings too.").replace('class="ch-name"', 'class="ch-name" id="music-h"')}
+    </div>
+    <div class="cmu-grid">
+      <a class="ct" href="/work/rubber-band" data-handoff><span class="ct-media">{_vid("rubber-band", "16/9")}</span><span class="ct-cap"><b>Rubber Band, live</b><span>Chapel Hill cover band.</span></span></a>
+      <a class="ct cmu-ep" href="https://open.spotify.com/album/5kVO52fF80upZVRJlc84SO" target="_blank" rel="noreferrer"><span class="ct-media">{_pic("ep", "Flicker of Time EP cover", "(max-width: 900px) 50vw, 25vw")}</span><span class="ct-cap"><b>Flicker of Time</b><span>My EP. Listen on Spotify.</span></span></a>
+      <figure class="ct cmu-bass"><span class="ct-media">{_pic("bass", "Cooper playing bass", "(max-width: 900px) 50vw, 25vw")}</span></figure>
+    </div>
+    {records_html}
+  </section>'''
+
+
+TAKE2 = [("Gear", "Everything I shoot, play and record with.", "/gear", "The rig", "desk", "Cooper at his desk"),
+         ("Film planner", "The questions I answer before I shoot anything.", "/resources/film-plan", "Free, no email", "film-still", "A still from the PlugVerse launch film")]
+
+
+def take2():
+    cards = "".join(f'''<li><a class="tk2" href="{u}"><span class="tk2-media">{_pic(img, alt, "(max-width: 900px) 100vw, 50vw")}</span><span class="tk2-cap"><span class="label">{tag}</span><b>{t}</b><span>{d}</span></span><span class="go">{ARROW}</span></a></li>''' for t, d, u, tag, img, alt in TAKE2)
+    return f"""<section class="take2 light" aria-labelledby="tk-h">
+    <div class="tk-head"><p class="label" id="tk-h">Resources</p><p>Free things I actually use. <a href="/resources">See all {ARROW}</a></p></div>
+    <ol class="tk2-grid">{cards}</ol>
+  </section>"""
+
+
+def chapters(records_html, diagram):
+    return "\n  ".join([chapter_index(), chapter_films(), chapter_motion(), chapter_product(diagram), chapter_music(records_html), take2()])
