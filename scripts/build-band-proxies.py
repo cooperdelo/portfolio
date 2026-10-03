@@ -47,10 +47,14 @@ for asset in assets:
         # 720p, frequent keyframes so scrubbing the timeline is instant, small enough to stream on a phone.
         # The bucket caps a file at 50 MB, so long clips get a lower bitrate (aim for about 40 MB at most).
         src_dur = float(subprocess.check_output(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "default=nw=1:nk=1", str(src)], text=True))
-        kbps = int(max(400, min(2500, 40e6 * 8 / max(src_dur, 1) / 1000 - 96)))
-        subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", str(src), "-vf", "scale=-2:720", "-c:v", "libx264", "-preset", "veryfast",
+        kbps = int(min(2500, 40e6 * 8 / max(src_dur, 1) / 1000 - 96))
+        # Very long clips (a whole set on one camera) can't fit 720p under the cap, so they drop to 360p, mono audio.
+        height, abr, preset = (720, "96k", "veryfast") if kbps >= 400 else (360, "40k", "slow")
+        if height == 360:
+            kbps = int(40e6 * 8 / max(src_dur, 1) / 1000 - 44)
+        subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", str(src), "-vf", f"scale=-2:{height}", "-c:v", "libx264", "-preset", preset,
                         "-b:v", f"{kbps}k", "-maxrate", f"{int(kbps * 1.3)}k", "-bufsize", f"{kbps * 2}k",
-                        "-g", "25", "-c:a", "aac", "-b:a", "96k", "-movflags", "+faststart", str(out)], check=True)
+                        "-g", "25", "-c:a", "aac", "-ac", "1" if height == 360 else "2", "-b:a", abr, "-movflags", "+faststart", str(out)], check=True)
         if out.stat().st_size > 49e6:
             print("     too big after encode, skipped"); continue
         data = out.read_bytes()
