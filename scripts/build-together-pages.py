@@ -211,91 +211,107 @@ def resources():
 
 
 def film_plan():
-    qs = "".join(f"""
-      <section class="q"><div><h2>{h}</h2><label for="{n}">{l}</label><div class="field"><textarea id="{n}" name="{n}" maxlength="5000" rows="3"></textarea></div></div></section>"""
-                 for h, l, n in PROMPTS)
-    body = f"""  <section class="pg-hero light" aria-labelledby="pg-h">
-    <p class="label">Resources / Film planner</p>
-    <h1 id="pg-h" data-hero><span class="line"><span>Get it out</span></span><span class="line"><span>of your head.</span></span></h1>
-    <p class="lede">The questions I answer before I shoot anything. Fill in what matters, download it, and go shoot.</p>
-    <p class="lede">No account and no email. Your notes stay in this browser.</p>
+    """Not a form. Cooper's framework, and one prompt you paste into your own AI so it interviews you."""
+    steps = "".join(f'<li><span class="label">{i + 1:02d}</span><b>{h}</b><span>{l}</span></li>' for i, (h, l, _) in enumerate(PROMPTS))
+    prompt = ("You're helping me plan a short video. Use Cooper Delo's film framework.\n\n"
+              "Ask me these one at a time, and wait for my answer before the next:\n"
+              + "\n".join(f"{i + 1}. {h}. {l}" for i, (h, l, _) in enumerate(PROMPTS))
+              + "\n\nRules: keep my answers in my words. If an answer is vague, ask one follow-up, not five. "
+                "Never invent details about my life or my footage.\n\n"
+                "When we're done, give me one page: the idea in one line, the opening shot, the question it holds, "
+                "what changes, the ending, and a shot list grouped by location (about 10 shots per location, each a different size, height or action).")
+    body = f"""  <section class="fp-hero dark" aria-labelledby="pg-h">
+    <video class="fp-vid" muted loop playsinline autoplay preload="metadata" poster="/videos/work/launch-film.jpg" aria-hidden="true"><source src="/videos/work/launch-film.mp4" type="video/mp4" /></video>
+    <div class="fp-copy">
+      <p class="label">Resources / Film planner</p>
+      <h1 id="pg-h" data-hero><span class="line"><span>Plan it</span></span><span class="line"><span>in one paste.</span></span></h1>
+      <p class="lede">The seven questions I answer before I shoot anything. Copy the prompt, paste it into ChatGPT or Claude, and it interviews you.</p>
+    </div>
   </section>
-  <section class="planner light" aria-label="Planner">
-    <form data-planner>{qs}
-    </form>
-    <aside>
-      <div class="acts"><button class="pill" type="button" data-plan-download>Download my plan</button><button class="pill" type="button" data-plan-print>Print</button></div>
-      <p class="note" data-plan-status role="status">Saved in this browser only.</p>
-      <p class="note">Want to see where this goes? <a href="/work/plugverse-launch-film">Watch the launch film</a>.</p>
-    </aside>
+  <section class="fp light" aria-label="The framework">
+    <ol class="fp-steps">{steps}</ol>
+    <div class="fp-prompt"><p class="label">The prompt</p><div class="cb"><pre>{html_escape(prompt)}</pre><button type="button" class="cp" aria-label="Copy the prompt">Copy</button></div>
+      <p class="note">This is how the <a href="/work/plugverse-launch-film">PlugVerse launch film</a> got planned.</p></div>
   </section>"""
-    page("resources/film-plan", "Film planner", "Plan your next film: the questions Cooper Delo answers before he shoots anything.", body)
+    page("resources/film-plan", "Film planner", "Cooper Delo's seven-question film framework, as one prompt you paste into your AI.", body, css=("/assets/gear.css",))
+
+
+def html_escape(s):
+    return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
 
 
 # ---------- gear: only what Cooper confirmed on 2026-10-02 (vault Context/user.md). ----------
-# Links only where the page was checked in a browser. Unknown models stay generic and unlinked.
-CHAIN = [("Amp + Cab", "off"), ("EQ", ""), ("Screamer", ""), ("Chorus", ""), ("Delay", ""), ("Reverb", "")]
+# Every item leads with a picture: his renders (/photos/gear-*.jpg) or a frame from his own footage.
+AMAZON_TAG = ""  # add Cooper's Amazon Associates tag here when he has one
+def amz(q):
+    from urllib.parse import quote_plus
+    return f"https://www.amazon.com/s?k={quote_plus(q)}" + (f"&tag={AMAZON_TAG}" if AMAZON_TAG else "")
+
 GEAR = [
-    ("Guitars", [
-        ("Fender Telecaster", "American Professional II", "https://www.fender.com/search?q=american%20professional%20ii%20telecaster"),
-        ("PRS Custom 24-08", "Core, not the SE", "https://prsguitars.com/electrics/model/custom_24_08_2025"),
-        ("Takamine GN51CE", "Acoustic. Passive DI at gigs", "https://www.takamine.com/GN51CE-NAT"),
+    ("Guitars", "guitars", [
+        ("tele", "Fender Telecaster", "American Professional II. Indie, funk, country.", amz("Fender American Professional II Telecaster")),
+        ("rig-prs", "PRS Custom 24-08", "The core one, not the SE. Big classic-rock leads.", amz("PRS Custom 24-08")),
+        ("rig-takamine", "Takamine GN51CE", "Acoustic. Passive DI to the PA at gigs.", amz("Takamine GN51CE")),
+        ("rig-bass", "Epiphone Embassy", "The green bass, for when I'm on bass.", amz("Epiphone Embassy Bass")),
     ]),
-    ("Amp and effects", [
-        ("Marshall DSL40CR", "Stealth Edition. All tubes", "https://www.marshall.com/us/en/product/dsl40-combo"),
-        ("Line 6 Pod Go", "Effects only. Amp block off", "https://line6.com/podgo/"),
+    ("Amps and effects", "amp", [
+        ("rig-marshall", "Marshall DSL40CR", "Stealth Edition. All tubes. This is the tone.", amz("Marshall DSL40CR")),
+        ("rig-pedals", "Line 6 Pod Go", "Pedals only. The amp block stays off.", amz("Line 6 Pod Go")),
+        ("rig-amp", "Fender Rumble 500", "Bass combo.", amz("Fender Rumble 500")),
     ]),
-    ("Studio", [
-        ("Focusrite Scarlett 2i2", "Interface", "https://focusrite.com/products/scarlett-2i2"),
-        ("sE Electronics sE2200", "Condenser mic. Voiceover", "https://seelectronics.com/se2200"),
-        ("Shure SM58", "Dynamic mic", "https://www.shure.com/en-US/products/microphones/sm58"),
-        ("beyerdynamic DT 770 Pro X", "Headphones", "https://www.beyerdynamic.com/p/dt-770-pro-x-limited-edition"),
-        ("RØDE mic arm", "", ""),
-        ("Studio monitors", "", ""),
+    ("Camera", "camera", [
+        ("camera", "Sony A7C II", "With the FE 16mm F1.8 G and the FE 24-50mm F2.8 G.", amz("Sony A7C II")),
+        ("camera-vnd-filter", "K&F Concept 67mm VND", "7-click variable ND. On both lenses.", amz("K&F Concept 67mm variable ND")),
     ]),
-    ("Camera", [
-        ("Sony A7C II", "Body", ""),
-        ("Sony FE 16mm F1.8 G", "Wide", ""),
-        ("Sony FE 24-50mm F2.8 G", "Zoom", ""),
-        ("K&F Concept VND", "67mm, 7-click. On both lenses", "https://www.kentfaith.com/feature_67mm-variable-nd-filter"),
-    ]),
-    ("When I'm on bass", [
-        ("Epiphone Embassy", "Green", "https://www.epiphone.com/en-US/p/Electric-Bass/EPIM96326/Graphite-Black"),
-        ("Fender Rumble 500", "Bass combo", "https://www.fender.com/products/rumble-500"),
+    ("Studio", "studio", [
+        ("studio-interface", "Focusrite Scarlett 2i2", "Interface.", amz("Focusrite Scarlett 2i2")),
+        ("studio-mic", "sE Electronics sE2200", "Condenser. Vocals and voiceover.", amz("sE Electronics sE2200")),
+        ("studio-headphones", "beyerdynamic DT 770 Pro X", "Headphones.", amz("beyerdynamic DT 770 Pro X")),
     ]),
 ]
+ALSO = [("Shure SM58", amz("Shure SM58")), ("RØDE mic arm", amz("RODE PSA1+")), ("Sony FE 16mm F1.8 G", amz("Sony FE 16mm F1.8 G")), ("Sony FE 24-50mm F2.8 G", amz("Sony FE 24-50mm F2.8 G"))]
+
+
+def gimg(key, alt, sizes="(max-width: 700px) 90vw, 30vw"):
+    return f'<img src="/img/gear/{key}-900.webp" srcset="/img/gear/{key}-480.webp 480w, /img/gear/{key}-900.webp 900w" sizes="{sizes}" alt="{alt}" loading="lazy" decoding="async" />'
 
 
 def gear():
-    blocks = "".join(f'<li class="{"off" if st else ""}"><span>{n}</span>{"<em>off</em>" if st else ""}</li>' for n, st in CHAIN)
     groups = []
-    for cat, items in GEAR:
-        rows = []
-        for name, note, url in items:
-            nm = f'<a href="{url}" target="_blank" rel="noreferrer">{name}<span class="go">{ARROW}</span></a>' if url else f"<span>{name}</span>"
-            rows.append(f'<li><span class="nm">{nm}</span><span class="nt">{note}</span></li>')
-        groups.append(f'<section class="gg" data-rv><p class="label">{cat}</p><ul>{"".join(rows)}</ul></section>')
-    body = f"""  <section class="pg-hero light" aria-labelledby="pg-h">
-    <p class="label">Gear</p>
-    <h1 id="pg-h" data-hero><span class="line"><span>What I</span></span><span class="line"><span>play through.</span></span></h1>
-    <p class="lede">The rig behind Rubber Band shows, the camera behind the films, and the desk I record at.</p>
+    for cat, slug, items in GEAR:
+        cards = "".join(f'''<li><a class="gi" href="{url}" target="_blank" rel="noreferrer sponsored">
+          <span class="gi-img">{gimg(key, name)}</span>
+          <span class="gi-cap"><b>{name}</b><span>{note}</span><span class="gi-buy label">Amazon {ARROW}</span></span></a></li>''' for key, name, note, url in items)
+        groups.append(f'<section class="gg2 g-{slug}" data-rv><p class="label">{cat}</p><ul class="n{len(items)}">{cards}</ul></section>')
+    also = " · ".join(f'<a href="{u}" target="_blank" rel="noreferrer sponsored">{n}</a>' for n, u in ALSO)
+    body = f"""  <section class="gh dark" aria-labelledby="pg-h">
+    <video class="gh-vid" muted loop playsinline autoplay preload="metadata" poster="/videos/work/gear-hero.jpg" aria-hidden="true">
+      <source src="/videos/work/gear-hero.webm" type="video/webm" /><source src="/videos/work/gear-hero.mp4" type="video/mp4" /></video>
+    <div class="gh-copy"><p class="label">Gear</p>
+      <h1 id="pg-h" data-hero><span class="line"><span>What I</span></span><span class="line"><span>play through.</span></span></h1>
+      <p class="lede">The rig behind Rubber Band, the camera behind the films, the desk I make it all at.</p></div>
   </section>
-  <section class="chain dark" aria-labelledby="chain-h">
-    <p class="label" id="chain-h">Signal chain</p>
-    <div class="rig" role="img" aria-label="Guitar into the Line 6 Pod Go with the amp block off, through EQ, Screamer, Chorus, Delay and Reverb, into the Marshall DSL40CR">
-      <div class="end"><span class="label">In</span><b>Tele or PRS</b></div>
-      <div class="pod"><span class="label">Line 6 Pod Go</span><ol>{blocks}</ol></div>
-      <div class="end"><span class="label">Out</span><b>Marshall DSL40CR</b></div>
-      <i class="wire" aria-hidden="true"><i></i></i>
+  <section class="chain2 dark" aria-labelledby="chain-h">
+    <p class="label" id="chain-h">The live rig</p>
+    <div class="c2">
+      <figure><span>{gimg("tele", "Telecaster")}</span><figcaption><b>Tele or PRS</b></figcaption></figure>
+      <i aria-hidden="true">{ARROW}</i>
+      <figure><span>{gimg("rig-pedals", "Line 6 Pod Go")}</span><figcaption><b>Pod Go</b><span>EQ · Screamer · Chorus · Delay · Reverb. Amp block off.</span></figcaption></figure>
+      <i aria-hidden="true">{ARROW}</i>
+      <figure><span>{gimg("rig-marshall", "Marshall DSL40CR")}</span><figcaption><b>Marshall DSL40CR</b><span>The tube amp is the tone.</span></figcaption></figure>
     </div>
-    <p class="why">The amp block stays off. The Marshall is the amp.</p>
   </section>
-  <section class="kit light" aria-label="Everything else">
+  <section class="kit2 light" aria-label="Everything I use">
     {"".join(groups)}
-    <p class="fine">Links go to the maker's page. I don't earn anything from them.</p>
+    <section class="gg2 g-color" data-rv><p class="label">Color and edit</p>
+      <div class="gc">
+        <a class="gc-card" href="https://www.blackmagicdesign.com/products/davinciresolve" target="_blank" rel="noreferrer"><span class="gc-img"><img src="/videos/work/chapter-one.jpg" alt="A frame from Chapter One, graded in Resolve" loading="lazy" /></span><span class="gi-cap"><b>DaVinci Resolve Studio</b><span>Every film on this site is cut and graded here.</span><span class="gi-buy label">Blackmagic {ARROW}</span></span></a>
+        <a class="gc-card" href="https://shop.gakuyen.com/products/odyssey-powergrade" target="_blank" rel="noreferrer"><span class="gc-img"><img src="/videos/work/the-start.jpg" alt="A frame from The Start" loading="lazy" /></span><span class="gi-cap"><b>Odyssey PowerGrade</b><span>Gaku's grade. One adjustment layer over the whole timeline.</span><span class="gi-buy label">shop.gakuyen.com {ARROW}</span></span></a>
+      </div></section>
+    <p class="g-also"><span class="label">Also on the desk</span> {also}</p>
+    <p class="fine">Amazon links are searches for the exact model. <span class="draft">Draft</span> If they become affiliate links, this line will say so.</p>
   </section>"""
-    page("gear", "Gear", "The guitars, amp, camera and studio gear Cooper Delo actually uses.", body, css=("/assets/gear.css",))
-
+    page("gear", "Gear", "The guitars, amp, camera, studio gear and grade Cooper Delo actually uses.", body, css=("/assets/gear.css",))
 
 if __name__ == "__main__":
     work_with_me()

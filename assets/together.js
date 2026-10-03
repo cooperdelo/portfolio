@@ -64,3 +64,16 @@
     document.querySelector("[data-plan-print]").addEventListener("click", () => window.print());
   }
 })();
+
+/* Copy buttons (film planner prompt, and anywhere else a .cb block appears outside the shop). */
+(() => {
+  if (window.__cdCopy) return; window.__cdCopy = true;
+  document.addEventListener("click", async (e) => {
+    const b = e.target.closest(".cp"); if (!b || b.closest("[data-kit]")) return;
+    const pre = b.parentElement.querySelector("pre");
+    try { await navigator.clipboard.writeText(pre.textContent); b.textContent = "Copied"; }
+    catch { const r = document.createRange(); r.selectNodeContents(pre); const s = getSelection(); s.removeAllRanges(); s.addRange(r); b.textContent = "Selected"; }
+    window.cdTrack?.("cta_click", { target: "copy_prompt" });
+    setTimeout(() => (b.textContent = "Copy"), 1600);
+  });
+})();

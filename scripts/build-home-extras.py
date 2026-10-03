@@ -217,9 +217,9 @@ def chapter_product(diagram):
       <ul class="cp-facts"><li><b>Solo</b><span class="label">built by me</span></li><li><b>Sep 23</b><span class="label">live since, 2026</span></li><li><b>5,314</b><span class="label">commits</span></li></ul>
     </div>
     <div class="cp-how">
-      <div class="cp-how-copy"><p class="label">How I built it</p><h3>One folder every Claude reads.</h3><p>Every session starts already knowing my work, and ends by saving what it learned.</p>
+      <div class="cp-how-copy"><p class="label">How I built it</p><h3>One folder every Claude reads.</h3><p>Built from this room. Every session starts already knowing my work, and ends by saving what it learned.</p>
         <div class="acts"><a class="pill" href="/work/ai-system">See the system {ARROW}</a><a class="pill" href="/plugverse">The company</a></div></div>
-      <div class="cp-how-plate">{diagram}</div>
+      <div class="cp-how-plate">{_vid("ai-hero", "16/9", webm=True)}</div>
     </div>
   </section>'''
 

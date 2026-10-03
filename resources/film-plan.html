@@ -4,12 +4,12 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>Film planner / Cooper Delo</title>
-<meta name="description" content="Plan your next film: the questions Cooper Delo answers before he shoots anything." />
+<meta name="description" content="Cooper Delo's seven-question film framework, as one prompt you paste into your AI." />
 <meta name="theme-color" content="#16130F" />
 <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 <link rel="manifest" href="/site.webmanifest" />
 <meta property="og:title" content="Film planner / Cooper Delo" />
-<meta property="og:description" content="Plan your next film: the questions Cooper Delo answers before he shoots anything." />
+<meta property="og:description" content="Cooper Delo's seven-question film framework, as one prompt you paste into your AI." />
 <meta property="og:image" content="https://cooperdelo.com/img/poster-montage-1920-3a4824-1280.jpg" />
 <meta property="og:url" content="https://cooperdelo.com/resources/film-plan" />
 <meta name="twitter:card" content="summary_large_image" />
@@ -18,6 +18,7 @@
 <link rel="preload" href="/fonts/NimbusSans-Bold.woff2" as="font" type="font/woff2" crossorigin />
 <link rel="stylesheet" href="/assets/site.css" />
 <link rel="stylesheet" href="/assets/together.css" />
+<link rel="stylesheet" href="/assets/gear.css" />
 <script>(function(d){var r=d.documentElement;try{if(sessionStorage.getItem('cd-intro'))r.classList.add('seen')}catch(e){}if(matchMedia('(prefers-reduced-motion: reduce)').matches)r.classList.add('rm')})(document)</script>
 </head>
 <body class="page">
@@ -27,27 +28,31 @@
   <nav class="links" aria-label="Primary"><a href="/work"><span class="roll"><span>Work</span><span aria-hidden="true">Work</span></span></a><a href="/resources"><span class="roll"><span>Resources</span><span aria-hidden="true">Resources</span></span></a><a href="/#about"><span class="roll"><span>About</span><span aria-hidden="true">About</span></span></a><a href="/#contact"><span class="roll"><span>Contact</span><span aria-hidden="true">Contact</span></span></a></nav>
 </header>
 <main>
-  <section class="pg-hero light" aria-labelledby="pg-h">
-    <p class="label">Resources / Film planner</p>
-    <h1 id="pg-h" data-hero><span class="line"><span>Get it out</span></span><span class="line"><span>of your head.</span></span></h1>
-    <p class="lede">The questions I answer before I shoot anything. Fill in what matters, download it, and go shoot.</p>
-    <p class="lede">No account and no email. Your notes stay in this browser.</p>
+  <section class="fp-hero dark" aria-labelledby="pg-h">
+    <video class="fp-vid" muted loop playsinline autoplay preload="metadata" poster="/videos/work/launch-film.jpg" aria-hidden="true"><source src="/videos/work/launch-film.mp4" type="video/mp4" /></video>
+    <div class="fp-copy">
+      <p class="label">Resources / Film planner</p>
+      <h1 id="pg-h" data-hero><span class="line"><span>Plan it</span></span><span class="line"><span>in one paste.</span></span></h1>
+      <p class="lede">The seven questions I answer before I shoot anything. Copy the prompt, paste it into ChatGPT or Claude, and it interviews you.</p>
+    </div>
   </section>
-  <section class="planner light" aria-label="Planner">
-    <form data-planner>
-      <section class="q"><div><h2>The actual idea</h2><label for="idea">What happened? What do you want someone to feel?</label><div class="field"><textarea id="idea" name="idea" maxlength="5000" rows="3"></textarea></div></div></section>
-      <section class="q"><div><h2>The first thing we see or hear</h2><label for="opening">Give someone a reason to keep watching.</label><div class="field"><textarea id="opening" name="opening" maxlength="5000" rows="3"></textarea></div></div></section>
-      <section class="q"><div><h2>What are we waiting to find out</h2><label for="question">A real unanswered question, not a vague promise.</label><div class="field"><textarea id="question" name="question" maxlength="5000" rows="3"></textarea></div></div></section>
-      <section class="q"><div><h2>What changes</h2><label for="change">The attempt, complication or detail that moves it forward.</label><div class="field"><textarea id="change" name="change" maxlength="5000" rows="3"></textarea></div></div></section>
-      <section class="q"><div><h2>What the ending gives us</h2><label for="payoff">Answer the question you opened. You don't need a life lesson.</label><div class="field"><textarea id="payoff" name="payoff" maxlength="5000" rows="3"></textarea></div></div></section>
-      <section class="q"><div><h2>What you need to shoot</h2><label for="shots">The action, framing, location and sound. Use what you actually have.</label><div class="field"><textarea id="shots" name="shots" maxlength="5000" rows="3"></textarea></div></div></section>
-      <section class="q"><div><h2>What happens after someone watches</h2><label for="next_step">Come back, see more of your work, try the thing, or just enjoy it.</label><div class="field"><textarea id="next_step" name="next_step" maxlength="5000" rows="3"></textarea></div></div></section>
-    </form>
-    <aside>
-      <div class="acts"><button class="pill" type="button" data-plan-download>Download my plan</button><button class="pill" type="button" data-plan-print>Print</button></div>
-      <p class="note" data-plan-status role="status">Saved in this browser only.</p>
-      <p class="note">Want to see where this goes? <a href="/work/plugverse-launch-film">Watch the launch film</a>.</p>
-    </aside>
+  <section class="fp light" aria-label="The framework">
+    <ol class="fp-steps"><li><span class="label">01</span><b>The actual idea</b><span>What happened? What do you want someone to feel?</span></li><li><span class="label">02</span><b>The first thing we see or hear</b><span>Give someone a reason to keep watching.</span></li><li><span class="label">03</span><b>What are we waiting to find out</b><span>A real unanswered question, not a vague promise.</span></li><li><span class="label">04</span><b>What changes</b><span>The attempt, complication or detail that moves it forward.</span></li><li><span class="label">05</span><b>What the ending gives us</b><span>Answer the question you opened. You don't need a life lesson.</span></li><li><span class="label">06</span><b>What you need to shoot</b><span>The action, framing, location and sound. Use what you actually have.</span></li><li><span class="label">07</span><b>What happens after someone watches</b><span>Come back, see more of your work, try the thing, or just enjoy it.</span></li></ol>
+    <div class="fp-prompt"><p class="label">The prompt</p><div class="cb"><pre>You're helping me plan a short video. Use Cooper Delo's film framework.
+
+Ask me these one at a time, and wait for my answer before the next:
+1. The actual idea. What happened? What do you want someone to feel?
+2. The first thing we see or hear. Give someone a reason to keep watching.
+3. What are we waiting to find out. A real unanswered question, not a vague promise.
+4. What changes. The attempt, complication or detail that moves it forward.
+5. What the ending gives us. Answer the question you opened. You don't need a life lesson.
+6. What you need to shoot. The action, framing, location and sound. Use what you actually have.
+7. What happens after someone watches. Come back, see more of your work, try the thing, or just enjoy it.
+
+Rules: keep my answers in my words. If an answer is vague, ask one follow-up, not five. Never invent details about my life or my footage.
+
+When we're done, give me one page: the idea in one line, the opening shot, the question it holds, what changes, the ending, and a shot list grouped by location (about 10 shots per location, each a different size, height or action).</pre><button type="button" class="cp" aria-label="Copy the prompt">Copy</button></div>
+      <p class="note">This is how the <a href="/work/plugverse-launch-film">PlugVerse launch film</a> got planned.</p></div>
   </section>
 </main>
 <footer class="contact" id="contact">

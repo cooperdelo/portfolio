@@ -457,7 +457,7 @@ def work_grid_page(diagram):
     by = {w["slug"]: w for w in WORK}
     for slug in order:
         if slug == "ai-system":
-            w, href, media = SYSTEM_CARD, "/work/ai-system", f'<span class="wc-sys">{diagram}</span>'
+            w, href, media = SYSTEM_CARD, "/work/ai-system", '<span class="film"><img src="/videos/work/ai-hero.jpg" alt="" loading="lazy" decoding="async" /></span>'
         elif slug == "plugverse":
             w, href, media = COMPANY, "/plugverse", f'<span class="film">{spic("work-poster-plugverse-product", "", "(max-width: 800px) 100vw, 48vw")}</span>'
         else:
@@ -517,14 +517,16 @@ def ai_system_page():
 {NAV}
 <main>
   <section class="as-hero dark" aria-labelledby="as-h">
-    <p class="label">Work / Product / How I built it</p>
-    <h1 id="as-h" data-hero>{lines("One folder")}{lines("every Claude reads.")}</h1>
-    <p class="lede">It's how I built PlugVerse by myself. Every session starts already knowing my work, and ends by saving what it learned.</p>
-    <div class="as-map" aria-label="Claude Code, Claude Cowork, claude.ai and Jev all read and write one folder">
-      <ul class="as-src">{srcs}</ul>
-      <svg class="as-wires" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">{wires}</svg>
-      <div class="as-win"><div class="as-bar"><i></i><i></i><i></i><span>the vault</span></div><ul class="as-tree">{tree}</ul></div>
+    <video class="as-vid" muted loop playsinline autoplay preload="metadata" poster="/videos/work/ai-hero.jpg" aria-hidden="true">
+      <source src="/videos/work/ai-hero.webm" type="video/webm" /><source src="/videos/work/ai-hero.mp4" type="video/mp4" /></video>
+    <div class="as-copy">
+      <p class="label">Work / Product / How I built it</p>
+      <h1 id="as-h" data-hero>{lines("One folder")}{lines("every Claude reads.")}</h1>
+      <p class="lede">It's how I built PlugVerse by myself, from this room. Every session starts already knowing my work, and ends by saving what it learned.</p>
     </div>
+  </section>
+  <section class="as-frames dark" aria-label="Where it happens">
+    {"".join(f'<figure class="{c}"><img src="/img/ai/{k}-1200.webp" srcset="/img/ai/{k}-720.webp 720w, /img/ai/{k}-1200.webp 1200w" sizes="(max-width: 900px) 100vw, 50vw" alt="{alt}" loading="lazy" decoding="async" /></figure>' for k, alt, c in [("desk-wide", "Cooper at his desk, the whole room", "wide"), ("code", "Code on the monitor", ""), ("pc", "The PC under the desk", "")])}
   </section>
   <section class="as-facts dark" aria-label="By the numbers"><ul>{facts}</ul></section>
   <section class="as-steps light" aria-label="How it works"><ol>{steps}</ol></section>
