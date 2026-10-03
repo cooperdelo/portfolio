@@ -1,0 +1,38 @@
+"""One source for what the site shows, so the homepage, /work, /resources and the shop never drift apart.
+
+Pillars are what Cooper does (Films & content, PlugVerse, Music). Resources are what he teaches.
+Every work piece points at the resource that explains how it was made.
+"""
+
+PILLARS = [("films", "Films & content"), ("plugverse", "PlugVerse"), ("music", "Music")]
+
+# slug, title, pillar, line, year, href, media (video name in /videos/work or image path), how-I-made-this resource slug
+WORK_CARDS = [
+    ("chapter-one", "Chapter One", "films", "Junior year, in 33 seconds.", "2026", "/work/chapter-one", ("video", "chapter-one"), "film-plan"),
+    ("plugverse-product", "PlugVerse", "plugverse", "I built it solo. Every show, one link.", "2025/26", "/work/plugverse-product", ("video", "pv-turntable"), "startup"),
+    ("rubber-band", "Rubber Band", "music", "Guitar, and I run the bookings.", "2025", "/work/rubber-band", ("video", "rubber-band"), "music"),
+    ("the-start", "The Start", "films", "I am terrified of starting.", "2026", "/work/the-start", ("video", "the-start"), "film-motion"),
+    ("plugverse-launch-film", "PlugVerse launch film", "plugverse", "My first short film, for my startup's launch.", "2026", "/work/plugverse-launch-film", ("video", "launch-film"), "film-plan"),
+    ("bioswap", "What's your rate?", "plugverse", "A PlugVerse ad, made in code.", "2026", "/work/bioswap", ("video", "bioswap-final"), "startup"),
+    ("flicker-of-time", "Flicker of Time", "music", "My EP. Four songs.", "2024", "https://open.spotify.com/album/5kVO52fF80upZVRJlc84SO", ("image", "/img/chapters/ep-720.webp"), "music"),
+]
+
+# slug, title, line, cover key (/img/res/<key>-600|1200.webp), href, access (free | email | paid)
+RESOURCES = [
+    ("gear", "My setup", "Everything I shoot, play and record with. Always up to date.", "gear", "/gear", "free"),
+    ("film-plan", "Plan a film in one paste", "Seven questions. Your AI asks them, you answer.", "film", "/resources/film-plan", "free"),
+    ("ai-system", "How I built my AI system", "One folder Claude reads before it answers.", "ai", "/resources/ai-system", "email"),
+    ("film-motion", "Film your life with one camera", "Bank ten shots a spot. Use one or two.", "ch1", "/resources/guides/film-motion", "email"),
+    ("linkedin", "LinkedIn posts strangers read", "Score your first line before you write the rest.", "pitch", "/resources/guides/linkedin", "email"),
+    ("instagram-tiktok", "Short videos from your real week", "One week, one topic a day, filmed on Sunday.", "phone", "/resources/guides/instagram-tiktok", "email"),
+    ("music", "Get your band booked", "One booking link, one note per song, a set in minutes.", "stage", "/resources/guides/music", "email"),
+    ("startup", "Shipping PlugVerse solo", "What actually worked, and what didn't.", "pv", "/resources/guides/startup", "free"),
+    ("design-kit", "Sites that don't look like AI", "The references, rules and prompt behind this site.", "code", "/shop/design-kit", "paid"),
+]
+RES = {r[0]: r for r in RESOURCES}
+ACCESS = {"free": "Free", "email": "Free with email", "paid": "Kit"}
+
+
+def res_img(key, alt="", sizes="(max-width: 900px) 100vw, 33vw", eager=False):
+    return (f'<img src="/img/res/{key}-1200.webp" srcset="/img/res/{key}-600.webp 600w, /img/res/{key}-1200.webp 1200w" sizes="{sizes}" '
+            f'alt="{alt}" loading="{"eager" if eager else "lazy"}" decoding="async" />')

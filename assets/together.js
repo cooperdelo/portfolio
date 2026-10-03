@@ -77,3 +77,24 @@
     setTimeout(() => (b.textContent = "Copy"), 1600);
   });
 })();
+
+/* Setup page: the item's picture follows the cursor down the list; the three renders tilt toward the pointer. */
+(() => {
+  const list = document.querySelector("[data-glist]"), img = document.querySelector("[data-gfloat]");
+  const FINE = matchMedia("(hover: hover) and (pointer: fine)").matches, RM = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (list && img && FINE) {
+    let x = 0, y = 0, tx = 0, ty = 0, raf = 0;
+    const loop = () => { x += (tx - x) * 0.18; y += (ty - y) * 0.18; img.style.transform = `translate3d(${x + 36}px, ${y}px, 0) translate(0, -50%)`; raf = requestAnimationFrame(loop); };
+    list.addEventListener("pointermove", (e) => { tx = e.clientX; ty = e.clientY; if (!raf) { x = tx; y = ty; raf = requestAnimationFrame(loop); } });
+    list.querySelectorAll(".gl[data-img]").forEach((a) => {
+      a.addEventListener("pointerenter", () => { img.src = a.dataset.img; img.classList.add("on"); });
+      a.addEventListener("pointerleave", () => img.classList.remove("on"));
+    });
+    list.addEventListener("pointerleave", () => { cancelAnimationFrame(raf); raf = 0; img.classList.remove("on"); });
+  }
+  if (FINE && !RM) document.querySelectorAll("[data-tilt]").forEach((f) => {
+    f.addEventListener("pointermove", (e) => { const r = f.getBoundingClientRect(); const px = (e.clientX - r.left) / r.width - 0.5, py = (e.clientY - r.top) / r.height - 0.5;
+      f.style.setProperty("--rx", (-py * 8).toFixed(2) + "deg"); f.style.setProperty("--ry", (px * 10).toFixed(2) + "deg"); });
+    f.addEventListener("pointerleave", () => { f.style.setProperty("--rx", "0deg"); f.style.setProperty("--ry", "0deg"); });
+  });
+})();

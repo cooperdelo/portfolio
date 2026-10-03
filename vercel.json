@@ -11,6 +11,46 @@
       "source": "/world/:path*",
       "destination": "/",
       "permanent": false
+    },
+    {
+      "source": "/work/ai-system",
+      "destination": "/resources/ai-system",
+      "permanent": false
+    },
+    {
+      "source": "/work-with-me",
+      "destination": "/#contact",
+      "permanent": false
+    },
+    {
+      "source": "/rubber-band",
+      "destination": "/work/rubber-band",
+      "permanent": false
+    },
+    {
+      "source": "/athletic",
+      "destination": "/",
+      "permanent": false
+    },
+    {
+      "source": "/builder",
+      "destination": "/",
+      "permanent": false
+    },
+    {
+      "source": "/cover",
+      "destination": "/",
+      "permanent": false
+    },
+    {
+      "source": "/lens",
+      "destination": "/",
+      "permanent": false
+    },
+    {
+      "source": "/now",
+      "destination": "/",
+      "permanent": false
     }
   ],
   "crons": [

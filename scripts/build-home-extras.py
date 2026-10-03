@@ -252,3 +252,60 @@ def take2():
 
 def chapters(records_html, diagram):
     return "\n  ".join([chapter_index(), chapter_films(), chapter_motion(), chapter_product(diagram), chapter_music(records_html), take2()])
+
+
+# ---------------------------------------------------------------- four doors (plan 2026-10-03): Work, Resources, Shop, Contact
+import sys as _sys, pathlib as _pl
+_sys.path.insert(0, str(_pl.Path(__file__).resolve().parent))
+from site_data import PILLARS, WORK_CARDS, RESOURCES, RES, ACCESS, res_img  # noqa: E402
+
+
+def _work_media(kind, val):
+    if kind == "video":
+        webm = f' data-webm="/videos/work/{val}.webm"' if val in ("bioswap-final", "pv-turntable") else ""
+        return (f'<img class="wk-poster" src="/videos/work/{val}.jpg" alt="" loading="lazy" decoding="async" />'
+                f'<video class="wk-vid" muted loop playsinline preload="none" data-src="/videos/work/{val}.mp4"{webm} aria-hidden="true"></video>')
+    return f'<img class="wk-poster" src="{val}" alt="" loading="lazy" decoding="async" />'
+
+
+def work_grid(heading=True, limit=None):
+    """Selected work, Gaku-style: tall cards, video on hover, filter chips by pillar."""
+    names = dict(PILLARS)
+    cards = []
+    for slug, title, pillar, line, year, href, (kind, val), how in WORK_CARDS[:limit]:
+        ext = href.startswith("http")
+        cards.append(f'''<li data-pillar="{pillar}"><a class="wk" href="{href}"{' target="_blank" rel="noreferrer"' if ext else " data-handoff"}>
+        <span class="wk-media">{_work_media(kind, val)}</span>
+        <span class="wk-chip label">{names[pillar]}</span>
+        <span class="wk-cap"><b>{title}</b><span>{line}</span><span class="label">{year} {ARROW}</span></span></a></li>''')
+    chips = '<button type="button" class="on" data-f="all">All</button>' + "".join(f'<button type="button" data-f="{k}">{n}</button>' for k, n in PILLARS)
+    head = f'''<div class="wk-head"><h2 class="wk-h" data-rv><span class="line"><span>Selected work</span></span></h2>
+      <div class="wk-chips label" role="group" aria-label="Filter work">{chips}</div></div>''' if heading else f'<div class="wk-head"><div class="wk-chips label" role="group" aria-label="Filter work">{chips}</div></div>'
+    return f'''<section class="wkg light" id="work" aria-label="Selected work" data-workgrid>
+    {head}
+    <ol class="wk-grid">{"".join(cards)}</ol>
+  </section>'''
+
+
+def res_bento(heading=True, limit=None, exclude=()):
+    """Resources as a bento of real covers (ref: Interactive Bento Gallery)."""
+    items = [r for r in RESOURCES if r[0] not in exclude][:limit]
+    cards = "".join(f'''<li class="rb-{i}"><a class="rb" href="{href}">{res_img(key)}
+        <span class="rb-cap"><span class="label">{ACCESS[acc]}</span><b>{title}</b><span>{line}</span></span><span class="rb-go">{ARROW}</span></a></li>'''
+                    for i, (slug, title, line, key, href, acc) in enumerate(items))
+    head = f'''<div class="rb-head"><h2 data-rv><span class="line"><span>Curated insights</span></span><span class="line"><span>&amp; creative resources</span></span></h2>
+      <p>How I actually make things. Copy what helps, skip what doesn't. <a href="/resources">See all {ARROW}</a></p></div>''' if heading else ""
+    return f'''<section class="rbs light" aria-label="Resources">
+    {head}
+    <ol class="rb-grid{" n" + str(len(items)) if limit else ""}">{cards}</ol>
+  </section>'''
+
+
+def shop_teaser():
+    d = RES["design-kit"]
+    return f'''<section class="sht dark" aria-labelledby="sht-h">
+    <a class="sht-card" href="/shop">
+      <span class="sht-media">{res_img(d[3], "", "(max-width: 900px) 100vw, 60vw")}</span>
+      <span class="sht-copy"><span class="label">Shop</span><b id="sht-h">Tools I made for my own work.</b><span>Kits, prompts and templates. Try every one before you get it.</span><span class="pill">Open the shop {ARROW}</span></span>
+    </a>
+  </section>'''

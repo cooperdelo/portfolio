@@ -31,7 +31,7 @@ SHOP_FOOT = f"""<footer class="sh-foot">
   <p class="sh-big" aria-hidden="true">Shop</p>
   <div class="sh-cols label">
     <span>&copy; 2026 Cooper Delo</span>
-    <nav aria-label="Elsewhere"><a href="/">Portfolio</a><a href="/resources">Free resources</a><a href="/work-with-me">Work with me</a><a href="/privacy">Privacy</a><a href="/terms">Terms</a></nav>
+    <nav aria-label="Elsewhere"><a href="/">Portfolio</a><a href="/resources">Free resources</a><a href="/#contact">Contact</a><a href="/privacy">Privacy</a><a href="/terms">Terms</a></nav>
     <span>Payments by Stripe. Tax calculated at checkout.</span>
   </div>
 </footer>"""
@@ -295,4 +295,3 @@ if __name__ == "__main__":
     design_kit()
     for s in ["ai-system", "linkedin", "instagram-tiktok", "film-motion", "music", "startup"]:
         guide(s)
-    resources_shelf()

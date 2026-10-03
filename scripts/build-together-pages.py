@@ -39,7 +39,7 @@ def page(path, title, desc, body, og="https://cooperdelo.com/img/poster-montage-
 <header class="nav label">
   <a class="mark" href="/" aria-label="Cooper Delo, home"><span class="roll"><span>Cooper Delo</span><span aria-hidden="true">Cooper Delo</span></span></a>
   <span class="where">Chapel Hill, NC&nbsp;&nbsp;<span data-clock>--:--</span> ET</span>
-  <nav class="links" aria-label="Primary"><a href="/work"><span class="roll"><span>Work</span><span aria-hidden="true">Work</span></span></a><a href="/resources"><span class="roll"><span>Resources</span><span aria-hidden="true">Resources</span></span></a><a href="/#about"><span class="roll"><span>About</span><span aria-hidden="true">About</span></span></a><a href="/#contact"><span class="roll"><span>Contact</span><span aria-hidden="true">Contact</span></span></a></nav>
+  <nav class="links" aria-label="Primary"><a href="/work"><span class="roll"><span>Work</span><span aria-hidden="true">Work</span></span></a><a href="/resources"><span class="roll"><span>Resources</span><span aria-hidden="true">Resources</span></span></a><a href="/shop"><span class="roll"><span>Shop</span><span aria-hidden="true">Shop</span></span></a><a href="#contact" data-contact><span class="roll"><span>Contact</span><span aria-hidden="true">Contact</span></span></a></nav>
 </header>
 <main>
 {body}
@@ -69,6 +69,7 @@ def page(path, title, desc, body, og="https://cooperdelo.com/img/poster-montage-
 <script src="/assets/lenis.min.js" defer></script>
 <script src="/assets/site.js" defer></script>
 <script src="/assets/beacon.js" defer></script>
+<script src="/assets/contact.js" defer></script>
 <script src="/assets/together.js" defer></script>
 </body>
 </html>
@@ -156,58 +157,16 @@ PROMPTS = [
 
 
 def resources():
-    sheet = "".join(f"<li><span>{h}</span><i></i><i></i></li>" for h, _, _ in PROMPTS)
-    body = f"""  <section class="pg-hero light" aria-labelledby="pg-h">
+    """Gaku's 'Curated insights & creative resources': every resource as a real cover, newest first."""
+    import runpy
+    ex = runpy.run_path(str(ROOT / "scripts" / "build-home-extras.py"))
+    body = f"""  <section class="pg-hero light rs-hero" aria-labelledby="pg-h">
     <p class="label">Resources</p>
-    <h1 id="pg-h" data-hero><span class="line"><span>Take what</span></span><span class="line"><span>helps.</span></span></h1>
-    <p class="lede">Things I actually use, cleaned up so you can use them too. One is ready. One I'm still pulling apart.</p>
+    <h1 id="pg-h" data-hero><span class="line"><span>Curated insights</span></span><span class="line"><span>&amp; resources.</span></span></h1>
+    <p class="lede">How I actually make things: films, content, the band, PlugVerse, the system behind it. Copy what helps. Nothing to sign up for unless you want the deep ones.</p>
   </section>
-  <section class="shelf light" aria-label="Resources">
-    <article class="res res-wide" data-rv>
-      <div class="top label"><span class="state live">Ready, free</span><span>Updated Oct 2026</span></div>
-      <a class="plate rig-mini" href="/gear" aria-label="Open the gear page">
-        <span class="rm-end">Tele or PRS</span><span class="rm-pod"><i class="off">Amp</i><i>EQ</i><i>Screamer</i><i>Chorus</i><i>Delay</i><i>Reverb</i></span><span class="rm-end">Marshall DSL40CR</span>
-      </a>
-      <h2>Gear</h2>
-      <p>The guitars, amp, camera and studio gear I actually use, with the Pod Go chain I run into the Marshall.</p>
-      <div class="acts"><a class="pill" href="/gear">See the gear {ARROW}</a></div>
-    </article>
-    <article class="res" data-rv>
-      <div class="top label"><span class="state live">Ready, free</span><span>No email needed</span></div>
-      <div class="plate desk">
-        <div class="sheet" aria-label="What the planner asks">
-          <p class="sheet-h">My film plan</p>
-          <ol>{sheet}</ol>
-          <p class="sheet-foot label">cooperdelo.com/resources/film-plan</p>
-        </div>
-        <figure class="taped"><img src="/img/p-launch-film-640.webp" width="640" height="360" alt="A still from the PlugVerse launch film" loading="lazy" decoding="async" /><figcaption>PlugVerse launch film</figcaption></figure>
-      </div>
-      <h2>Film planner</h2>
-      <p>The questions I answer before I shoot anything. Fill them in, it saves in your browser, and you can download or print the plan when you're done.</p>
-      <div class="acts"><a class="pill" href="/resources/film-plan">Open the planner {ARROW}</a></div>
-    </article>
-    <article class="res" data-rv>
-      <div class="top label"><span class="state">In progress</span><span>Not ready yet</span></div>
-      <div class="plate anatomy">
-        <picture><source type="image/webp" srcset="/img/resources/motion-anatomy-720.webp 720w, /img/resources/motion-anatomy-1200.webp 1200w" sizes="(max-width: 900px) 92vw, 46vw" /><img src="/img/resources/motion-anatomy-720.webp" width="720" height="720" alt="A frame from Bioswap: a glass music card floating over a blurred band page" loading="lazy" decoding="async" /></picture>
-        <span class="pin r" style="--x:96%;--y:80%"><b>Glass card</b>blur, lit top edge, soft inner shadow</span>
-        <span class="pin r" style="--x:96%;--y:5%"><b>Depth</b>the page stays behind it, out of focus</span>
-        <span class="pin" style="--x:4%;--y:5%"><b>One camera</b>the whole scene moves, never a cut</span>
-        <span class="wip label">What I'm pulling out</span>
-      </div>
-      <h2>Motion starter</h2>
-      <p>The camera rig, the glass cards and the spring timings from Bioswap, pulled out so you can drop them into your own Remotion project. I'm still building it, so there's nothing to download yet.</p>
-      <div class="acts"><a class="pill" href="mailto:cooper@plugverse.app?subject=Motion%20starter">Email me when it's ready</a><a class="pill" href="/#motion">How Bioswap moves</a></div>
-      <p class="fine">That button just opens an email to me. There's no mailing list behind it.</p>
-    </article>
-  </section>
-  <section class="side light" aria-labelledby="side-h">
-    <p class="label">Booking your own shows</p>
-    <h2 id="side-h" data-rv><span class="line"><span>In a band?</span></span></h2>
-    <p>I use PlugVerse for my band's gigs. When someone reaches out, I send an offer with the event details. They accept and sign in the same place.</p>
-    <div class="acts"><a class="pill" href="{PV}" target="_blank" rel="noreferrer">See PlugVerse {ARROW}</a></div>
-  </section>"""
-    page("resources/index", "Resources", "Things Cooper Delo uses, cleaned up so you can use them too.", body)
+  {ex["res_bento"](heading=False)}"""
+    page("resources/index", "Resources", "How Cooper Delo actually makes things: films, content, music, PlugVerse and the AI system behind it.", body, css=("/assets/doors.css",))
 
 
 def film_plan():
@@ -277,41 +236,33 @@ def gimg(key, alt, sizes="(max-width: 700px) 90vw, 30vw"):
 
 
 def gear():
-    groups = []
+    """Concise: a hero, three rendered pieces, then one list of everything (ref: services list with a hover image)."""
+    feat = [("rig-marshall", "Marshall DSL40CR", "The amp. All tubes."), ("rig-prs", "PRS Custom 24-08", "Big classic-rock leads."), ("rig-pedals", "Line 6 Pod Go", "Pedals only, amp block off.")]
+    feats = "".join(f'''<figure class="gf" data-tilt><span class="gf-img">{gimg(k, n, "(max-width: 900px) 90vw, 32vw")}</span><figcaption><b>{n}</b><span>{d}</span></figcaption></figure>''' for k, n, d in feat)
+    rows = []
     for cat, slug, items in GEAR:
-        cards = "".join(f'''<li><a class="gi" href="{url}" target="_blank" rel="noreferrer sponsored">
-          <span class="gi-img">{gimg(key, name)}</span>
-          <span class="gi-cap"><b>{name}</b><span>{note}</span><span class="gi-buy label">Amazon {ARROW}</span></span></a></li>''' for key, name, note, url in items)
-        groups.append(f'<section class="gg2 g-{slug}" data-rv><p class="label">{cat}</p><ul class="n{len(items)}">{cards}</ul></section>')
-    also = " · ".join(f'<a href="{u}" target="_blank" rel="noreferrer sponsored">{n}</a>' for n, u in ALSO)
+        rows.append(f'<li class="gl-cat label">{cat}</li>')
+        rows += [f'''<li><a class="gl" href="{url}" target="_blank" rel="noreferrer sponsored" data-img="/img/gear/{key}-480.webp"><b>{name}</b><span>{note}</span><i class="label">Amazon {ARROW}</i></a></li>''' for key, name, note, url in items]
+    rows.append('<li class="gl-cat label">Color and edit</li>')
+    rows.append(f'''<li><a class="gl" href="https://www.blackmagicdesign.com/products/davinciresolve" target="_blank" rel="noreferrer" data-img="/videos/work/chapter-one.jpg"><b>DaVinci Resolve Studio</b><span>Every film on this site is cut and graded here.</span><i class="label">Blackmagic {ARROW}</i></a></li>''')
+    rows.append(f'''<li><a class="gl" href="https://shop.gakuyen.com/products/odyssey-powergrade" target="_blank" rel="noreferrer" data-img="/videos/work/the-start.jpg"><b>Odyssey PowerGrade</b><span>Gaku's grade, on one adjustment layer.</span><i class="label">shop.gakuyen.com {ARROW}</i></a></li>''')
+    rows.append('<li class="gl-cat label">Also on the desk</li>')
+    rows += [f'<li><a class="gl" href="{u}" target="_blank" rel="noreferrer sponsored"><b>{n}</b><span></span><i class="label">Amazon {ARROW}</i></a></li>' for n, u in ALSO]
     body = f"""  <section class="gh dark" aria-labelledby="pg-h">
     <video class="gh-vid" muted loop playsinline autoplay preload="metadata" poster="/videos/work/gear-hero.jpg" aria-hidden="true">
       <source src="/videos/work/gear-hero.webm" type="video/webm" /><source src="/videos/work/gear-hero.mp4" type="video/mp4" /></video>
-    <div class="gh-copy"><p class="label">Gear</p>
-      <h1 id="pg-h" data-hero><span class="line"><span>What I</span></span><span class="line"><span>play through.</span></span></h1>
-      <p class="lede">The rig behind Rubber Band, the camera behind the films, the desk I make it all at.</p></div>
+    <div class="gh-copy"><p class="label">Resources / Setup · always up to date</p>
+      <h1 id="pg-h" data-hero><span class="line"><span>My setup.</span></span></h1>
+      <p class="lede">Everything I shoot, play and record with, in one place.</p></div>
   </section>
-  <section class="chain2 dark" aria-labelledby="chain-h">
-    <p class="label" id="chain-h">The live rig</p>
-    <div class="c2">
-      <figure><span>{gimg("tele", "Telecaster")}</span><figcaption><b>Tele or PRS</b></figcaption></figure>
-      <i aria-hidden="true">{ARROW}</i>
-      <figure><span>{gimg("rig-pedals", "Line 6 Pod Go")}</span><figcaption><b>Pod Go</b><span>EQ · Screamer · Chorus · Delay · Reverb. Amp block off.</span></figcaption></figure>
-      <i aria-hidden="true">{ARROW}</i>
-      <figure><span>{gimg("rig-marshall", "Marshall DSL40CR")}</span><figcaption><b>Marshall DSL40CR</b><span>The tube amp is the tone.</span></figcaption></figure>
-    </div>
-  </section>
-  <section class="kit2 light" aria-label="Everything I use">
-    {"".join(groups)}
-    <section class="gg2 g-color" data-rv><p class="label">Color and edit</p>
-      <div class="gc">
-        <a class="gc-card" href="https://www.blackmagicdesign.com/products/davinciresolve" target="_blank" rel="noreferrer"><span class="gc-img"><img src="/videos/work/chapter-one.jpg" alt="A frame from Chapter One, graded in Resolve" loading="lazy" /></span><span class="gi-cap"><b>DaVinci Resolve Studio</b><span>Every film on this site is cut and graded here.</span><span class="gi-buy label">Blackmagic {ARROW}</span></span></a>
-        <a class="gc-card" href="https://shop.gakuyen.com/products/odyssey-powergrade" target="_blank" rel="noreferrer"><span class="gc-img"><img src="/videos/work/the-start.jpg" alt="A frame from The Start" loading="lazy" /></span><span class="gi-cap"><b>Odyssey PowerGrade</b><span>Gaku's grade. One adjustment layer over the whole timeline.</span><span class="gi-buy label">shop.gakuyen.com {ARROW}</span></span></a>
-      </div></section>
-    <p class="g-also"><span class="label">Also on the desk</span> {also}</p>
+  <section class="gfs dark" aria-label="The rig">{feats}</section>
+  <section class="gls light" aria-label="Everything I use">
+    <ul class="gl-list" data-glist>{"".join(rows)}</ul>
     <p class="fine">Amazon links are searches for the exact model. <span class="draft">Draft</span> If they become affiliate links, this line will say so.</p>
+    <img class="gl-float" data-gfloat alt="" aria-hidden="true" />
   </section>"""
-    page("gear", "Gear", "The guitars, amp, camera, studio gear and grade Cooper Delo actually uses.", body, css=("/assets/gear.css",))
+    page("gear", "My setup", "The guitars, amp, camera, studio gear and grade Cooper Delo actually uses.", body, css=("/assets/gear.css",))
+
 
 if __name__ == "__main__":
     work_with_me()
