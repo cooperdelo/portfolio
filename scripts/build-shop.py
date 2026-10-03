@@ -257,7 +257,11 @@ GUIDE_DEMO = {"linkedin": demo_linkedin, "music": demo_music, "ai-system": demo_
 def guide(slug):
     demo = GUIDE_DEMO.get(slug)
     demo_html = f'<section class="gd-demo" aria-label="Try it">{demo()}</section>' if demo else ""
-    body = f"""  <section class="gd-hero light" data-kit="{slug}" aria-labelledby="gd-h">
+    sys.path.insert(0, str(ROOT / "scripts"))
+    from site_data import RES
+    cover = RES[slug][3] if slug in RES else "film"
+    body = f"""  <section class="gd-hero gd-cover dark" data-kit="{slug}" aria-labelledby="gd-h">
+    <img class="gd-bg" src="/img/res/{cover}-1200.webp" srcset="/img/res/{cover}-600.webp 600w, /img/res/{cover}-1200.webp 1200w" sizes="100vw" alt="" aria-hidden="true" />
     <a class="kp-back label" href="/resources">{ARROW} Resources</a>
     <p class="label" data-k-pillar>&nbsp;</p>
     <h1 id="gd-h" data-k-title>&nbsp;</h1>
@@ -284,7 +288,7 @@ def guide(slug):
     </div>
   </div>
   <div class="gd-bar" data-gate-bar hidden><span data-bar-count></span><button type="button" class="pill solid" data-gm-open>Unlock free {ARROW}</button></div>"""
-    page(f"resources/guides/{slug}", "Guide", "A free guide from Cooper Delo.", body, css=("/assets/together.css", "/assets/shop.css"), shop=False)
+    page(f"resources/guides/{slug}", "Guide", "A free guide from Cooper Delo.", body, css=("/assets/together.css", "/assets/shop.css", "/assets/shop-v2.css"), shop=False)
 
 def resources_shelf():
     """Add a Guides shelf to /resources (QA only), drawn from /api/kit at runtime."""
