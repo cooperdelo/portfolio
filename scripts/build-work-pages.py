@@ -574,7 +574,7 @@ if __name__ == "__main__":
             .replace("{FRAMES}", frames_block()).replace("{FOOTER}", footer("home-footer")).replace("{ABOUTPIC}", spic("home-about", "Cooper Delo on the lawn at dusk", "(max-width: 900px) 100vw, 40vw")).replace("{SCRIPTS}", SCRIPTS)
             .replace("{CAL}", CAL).replace("{ARROW}", ARROW))
     extras = runpy.run_path(str(ROOT / "scripts/build-home-extras.py"))
-    page = (page.replace("{WORKGRID}", extras["work_grid"]()).replace("{RECORDS}", extras["records"]()).replace("{RESOURCES}", extras["res_bento"](limit=5)).replace("{SHOP}", extras["shop_teaser"]()).replace("{STRIP}", extras["strip"](frames_block()))
+    page = (page.replace("{WORKGRID}", extras["work_grid"](home=True)).replace("{RECORDS}", extras["records"]()).replace("{RESOURCES}", extras["res_bento"](limit=5)).replace("{SHOP}", extras["shop_teaser"]()).replace("{STRIP}", extras["strip"](frames_block()))
             .replace("</head>", '<link rel="stylesheet" href="/assets/showcase.css" />\n<link rel="stylesheet" href="/assets/doors.css" />\n<link rel="stylesheet" href="/assets/records.css" />\n<link rel="stylesheet" href="/assets/album-viewer.css" />\n</head>', 1)
             .replace('<script src="/assets/site.js" defer></script>', '<script src="/assets/site.js" defer></script>\n<script src="/assets/doors.js" defer></script>\n<script src="/assets/records.js" defer></script>', 1))
     (ROOT / "index.html").write_text(page, encoding="utf-8")

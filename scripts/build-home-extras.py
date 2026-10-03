@@ -55,6 +55,8 @@ def records():
     for a in ALBUMS:  # not a ranking, so no numbers
         s = a["slug"]
         own = a.get("own")
+        if own:  # Cooper's 2024 EP stays off the homepage (ruling 2026-10-03)
+            continue
         items.append(
             f'<li class="rx{" mine" if own else ""}" data-slug="{s}" data-title="{a["title"]}">'
             f'<button class="rx-hit" type="button" aria-haspopup="dialog" aria-label="Open {a["title"]}, {a["artist"]}, {a["year"]}">'
@@ -67,7 +69,7 @@ def records():
     # the copy is hidden from screen readers and keyboard.
     copy = [i.replace('<li class="rx', '<li aria-hidden="true" class="rx', 1).replace('<button class="rx-hit" type="button"', '<button class="rx-hit" type="button" tabindex="-1"', 1) for i in items]
     return f"""<section class="records dark" aria-labelledby="rx-h">
-    <div class="rx-head"><p class="label" id="rx-h">On repeat</p><p class="rx-sub">A few records I come back to, and one of mine. <span class="rx-tag">Pick one</span></p></div>
+    <div class="rx-head"><p class="label" id="rx-h">On repeat</p><p class="rx-sub">A few records I come back to. <span class="rx-tag">Pick one</span></p></div>
     <div class="rx-belt" data-records><ol class="rx-track">
       {(chr(10) + "      ").join(items + copy)}
     </ol></div>
@@ -267,16 +269,27 @@ def _work_media(kind, val):
     return f'<img class="wk-poster" src="{val}" alt="" loading="lazy" decoding="async" />'
 
 
-def work_grid(heading=True, limit=None):
-    """Selected work, Gaku-style: tall cards, video on hover, filter chips by pillar."""
+# The homepage shows one piece per thing Cooper does, in one screen. Everything else lives on /work.
+HOME_WORK = ("chapter-one", "plugverse-product", "the-start", "rubber-band")
+
+
+def work_grid(heading=True, limit=None, home=False):
+    """Selected work, Gaku-style: tall cards, video on hover. /work gets filter chips by pillar; the homepage gets four."""
     names = dict(PILLARS)
     cards = []
-    for slug, title, pillar, line, year, href, (kind, val), how in WORK_CARDS[:limit]:
+    items = [w for s in HOME_WORK for w in WORK_CARDS if w[0] == s] if home else WORK_CARDS[:limit]
+    for slug, title, pillar, line, year, href, (kind, val), how in items:
         ext = href.startswith("http")
         cards.append(f'''<li data-pillar="{pillar}"><a class="wk" href="{href}"{' target="_blank" rel="noreferrer"' if ext else " data-handoff"}>
         <span class="wk-media">{_work_media(kind, val)}</span>
         <span class="wk-chip label">{names[pillar]}</span>
         <span class="wk-cap"><b>{title}</b><span>{line}</span><span class="label">{year} {ARROW}</span></span></a></li>''')
+    if home:
+        return f'''<section class="wkg wkg-home light" id="work" aria-labelledby="wk-h">
+    <div class="wk-head"><h2 class="wk-h" id="wk-h" data-rv><span class="line"><span>Selected work</span></span></h2>
+      <a class="wk-all label" href="/work">All work {ARROW}</a></div>
+    <ol class="wk-grid">{"".join(cards)}</ol>
+  </section>'''
     chips = '<button type="button" class="on" data-f="all">All</button>' + "".join(f'<button type="button" data-f="{k}">{n}</button>' for k, n in PILLARS)
     head = f'''<div class="wk-head"><h2 class="wk-h" data-rv><span class="line"><span>Selected work</span></span></h2>
       <div class="wk-chips label" role="group" aria-label="Filter work">{chips}</div></div>''' if heading else f'<div class="wk-head"><div class="wk-chips label" role="group" aria-label="Filter work">{chips}</div></div>'

@@ -83,3 +83,23 @@
 /* Full resources page (9 covers): the last row fills edge to edge instead of leaving a hole. */
 .rbs .rb-grid:not([class*=" n"]) .rb-8 { grid-column: span 2; }
 @media (min-width: 901px) { .rbs .rb-grid:not([class*=" n"]) .rb-7 { grid-column: span 2; } }
+/* Homepage: four pieces, one row, the whole section in one screen. */
+.wkg-home { padding-block: clamp(56px, 9vh, 96px); }
+.wkg-home .wk-h { font-size: clamp(34px, 5.4vw, 96px); }
+.wk-all { display: inline-flex; align-items: center; gap: 8px; padding-bottom: 3px; border-bottom: 1px solid currentColor; }
+.wk-all svg { width: 12px; height: 12px; transition: transform .5s var(--ease); }
+.wk-all:hover svg { transform: translateX(4px); }
+.wkg-home .wk-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.wkg-home .wk-grid > li:first-child:not(.out) { grid-column: auto; }
+.wkg-home .wk, .wkg-home .wk-grid > li:first-child .wk { aspect-ratio: 4 / 5; max-height: calc(100svh - 300px); width: 100%; }
+.wkg-home .wk-cap { grid-template-columns: minmax(0, 1fr); }
+.wkg-home .wk-cap b, .wkg-home .wk-grid > li:first-child .wk-cap b { font-size: clamp(18px, 1.9vw, 32px); }
+.wkg-home .wk-cap .label { grid-column: 1; grid-row: auto; }
+@media (max-width: 900px) {
+  .wkg-home .wk-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .wkg-home .wk, .wkg-home .wk-grid > li:first-child .wk { aspect-ratio: 4 / 5; max-height: none; }
+  .wkg-home .wk-cap > span:not(.label) { display: none; }
+  .wkg-home .wk-chip { left: 10px; top: 10px; font-size: 9px; }
+  .wkg-home .wk-cap b, .wkg-home .wk-grid > li:first-child .wk-cap b { font-size: clamp(12px, 3.7vw, 20px); }
+  .wkg-home .wk-cap { left: 12px; right: 12px; bottom: 12px; }
+}

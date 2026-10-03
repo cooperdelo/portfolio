@@ -19,7 +19,7 @@ audio.preload = "none";
 let raf = 0, last = 0, introT = 1;
 
 async function loadData() {
-  if (!data) data = await (await fetch("/content/records.json")).json();
+  if (!data) data = (await (await fetch("/content/records.json")).json()).filter((r) => !r.own);
   return data;
 }
 
