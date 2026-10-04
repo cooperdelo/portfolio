@@ -97,7 +97,7 @@ export default async function handler(req, res) {
       return res.status(200).json({
         you: who.n,
         gigs: pile || [...new Set(all.map((a) => a.gig))],
-        clips: assets.map((a) => ({ id: a.id, name: a.name, gig: a.gig, kind: photo(a) ? 'photo' : 'video', duration: a.duration, url: drive(a.preview_drive_id) || urls[a.proxy_path] || null, poster: photo(a) ? null : drive(a.poster_drive_id) || (a.proxy_path && urls[poster(a.proxy_path)]) || null })),
+        clips: assets.map((a) => ({ id: a.id, name: a.name, gig: a.gig, kind: photo(a) ? 'photo' : 'video', duration: a.duration, url: drive(a.preview_drive_id) || urls[a.proxy_path] || null, poster: drive(a.poster_drive_id) || (!photo(a) && a.proxy_path && urls[poster(a.proxy_path)]) || null })),
         marks: reviews.filter((r) => ids.has(r.asset_id)).map((r) => mark(r)),
       });
     }
@@ -108,9 +108,10 @@ export default async function handler(req, res) {
       || [shot, subject].some((t) => t !== null && (typeof t !== 'string' || !TAG.test(t)))) return res.status(400).json({ error: 'Something in that save looks off.' });
     for (const n of [start, end]) if (n !== null && (typeof n !== 'number' || !Number.isFinite(n) || n < 0)) return res.status(400).json({ error: 'Bad trim time.' });
     if ((start === null) !== (end === null) || (start !== null && end <= start)) return res.status(400).json({ error: 'The trim end has to come after the start.' });
-    const a = (await assetsQ('gig,mime_type', 'gig', `id=eq.${asset}`))[0];
+    const a = (await assetsQ('gig,mime_type,duration', 'gig', `id=eq.${asset}`))[0];
     if (!a) return res.status(404).json({ error: 'That clip is not there anymore.' });
     if (pile && !pile.includes(a.gig)) return res.status(403).json({ error: 'That clip is not in your link.' });
+    if (a.duration > 0 && end > a.duration + 0.5) return res.status(400).json({ error: 'The trim runs past the end of the clip.' });
     if (photo(a) && start !== null) return res.status(400).json({ error: 'Photos cannot be trimmed.' });
     const row = { verdict: VERDICTS[verdict], note, trim_start: start, trim_end: end, revision: revision + 1, updated_at: new Date().toISOString(), updated_by: who.n, use_band: band, use_broll: broll, shot, subject };
     const send = async (r) => {

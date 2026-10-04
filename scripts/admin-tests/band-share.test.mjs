@@ -19,7 +19,7 @@ const A2 = '22222222-2222-4222-8222-222222222222';
 const A3 = '33333333-3333-4333-8333-333333333333';
 const ASSETS = [
   { id: A1, name: 'a.mp4', gig: 'Chi Phi', duration: 10, mime_type: 'video/mp4', proxy_path: 'x/a.mp4', preview_drive_id: 'DRV1', poster_drive_id: null },
-  { id: A2, name: 'b.jpg', gig: 'Chi Phi', duration: null, mime_type: 'image/jpeg', proxy_path: null, preview_drive_id: 'DRV2', poster_drive_id: null },
+  { id: A2, name: 'b.jpg', gig: 'Chi Phi', duration: null, mime_type: 'image/jpeg', proxy_path: null, preview_drive_id: 'DRV2', poster_drive_id: 'THUMB2' },
   { id: A3, name: 'c.mp4', gig: 'Kappa', duration: 5, mime_type: 'video/mp4', proxy_path: 'y/c.mp4', preview_drive_id: null, poster_drive_id: null },
 ];
 
@@ -140,7 +140,7 @@ test('GET returns only the pile, with Drive urls when the key exists and Supabas
   assert.deepEqual(r.body.clips.map((c) => [c.id, c.kind]), [[A1, 'video'], [A2, 'photo']]);
   assert.equal(r.body.clips[0].url, 'https://www.googleapis.com/drive/v3/files/DRV1?alt=media&key=KEY123');
   assert.match(r.body.clips[0].poster, /\/sign\/x\/poster\.jpg$/);
-  assert.equal(r.body.clips[1].poster, null);
+  assert.match(r.body.clips[1].poster, /files\/THUMB2\?alt=media/);
   assert.deepEqual(r.body.marks.map((m) => m.asset), [A1]);
   assert.equal(r.body.marks[0].band, true);
   const all = await call({ query: { k: makeLink('Jake') } });
@@ -179,4 +179,9 @@ test('owner lists gigs and mints a pile-limited link', () => withFake(async () =
   const every = await call({ query: { mint: 'Jake' }, headers: h });
   assert.equal(readLink(new URL(every.body.url).searchParams.get('k')).g, undefined);
   assert.deepEqual(every.body.gigs, ['Chi Phi', 'Kappa']);
+}));
+
+test('a trim cannot run past the clip duration', () => withFake(async () => {
+  assert.equal((await post({ start: 1, end: 11 })).code, 400);
+  assert.equal((await post({ start: 1, end: 10.4 })).code, 200);
 }));
