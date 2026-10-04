@@ -140,7 +140,7 @@ test('GET returns only the pile, with Drive urls when the key exists and Supabas
   assert.deepEqual(r.body.clips.map((c) => [c.id, c.kind]), [[A1, 'video'], [A2, 'photo']]);
   assert.equal(r.body.clips[0].url, 'https://www.googleapis.com/drive/v3/files/DRV1?alt=media&key=KEY123');
   assert.match(r.body.clips[0].poster, /\/sign\/x\/poster\.jpg$/);
-  assert.match(r.body.clips[1].poster, /files/THUMB2?alt=media/);
+  assert.match(r.body.clips[1].poster, /files\/THUMB2\?alt=media/);
   assert.deepEqual(r.body.marks.map((m) => m.asset), [A1]);
   assert.equal(r.body.marks[0].band, true);
   const all = await call({ query: { k: makeLink('Jake') } });
