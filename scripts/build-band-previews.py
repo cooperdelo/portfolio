@@ -208,6 +208,8 @@ def main():
             print(("FAIL " + name + " " + err) if err else st.upper() + " " + name)
     print(f"\nrows updated {len(plan_update)}, retired {len(retire)}, inserted {len(ins)} | previews: encoded {stats['done']}, existing {stats['skip']}, failed {stats['fail']}")
     print("Next: let Drive for Desktop finish uploading, then run with --link --apply.")
+    if any(r["gig"] != FOLDERS[f] for r, f, p in plan_update) or plan_insert or photo_new:
+        print("Gig labels changed — mint bandmate links after this run.")
 
 
 def link(a, rows, get, patch):
