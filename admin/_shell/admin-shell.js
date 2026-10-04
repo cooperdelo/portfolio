@@ -26,6 +26,7 @@ const NAV = [
   {section: 'Workspaces', items: [
     {href:'/admin/',label:'Choose workspace',ic:'home',roles:['full']},
     {href:'/admin/personal/',label:'Personal',ic:'compass',roles:['full']},
+    {href:'/admin/schedule/',label:'Schedule',ic:'calendar',roles:['full']},
     {href:'/admin/plugverse/',label:'PlugVerse',ic:'workflow',roles:['full','plugverse','acquisition']},
     {href:'/admin/content/',label:'All content',ic:'film',roles:['full']},
     {href:'/admin/finance/',label:'Money',ic:'wallet',roles:['full','plugverse']},
@@ -38,7 +39,7 @@ const NAV = [
   ]}
 ];
 const TABS = {
-  full:[['/admin/','Workspaces','home'],['/admin/personal/','Personal','compass'],['/admin/plugverse/','PlugVerse','workflow'],['/admin/content/','Content','film']],
+  full:[['/admin/personal/','Personal','compass'],['/admin/schedule/','Schedule','calendar'],['/admin/plugverse/','PlugVerse','workflow'],['/admin/content/','Content','film']],
   plugverse:[['/admin/plugverse/','PlugVerse','workflow'],['/admin/finance/','Money','wallet']],
   acquisition:[['/admin/plugverse/','PlugVerse','workflow'],['/admin/acquisition/','Queue','users'],['/admin/acquisition/?view=replies','Replies','repeat']]
 };
