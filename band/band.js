@@ -6,7 +6,7 @@ const fmt = (t) => (t == null ? "—" : `${Math.floor(t / 60)}:${(t % 60).toFixe
 const SHOTS = [["wide", "Wide"], ["medium", "Medium"], ["close", "Close"], ["lowangle", "Low angle"], ["pov", "POV"], ["static", "Static"], ["detail", "Detail"]];
 const SUBJECTS = ["band", "crowd", "singer", "guitarist", "bassist", "drummer", "stage", "setup"].map((s) => [s, s[0].toUpperCase() + s.slice(1)]);
 const CHIPS = { shot: SHOTS, subject: SUBJECTS };
-let clips = [], marks = {}, show = "all", kind = "", gig = "", cur = -1, you = "", noteT = 0, noteId = "", advT = 0, toastT = 0;
+let clips = [], marks = {}, confirmed = {}, show = "all", kind = "", gig = "", cur = -1, you = "", noteT = 0, noteId = "", advT = 0, toastT = 0;
 const v = $("[data-video]"), img = $("[data-photo]"), track = $("[data-track]");
 
 const blank = (id) => ({ asset: id, revision: 0, verdict: "unreviewed", note: "", start: null, end: null, band: false, broll: false, shot: null, subject: null });
@@ -27,6 +27,7 @@ async function load() {
   $("[data-gig]").innerHTML = '<option value="">Every gig</option>' + gigs.map((g) => `<option>${esc(g)}</option>`).join("");
   if (gig && !gigs.includes(gig)) gig = "";
   $("[data-gig]").value = gig;
+  confirmed = { ...marks };
   list(); progress();
   // On a laptop the player sits beside the list, so start on the first clip nobody has marked yet.
   if (cur < 0 && matchMedia("(min-width: 901px)").matches) { const first = clips.find((c) => c.url && mk(c).verdict === "unreviewed") || clips.find((c) => c.url); if (first) open(clips.indexOf(first)); }
@@ -170,12 +171,17 @@ async function run() {
       const d = await r.json().catch(() => ({}));
       if (r.ok) {
         marks[id] = { ...mk(c), revision: d.mark.revision, by: d.mark.by };
+        confirmed[id] = { ...m, revision: d.mark.revision, by: d.mark.by };
         status(`Saved · ${new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}`);
         if (d.notice) toast(d.notice);
       } else if (d.code === "CHANGED") {
-        pending.clear(); const here = clips[cur]?.id; await load(); const i = clips.findIndex((x) => x.id === here); if (i >= 0) open(i);
+        clearTimeout(noteT); noteT = 0; pending.clear(); const here = clips[cur]?.id; await load(); const i = clips.findIndex((x) => x.id === here); if (i >= 0) open(i);
         status(d.error || "Someone else changed this one. Reloaded."); break;
-      } else status(d.error || "Not saved.");
+      } else {
+        if (confirmed[id]) marks[id] = confirmed[id]; else delete marks[id];
+        if (clips[cur]?.id === id) { $("[data-note]").value = mk(c).note || ""; paint(); }
+        list(); progress(); status(d.error || "Not saved.");
+      }
     } catch { status("Offline. Not saved."); }
   }
   saving = false; list(); progress();
