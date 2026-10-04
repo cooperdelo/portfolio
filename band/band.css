@@ -81,10 +81,9 @@ body.bandrev { background: var(--ink); color: var(--bone); min-height: 100svh; p
 .br-nav { display: flex; justify-content: space-between; }
 .br-nav button { padding: 10px 4px; opacity: .75; }
 .br-help { margin-top: 24px; opacity: .45; }
-@media (min-width: 901px) {
-  .br-player > * { order: 5; }
-  .br-back, .br-title { order: 0; } .br-video { order: 1; } .tl { order: 2; } .br-verdict { order: 3; } .br-use { order: 4; }
-}
+/* Watch, trim, decide, then tag: the verdict sits above the tags at every width, so on phones the sticky bar never covers the chips. */
+.br-player > * { order: 5; }
+.br-back, .br-title { order: 0; } .br-video { order: 1; } .tl { order: 2; } .br-verdict { order: 3; } .br-use { order: 4; }
 @media (max-width: 900px) {
   .br-main { grid-template-columns: minmax(0, 1fr); }
   .br-list { position: static; max-height: none; }
