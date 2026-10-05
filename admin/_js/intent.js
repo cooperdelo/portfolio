@@ -1,0 +1,12 @@
+import {mountShell} from '/admin/_shell/admin-shell.js';
+import {sb,requireFullAdminOrRedirect} from '/admin/_shell/supabase.js';
+import {esc,pageHead} from '/admin/_shell/ui.js';
+import {safeURL} from '/admin/_shell/research-model.mjs';
+if(!(await requireFullAdminOrRedirect()))throw Error('Full admin required');
+await mountShell({title:'Brand & next steps'});
+const app=document.querySelector('#app');
+try{
+ const {data,error}=await sb.from('content_brand').select('value,updated_at').eq('key','intentional_brand').single();if(error)throw error;
+ const b=JSON.parse(data.value);
+ app.innerHTML=pageHead('Content','What this is building toward.')+`<p><a href="/admin/content/research">Reference library</a> · <a href="/admin/schedule/">Current plan</a></p><section class="sv-card research-card"><h2>In my words</h2><p>${esc(b.positioning)}</p><p>${esc(b.opportunity)}</p><p>${esc(b.career)}</p><p class="research-meta">Existing pillars stay. Each piece needs a reason to matter, not a sales pitch. Updated ${esc(new Date(data.updated_at).toLocaleDateString())}.</p></section><div class="sv-section sv-grid split">${b.routes.map(r=>`<section class="sv-card research-card"><h2>${esc(r.label)}</h2><p>${esc(r.purpose)}</p><p><strong>Next action:</strong> ${esc(r.cta)}</p><p class="research-meta">Look for: ${esc(r.measure)}</p>${safeURL(r.destination)?`<a href="${esc(r.destination)}" target="_blank" rel="noopener noreferrer">Open destination</a>`:''}</section>`).join('')}</div><section class="sv-section sv-card research-card"><h2>Profile copy</h2><p>${esc(b.bio_status)}</p><h3>Instagram</h3><pre>${esc(b.instagram_bio)}</pre><h3>TikTok</h3><pre>${esc(b.tiktok_bio)}</pre><p>Bio link: cooperdelo.com. Relevant product posts can link directly to PlugVerse. A film post can link to its specific work page.</p></section><section class="sv-section sv-card research-card"><h2>What counts as progress?</h2><p>Followers, useful conversations, paid work, and artists using PlugVerse are separate outcomes. Public views alone cannot establish any of them.</p><p><a href="/admin/people/">Professional conversations</a> · <a href="/admin/plugverse/">PlugVerse outcomes</a> · <a href="/admin/insights/">Content performance</a></p><p class="research-meta">No inferred leads or revenue. Use observed results and dates in the existing records.</p></section>`;
+}catch(e){app.innerHTML=pageHead('Content','Brand direction')+`<p>Could not load the current direction. ${esc(e.message||'Try again.')}</p>`;}

@@ -1,0 +1,10 @@
+const form=document.querySelector('#inquiry');
+if(form){form.addEventListener('submit',e=>{e.preventDefault();const values=new FormData(form);const source=new URLSearchParams(location.search).get('utm_source')||'portfolio';const body=`Hi Cooper,\n\nI'm reaching out about ${values.get('kind')}.\n\n${values.get('brief')}\n\nTiming: ${values.get('timing')||'To discuss'}\nBudget / role: ${values.get('budget')||'To discuss'}\n\nFound you through: ${source.slice(0,80)}`;const url=`mailto:cooper@plugverse.app?subject=${encodeURIComponent('Let’s make something: '+values.get('kind'))}&body=${encodeURIComponent(body)}`;document.querySelector('#draft-link').href=url;document.querySelector('#draft-ready').hidden=false;document.querySelector('#draft-ready').scrollIntoView({block:'nearest'});});}
+const planner=document.querySelector('#planner');
+if(planner){
+ const status=document.querySelector('#planner-status'),storageKey='cd-film-plan-v1';
+ try{const data=JSON.parse(localStorage.getItem(storageKey)||'{}');for(const [key,value] of Object.entries(data)){const field=planner.elements.namedItem(key);if(field&&typeof value==='string')field.value=value;}}catch{status.textContent='Browser storage is unavailable. You can still download your plan.';}
+ planner.addEventListener('input',()=>{const data=Object.fromEntries(new FormData(planner));try{localStorage.setItem(storageKey,JSON.stringify(data));status.textContent='Saved in this browser only.';}catch{status.textContent='Use Download to keep a copy; browser storage is unavailable.';}});
+ document.querySelector('#download-plan').onclick=()=>{const data=Object.fromEntries(new FormData(planner));const text='# My film plan\n\n'+Object.entries(data).map(([key,value])=>`## ${key.replaceAll('_',' ')}\n${value||'(not filled in)'}\n`).join('\n');const url=URL.createObjectURL(new Blob([text],{type:'text/markdown'}));const link=document.createElement('a');link.href=url;link.download='my-film-plan.md';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);status.textContent='Download prepared. Nothing was uploaded.';};
+ document.querySelector('#print-plan').onclick=()=>window.print();
+}
