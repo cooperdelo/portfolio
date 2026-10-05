@@ -30,6 +30,7 @@ export default async function handler(req, res) {
   let ev; try { ev = JSON.parse(body); } catch { return res.status(400).json({ error: 'bad_json' }); }
   if (ev.type !== 'checkout.session.completed' && ev.type !== 'checkout.session.async_payment_succeeded') return res.status(200).json({ ignored: ev.type });
   const s = ev.data?.object || {};
+  if (s.payment_status !== 'paid' && s.payment_status !== 'no_payment_required') return res.status(200).json({ pending: s.payment_status }); // async methods finish later
   const key = process.env.SUPABASE_ADMIN_SERVICE_ROLE_KEY;
   if (!key) return res.status(200).json({ recorded: false });
   const row = { stripe_session: s.id, kit: s.metadata?.kit || '', email: s.customer_details?.email || null, amount_total: s.amount_total ?? null,

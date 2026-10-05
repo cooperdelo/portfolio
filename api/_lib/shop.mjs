@@ -4,9 +4,9 @@
 import { createHmac, timingSafeEqual } from 'node:crypto';
 import { gunzipSync } from 'node:zlib';
 
-// gate: free | email | paid. Prices are drafts until Cooper sets them.
+// gate: free | email | paid. draft: true shows a 'Draft price' tag (Design kit set at $29 on 2026-10-05).
 export const KITS = {
-  design: { title: "Sites that don't look like AI", gate: 'paid', price: 2900, draft: true, shop: '/shop/design-kit' },
+  design: { title: "Sites that don't look like AI", gate: 'paid', price: 2900, shop: '/shop/design-kit' },
   'ai-system': { title: 'One folder Claude reads first', gate: 'email', guide: '/resources/guides/ai-system' },
   linkedin: { title: 'LinkedIn posts strangers actually read', gate: 'email', guide: '/resources/guides/linkedin' },
   'instagram-tiktok': { title: 'Short videos from your real week', gate: 'email', guide: '/resources/guides/instagram-tiktok' },
@@ -14,7 +14,7 @@ export const KITS = {
   music: { title: 'Book gigs, build sets, dial tone', gate: 'email', guide: '/resources/guides/music' },
   startup: { title: 'Shipping PlugVerse solo with AI', gate: 'free', guide: '/resources/guides/startup' },
 };
-export const TAX_CODE = 'txcd_10000000'; // Stripe: general electronically supplied services (digital goods)
+export const TAX_CODE = 'txcd_10503004'; // Stripe: digital documents, viewable, permanent rights (eligible for Managed Payments)
 
 let cache = null;
 export function loadKits(env = process.env) {
@@ -68,11 +68,16 @@ export function canRead(slug, token, env = process.env) {
 export const EMAIL_RE = /^[^\s@<>()"',;:]{1,64}@[^\s@<>()"',;:]{1,190}\.[a-z]{2,24}$/i;
 export const isProd = (env = process.env) => env.VERCEL_ENV === 'production';
 // Demo checkout exists so the paywall can be tested before a Stripe test key is added. Never in production.
+// While production still runs on a Stripe test key, checkout only opens for someone holding the test pass
+// (?tp= on the shop page), so nobody can unlock the paid kit with Stripe's public test card.
+export const testPass = (env = process.env) => (env.SHOP_TOKEN_SECRET ? createHmac('sha256', env.SHOP_TOKEN_SECRET).update('test-checkout-v1').digest('base64url').slice(0, 16) : null);
+export const checkoutLocked = (pass, env = process.env) => isProd(env) && /^(sk|rk)_test_/.test(env.SHOP_STRIPE_SECRET_KEY || '') && (!testPass(env) || pass !== testPass(env));
 export const demoAllowed = (env = process.env) => !isProd(env) && !env.SHOP_STRIPE_SECRET_KEY && env.SHOP_DEMO === '1';
 
+export const STRIPE_VERSION = '2026-09-30.endive';
 export async function stripe(path, { method = 'GET', form = null, key } = {}) {
   const r = await fetch(`https://api.stripe.com/v1/${path}`, {
-    method, headers: { Authorization: `Bearer ${key}`, ...(form ? { 'Content-Type': 'application/x-www-form-urlencoded' } : {}) },
+    method, headers: { Authorization: `Bearer ${key}`, 'Stripe-Version': STRIPE_VERSION, ...(form ? { 'Content-Type': 'application/x-www-form-urlencoded' } : {}) },
     body: form ? new URLSearchParams(form).toString() : undefined, signal: AbortSignal.timeout(9000),
   });
   const j = await r.json().catch(() => ({}));
