@@ -14,7 +14,7 @@ export const KITS = {
   music: { title: 'Book gigs, build sets, dial tone', gate: 'email', guide: '/resources/guides/music' },
   startup: { title: 'Shipping PlugVerse solo with AI', gate: 'free', guide: '/resources/guides/startup' },
 };
-export const TAX_CODE = 'txcd_10000000'; // Stripe: general electronically supplied services (digital goods)
+export const TAX_CODE = 'txcd_10503004'; // Stripe: digital documents, viewable, permanent rights (eligible for Managed Payments)
 
 let cache = null;
 export function loadKits(env = process.env) {
@@ -70,9 +70,10 @@ export const isProd = (env = process.env) => env.VERCEL_ENV === 'production';
 // Demo checkout exists so the paywall can be tested before a Stripe test key is added. Never in production.
 export const demoAllowed = (env = process.env) => !isProd(env) && !env.SHOP_STRIPE_SECRET_KEY && env.SHOP_DEMO === '1';
 
+export const STRIPE_VERSION = '2026-09-30.endive';
 export async function stripe(path, { method = 'GET', form = null, key } = {}) {
   const r = await fetch(`https://api.stripe.com/v1/${path}`, {
-    method, headers: { Authorization: `Bearer ${key}`, ...(form ? { 'Content-Type': 'application/x-www-form-urlencoded' } : {}) },
+    method, headers: { Authorization: `Bearer ${key}`, 'Stripe-Version': STRIPE_VERSION, ...(form ? { 'Content-Type': 'application/x-www-form-urlencoded' } : {}) },
     body: form ? new URLSearchParams(form).toString() : undefined, signal: AbortSignal.timeout(9000),
   });
   const j = await r.json().catch(() => ({}));

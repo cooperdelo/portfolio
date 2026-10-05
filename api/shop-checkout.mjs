@@ -1,5 +1,6 @@
 // POST /api/shop-checkout {kit, code?}
-// Creates a Stripe Checkout session for a paid kit: tax calculated by Stripe Tax, promotion codes accepted
+// Creates a Stripe Checkout session for a paid kit through Managed Payments (Stripe is merchant of record: tax,
+// fraud, disputes and receipts are Stripe's), promotion codes accepted
 // (or applied up front when a ?code= link is used), receipt emailed by Stripe. Without a Stripe key on QA it
 // answers with a demo URL so the whole flow can still be clicked through. Demo never runs in production.
 import { KITS, TAX_CODE, demoAllowed, stripe, readBody, origin } from './_lib/shop.mjs';
@@ -28,9 +29,10 @@ export default async function handler(req, res) {
     'line_items[0][price_data][tax_behavior]': 'exclusive',
     'line_items[0][price_data][product_data][name]': meta.title,
     'line_items[0][price_data][product_data][tax_code]': TAX_CODE,
-    'automatic_tax[enabled]': 'true',
+    // Managed Payments rejects automatic_tax and invoice_creation: Stripe calculates tax and sends the receipt itself.
+    'managed_payments[enabled]': 'true',
+    integration_identifier: 'cooperdelo-shop-kqwmzrta',
     customer_creation: 'always',
-    'invoice_creation[enabled]': 'true',
     'metadata[kit]': slug,
     success_url: `${page}?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${page}?canceled=1`,
