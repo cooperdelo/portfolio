@@ -63,7 +63,8 @@ Static HTML portfolio site (Vercel-hosted at cooperdelo.com) plus a private admi
   money-overview.mjs             ← Read-only Money payload (bank balances, recent txns; personal snapshots + reconciliation doc for full only)
   acquisition.mjs                ← Acquisition board connection status. Fails closed (not_connected, writes rejected) until the owner is connected
   acquisition-results.mjs        ← 30-day artist signup outcomes by signup_utm, read from PlugVerse `users`
-  band-review.mjs                ← Band media list, signed preview URLs from `band-review` bucket, review saves via band_review_save()
+  band-review.mjs                ← Admin band media list + review saves via band_review_save() (old Supabase proxies are gone; previews are in Drive)
+  band-share.mjs                 ← Bandmate reviewer API behind signed links: piles, Drive preview URLs, shared marks + tags
   band-media-source.mjs          ← Returns the confirmed Rubber Band Drive folder URL from vault_documents
   _lib/admin-auth.mjs            ← authorize(req, roles): verifies the JWT + admin_allowlist role; privateResponse() no-store headers
 ```
@@ -100,7 +101,7 @@ Static HTML portfolio site (Vercel-hosted at cooperdelo.com) plus a private admi
 | `band_media_reviews` | One review row per asset per reviewer. Written only through `band_review_save(...)` (SECURITY DEFINER, full admin, optimistic `revision` check). | `asset_id` → band_media_assets, `reviewer` (auth uid), `revision`, `verdict` (unreviewed/favorite/reject), `note`, `time_seconds`, `trim_start`, `trim_end`, `updated_at`. PK (asset_id, reviewer) |
 | `band_media_operations` | Idempotency log for `band_review_save` retries (same operation id + payload returns the stored result). | `operation_id` (PK), `reviewer`, `asset_id`, `request`, `result`, `created_at` |
 
-Storage: private bucket `band-review` (50 MB limit; mp4/jpeg/webp/json) holds review proxies. Pages never read it directly; `/api/band-review` returns 15-minute signed URLs.
+Storage: private bucket `band-review` is now empty (review previews moved to Google Drive 2026-10-04/05; see Band footage reviewer below). Pages never read it directly; `/api/band-review` returns 15-minute signed URLs.
 
 ### Views (read-only summaries)
 
@@ -327,18 +328,26 @@ NOTE on the two Supabase service-role keys: there are TWO separate Supabase proj
 
 If any required var is missing, the affected source returns an error message in the response payload — the page renders the other KPIs and shows the error banner.
 
-## Shop + gated guides (QA only, branch `qa-shop`)
+## Shop + gated guides (live on main, Stripe test mode)
 
-Modeled on gakuyen.com (vault: Projects/design-references/gakuyen-2026-10-02). Three doors: Work, Resources, Shop. The shop is `/shop/*` in this repo and is meant to be served at `shop.cooperdelo.com` through the host rewrites in `vercel.json` (inert until that domain is attached). Nothing here is on `main` until Cooper says go.
+Three doors: Work, Resources, Shop. The shop is `/shop/*` on cooperdelo.com (Cooper chose to keep it there; `shop.cooperdelo.com` host rewrites in `vercel.json` stay inert).
 
-- **No kit content in the repo** (it is public). Pages are shells; `/api/kit` serves everything from the `SHOP_KITS_GZ` env var (base64 of gzipped JSON keyed by slug; source: the vault-side publish-safe guides, `F:/Renders/cooper-corpus/guides/public`).
-- **Gates** (`api/_lib/shop.mjs` `KITS`): `free` (startup), `email` (ai-system, linkedin, instagram-tiktok, film-motion, music), `paid` (design, draft $29). Access = HMAC token (`SHOP_TOKEN_SECRET`) stored in the browser as `kit:<slug>`.
-- **Paid**: `/api/shop-checkout` creates a Stripe Checkout session (`automatic_tax` on, tax code `txcd_10000000`, `allow_promotion_codes`, or `?code=` applied up front, receipt via `invoice_creation`). The kit page verifies `session_id` with Stripe and unlocks. `/api/shop-webhook` (signed with `SHOP_STRIPE_WEBHOOK_SECRET`) records orders in `shop_orders`.
-- **Demo mode**: with `SHOP_DEMO=1`, no Stripe key and not production, checkout returns `?demo=1` and the paid kit unlocks without paying. Impossible in production (tested).
-- **Admin**: `/admin/shop` (full only): emails, orders, revenue, tax, gate steps. Tables come from `scripts/migrations/20261003-shop.sql` (NOT applied).
-- **Env vars (Preview, branch qa-shop)**: `SHOP_KITS_GZ`, `SHOP_TOKEN_SECRET`, `SHOP_DEMO=1`; later `SHOP_STRIPE_SECRET_KEY` (sk_test first), `SHOP_STRIPE_WEBHOOK_SECRET`.
-- **Build**: `python scripts/build-shop.py` after `build-together-pages.py` (it adds the guides shelf to `/resources`).
-- **Before go-live** (Cooper): prices, license + refund answers (FAQ shows Draft), Stripe Tax registrations, email sending for the gate, attach `shop.cooperdelo.com`, apply the shop migration, then merge.
+- **No kit content in the repo** (it is public). Pages are shells; `/api/kit` serves everything from the `SHOP_KITS_GZ` env var (base64 of gzipped JSON keyed by slug; source: `F:/Renders/cooper-corpus/guides/public`).
+- **Gates** (`api/_lib/shop.mjs` `KITS`): `free` (startup), `email` (ai-system, linkedin, instagram-tiktok, film-motion, music), `paid` (design, $29, set 2026-10-05). Access = HMAC token (`SHOP_TOKEN_SECRET`) stored in the browser as `kit:<slug>`.
+- **Paid**: `/api/shop-checkout` creates a Checkout session through **Stripe Managed Payments** (Stripe/Link is merchant of record: tax, fraud, disputes, receipts). So no `automatic_tax` / `invoice_creation`; `managed_payments[enabled]`, eligible tax code `txcd_10503004`, `integration_identifier`, promotion codes. Every Stripe call pins `Stripe-Version` (`STRIPE_VERSION` in `_lib/shop.mjs`). The kit page verifies `session_id` with Stripe and unlocks. `/api/shop-webhook` (signed, `SHOP_STRIPE_WEBHOOK_SECRET`) records only paid sessions in `shop_orders`.
+- **Test-mode lock**: while production's `SHOP_STRIPE_SECRET_KEY` is a test key, checkout returns `checkout_opening_soon` unless the request carries the test pass (`?tp=` on the kit page = `testPass()`, HMAC of `SHOP_TOKEN_SECRET`). A live key removes the lock. End-to-end test purchase passed 2026-10-05 (NC tax 7.5%, unlock with 5 steps).
+- **Stripe objects**: test webhook endpoint `we_1UN3DKL2qbzecfg6BpDjJnvK` (checkout.session.completed + async_payment_succeeded). For live: restricted key `rk_live_…` (Checkout Sessions write, Promotion Codes read) and a live endpoint.
+- **License / refunds** (FAQ): own and client work, no resale; full refund within 14 days.
+- **Demo mode**: with `SHOP_DEMO=1`, no Stripe key and not production, checkout returns `?demo=1`. Impossible in production (tested).
+- **Admin**: `/admin/shop` (full only). Tables from `scripts/migrations/20261003-shop.sql`.
+- **Env vars**: `SHOP_KITS_GZ`, `SHOP_TOKEN_SECRET`, `SHOP_STRIPE_SECRET_KEY`, `SHOP_STRIPE_WEBHOOK_SECRET` (values in `F:/Renders/cooper-corpus/guides/SHOP_*.txt`, never in the repo).
+
+## Band footage reviewer (`/band`, live 2026-10-04)
+
+- Bandmates open `/band?k=<signed link>` (no login). Links are HMAC-signed by `/api/band-share` and carry a pile of gig labels; mint them in `/admin/assets` (name + gig checkboxes). They mark keep / favorite / delete, trim, tick Band post / B-roll, shot + subject. Migration `20261004-band-review-v2.sql` (applied).
+- **Previews live in Google Drive, not Supabase** (the free bucket was full; old proxies deleted 2026-10-05). Folder `Rubber Band Review/previews` in **cdelo628@gmail.com**'s Drive (mounted at H: by Drive for Desktop), id `1A49c_PEJqWKXqvzVJBAjv39OoGh9L4Hj`, shared anyone-with-link. Videos stream via the Drive API with the key in `automation_secrets.google_drive_api_key`; posters and photos come from `lh3.googleusercontent.com` (bulk API requests trip Google's bot block). The Claude Drive connector is delocooper6 and can't see this folder.
+- 570 items: videos for AXO bid, Pi Kapp, MAW, Chi Phi; photos (Sony ARW) for Phi Mu · Sep 26 and DZ State · Oct 2.
+- `scripts/build-band-previews.py` (dry run default; `--apply`, `--link --folder-id …`, `--photos-from G:/Videos/00_INBOX/<offload>`) and `scripts/finish-band-review.py` (dry run default): rejects move to `G:/Videos/_to_delete/band-review-<date>/` with an UNDO csv; keepers are cut from the originals into band versions (`03_GIGS/<gig>/_band` + Drive "For the band") and `01_BROLL` masters, optional per-gig `_grade.cube`; photo keepers copy RAW to `G:/Photos/Gigs/<slug>/selects`. Never overwrites. The finish script has only been dry-run.
 
 ## Public site notes
 
