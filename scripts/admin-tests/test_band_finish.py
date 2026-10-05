@@ -5,6 +5,9 @@ from pathlib import Path
 spec = importlib.util.spec_from_file_location("finish", Path(__file__).resolve().parents[1] / "finish-band-review.py")
 f = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(f)
+bspec = importlib.util.spec_from_file_location("build", Path(__file__).resolve().parents[1] / "build-band-previews.py")
+b = importlib.util.module_from_spec(bspec)
+bspec.loader.exec_module(b)
 
 
 class Counter(unittest.TestCase):
@@ -106,6 +109,69 @@ class Safety(unittest.TestCase):
     def test_archive_dest_same_tree(self):
         d = f.archive_dest("G:/Videos/03_GIGS/axo_bid_8-25-26/_band/s_0s.mp4", "2026-10-04")
         self.assertEqual(d.as_posix(), "G:/Videos/_to_delete/band-review-2026-10-04/Videos/03_GIGS/axo_bid_8-25-26/_band/s_0s.mp4")
+
+
+class Photos(unittest.TestCase):
+    def test_date_to_label(self):
+        import datetime as dt
+        self.assertEqual(b.date_label(dt.date(2026, 8, 25)), "AXO bid · Aug 25")
+        self.assertEqual(b.date_label(dt.date(2026, 8, 26)), "Pi Kapp · Aug 26")
+        self.assertEqual(b.date_label(dt.date(2026, 9, 11)), "MAW · Sep 11")
+        self.assertEqual(b.date_label(dt.date(2026, 9, 12)), "Chi Phi · Sep 12")
+        self.assertEqual(b.date_label(dt.date(2026, 9, 26)), "Photos · Sep 26")
+        self.assertEqual(b.date_label(dt.date(2026, 10, 2)), "Photos · Oct 2")  # no leading zero
+        self.assertEqual(b.date_label(dt.date(2026, 9, 9)), "Photos · Sep 9")
+
+    def test_exif_date_parse(self):
+        import datetime as dt
+        self.assertEqual(b.parse_exif_date("2026:09:26 16:56:44"), dt.date(2026, 9, 26))
+        self.assertIsNone(b.parse_exif_date("")); self.assertIsNone(b.parse_exif_date(None)); self.assertIsNone(b.parse_exif_date("0000:00:00 00:00:00"))
+
+    def test_stem_pairing(self):
+        paths = [Path(x) for x in ("DSC1.ARW", "DSC1.JPG", "DSC2.ARW", "DSC3.JPG", "._DSC4.ARW", "DSC5.ARW.partial", "notes.xml", "C0001.MP4", "dsc6.arw", "DSC6.jpeg")]
+        got = b.pair_shots(paths)
+        self.assertEqual([(o.name, j.name if j else None) for o, j in got],
+                         [("DSC1.ARW", "DSC1.JPG"), ("DSC2.ARW", None), ("DSC3.JPG", None), ("dsc6.arw", "DSC6.jpeg")])
+
+    def test_mime(self):
+        self.assertEqual(b.photo_mime("a.ARW"), "image/x-sony-arw"); self.assertEqual(b.photo_mime("a.JPG"), "image/jpeg")
+
+    def test_gig_slug(self):
+        self.assertEqual(f.gig_slug("Chi Phi · Sep 12"), "chiphi-sep12")
+        self.assertEqual(f.gig_slug("Photos · Sep 26"), "photos-sep26")
+        self.assertEqual(f.gig_slug("AXO bid · Aug 25"), "axobid-aug25")
+        self.assertEqual(f.gig_slug(""), "photos")
+
+    def test_photo_files_finds_same_stem_jpg(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as td:
+            td = Path(td)
+            for n in ("A.ARW", "A.JPG", "B.ARW", "C.JPG", "A2.JPG"):
+                (td / n).write_text("x")
+            self.assertEqual([p.name for p in f.photo_files(td / "A.ARW")], ["A.ARW", "A.JPG"])
+            self.assertEqual([p.name for p in f.photo_files(td / "B.ARW")], ["B.ARW"])
+            self.assertEqual([p.name for p in f.photo_files(td / "C.JPG")], ["C.JPG"])
+            self.assertEqual([p.name for p in f.photo_files(td / "gone.ARW")], ["gone.ARW"])
+
+    def test_output_paths(self):
+        a, j = Path("G:/Videos/00_INBOX/x/DSC1.ARW"), Path("G:/Videos/00_INBOX/x/DSC1.JPG")
+        plan = f.photo_copy_plan([a, j], "Photos · Sep 26", False, False)
+        self.assertEqual([(k, d.as_posix()) for k, s, d in plan],
+                         [("select0", "G:/Photos/Gigs/photos-sep26/selects/DSC1.ARW"), ("select1", "G:/Photos/Gigs/photos-sep26/selects/DSC1.JPG")])
+        fav = f.photo_copy_plan([a], "Chi Phi · Sep 12", True, False)
+        self.assertEqual([d.as_posix() for k, s, d in fav], ["G:/Photos/Gigs/chiphi-sep12/selects/DSC1.ARW", "G:/Photos/Good Stills/band/DSC1.ARW"])
+        self.assertEqual(len(f.photo_copy_plan([a], "MAW · Sep 11", False, True)), 2)  # use_broll = stills library
+        self.assertEqual(f.photo_band_name(a), "DSC1.jpg")
+
+    def test_reject_destination_keeps_relative_path(self):
+        sp = "Videos/00_INBOX/2026-10-04_a7c2/DSC1.ARW"
+        self.assertEqual(f.undo_dest(sp, "2026-10-04").as_posix(), "G:/Videos/_to_delete/band-review-2026-10-04/" + sp)
+        self.assertEqual(f.rel_g(Path("G:/") / sp), sp)
+
+    def test_photo_source_roots(self):
+        self.assertTrue(f.safe_rel("Videos/00_INBOX/a/b.ARW") and "Videos/00_INBOX/a/b.ARW".startswith(f.PHOTO_ROOTS))
+        self.assertFalse("Videos/03_GIGS/a.ARW".startswith(f.PHOTO_ROOTS))
+        self.assertFalse(f.inside("G:/Photos/../Videos/03_GIGS/x.ARW", f.G / "Photos"))
 
 
 if __name__ == "__main__":
