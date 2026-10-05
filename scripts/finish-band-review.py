@@ -122,7 +122,7 @@ def photo_files(src):
 
 def fs_label(label):
     """A gig label made safe as ONE path component (no separators, drive colons or reserved characters, no leading/trailing dots)."""
-    s = re.sub(r'[/\:*?"<>|\x00-\x1f]', "-", label or "").strip(" .")
+    s = re.sub(r'[/\\:*?"<>|\x00-\x1f]', "-", label or "").strip(" .")
     return s or "Photos"
 
 
