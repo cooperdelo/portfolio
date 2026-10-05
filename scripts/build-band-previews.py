@@ -22,6 +22,7 @@ PHOTOS = "Band photos"
 VIDEO = {".mov": "video/quicktime", ".mp4": "video/mp4"}
 IMAGE = {".jpg": "image/jpeg", ".jpeg": "image/jpeg"}
 RAW = ".arw"
+PHOTO_ROOTS = ("Videos/00_INBOX", "Photos")  # same roots finish-band-review.py accepts for G: photos
 SHOT_EXT = (RAW, ".jpg", ".jpeg")
 GIG_DATES = {"2026-08-25": "AXO bid \u00b7 Aug 25", "2026-08-26": "Pi Kapp \u00b7 Aug 26", "2026-09-11": "MAW \u00b7 Sep 11", "2026-09-12": "Chi Phi \u00b7 Sep 12", "2026-09-26": "Phi Mu \u00b7 Sep 26", "2026-10-02": "DZ State \u00b7 Oct 2"}
 NEW_COLS = "source_path,preview_drive_id,poster_drive_id"
@@ -143,6 +144,30 @@ def shot_dates(shots):
     return {o: dates.get(o) or datetime.date.fromtimestamp(o.stat().st_mtime) for o in orig}
 
 
+def check_photos_dir(path):
+    """Error message, or None when `path` is an existing folder on G: under Videos/00_INBOX/ or Photos/ (what finish-band-review accepts)."""
+    p = Path(path)
+    if not p.is_dir():
+        return f"--photos-from: not a folder: {path}"
+    try:
+        rel = Path(os.path.realpath(p)).relative_to(os.path.realpath(G)).as_posix()
+    except ValueError:
+        return f"--photos-from must be on G: (got {path})"
+    if not any(rel == r or rel.startswith(r + "/") for r in PHOTO_ROOTS):
+        return f"--photos-from must be under G:/Videos/00_INBOX/ or G:/Photos/ (got {path})"
+    return None
+
+
+def is_gig_date(d):
+    return d.isoformat() in GIG_DATES
+
+
+def skipped_summary(dates):
+    """'Aug 17 (2), Sep 9 (1)' for the dates of skipped shots, in date order."""
+    c = collections.Counter(dates)
+    return ", ".join(f"{d.strftime('%b')} {d.day} ({n})" for d, n in sorted(c.items()))
+
+
 def scan_shots(folder):
     d = Path(folder)
     return pair_shots([p for p in sorted(d.iterdir()) if p.is_file()]) if d.is_dir() else []
@@ -221,6 +246,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--apply", action="store_true"); ap.add_argument("--link", action="store_true")
     ap.add_argument("--drive-root"); ap.add_argument("--photos-dir"); ap.add_argument("--photos-match", default="band")
+    ap.add_argument("--include-other-dates", action="store_true", help="also import --photos-from shots whose date is not a known gig date (default: skip them)")
     ap.add_argument("--photos-from", help="folder of camera photos (.ARW/.JPG, not recursive): one asset per shot, gig label from the shot date")
     ap.add_argument("--folder-id"); ap.add_argument("--jobs", type=int, default=2)
     a = ap.parse_args()
@@ -275,10 +301,17 @@ def main():
                 photos.append((p, sp))
     photo_new = [{"path": p, "sp": sp, "mime": "image/jpeg", "gig": PHOTOS} for p, sp in photos]
     shot_info = []  # (original, jpg sidecar, date, label) for --photos-from
+    skipped = []
     if a.photos_from:
+        bad = check_photos_dir(a.photos_from)
+        if bad:
+            sys.exit(bad)
         shots = scan_shots(a.photos_from)
         dates = shot_dates(shots)
+        skipped = [dates[o] for o, j in shots if not is_gig_date(dates[o]) and not a.include_other_dates]
         for o, j in shots:
+            if not is_gig_date(dates[o]) and not a.include_other_dates:
+                continue
             shot_info.append((o, j, dates[o], date_label(dates[o])))
             photo_new.append({"path": o, "sp": rel_g(o), "mime": photo_mime(o), "gig": date_label(dates[o])})
     photo_all = list(photo_new)
@@ -301,10 +334,12 @@ def main():
         new_sp = {x["sp"] for x in photo_new}
         mine = [t for t in shot_info if rel_g(t[0]) in new_sp]
         raws = sum(1 for t in shot_info if t[0].suffix.lower() == RAW)
-        print(f"\nPhotos in {a.photos_from}: {len(shot_info)} shots ({raws} ARW originals, {len(shot_info) - raws} JPG-only, "
+        print(f"\nPhotos in {a.photos_from}: {len(shot_info)} gig shots ({raws} ARW originals, {len(shot_info) - raws} JPG-only, "
               f"{sum(1 for t in shot_info if t[1] and t[0].suffix.lower() == RAW)} ARW+JPG pairs) | new {len(mine)}, already in DB {len(shot_info) - len(mine)}")
         for (lbl, d), n in sorted(collections.Counter((t[3], t[2].isoformat()) for t in mine).items(), key=lambda kv: kv[0][1]):
             print(f"  {lbl!r:30} {d}  {n}")
+        if skipped:
+            print(f"skipped {len(skipped)} shots from non-gig dates: {skipped_summary(skipped)} -- add --include-other-dates to import them")
     if a.photos_dir and not photos:
         print("  (no photos matched --photos-match", repr(a.photos_match) + ")")
 

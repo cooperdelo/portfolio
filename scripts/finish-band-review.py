@@ -116,8 +116,22 @@ def photo_files(src):
     src = Path(src)
     out = [src]
     if src.suffix.lower() == RAW and src.parent.is_dir():
-        out += sorted(q for q in src.parent.iterdir() if q.is_file() and q.stem == src.stem and q.suffix.lower() in JPEGS)
+        out += sorted(q for q in src.parent.iterdir() if q.is_file() and q.stem.lower() == src.stem.lower() and q.suffix.lower() in JPEGS)
     return out
+
+
+def fs_label(label):
+    """A gig label made safe as ONE path component (no separators, drive colons or reserved characters, no leading/trailing dots)."""
+    s = re.sub(r'[/\:*?"<>|\x00-\x1f]', "-", label or "").strip(" .")
+    return s or "Photos"
+
+
+def drive_band_dir(root, label):
+    """<Drive>/My Drive/Rubber Band Review/For the band/<label>, guaranteed inside the Drive mount (ValueError otherwise)."""
+    d = Path(root) / DRIVE_SUB / "For the band" / fs_label(label)
+    if not inside(d, root):
+        raise ValueError("band folder escapes the Drive mount")
+    return d
 
 
 def photo_copy_plan(files, label, favorite, use_broll):
@@ -270,7 +284,13 @@ def safe_move(src, dst, undo_csv, taken=()):
 def safe_copy(src, dst, taken=()):
     dst = unique(dst, taken)
     dst.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copy2(src, dst)
+    part = dst.with_name(dst.name + ".part")  # a crash mid-copy must not leave a truncated file under the final name
+    try:
+        shutil.copy2(src, part)
+        os.replace(part, dst)
+    except BaseException:
+        part.unlink(missing_ok=True)
+        raise
     return dst
 
 
@@ -492,7 +512,7 @@ def main():
                     if m.get("use_band"):
                         if root:
                             stats["photo_copy"] += 1
-                            step("photo_band", root / DRIVE_SUB / "For the band" / label / photo_band_name(src), lambda d: render_photo(src, d), "RENDER")
+                            step("photo_band", drive_band_dir(root, label) / photo_band_name(src), lambda d: render_photo(src, d), "RENDER")
                         else:
                             pending.append(f"{name}: band photo render needs the Drive mount")
                 elif photo:
@@ -539,7 +559,7 @@ def main():
                                 pending.append(f"{name}: Drive copy waits for the local band cut")
                             else:
                                 lb = Path(cur["steps"]["band"]["dst"]).name if "band" in cur["steps"] else bn  # copy keeps the local file's real name
-                                step("band_drive", root / DRIVE_SUB / "For the band" / label / lb,
+                                step("band_drive", drive_band_dir(root, label) / lb,
                                      lambda d: safe_copy(Path(cur["steps"]["band"]["dst"]), d) and None, "COPY")
 
             clean = len(pending) + len(errors) + len(needs_trim_l) == before

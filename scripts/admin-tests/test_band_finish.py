@@ -137,6 +137,45 @@ class Photos(unittest.TestCase):
     def test_mime(self):
         self.assertEqual(b.photo_mime("a.ARW"), "image/x-sony-arw"); self.assertEqual(b.photo_mime("a.JPG"), "image/jpeg")
 
+    def test_non_gig_dates_and_summary(self):
+        import datetime as dt
+        self.assertTrue(b.is_gig_date(dt.date(2026, 9, 26))); self.assertFalse(b.is_gig_date(dt.date(2026, 8, 17)))
+        self.assertEqual(b.skipped_summary([dt.date(2026, 9, 19)] * 6 + [dt.date(2026, 8, 17)] * 2 + [dt.date(2026, 9, 9)]), "Aug 17 (2), Sep 9 (1), Sep 19 (6)")
+
+    def test_photos_from_validation(self):
+        self.assertIsNone(b.check_photos_dir("G:/Videos/00_INBOX/2026-10-04_a7c2") if Path("G:/Videos/00_INBOX/2026-10-04_a7c2").is_dir() else None)
+        self.assertIn("must be", b.check_photos_dir("C:/Windows") or "")
+        self.assertIn("not a folder", b.check_photos_dir("G:/no/such/dir"))
+        if Path("G:/Videos/03_GIGS").is_dir():
+            self.assertIn("must be under", b.check_photos_dir("G:/Videos/03_GIGS"))
+
+    def test_gig_label_cannot_escape_drive(self):
+        import tempfile
+        self.assertEqual(f.fs_label("../../Escape"), "-..-Escape"); self.assertEqual(f.fs_label(r"a/b\c:d"), "a-b-c-d")
+        self.assertEqual(f.fs_label(".."), "Photos"); self.assertEqual(f.fs_label(""), "Photos")
+        with tempfile.TemporaryDirectory() as td:
+            for lbl in ("../../Escape", "..", "/abs", r"C:\x", "Chi Phi · Sep 12"):
+                d = f.drive_band_dir(td, lbl)
+                self.assertTrue(f.inside(d, td), lbl); self.assertEqual(d.parent.name, "For the band")
+
+    def test_safe_copy_leaves_no_part_and_never_truncates(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as td:
+            td = Path(td); (td / "a.ARW").write_text("data")
+            d = f.safe_copy(td / "a.ARW", td / "o" / "a.ARW")
+            self.assertEqual(d.read_text(), "data"); self.assertEqual([p.name for p in (td / "o").iterdir()], ["a.ARW"])
+            with self.assertRaises(FileNotFoundError):
+                f.safe_copy(td / "missing.ARW", td / "o" / "m.ARW")
+            self.assertFalse((td / "o" / "m.ARW").exists()); self.assertFalse((td / "o" / "m.ARW.part").exists())
+
+    def test_sidecar_case_insensitive(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as td:
+            td = Path(td)
+            for n in ("dsc1.arw", "DSC1.JPG"):
+                (td / n).write_text("x")
+            self.assertEqual(sorted(p.name for p in f.photo_files(td / "dsc1.arw")), ["DSC1.JPG", "dsc1.arw"])
+
     def test_gig_slug(self):
         self.assertEqual(f.gig_slug("Chi Phi · Sep 12"), "chiphi-sep12")
         self.assertEqual(f.gig_slug("Photos · Sep 26"), "photos-sep26")
