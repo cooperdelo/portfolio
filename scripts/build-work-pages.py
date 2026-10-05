@@ -219,6 +219,14 @@ def made_this(w):
       <span class="made-cap"><span class="label">How I made this · {ACCESS[acc]}</span><b>{E(title)}</b><span>{E(line)}</span></span><span class="made-go">{ARROW}</span></a>'''
 
 
+def make_line(w):
+    """'Make one like this', right before Next: the same resource as the How I made this card."""
+    import sys as _s; _s.path.insert(0, str(ROOT / "scripts"))
+    from site_data import WORK_CARDS, mk_line
+    how = {c[0]: c[7] for c in WORK_CARDS}.get(w["slug"])
+    return mk_line(how, "Make one like this", "case") if how else ""
+
+
 def case(w, nxt, no):
     poster = f"/videos/work/{w.get('video')}.jpg"
     la, li = vsrc(w.get("video"), w.get("webm"))
@@ -272,6 +280,7 @@ def case(w, nxt, no):
   {body}
   {extra}
   {stills_block(w)}
+  {make_line(w)}
   <a class="next dark" href="/work/{nxt['slug']}" data-cursor="Next">
     <span class="label"><span>Next</span><span>{E(nxt['disc'])}</span></span>
     <span class="t">{E(nxt['title'])}</span>
@@ -324,7 +333,7 @@ INDEX = """{HEAD}
     </div>
     <div class="copy">
       <h1 data-hero><span class="line"><span>Founder of PlugVerse.</span></span><span class="line"><span>I make films and</span></span><span class="line"><span>play in a band.</span></span><span class="line"><span>CS + Business, UNC.</span></span></h1>
-      <div class="meta"><a class="pill" href="#work">See the work {ARROW}</a><a class="pill" href="#contact" data-contact>Send me a message</a></div>
+      <div class="meta"><a class="pill" href="#work">See the work {ARROW}</a><a class="pill" href="#start" data-from="hero" data-to="start">Free playbooks</a></div>
     </div>
     <div class="foot">
       <div class="bar label"><span>35.913N 79.056W</span><span>Chapel Hill, NC</span></div>
@@ -507,6 +516,8 @@ SYS_STEPS = [("Read first", "Every session opens the same folder before it answe
              ("Run without me", "Scheduled jobs pull the data, Jev sorts it, and I only see what needs me.")]
 
 def ai_system_page():
+    import sys as _s; _s.path.insert(0, str(ROOT / "scripts"))
+    from site_data import next_block
     srcs = "".join(f'<li style="--d:{i * .5}s"><b>{a}</b><span>{b}</span></li>' for i, (a, b) in enumerate(SYS_SRC))
     n = len(SYS_TREE)
     tree = "".join(f'<li style="--d:{i * .12}s"><span class="f">{"&#9500;" if i < n - 1 else "&#9492;"} {E(a)}</span><span class="c">{E(b)}</span></li>' for i, (a, b) in enumerate(SYS_TREE))
@@ -539,6 +550,7 @@ def ai_system_page():
     <p>The folder layout, the rules file, the decision template and the one prompt that builds it for you.</p>
     <div class="acts"><a class="pill solid" href="/resources/guides/ai-system">Get the guide {ARROW}</a><a class="pill" href="/resources">More resources</a></div>
   </section>
+  {next_block("ai-system")}
 </main>
 {footer()}
 {SCRIPTS}
@@ -551,7 +563,9 @@ if __name__ == "__main__":
     for i, w in enumerate(WORK):
         html_ = case(w, WORK[(i + 1) % len(WORK)], f"{i + 1:02d}")
         if w["slug"] == "bioswap":  # the Motion breakdown lives with the piece it explains
-            html_ = (html_.replace('  <a class="next dark"', "  " + home_extras["motion"](in_case=True) + '\n  <a class="next dark"', 1)
+            # ...and sits above 'Make one like this', which stays right before Next
+            anchor = '  <a class="mk-line"' if '  <a class="mk-line"' in html_ else '  <a class="next dark"'
+            html_ = (html_.replace(anchor, "  " + home_extras["motion"](in_case=True) + "\n" + anchor, 1)
                      .replace("</head>", '<link rel="stylesheet" href="/assets/motion.css" />\n</head>', 1)
                      .replace('<script src="/assets/beacon.js" defer></script>', '<script src="/assets/beacon.js" defer></script>\n<script src="/assets/motion.js" defer></script>', 1))
         (ROOT / "work" / f"{w['slug']}.html").write_text(html_, encoding="utf-8")
@@ -574,7 +588,7 @@ if __name__ == "__main__":
             .replace("{FRAMES}", frames_block()).replace("{FOOTER}", footer("home-footer")).replace("{ABOUTPIC}", spic("home-about", "Cooper Delo on the lawn at dusk", "(max-width: 900px) 100vw, 40vw")).replace("{SCRIPTS}", SCRIPTS)
             .replace("{CAL}", CAL).replace("{ARROW}", ARROW))
     extras = runpy.run_path(str(ROOT / "scripts/build-home-extras.py"))
-    page = (page.replace("{WORKGRID}", extras["work_grid"](home=True)).replace("{RECORDS}", extras["records"]()).replace("{RESOURCES}", extras["res_bento"](limit=5)).replace("{SHOP}", extras["shop_teaser"]()).replace("{STRIP}", extras["strip"](frames_block()))
+    page = (page.replace("{WORKGRID}", extras["work_grid"](home=True)).replace("{RECORDS}", extras["records"]()).replace("{RESOURCES}", extras["start_here"]()).replace("{SHOP}", extras["shop_teaser"]()).replace("{STRIP}", extras["strip"](frames_block()))
             .replace("</head>", '<link rel="stylesheet" href="/assets/showcase.css" />\n<link rel="stylesheet" href="/assets/doors.css" />\n<link rel="stylesheet" href="/assets/records.css" />\n<link rel="stylesheet" href="/assets/album-viewer.css" />\n</head>', 1)
             .replace('<script src="/assets/site.js" defer></script>', '<script src="/assets/site.js" defer></script>\n<script src="/assets/doors.js" defer></script>\n<script src="/assets/records.js" defer></script>', 1))
     (ROOT / "index.html").write_text(page, encoding="utf-8")

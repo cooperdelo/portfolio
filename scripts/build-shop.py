@@ -149,7 +149,7 @@ def demo_shots():
 
 # ---------------------------------------------------------------- kits as objects (ref: 3D Book card + holographic sheen)
 KITS_SHELF = [  # slug, title, line, cover, href, state
-    ("design", "Design kit", "Sites that don't look like AI.", "/img/res/designkit-1200.webp", "/shop/design-kit", "$29 draft"),
+    ("design", "Design kit", "Sites that don't look like AI.", "/img/res/designkit-1200.webp", "/shop/design-kit", "$29"),
     ("ai", "AI system kit", "The folder, the rules, the prompt.", "/img/res/ai-1200.webp", "/resources/ai-system", "Coming"),
     ("band", "Band kit", "Booking link, song notes, set builder.", "/img/res/stage-1200.webp", "/resources/guides/music", "Coming"),
     ("film", "Film kit", "Plan, shoot, grade in one pass.", "/img/res/ch1-1200.webp", "/resources/film-plan", "Coming"),
@@ -212,8 +212,8 @@ def storefront():
       <details><summary>What do I actually get?</summary><p>A page that stays unlocked in your browser with every step, every rule and every prompt, each with a copy button. You paste them into Claude and build.</p></details>
       <details><summary>Do I need to code?</summary><p>No. The prompts do the asking. If you can paste text into Claude, you can use them.</p></details>
       <details><summary>Is the free stuff actually free?</summary><p>Yes. Some guides ask for an email so I can send you new ones. The film planner doesn't even ask for that.</p></details>
-      <details><summary>Can I use it for client work? <span class="draft">Draft</span></summary><p>Answer pending. Cooper sets the license before this goes live.</p></details>
-      <details><summary>Refunds? <span class="draft">Draft</span></summary><p>Policy pending. Cooper sets it before this goes live.</p></details>
+      <details><summary>Can I use it for client work?</summary><p>Yes. Use it on your own projects and for clients. Just don't resell or share the kit itself.</p></details>
+      <details><summary>Refunds?</summary><p>Full refund within 14 days, no questions asked. Just <a href="#contact" data-contact>send me a message</a>.</p></details>
     </div>
   </section>"""
     page("shop/index", "Shop", "Kits, prompts and templates Cooper Delo made for his own work first.", body)
@@ -255,7 +255,7 @@ def guide(slug):
     demo = GUIDE_DEMO.get(slug)
     demo_html = f'<section class="gd-demo" aria-label="Try it">{demo()}</section>' if demo else ""
     sys.path.insert(0, str(ROOT / "scripts"))
-    from site_data import RES
+    from site_data import RES, next_block
     cover = RES[slug][3] if slug in RES else "film"
     body = f"""  <section class="gd-hero gd-cover dark" data-kit="{slug}" aria-labelledby="gd-h">
     <img class="gd-bg" src="/img/res/{cover}-1200.webp" srcset="/img/res/{cover}-600.webp 600w, /img/res/{cover}-1200.webp 1200w" sizes="100vw" alt="" aria-hidden="true" />
@@ -271,6 +271,7 @@ def guide(slug):
     <div class="gd-more" data-gate hidden><button type="button" class="pill solid" data-gm-open>Unlock the rest, free {ARROW}</button><p class="label" data-gate-count></p></div>
     <div class="gd-master" data-master hidden></div>
   </section>
+  {next_block(slug)}
   <div class="gm" data-gate-modal hidden data-lenis-prevent>
     <div class="gm-scrim" data-gm-close></div>
     <div class="gm-card" role="dialog" aria-modal="true" aria-labelledby="gm-h">
@@ -281,7 +282,7 @@ def guide(slug):
       <ol class="gm-list" data-gm-outline></ol>
       <form class="gd-form" data-email-gate><label><span class="label">Email</span><input type="email" name="email" required maxlength="254" autocomplete="email" placeholder="you@email.com" /></label><button class="pill solid" type="submit">Open the guide {ARROW}</button></form>
       <p class="kp-msg" data-msg role="status"></p>
-      <p class="gd-fine">I'll only use it to send you new guides. <span class="draft">Draft</span></p>
+      <p class="gd-fine">I'll only use it to send you new guides.</p>
     </div>
   </div>
   <div class="gd-bar" data-gate-bar hidden><span data-bar-count></span><button type="button" class="pill solid" data-gm-open>Unlock free {ARROW}</button></div>"""

@@ -36,3 +36,58 @@ ACCESS = {"free": "Free", "email": "Free", "paid": "Kit"}  # never say "with ema
 def res_img(key, alt="", sizes="(max-width: 900px) 100vw, 33vw", eager=False):
     return (f'<img src="/img/res/{key}-1200.webp" srcset="/img/res/{key}-600.webp 600w, /img/res/{key}-1200.webp 1200w" sizes="{sizes}" '
             f'alt="{alt}" loading="{"eager" if eager else "lazy"}" decoding="async" />')
+
+
+# ---------------------------------------------------------------- the funnel (2026-10-05): one clear next step everywhere
+ARROW = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1 8h13M9 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>'
+PRICE = {"design-kit": "$29"}
+
+
+def tag(slug):
+    """Free, or Kit · $29. Never 'with email'."""
+    acc = RES[slug][5]
+    return f"Kit · {PRICE[slug]}" if acc == "paid" else ACCESS[acc]
+
+
+# Homepage "Start here": what the visitor is trying to do -> the one resource for it.
+PICKER = [
+    ("film-motion", "Film your life"),
+    ("music", "Get your band booked"),
+    ("startup", "Ship something solo"),
+    ("ai-system", "Run your life with AI"),
+    ("design-kit", "Make a site that doesn't look like AI"),
+]
+
+# End of every free resource: one related free thing, plus the kit only where it genuinely fits.
+NEXT = {
+    "film-motion": ["film-plan", "gear"],
+    "film-plan": ["film-motion"],
+    "instagram-tiktok": ["film-plan"],
+    "linkedin": ["instagram-tiktok", "design-kit"],
+    "music": ["film-motion"],
+    "startup": ["ai-system", "design-kit"],
+    "ai-system": ["design-kit", "startup"],
+}
+
+
+def next_block(slug, theme="light"):
+    """'Next' cards at the end of a free resource. Static, so it shows locked and unlocked."""
+    items = NEXT.get(slug, [])
+    if not items:
+        return ""
+    cards = "".join(
+        f'''<li><a class="made" href="{RES[s][4]}" data-from="next" data-to="{s}"><span class="made-img">{res_img(RES[s][3], "", "(max-width: 700px) 100vw, 220px")}</span>
+        <span class="made-cap"><span class="label">{tag(s)}</span><b>{RES[s][1]}</b><span>{RES[s][2]}</span></span><span class="made-go">{ARROW}</span></a></li>'''
+        for s in items)
+    return f'''<section class="nx {theme}" aria-labelledby="nx-h">
+    <p class="label" id="nx-h">Next</p>
+    <ol class="nx-list n{len(items)}">{cards}</ol>
+  </section>'''
+
+
+def mk_line(slug, label, frm):
+    """One line that points at a resource: 'Make one like this' on case pages, the film guide on /gear."""
+    if slug not in RES:
+        return ""
+    s = RES[slug]
+    return f'''<a class="mk-line" href="{s[4]}" data-from="{frm}" data-to="{slug}"><span class="label">{label}</span><b>{s[1]}</b><span class="label mk-tag">{tag(slug)} {ARROW}</span></a>'''

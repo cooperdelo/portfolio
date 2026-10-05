@@ -5,6 +5,9 @@
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
+import sys
+sys.path.insert(0, str(ROOT / "scripts"))
+from site_data import next_block, mk_line  # noqa: E402
 ARROW = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1 8h13M9 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>'
 CAL = "https://cal.com/cooper-delo1"
 PV = "https://plugverse.app/?utm_source=cooperdelo&utm_medium=portfolio&utm_campaign=artist_workflow"
@@ -212,7 +215,8 @@ def film_plan():
     <div class="fp-cols">{cols}</div>
     <div class="fp-prompt"><p class="label">One paste. Change the highlighted line.</p><div class="cb"><pre>{prompt}</pre><button type="button" class="cp" aria-label="Copy the prompt">Copy</button></div>
       <p class="note">Same rules behind the <a href="/work/plugverse-launch-film">PlugVerse launch film</a>.</p></div>
-  </section>"""
+  </section>
+  {next_block("film-plan")}"""
     page("resources/film-plan", "Film planner", "Cooper Delo's hooks, story checks and retention rules, as one prompt you paste into your AI with your idea.", body, css=("/assets/gear.css",))
 
 
@@ -281,7 +285,8 @@ def gear():
     <ul class="gl-list" data-glist>{"".join(rows)}</ul>
     <p class="fine">Amazon links are searches for the exact model. <span class="draft">Draft</span> If they become affiliate links, this line will say so.</p>
     <img class="gl-float" data-gfloat alt="" aria-hidden="true" />
-  </section>"""
+  </section>
+  {mk_line("film-motion", "How I film with it", "gear")}"""
     page("gear", "My setup", "The guitars, amp, camera, studio gear and grade Cooper Delo actually uses.", body, css=("/assets/gear.css",))
 
 

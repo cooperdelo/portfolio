@@ -258,7 +258,7 @@ def chapters(records_html, diagram):
 # ---------------------------------------------------------------- four doors (plan 2026-10-03): Work, Resources, Shop, Contact
 import sys as _sys, pathlib as _pl
 _sys.path.insert(0, str(_pl.Path(__file__).resolve().parent))
-from site_data import PILLARS, WORK_CARDS, RESOURCES, RES, ACCESS, res_img  # noqa: E402
+from site_data import PILLARS, WORK_CARDS, RESOURCES, RES, ACCESS, res_img, PICKER, tag  # noqa: E402
 
 
 def _work_media(kind, val):
@@ -310,6 +310,23 @@ def res_bento(heading=True, limit=None, exclude=()):
     return f'''<section class="rbs light" aria-label="Resources">
     {head}
     <ol class="rb-grid{" n" + str(len(items)) if limit else ""}">{cards}</ol>
+  </section>'''
+
+
+def start_here():
+    """Homepage Resources, led by a picker: what are you trying to do -> the one resource for it.
+    Everything the picker doesn't name sits under it as one compact line."""
+    rows = "".join(f'''<li><a class="pk" href="{RES[s][4]}" data-from="picker" data-to="{s}">
+        <span class="label pk-no">{i + 1:02d}</span><span class="pk-img">{res_img(RES[s][3], "", "(max-width: 900px) 72px, 160px")}</span>
+        <span class="pk-cap"><b>{ask}</b><span>{RES[s][2]}</span></span><span class="label pk-tag">{tag(s)}</span><span class="pk-go">{ARROW}</span></a></li>'''
+                   for i, (s, ask) in enumerate(PICKER))
+    named = {s for s, _ in PICKER}
+    rest = "".join(f'<li><a href="{r[4]}" data-from="picker_all" data-to="{r[0]}">{r[1]}</a></li>' for r in RESOURCES if r[0] not in named)
+    return f'''<section class="rbs pks light" id="start" aria-labelledby="pk-h">
+    <div class="rb-head pk-head"><div><p class="label">Start here · Free playbooks</p><h2 id="pk-h" data-rv><span class="line"><span>What are you</span></span><span class="line"><span>trying to do?</span></span></h2></div>
+      <p>Pick one. Four free guides and one paid kit.</p></div>
+    <ol class="pk-list">{rows}</ol>
+    <div class="pk-all"><p class="label">Also free</p><ul>{rest}</ul><a class="pk-allk label" href="/resources">All resources {ARROW}</a></div>
   </section>'''
 
 

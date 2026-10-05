@@ -325,6 +325,7 @@ button.wk-day:hover { border-color: rgba(244, 240, 231, .5); }
 .gd-steps .st.locked:last-child { opacity: .3; }
 .gd-steps .st.locked:hover h3 { text-decoration: underline; text-underline-offset: 4px; }
 .gd-more { max-width: 980px; margin: clamp(26px, 4vh, 40px) auto 0; display: flex; flex-wrap: wrap; align-items: center; gap: 16px; }
+.gd-more[hidden] { display: none; }
 .gd-more .label { opacity: .62; }
 .gd-more .pill.solid { background: var(--ink); color: var(--bone); border-color: var(--ink); }
 .gm { position: fixed; inset: 0; z-index: 200; display: grid; place-items: center; padding: 20px; }
