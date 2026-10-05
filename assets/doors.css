@@ -149,3 +149,4 @@
   .pk-allk { margin-left: 0; }
 }
 .pk-img img[src*="/designkit-"] { object-position: 50% 0; }
+.pk-img img[src*="designkit"] { object-position: 50% 18%; }
