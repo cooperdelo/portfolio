@@ -4,6 +4,9 @@ is moved into the same _to_delete tree with an UNDO row. Reads ONLY the shared b
 
     reject (video)  -> G:/Videos/_to_delete/band-review-<date>/<same path>   (+ _UNDO.csv, then asset.retired_at)
     reject (photo)  -> <Drive>/My Drive/Rubber Band Review/_to_delete/       (+ _UNDO.csv)
+    reject (photo on G:) -> G:/Videos/_to_delete/band-review-<date>/<same path>: the ARW and any same-stem JPG (+ _UNDO.csv, then retired)
+    keep/favorite photo on G: -> ARW (+ same-stem JPG) copied to G:/Photos/Gigs/<gig slug>/selects/; favorites and use_broll also get
+        a copy in G:/Photos/Good Stills/band/; use_band also renders a full-size JPEG (q92) into <Drive>/.../For the band/<gig label>/
     keep/favorite   -> cut [trim_start, trim_end] from the ORIGINAL, per the "used for" ticks:
         use_broll   -> G:/Videos/01_BROLL/<prefix>_<shot|wide>_<subject|band>_<NNN>[_HERO].mp4  (+ _gig_subclips_map.csv)
         use_band    -> G:/Videos/03_GIGS/<gig>/_band/<stem>_<start>s.mp4 and <Drive>/.../For the band/<gig label>/
@@ -26,6 +29,11 @@ BAND = "00000000-0000-4000-8000-0000000b0a4d"  # the bandmates' shared reviewer
 PREFIX = {"chiphi_9-12-26": "chiphi", "maw_9-11-26": "maw", "pikapp_8-26-26": "pikapp", "axo_bid_8-25-26": "axo"}
 LABEL = {"pikapp_8-26-26": "Pi Kapp \u00b7 Aug 26", "axo_bid_8-25-26": "AXO bid \u00b7 Aug 25", "maw_9-11-26": "MAW \u00b7 Sep 11", "chiphi_9-12-26": "Chi Phi \u00b7 Sep 12"}
 DRIVE_SUB = "My Drive/Rubber Band Review"
+PHOTO_ROOTS = ("Videos/00_INBOX/", "Photos/")  # photo originals on G: may only live under these
+GIG_PHOTOS = G / "Photos/Gigs"
+STILLS = G / "Photos/Good Stills/band"
+RAW = ".arw"
+JPEGS = (".jpg", ".jpeg")
 MIGRATION = "apply 20261004-band-review-v2.sql first"
 BOM = b"\xef\xbb\xbf"
 H264 = ["-c:v", "libx264", "-profile:v", "high", "-pix_fmt", "yuv420p"]
@@ -94,6 +102,67 @@ def gig_folder(source_path):
 
 def is_photo(asset):
     return asset["mime_type"].startswith("image/")
+
+
+def gig_slug(label):
+    """'Chi Phi \u00b7 Sep 12' -> 'chiphi-sep12'; 'Photos \u00b7 Sep 26' -> 'photos-sep26'."""
+    parts = [re.sub(r"[^a-z0-9]", "", p.lower()) for p in re.split(r"[\u00b7|]", label or "")]
+    return "-".join(p for p in parts if p) or "photos"
+
+
+def photo_files(src):
+    """The shot's files: the original plus any same-stem JPG next to a RAW. A JPG original has no siblings. The original comes first
+    even when it is already gone (a re-run after a partial move)."""
+    src = Path(src)
+    out = [src]
+    if src.suffix.lower() == RAW and src.parent.is_dir():
+        out += sorted(q for q in src.parent.iterdir() if q.is_file() and q.stem.lower() == src.stem.lower() and q.suffix.lower() in JPEGS)
+    return out
+
+
+def fs_label(label):
+    """A gig label made safe as ONE path component (no separators, drive colons or reserved characters, no leading/trailing dots)."""
+    s = re.sub(r'[/\\:*?"<>|\x00-\x1f]', "-", label or "").strip(" .")
+    return s or "Photos"
+
+
+def drive_band_dir(root, label):
+    """<Drive>/My Drive/Rubber Band Review/For the band/<label>, guaranteed inside the Drive mount (ValueError otherwise)."""
+    d = Path(root) / DRIVE_SUB / "For the band" / fs_label(label)
+    if not inside(d, root):
+        raise ValueError("band folder escapes the Drive mount")
+    return d
+
+
+def photo_copy_plan(files, label, favorite, use_broll):
+    """[(step kind, source, destination)] for a kept G: photo: selects always; the stills library for favorites and use_broll."""
+    plan = [(f"select{i}", f, GIG_PHOTOS / gig_slug(label) / "selects" / f.name) for i, f in enumerate(files)]
+    if favorite or use_broll:
+        plan += [(f"still{i}", f, STILLS / f.name) for i, f in enumerate(files)]
+    return plan
+
+
+def photo_band_name(src):
+    return Path(src).stem + ".jpg"
+
+
+def render_photo(src, out):
+    """Full-resolution JPEG for the band (magick decodes ARW). Never overwrites; written under .part so Drive never syncs half a file."""
+    out = Path(out)
+    if out.exists():
+        return "refusing to overwrite " + str(out)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    part = out.with_name(out.stem + ".part.jpg")
+    r = subprocess.run(["magick", str(src), "-auto-orient", "-quality", "92", str(part)], stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, text=True)
+    if r.returncode or not part.exists():
+        part.unlink(missing_ok=True)
+        return "magick: " + r.stderr[-300:]
+    os.replace(part, out)
+    return None
+
+
+def rel_g(p):
+    return Path(p).relative_to(G).as_posix()
 
 
 def find_drive_root(given=None):
@@ -215,7 +284,13 @@ def safe_move(src, dst, undo_csv, taken=()):
 def safe_copy(src, dst, taken=()):
     dst = unique(dst, taken)
     dst.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copy2(src, dst)
+    part = dst.with_name(dst.name + ".part")  # a crash mid-copy must not leave a truncated file under the final name
+    try:
+        shutil.copy2(src, part)
+        os.replace(part, dst)
+    except BaseException:
+        part.unlink(missing_ok=True)
+        raise
     return dst
 
 
@@ -325,7 +400,12 @@ def main():
             src = root / rel
             return (src, None) if inside(src, root) else (None, "source_path escapes the Drive mount")
         if is_photo(asset):
-            return None, "photo source must be in Drive"
+            if not (safe_rel(sp) and sp.startswith(PHOTO_ROOTS)):
+                return None, "photo source must be under G:/Videos/00_INBOX/ or G:/Photos/ (or in Drive)"
+            src = G / sp
+            if not any(inside(src, G / r) for r in PHOTO_ROOTS):
+                return None, "source_path escapes the photo folders"
+            return src, None
         if not (safe_rel(sp) and sp.startswith("Videos/03_GIGS/") and gig_folder(sp)):
             return None, "unsafe source_path"
         src = G / sp
@@ -346,6 +426,7 @@ def main():
             if err:
                 pending.append(f"{name}: {err}"); continue
             photo, folder = is_photo(asset), gig_folder(asset["source_path"])
+            gphoto = photo and not asset["source_path"].startswith("drive:")
             label = LABEL.get(folder, asset["gig"])
             same = prior.get("revision") == m["revision"]
             cur = prior if same else {"revision": m["revision"], "verdict": v, "steps": {}, "counter": prior.get("counter")}
@@ -388,36 +469,53 @@ def main():
 
             if v == "reject":
                 stats["reject"] += 1
-                if photo:
+                if gphoto:  # the RAW and its same-stem JPG travel together
+                    moves = [("move" if i == 0 else f"move{i}", q, undo_dest(rel_g(q), today), ulog_tree) for i, q in enumerate(photo_files(src))]
+                elif photo:
                     if not root:
                         pending.append(f"{name}: rejected photo needs the Drive mount"); continue
-                    ulog, base = root / DRIVE_SUB / "_to_delete" / "_UNDO.csv", root / DRIVE_SUB / "_to_delete" / src.name
+                    moves = [("move", src, root / DRIVE_SUB / "_to_delete" / src.name, root / DRIVE_SUB / "_to_delete" / "_UNDO.csv")]
                 else:
-                    ulog, base = ulog_tree, undo_dest(asset["source_path"], today)
-                rec = cur["steps"].get("move")
-                n_planned += 1
-                if not src.exists():  # already moved (earlier run died before the retire): trust the recorded or default destination
-                    gone = Path(rec["dst"]) if rec else base
-                    if not gone.exists():
-                        pending.append(f"{name}: original missing and no moved copy found"); continue
-                    print(f"  REJECT  {name}  already moved -> {gone}")
-                    n_ok += 1
-                else:
-                    dst = unique(base, taken); taken.add(str(dst))
-                    print(f"  REJECT  {name}  ->  {dst}")
-                    if a.apply:
-                        dst = safe_move(src, dst, ulog)
-                        cur["steps"]["move"] = {"dst": str(dst)}; log[asset["id"]] = cur; save_log()
+                    moves = [("move", src, undo_dest(asset["source_path"], today), ulog_tree)]
+                for mkey, msrc, base, ulog in moves:
+                    rec = cur["steps"].get(mkey)
+                    n_planned += 1
+                    if not msrc.exists():  # already moved (earlier run died before the retire): trust the recorded or default destination
+                        gone = Path(rec["dst"]) if rec else base
+                        if not gone.exists():
+                            pending.append(f"{name}: original missing and no moved copy found"); continue
+                        print(f"  REJECT  {msrc.name}  already moved -> {gone}")
                         n_ok += 1
+                    else:
+                        dst = unique(base, taken); taken.add(str(dst))
+                        print(f"  REJECT  {msrc.name}  ->  {dst}")
+                        if a.apply:
+                            dst = safe_move(msrc, dst, ulog)
+                            cur["steps"][mkey] = {"dst": str(dst)}; log[asset["id"]] = cur; save_log()
+                            n_ok += 1
                 if a.apply and n_ok == n_planned:
                     requests.patch(f"{BASE}/rest/v1/band_media_assets?id=eq.{asset['id']}", headers={**Hd, "Prefer": "return=minimal"},
                                    json={"retired_at": datetime.datetime.now(datetime.timezone.utc).isoformat()}, timeout=30).raise_for_status()
             else:
-                if not (m.get("use_band") or m.get("use_broll")):
+                if not gphoto and not (m.get("use_band") or m.get("use_broll")):  # a kept G: photo always goes to selects
                     needs_tick.append(f"{name} ({v})"); continue
                 hero = v == "favorite"
                 start, end = m.get("trim_start") or 0, m.get("trim_end")
-                if photo:
+                if gphoto:
+                    label = asset["gig"]
+                    files = [q for q in photo_files(src) if q.exists()]
+                    if not files:
+                        pending.append(f"{name}: original missing"); continue
+                    for kind, fsrc, fdst in photo_copy_plan(files, label, hero, m.get("use_broll")):
+                        stats["photo_copy"] += 1
+                        step(kind, fdst, lambda d, fsrc=fsrc: safe_copy(fsrc, d) and None, "PHOTO")
+                    if m.get("use_band"):
+                        if root:
+                            stats["photo_copy"] += 1
+                            step("photo_band", drive_band_dir(root, label) / photo_band_name(src), lambda d: render_photo(src, d), "RENDER")
+                        else:
+                            pending.append(f"{name}: band photo render needs the Drive mount")
+                elif photo:
                     if m.get("use_broll"):
                         stats["photo_copy"] += 1
                         step("photo_broll", G / "Photos/Good Stills/band" / src.name, lambda d: safe_copy(src, d) and None, "PHOTO")
@@ -461,7 +559,7 @@ def main():
                                 pending.append(f"{name}: Drive copy waits for the local band cut")
                             else:
                                 lb = Path(cur["steps"]["band"]["dst"]).name if "band" in cur["steps"] else bn  # copy keeps the local file's real name
-                                step("band_drive", root / DRIVE_SUB / "For the band" / label / lb,
+                                step("band_drive", drive_band_dir(root, label) / lb,
                                      lambda d: safe_copy(Path(cur["steps"]["band"]["dst"]), d) and None, "COPY")
 
             clean = len(pending) + len(errors) + len(needs_trim_l) == before
