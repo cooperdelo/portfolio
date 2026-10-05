@@ -35,6 +35,8 @@ body.bandrev { background: var(--ink); color: var(--bone); min-height: 100svh; p
 .br-player[hidden] { display: none; }
 .br-back { display: none; justify-self: start; opacity: .7; }
 .br-title .label { opacity: .55; }
+.br-title .br-dl { display: inline-block; margin-top: 10px; padding: 9px 14px; border: 1px solid var(--line-d); border-radius: 999px; opacity: 1; text-decoration: none; color: inherit; }
+.br-title .br-dl[hidden] { display: none; }
 .br-title h2 { font-family: var(--display); font-weight: 700; text-transform: uppercase; font-size: clamp(20px, 2.4vw, 34px); line-height: .9; margin-top: 6px; overflow-wrap: anywhere; }
 .br-video { position: relative; border-radius: 10px; overflow: hidden; background: #000; aspect-ratio: 16 / 9; }
 .br-video video, .br-video img { width: 100%; height: 100%; object-fit: contain; cursor: pointer; }
