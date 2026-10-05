@@ -78,7 +78,7 @@ def records():
 
 # ---------------------------------------------------------------- showcase: one screen, four tabs, one best piece each
 SHOW = [
-    {"tab": "Storytelling", "title": "Chapter One", "line": "Junior year, in 33 seconds.", "stat": "17.6K views on TikTok",
+    {"tab": "Storytelling", "title": "Chapter One", "line": "Junior year, in 33 seconds.", "stat": "0:33 · 2026",
      "cta": ("Watch it", "/work/chapter-one"), "video": "chapter-one", "ar": "16/9"},
     {"tab": "Motion", "title": "Bioswap", "line": "One camera, no cuts. Built in code.", "stat": "Remotion, React, Resolve",
      "cta": ("See how it moves", "/work/bioswap"), "video": "bioswap-final", "ar": "1/1", "webm": True},
@@ -187,7 +187,7 @@ def chapter_films():
     return f'''<section class="ch ch-films light" id="films" aria-labelledby="films-h">
     {_head("films", "01", "Films", "Short films I shoot and cut myself.").replace('class="ch-name"', 'class="ch-name" id="films-h"')}
     <div class="ct-grid">
-      {tile("chapter-one", "chapter-one", "Chapter One", "Junior year, in 33 seconds.", "0:33 · 17.6K views on TikTok", "big")}
+      {tile("chapter-one", "chapter-one", "Chapter One", "Junior year, in 33 seconds.", "0:33 · 2026", "big")}
       {tile("the-start", "the-start", "The Start", "I am terrified of starting.", "0:20 · 2026", "")}
       {tile("plugverse-launch-film", "launch-film", "PlugVerse launch film", "My first short film, made for my startup's launch.", "1:00 · 2026", "")}
     </div>

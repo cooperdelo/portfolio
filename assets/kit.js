@@ -72,7 +72,9 @@
     if (locked) return `<li class="st locked"><span class="label no">${String(i + 1).padStart(2, "0")}</span><div><h3>${esc(s)}</h3><div class="cb ghost" aria-hidden="true"><i></i><i></i><i></i></div></div><span class="lk">${LOCK}</span></li>`;
     return `<li class="st"><span class="label no">${String(i + 1).padStart(2, "0")}</span><div><h3>${esc(s.do)}</h3>${s.copy ? block(s.copy) : ""}</div></li>`;
   }
-  const masterHTML = (k) => k.master_prompt ? `<div class="mp"><p class="label">The one prompt</p><h2>Paste this into Claude.</h2>${block(k.master_prompt, "Copy the prompt")}</div>` : "";
+  // Works in any AI tool. Kits that make files or code go to a coding agent; the rest go in any chat.
+  const CODING = new Set(["design", "startup", "ai-system"]);
+  const masterHTML = (k) => k.master_prompt ? `<div class="mp"><p class="label">The one prompt</p><h2>${CODING.has(k.slug) ? "Paste this into your coding agent." : "Paste this into your AI."}</h2><p class="mp-tools">${CODING.has(k.slug) ? "Claude Code, Cursor, Codex or any coding agent." : "Claude, ChatGPT, Gemini or whatever you use."}</p>${block(k.master_prompt, "Copy the prompt")}</div>` : "";
 
   function render(d) {
     const k = d.kit;

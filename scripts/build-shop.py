@@ -91,14 +91,16 @@ def demo_linkedin():
     boxes = "".join(f'<li><label><input type="checkbox" data-check="{k}" /><b>{t}</b><span>{q}</span></label></li>' for k, t, q in checks)
     return f"""<div class="dm dm-li" data-demo="linkedin">
       <div class="li-card">
-        <div class="li-top"><img class="li-av" src="/img/lawn-1280.webp" alt="" loading="lazy" /><div><b>Cooper Delo</b><span>Founder, PlugVerse · 1h</span></div></div>
-        <textarea class="li-text" rows="2" maxlength="300" data-line aria-label="Your first line">Nobody at the pitch cared about my slides. They cared about one number.</textarea>
-        <img class="li-photo" src="/img/res/pitch-1200.webp" alt="Cooper pitching PlugVerse at Innovate Carolina" loading="lazy" />
+        <div class="li-top"><span class="li-av" data-li-you aria-hidden="true"></span><img class="li-av" data-li-me src="/img/lawn-1280.webp" alt="" loading="lazy" hidden /><div><b data-li-name>You</b><span data-li-sub>Your headline · now</span></div></div>
+        <textarea class="li-text" rows="2" maxlength="300" data-line aria-label="Your first line" placeholder="Type the first line of your next post"></textarea>
+        <div class="li-img" data-li-you>Your photo or screenshot</div>
+        <img class="li-photo" data-li-me src="/img/res/pitch-1200.webp" alt="Cooper pitching PlugVerse at Innovate Carolina" loading="lazy" hidden />
       </div>
       <div class="dm-ctl">
         <p class="label">One point each</p>
         <ul class="li-checks">{boxes}</ul>
         <p class="li-verdict" data-verdict aria-live="polite"><b data-li-score>0</b><span data-li-say>Keep the idea, change the wrapper.</span></p>
+        <button type="button" class="dm-mine label" data-mine aria-pressed="false">See mine</button>
       </div>
     </div>"""
 
@@ -113,29 +115,43 @@ def demo_music():
 
 
 def demo_vault():
-    items = [("CLAUDE.md", "The rules Claude reads before anything else. Each one was written after something broke.", "CLAUDE.md"),
+    items = [("CLAUDE.md", "The rules your AI reads before anything else (CLAUDE.md, AGENTS.md or custom instructions). Each one was written after something broke.", "CLAUDE.md"),
              ("Context/", "Who you are, how you write, what you've committed to, and the memory log.", "Context/voice.md"),
-             ("Decisions/", "One dated file per call you make. Claude checks here before it guesses.", "Decisions/YYYY-MM-DD-topic.md"),
+             ("Decisions/", "One dated file per call you make. Your AI checks here before it guesses.", "Decisions/YYYY-MM-DD-topic.md"),
              ("Projects/", "One folder per project, each with one front-door file.", "Projects/[name]/README.md"),
-             ("Skills/", "Step-by-step procedures Claude can run the same way every time.", "Skills/[job]/SKILL.md"),
+             ("Skills/", "Step-by-step procedures your AI can run the same way every time.", "Skills/[job]/SKILL.md"),
              ("Scheduled-Tasks/", "Jobs that run without you, listed on one roster.", "Scheduled-Tasks/TASK-ROSTER.md"),
              ("Daily/", "What happened today. Chats get saved to Inbox when they end.", "Daily/YYYY-MM-DD.md")]
     tree = "".join(f'<li><button type="button" data-v="{i}"{" aria-pressed=\"true\"" if i == 0 else " aria-pressed=\"false\""}><span class="vf">{"&#9500;" if i < len(items) - 1 else "&#9492;"} {E(n)}</span></button></li>' for i, (n, _, _) in enumerate(items))
     panes = "".join(f'<div class="vp" data-vp="{i}"{"" if i == 0 else " hidden"}><p class="label">{E(n)}</p><p class="vd">{E(d)}</p><p class="vx"><span class="label">For example</span><code>{E(x)}</code></p></div>' for i, (n, d, x) in enumerate(items))
     return f"""<div class="dm dm-vault" data-demo="vault">
       <div class="vwin"><div class="win-bar"><i></i><i></i><i></i><span>~/vault</span></div><ul class="vtree">{tree}</ul></div>
-      <div class="dm-ctl" aria-live="polite">{panes}<p class="dm-note">Click a folder. This is the shape of mine.</p></div>
+      <div class="dm-ctl" aria-live="polite">{panes}<p class="dm-note">Click a folder. Yours starts with the same shape.</p></div>
     </div>"""
 
+PILLAR_IDEAS = ["Work", "Study", "Training", "Faith", "Family", "Craft", "Travel", "Food"]
+
 def demo_week():
-    days = "".join(f'<li><button type="button" class="wk-day" data-day="{i}"><span class="label">{d}</span><b data-topic>Pick</b><span class="wk-fmt" data-fmt></span></button></li>' for i, d in enumerate(["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]))
+    """The reader's own pillars first, then their week. Cooper's week is only an example behind 'See mine'."""
+    dn = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+    chips = "".join(f'<button type="button" data-p="{E(t)}" aria-pressed="false">{E(t)}</button>' for t in PILLAR_IDEAS)
+    days = "".join(f'<li><button type="button" class="wk-day" data-day="{i}"><span class="label">{d}</span><b data-topic>&nbsp;</b><span class="wk-fmt" data-fmt></span></button></li>' for i, d in enumerate(dn))
     return f"""<div class="dm dm-week" data-demo="week">
       <div class="wk">
-        <ol class="wk-days"><li><div class="wk-day sun"><span class="label">Sun</span><b>Film + edit</b><span class="wk-fmt">No posting</span></div></li>{days}</ol>
-        <div class="wk-car" role="group" aria-label="Which day is the carousel"><span class="label">Carousel</span>{"".join(f'<button type="button" data-car="{i}" aria-pressed="false">{d}</button>' for i, d in enumerate(["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]))}</div>
-        <p class="dm-note">Tap a day to change its topic.</p>
+        <div class="wk-pp">
+          <p class="label">1 · Your pillars, 2 to 5</p>
+          <p class="wk-hint">The parts of your life you actually want to show.</p>
+          <div class="wk-chips" role="group" aria-label="Pick your pillars" data-chips>{chips}</div>
+          <form class="wk-add" data-add><label><span class="sr">Add your own pillar</span><input name="p" maxlength="24" autocomplete="off" placeholder="Add your own" /></label><button type="submit" class="label">Add</button></form>
+          <div class="wk-main" data-main hidden><span class="label">Main pillar</span><span class="wk-mains" data-mains></span></div>
+        </div>
+        <p class="label wk-step">2 · Your week</p>
+        <ol class="wk-days" data-week><li><div class="wk-day sun"><span class="label">Sun</span><b>Film + edit</b><span class="wk-fmt">No posting</span></div></li>{days}</ol>
+        <div class="wk-car" role="group" aria-label="Which day is the carousel"><span class="label">Carousel</span>{"".join(f'<button type="button" data-car="{i}" aria-pressed="false">{d}</button>' for i, d in enumerate(dn))}</div>
+        <p class="dm-note" data-wk-note>Pick two or more and the week fills in. Tap a day to change it.</p>
       </div>
-      <div class="dm-ctl"><p class="label">The week checks</p><ul class="wk-checks" data-checks></ul></div>
+      <div class="dm-ctl"><p class="label">The week checks</p><ul class="wk-checks" data-checks></ul>
+        <button type="button" class="dm-mine label" data-mine aria-pressed="false">See mine</button></div>
     </div>"""
 
 def demo_shots():
@@ -202,15 +218,15 @@ def storefront():
     <ol class="stk-list">
       <li class="stk-card" style="--i:0"><div class="stk-copy"><p class="label">LinkedIn</p><h3>Score your first line.</h3><p>The four checks I run before I post. Tick what's true.</p><a class="pill" href="/resources/guides/linkedin">Get the guide {ARROW}</a></div><div class="stk-demo">{demo_linkedin()}</div></li>
       <li class="stk-card" style="--i:1"><div class="stk-copy"><p class="label">Music</p><h3>Sort a setlist.</h3><p>Paste your set. It groups by tuning so you retune less.</p><a class="pill" href="/resources/guides/music">Get the guide {ARROW}</a></div><div class="stk-demo">{demo_music()}</div></li>
-      <li class="stk-card" style="--i:2"><div class="stk-copy"><p class="label">AI system</p><h3>One folder Claude reads.</h3><p>The setup behind everything on this site.</p><a class="pill" href="/resources/ai-system">See the system {ARROW}</a></div><div class="stk-demo">{demo_vault()}</div></li>
+      <li class="stk-card" style="--i:2"><div class="stk-copy"><p class="label">AI system</p><h3>One folder your AI reads.</h3><p>The setup behind everything on this site.</p><a class="pill" href="/resources/ai-system">See the system {ARROW}</a></div><div class="stk-demo">{demo_vault()}</div></li>
     </ol>
   </section>
 
   <section class="sh-faq" aria-labelledby="fq-h">
     <h2 id="fq-h">What people ask me.</h2>
     <div class="faq">
-      <details><summary>What do I actually get?</summary><p>A page that stays unlocked in your browser with every step, every rule and every prompt, each with a copy button. You paste them into Claude and build.</p></details>
-      <details><summary>Do I need to code?</summary><p>No. The prompts do the asking. If you can paste text into Claude, you can use them.</p></details>
+      <details><summary>What do I actually get?</summary><p>A page that stays unlocked in your browser with every step, every rule and every prompt, each with a copy button. You paste them into Claude, ChatGPT, Gemini or whatever you use, and build.</p></details>
+      <details><summary>Do I need to code?</summary><p>No. The prompts do the asking. If you can paste text into an AI tool, you can use them.</p></details>
       <details><summary>Is the free stuff actually free?</summary><p>Yes. Some guides ask for an email so I can send you new ones. The film planner doesn't even ask for that.</p></details>
       <details><summary>Can I use it for client work?</summary><p>Yes. Use it on your own projects and for clients. Just don't resell or share the kit itself.</p></details>
       <details><summary>Refunds?</summary><p>Full refund within 14 days, no questions asked. Just <a href="#contact" data-contact>send me a message</a>.</p></details>

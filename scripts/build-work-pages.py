@@ -547,7 +547,7 @@ def ai_system_page():
   </section>
   <section class="as-next light" aria-labelledby="as-n">
     <h2 id="as-n" data-rv>{lines("Set up")}{lines("your own.")}</h2>
-    <p>The folder layout, the rules file, the decision template and the one prompt that builds it for you.</p>
+    <p>The folder layout, the rules file, the decision template and the one prompt that builds it for you, in whatever AI you use.</p>
     <div class="acts"><a class="pill solid" href="/resources/guides/ai-system">Get the guide {ARROW}</a><a class="pill" href="/resources">More resources</a></div>
   </section>
   {next_block("ai-system")}

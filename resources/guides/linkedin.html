@@ -40,14 +40,16 @@
   </section>
   <section class="gd-demo" aria-label="Try it"><div class="dm dm-li" data-demo="linkedin">
       <div class="li-card">
-        <div class="li-top"><img class="li-av" src="/img/lawn-1280.webp" alt="" loading="lazy" /><div><b>Cooper Delo</b><span>Founder, PlugVerse · 1h</span></div></div>
-        <textarea class="li-text" rows="2" maxlength="300" data-line aria-label="Your first line">Nobody at the pitch cared about my slides. They cared about one number.</textarea>
-        <img class="li-photo" src="/img/res/pitch-1200.webp" alt="Cooper pitching PlugVerse at Innovate Carolina" loading="lazy" />
+        <div class="li-top"><span class="li-av" data-li-you aria-hidden="true"></span><img class="li-av" data-li-me src="/img/lawn-1280.webp" alt="" loading="lazy" hidden /><div><b data-li-name>You</b><span data-li-sub>Your headline · now</span></div></div>
+        <textarea class="li-text" rows="2" maxlength="300" data-line aria-label="Your first line" placeholder="Type the first line of your next post"></textarea>
+        <div class="li-img" data-li-you>Your photo or screenshot</div>
+        <img class="li-photo" data-li-me src="/img/res/pitch-1200.webp" alt="Cooper pitching PlugVerse at Innovate Carolina" loading="lazy" hidden />
       </div>
       <div class="dm-ctl">
         <p class="label">One point each</p>
         <ul class="li-checks"><li><label><input type="checkbox" data-check="them" /><b>Them</b><span>About other people?</span></label></li><li><label><input type="checkbox" data-check="fight" /><b>Fight</b><span>Could someone disagree?</span></label></li><li><label><input type="checkbox" data-check="proof" /><b>Proof</b><span>Does the photo prove it?</span></label></li><li><label><input type="checkbox" data-check="odd" /><b>Odd</b><span>Would a stranger stop?</span></label></li></ul>
         <p class="li-verdict" data-verdict aria-live="polite"><b data-li-score>0</b><span data-li-say>Keep the idea, change the wrapper.</span></p>
+        <button type="button" class="dm-mine label" data-mine aria-pressed="false">See mine</button>
       </div>
     </div></section>
   <section class="gd-body light" aria-label="The guide">

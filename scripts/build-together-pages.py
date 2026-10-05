@@ -208,7 +208,7 @@ def film_plan():
     <div class="fp-copy">
       <p class="label">Resources / Film planner</p>
       <h1 id="pg-h" data-hero><span class="line"><span>Hooks that</span></span><span class="line"><span>hold.</span></span></h1>
-      <p class="lede">The hooks, story checks and retention rules I actually use. Paste them into ChatGPT or Claude with your idea, and it writes yours, your way.</p>
+      <p class="lede">The hooks, story checks and retention rules I actually use. Paste them into Claude, ChatGPT, Gemini or whatever you use, with your idea, and it writes yours, your way.</p>
     </div>
   </section>
   <section class="fp light" aria-label="The playbook">

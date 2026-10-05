@@ -20,9 +20,24 @@
     sync();
   });
 
-  // ---------------------------------------------------------- LinkedIn: Cooper's four checks, scored by you
+  // ---------------------------------------------------------- LinkedIn: your first line, the four checks. Cooper's post is only an example ("See mine").
   document.querySelectorAll('[data-demo="linkedin"]').forEach((d) => {
     const boxes = [...d.querySelectorAll("[data-check]")], out = d.querySelector("[data-li-score]"), say = d.querySelector("[data-li-say]"), v = d.querySelector("[data-verdict]");
+    const mineBtn = d.querySelector("[data-mine]"), text = d.querySelector("[data-line]"), name = d.querySelector("[data-li-name]"), sub = d.querySelector("[data-li-sub]");
+    const MINE = { line: "Nobody at the pitch cared about my slides. They cared about one number.", name: "Cooper Delo", sub: "Founder, PlugVerse · 1h" };
+    let yours = { line: "", checks: [] };
+    mineBtn?.addEventListener("click", () => {
+      const on = mineBtn.getAttribute("aria-pressed") !== "true";
+      if (on) yours = { line: text.value, checks: boxes.map((b) => b.checked) };
+      mineBtn.setAttribute("aria-pressed", String(on));
+      mineBtn.textContent = on ? "Back to yours" : "See mine";
+      d.querySelectorAll("[data-li-you]").forEach((e) => { e.hidden = on; });
+      d.querySelectorAll("[data-li-me]").forEach((e) => { e.hidden = !on; });
+      text.value = on ? MINE.line : yours.line; text.readOnly = on;
+      name.textContent = on ? MINE.name : "You"; sub.textContent = on ? MINE.sub : "Your headline · now";
+      boxes.forEach((b, i) => { b.checked = on ? false : !!yours.checks[i]; });  // score mine yourself; no score is claimed for it
+      sync();
+    });
     const sync = () => {
       const n = boxes.filter((b) => b.checked).length;
       out.textContent = n;
@@ -55,6 +70,7 @@
 
 /* Guide demos: the vault tree, the posting week, the shot bank. */
 (() => {
+  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   // vault: click a folder, see what lives there
   document.querySelectorAll('[data-demo="vault"]').forEach((d) => {
     const btns = [...d.querySelectorAll("[data-v]")], panes = [...d.querySelectorAll("[data-vp]")];
@@ -64,22 +80,80 @@
     }));
   });
 
-  // week: six days, one topic each, one carousel
-  const TOPICS = ["Founder", "Mindset", "Music", "College", "Yours"];
+  // week: the reader picks their own pillars (2 to 5), then six days, one pillar each, one carousel.
+  // Cooper's own week is an example behind "See mine", never the default.
+  const MINE_WEEK = { picked: ["Founder", "Mindset", "Music", "College"], main: "Founder", plan: ["Founder", "Mindset", "Founder", "Music", "College", "Open slot"], car: 3 };
   document.querySelectorAll('[data-demo="week"]').forEach((d) => {
-    const days = [...d.querySelectorAll("[data-day]")], cars = [...d.querySelectorAll("[data-car]")], checks = d.querySelector("[data-checks]");
-    const pick = [0, 1, 0, 2, 3, 4]; let car = 3;
-    const draw = () => {
-      days.forEach((b, i) => { b.querySelector("[data-topic]").textContent = TOPICS[pick[i]]; b.querySelector("[data-fmt]").textContent = i === car ? "Carousel" : ""; b.classList.toggle("car", i === car); });
-      cars.forEach((b, i) => b.setAttribute("aria-pressed", String(i === car)));
-      const count = (t) => pick.filter((p) => TOPICS[p] === t).length;
-      const rows = [["Founder twice", count("Founder") === 2], ["Mindset, Music and College once each", ["Mindset", "Music", "College"].every((t) => count(t) === 1)],
-        ["One of your own", count("Yours") === 1], ["One carousel", car > -1], ["Filmed on Sunday", true]];
-      checks.innerHTML = rows.map(([t, ok]) => `<li class="${ok ? "ok" : ""}"><span class="dot" aria-hidden="true"></span>${t}<span class="label">${ok ? "Done" : "Not yet"}</span></li>`).join("");
-      d.classList.toggle("done", rows.every(([, ok]) => ok));
+    const chipsEl = d.querySelector("[data-chips]"), add = d.querySelector("[data-add]"), mainEl = d.querySelector("[data-main]"), mains = d.querySelector("[data-mains]");
+    const days = [...d.querySelectorAll("[data-day]")], cars = [...d.querySelectorAll("[data-car]")], checks = d.querySelector("[data-checks]"), note = d.querySelector("[data-wk-note]"), mineBtn = d.querySelector("[data-mine]");
+    let st = { picked: [], main: "", plan: ["", "", "", "", "", ""], car: 3 }, saved = null;
+    const mine = () => saved !== null;
+    const others = () => st.picked.filter((p) => p !== st.main);
+    const fill = () => {
+      if (st.picked.length < 2) { st.plan = ["", "", "", "", "", ""]; return; }
+      const o = others(), at = (i) => o[i % o.length];
+      st.plan = [st.main, at(0), at(1), st.main, at(2), at(3)];
     };
-    days.forEach((b, i) => b.addEventListener("click", () => { pick[i] = (pick[i] + 1) % TOPICS.length; draw(); }));
-    cars.forEach((b, i) => b.addEventListener("click", () => { car = i; draw(); }));
+    const chips = () => [...chipsEl.querySelectorAll("[data-p]")];
+    const draw = () => {
+      const m = mine();
+      chips().forEach((c) => {
+        const on = st.picked.includes(c.dataset.p);
+        c.setAttribute("aria-pressed", String(on));
+        c.disabled = m || (!on && st.picked.length >= 5);
+      });
+      add.querySelectorAll("input, button").forEach((e) => { e.disabled = m || st.picked.length >= 5; });
+      mainEl.hidden = st.picked.length < 2;
+      mains.innerHTML = st.picked.map((p) => `<button type="button" data-m="${esc(p)}" aria-pressed="${p === st.main}"${m ? " disabled" : ""}>${esc(p)}</button>`).join("");
+      days.forEach((b, i) => {
+        b.querySelector("[data-topic]").textContent = st.plan[i] || "Pick";
+        b.querySelector("[data-fmt]").textContent = i === st.car && st.plan[i] ? "Carousel" : "";
+        b.classList.toggle("car", i === st.car && !!st.plan[i]);
+        b.classList.toggle("empty", !st.plan[i]);
+        b.disabled = m || st.picked.length < 2;
+      });
+      cars.forEach((b, i) => { b.setAttribute("aria-pressed", String(i === st.car)); b.disabled = m; });
+      const n = (t) => st.plan.filter((p) => p === t).length, ready = st.picked.length >= 2;
+      const rows = [
+        [ready ? `${m ? "Main" : "Your main"} pillar (${st.main}) twice` : "Your main pillar twice", ready && n(st.main) === 2],
+        ["Every other pillar at least once", ready && others().every((o) => n(o) >= 1)],
+        ["One carousel", ready && st.car > -1],
+        ["Filmed on Sunday", ready],
+      ];
+      checks.innerHTML = rows.map(([t, ok]) => `<li class="${ok ? "ok" : ""}"><span class="dot" aria-hidden="true"></span>${esc(t)}<span class="label">${ok ? "Done" : "Not yet"}</span></li>`).join("");
+      d.classList.toggle("done", rows.every(([, ok]) => ok));
+      note.textContent = m ? "This is my week. Yours starts from your own pillars." : ready ? "Tap a day to swap its pillar." : "Pick two or more and the week fills in. Tap a day to change it.";
+    };
+    const toggle = (p) => {
+      if (st.picked.includes(p)) st.picked = st.picked.filter((x) => x !== p);
+      else if (st.picked.length < 5) st.picked.push(p);
+      if (!st.picked.includes(st.main)) st.main = st.picked[0] || "";
+      fill(); draw();
+    };
+    chipsEl.addEventListener("click", (e) => { const c = e.target.closest("[data-p]"); if (c && !mine()) toggle(c.dataset.p); });
+    add.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const input = add.querySelector("input"), v = input.value.trim().replace(/\s+/g, " ").slice(0, 24);
+      if (!v || mine()) return;
+      let c = chips().find((x) => x.dataset.p.toLowerCase() === v.toLowerCase());
+      if (!c) { c = document.createElement("button"); c.type = "button"; c.dataset.p = v; c.textContent = v; c.setAttribute("aria-pressed", "false"); chipsEl.append(c); }
+      input.value = "";
+      if (!st.picked.includes(c.dataset.p)) toggle(c.dataset.p);
+    });
+    mains.addEventListener("click", (e) => { const b = e.target.closest("[data-m]"); if (!b || mine()) return; st.main = b.dataset.m; fill(); draw(); });
+    days.forEach((b, i) => b.addEventListener("click", () => {
+      if (mine() || st.picked.length < 2) return;
+      st.plan[i] = st.picked[(st.picked.indexOf(st.plan[i]) + 1) % st.picked.length]; draw();
+    }));
+    cars.forEach((b, i) => b.addEventListener("click", () => { if (!mine()) { st.car = i; draw(); } }));
+    mineBtn?.addEventListener("click", () => {
+      if (mine()) { st = saved; saved = null; }
+      else { saved = JSON.parse(JSON.stringify(st)); st = JSON.parse(JSON.stringify(MINE_WEEK)); }
+      mineBtn.setAttribute("aria-pressed", String(mine()));
+      mineBtn.textContent = mine() ? "Back to yours" : "See mine";
+      d.classList.toggle("mine", mine());
+      draw();
+    });
     draw();
   });
 
