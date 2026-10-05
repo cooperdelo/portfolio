@@ -6,6 +6,7 @@
 .mo-top .label { grid-column: 1 / -1; opacity: .62; margin-bottom: clamp(18px, 3vh, 32px); }
 .mo-big { grid-column: 1 / 9; font-family: var(--display); font-weight: 700; text-transform: uppercase; font-size: clamp(46px, 9.2vw, 168px); line-height: .8; letter-spacing: -.03em; }
 .mo-big .line:nth-child(2) { padding-left: 1.1em; }
+@media (max-width: 340px) { .mo-big { font-size: 40px; } } /* 'One camera.' clipped at 320px */
 .mo-lede { grid-column: 9 / 13; font-size: clamp(15px, 1.15vw, 18px); line-height: 1.45; max-width: 34ch; opacity: .82; padding-bottom: .4em; }
 
 .mo-body { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: var(--gutter); margin-top: clamp(56px, 9vh, 120px); }

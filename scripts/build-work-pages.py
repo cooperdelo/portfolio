@@ -84,7 +84,7 @@ WORK = [
   dict(slug="rubber-band", title="Rubber Band", disc="Live, guitar", year="2025", video="rubber-band", ar="16/9",
        say="Chapel Hill cover band. I play guitar and run the bookings.",
        credits=[("Role", "Guitar, bookings"), ("Year", "2025 to now"), ("Gear", "PRS Custom 24-08, Telecaster, Pod Go"),
-                ("Link", [("Band page", "/rubber-band"), ("Book the band", "https://plugverse.app/a/2499f269-dff2-4025-85a6-cf1ff8991382")])],
+                ("Link", [("Band page", "https://plugverse.app/a/rubberband?ref=9CRDUTEJ&utm_source=profile-share&utm_medium=link&utm_campaign=profile-share", "noopener"), ("Book the band", "https://plugverse.app/a/2499f269-dff2-4025-85a6-cf1ff8991382")])],
        stills=[("work-rubber-band-still-1", "wide"), ("work-rubber-band-still-2", ""), ("work-rubber-band-still-3", "drop")]),
 ]
 
@@ -166,11 +166,16 @@ def lines(t):
 def still_src(n):
     return f"/photos/{n[3:]}.jpg" if n.startswith("../") else f"/photos/work/{n}.jpg"
 
+def credit_link(text, url, rel="noreferrer"):
+    ext = f' target="_blank" rel="{rel}"' if url.startswith("http") else ""
+    return f'<a href="{E(url)}"{ext}>{E(text)}</a>'
+
 def credits_table(w):
     rows = []
     for k, v in w["credits"]:
         if isinstance(v, list):
-            cell = "<br />".join(f'<a href="{u}"{" target=&quot;_blank&quot; rel=&quot;noreferrer&quot;".replace("&quot;", chr(34)) if u.startswith("http") else ""}>{E(t)}</a>' for t, u in v)
+            # A link is (text, url) or (text, url, rel); external links open in a new tab, rel defaults to noreferrer.
+            cell = "<br />".join(credit_link(*l) for l in v)
         else:
             cell = E(v)
         rows.append(f'<tr><th scope="row">{E(k)}</th><td>{cell}</td></tr>')
@@ -473,7 +478,7 @@ SYSTEM_CARD = dict(slug="ai-system", title="My AI system", disc="Systems", year=
 
 def work_grid_page(_unused=None):
     extras = runpy.run_path(str(ROOT / "scripts/build-home-extras.py"))
-    css = '<link rel="stylesheet" href="/assets/doors.css" />\n</head>'
+    css = '<link rel="stylesheet" href="/assets/work.css" />\n<link rel="stylesheet" href="/assets/doors.css" />\n</head>'
     return f"""{head("Work / Cooper Delo", "Films, content, PlugVerse and music by Cooper Delo.", "https://cooperdelo.com/work").replace("</head>", css, 1)}
 <body class="page">
 {NAV}

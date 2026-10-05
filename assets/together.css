@@ -6,6 +6,10 @@
 .pg-hero h1 { grid-column: 1 / 10; font-family: var(--display); font-weight: 700; text-transform: uppercase; font-size: clamp(44px, 9vw, 164px); line-height: .8; letter-spacing: -.03em; }
 .pg-hero .lede { grid-column: 10 / 13; font-size: clamp(15px, 1.15vw, 18px); line-height: 1.45; max-width: 30ch; padding-bottom: .3em; }
 .pg-hero .lede + .lede { grid-column: 10 / 13; opacity: .62; margin-top: -8px; }
+/* "Resources." is ~9.5em wide in Druk Wide: size it to its column so the S is not clipped. */
+.rs-hero h1 { font-size: clamp(44px, 7.3vw, 164px); }
+/* Half-width resource cards on phones: the longest words (STRANGERS, PLUGVERSE) are ~9.5em, so size the title to the card and let it run over the arrow column (the arrow sits on the line below). */
+@media (max-width: 600px) { .rs-hero + .rbs li:not(.rb-0):not(.rb-5):not(.rb-8) .rb-cap b { margin-right: -30px; font-size: min(17px, calc((50vw - 55px) / 9.6)); } }
 
 /* ---------- three ways in ---------- */
 .paths { padding: 0 var(--gutter) clamp(80px, 12vh, 140px); }
@@ -83,6 +87,7 @@
 @media (max-width: 900px) {
   .pg-hero h1, .pg-hero .lede, .pg-hero .lede + .lede { grid-column: 1 / -1; }
   .pg-hero .lede { margin-top: 18px; }
+  .rs-hero h1 { font-size: clamp(26px, 8.8vw, 164px); }
   .path { grid-template-columns: 40px 1fr; }
   .path p, .path .proof { grid-column: 2; }
   .brief { display: block; }

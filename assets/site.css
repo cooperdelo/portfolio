@@ -80,6 +80,8 @@ a:hover > .roll > span, a:focus-visible > .roll > span { transform: translateY(-
 @media (max-width: 700px) { .nav { grid-template-columns: 1fr auto; } .nav .where { display: none; } .nav .links { gap: 16px; } }
 @media (max-width: 480px) { .nav { column-gap: 14px; } .nav .mark { white-space: nowrap; font-size: 11px; } .nav .links { gap: 11px; } .nav .links a { font-size: 10px; letter-spacing: .04em; } .nav .links a[href="/#about"] { display: none; } }
 @media (max-width: 360px) { .nav .mark { font-size: 10px; } .nav .links { gap: 9px; } .nav .links a { font-size: 9px; letter-spacing: .02em; } }
+/* Phone tap targets: the nav type is 9 to 11px tall, so pad the hit area out to ~40px and pull the margins back so nothing moves. */
+@media (max-width: 700px) { .nav .mark, .nav .links a { padding: 14px 4px; margin: -14px -4px; } }
 
 /* ---------- custom cursor (only over work and media) ---------- */
 .cur { position: fixed; left: 0; top: 0; z-index: 99; pointer-events: none; width: 96px; height: 96px; margin: -48px 0 0 -48px; border-radius: 50%; background: var(--bone); color: var(--ink); display: grid; place-items: center; transform: translate3d(-200px, -200px, 0) scale(0); box-shadow: 0 10px 40px -10px rgba(0, 0, 0, .4); }
@@ -296,6 +298,7 @@ html.seen .intro, html.rm .intro { display: none; }
 .credits td { font-weight: 700; font-size: 15px; text-transform: uppercase; letter-spacing: .02em; line-height: 1.35; }
 .credits td a { border-bottom: 1px solid currentColor; }
 .credits td a:hover { opacity: .6; }
+@media (pointer: coarse) { .credits td a { display: inline-block; padding-block: 8px 2px; } } /* stacked links (Instagram / TikTok) were 20px tall and touching */
 @media (max-width: 900px) { .case-body { grid-template-columns: 1fr; gap: 40px; } }
 
 .stills { padding: 0 var(--gutter) clamp(80px, 12vh, 140px); display: grid; grid-template-columns: 1fr 1fr; gap: var(--gutter); row-gap: calc(var(--gutter) * 1.4); align-items: start; }
@@ -375,6 +378,7 @@ html.seen .intro, html.rm .intro { display: none; }
 .r-sub { font-weight: 700; text-transform: uppercase; font-size: clamp(18px, 1.8vw, 28px); line-height: 1.05; max-width: 22ch; }
 .r-cta { display: flex; flex-wrap: wrap; gap: 10px; }
 .r-h { font-family: var(--display); text-transform: uppercase; font-size: clamp(30px, 6.6vw, 118px); line-height: .84; letter-spacing: -.02em; margin-bottom: clamp(24px, 4vh, 48px); }
+@media (max-width: 340px) { .r-h { font-size: 28px; } } /* 'Experience' clipped at 320px */
 .r-edu, .r-list { padding: clamp(80px, 12vh, 140px) var(--gutter) 0; }
 .r-edu:last-of-type { padding-bottom: clamp(80px, 12vh, 140px); }
 .r-edu .credits { max-width: 980px; }
