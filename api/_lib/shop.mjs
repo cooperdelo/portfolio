@@ -4,9 +4,9 @@
 import { createHmac, timingSafeEqual } from 'node:crypto';
 import { gunzipSync } from 'node:zlib';
 
-// gate: free | email | paid. Prices are drafts until Cooper sets them.
+// gate: free | email | paid. draft: true shows a 'Draft price' tag (Design kit set at $29 on 2026-10-05).
 export const KITS = {
-  design: { title: "Sites that don't look like AI", gate: 'paid', price: 2900, draft: true, shop: '/shop/design-kit' },
+  design: { title: "Sites that don't look like AI", gate: 'paid', price: 2900, shop: '/shop/design-kit' },
   'ai-system': { title: 'One folder Claude reads first', gate: 'email', guide: '/resources/guides/ai-system' },
   linkedin: { title: 'LinkedIn posts strangers actually read', gate: 'email', guide: '/resources/guides/linkedin' },
   'instagram-tiktok': { title: 'Short videos from your real week', gate: 'email', guide: '/resources/guides/instagram-tiktok' },
