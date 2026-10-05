@@ -158,3 +158,4 @@
   .pk-go { width: 36px; height: 36px; }
   .pk-cap b { font-size: clamp(15px, 4.9vw, 18px); }
 }
+@media (max-width: 700px) { .pk-all ul a { min-height: 40px; padding: 0 14px; font-size: 13px; } .pk-allk { min-height: 40px; } }

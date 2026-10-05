@@ -396,3 +396,5 @@ html.gm-lock, html.gm-lock body { overflow: hidden; }
 .li-top span.li-av { flex: none; }
 .li-text::placeholder { color: #8a8378; }
 .dm-ctl input:disabled + b, .dm-ctl label:has(input:disabled) { cursor: default; }
+@media (max-width: 700px) { .dm-mine { min-height: 40px; padding: 0 14px; font-size: 11px; } }
+@media (max-width: 700px) { .wk-chips button, .wk-mains button, .wk-add button { min-height: 40px; padding: 0 14px; font-size: 13px; } }
