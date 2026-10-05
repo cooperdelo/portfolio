@@ -136,3 +136,18 @@ test('checkout uses Managed Payments: no automatic_tax or invoice_creation, pinn
     assert.equal(sent.form.get('line_items[0][price_data][product_data][tax_code]'), shop.TAX_CODE);
   } finally { globalThis.fetch = realFetch; delete process.env.SHOP_STRIPE_SECRET_KEY; }
 });
+
+test('production on a test key: checkout only opens with the test pass', async () => {
+  const realFetch = globalThis.fetch;
+  globalThis.fetch = async () => new Response(JSON.stringify({ url: 'https://checkout.stripe.com/x' }), { status: 200 });
+  process.env.SHOP_STRIPE_SECRET_KEY = 'sk_test_x'; process.env.VERCEL_ENV = 'production';
+  try {
+    assert.equal(shop.checkoutLocked('nope'), true);
+    const locked = await call(checkout, { method: 'POST', body: { kit: 'design' } });
+    assert.equal(locked.code, 503); assert.equal(locked.body.error, 'checkout_opening_soon');
+    const open = await call(checkout, { method: 'POST', body: { kit: 'design', tp: shop.testPass() } });
+    assert.equal(open.code, 200);
+    process.env.SHOP_STRIPE_SECRET_KEY = 'rk_live_x';
+    assert.equal(shop.checkoutLocked(''), false);
+  } finally { globalThis.fetch = realFetch; delete process.env.SHOP_STRIPE_SECRET_KEY; delete process.env.VERCEL_ENV; }
+});

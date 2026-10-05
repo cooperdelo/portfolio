@@ -190,10 +190,12 @@
     e.preventDefault();
     const btn = buy.querySelector("button"); btn.disabled = true; msg("Opening checkout");
     track("checkout_start", { kit: slug });
-    const [code, d] = await post("/api/shop-checkout", { kit: slug, code: buy.code.value.trim() });
+    let tp = new URLSearchParams(location.search).get("tp") || "";
+    try { if (tp) sessionStorage.setItem("cd_tp", tp); else tp = sessionStorage.getItem("cd_tp") || ""; } catch {}
+    const [code, d] = await post("/api/shop-checkout", { kit: slug, code: buy.code.value.trim(), tp });
     if (code === 200 && d.url) { location.href = d.url; return; }
     btn.disabled = false;
-    msg(d.error === "bad_code" ? "That code didn't work." : d.error === "checkout_not_configured" ? "Checkout isn't switched on yet." : "Checkout didn't open. Try again in a moment.");
+    msg(d.error === "bad_code" ? "That code didn't work." : d.error === "checkout_not_configured" || d.error === "checkout_opening_soon" ? "Checkout opens soon." : "Checkout didn't open. Try again in a moment.");
   });
 
   start();

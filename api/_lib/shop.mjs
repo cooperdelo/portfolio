@@ -68,6 +68,10 @@ export function canRead(slug, token, env = process.env) {
 export const EMAIL_RE = /^[^\s@<>()"',;:]{1,64}@[^\s@<>()"',;:]{1,190}\.[a-z]{2,24}$/i;
 export const isProd = (env = process.env) => env.VERCEL_ENV === 'production';
 // Demo checkout exists so the paywall can be tested before a Stripe test key is added. Never in production.
+// While production still runs on a Stripe test key, checkout only opens for someone holding the test pass
+// (?tp= on the shop page), so nobody can unlock the paid kit with Stripe's public test card.
+export const testPass = (env = process.env) => (env.SHOP_TOKEN_SECRET ? createHmac('sha256', env.SHOP_TOKEN_SECRET).update('test-checkout-v1').digest('base64url').slice(0, 16) : null);
+export const checkoutLocked = (pass, env = process.env) => isProd(env) && /^(sk|rk)_test_/.test(env.SHOP_STRIPE_SECRET_KEY || '') && (!testPass(env) || pass !== testPass(env));
 export const demoAllowed = (env = process.env) => !isProd(env) && !env.SHOP_STRIPE_SECRET_KEY && env.SHOP_DEMO === '1';
 
 export const STRIPE_VERSION = '2026-09-30.endive';

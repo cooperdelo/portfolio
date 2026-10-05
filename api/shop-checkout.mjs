@@ -3,7 +3,7 @@
 // fraud, disputes and receipts are Stripe's), promotion codes accepted
 // (or applied up front when a ?code= link is used), receipt emailed by Stripe. Without a Stripe key on QA it
 // answers with a demo URL so the whole flow can still be clicked through. Demo never runs in production.
-import { KITS, TAX_CODE, demoAllowed, stripe, readBody, origin } from './_lib/shop.mjs';
+import { KITS, TAX_CODE, demoAllowed, checkoutLocked, stripe, readBody, origin } from './_lib/shop.mjs';
 
 export default async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store, private');
@@ -15,6 +15,7 @@ export default async function handler(req, res) {
   const site = origin(req);
   const page = `${site}${meta.shop}`;
   const key = process.env.SHOP_STRIPE_SECRET_KEY;
+  if (checkoutLocked(String(body?.tp || ''))) return res.status(503).json({ error: 'checkout_opening_soon' });
 
   if (!key) {
     if (!demoAllowed()) return res.status(503).json({ error: 'checkout_not_configured' });
