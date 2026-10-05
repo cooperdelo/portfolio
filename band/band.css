@@ -33,12 +33,17 @@ body.bandrev { background: var(--ink); color: var(--bone); min-height: 100svh; p
 .br-empty { padding: 20px; opacity: .5; }
 .br-player { display: grid; gap: 14px; }
 .br-player[hidden] { display: none; }
-.br-back { display: none; justify-self: start; opacity: .7; }
+.br-bar { display: none; }
+.br-back { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 18px 0 14px; border: 1px solid var(--line-d); border-radius: 999px; font-family: var(--display); text-transform: uppercase; font-size: 15px; background: rgba(244, 240, 231, .06); }
 .br-title .label { opacity: .55; }
 .br-title .br-dl { display: inline-block; margin-top: 10px; padding: 9px 14px; border: 1px solid var(--line-d); border-radius: 999px; opacity: 1; text-decoration: none; color: inherit; }
 .br-title .br-dl[hidden] { display: none; }
 .br-title h2 { font-family: var(--display); font-weight: 700; text-transform: uppercase; font-size: clamp(20px, 2.4vw, 34px); line-height: .9; margin-top: 6px; overflow-wrap: anywhere; }
-.br-video { position: relative; border-radius: 10px; overflow: hidden; background: #000; aspect-ratio: 16 / 9; }
+.br-video { position: relative; width: min(100%, calc(76svh * var(--arn, 1.7778))); aspect-ratio: var(--ar, 16 / 9); margin-inline: auto; border-radius: 10px; overflow: hidden; background: #000; touch-action: pan-y; }
+.br-video.loading { background: #0d0b09; }
+.br-video.loading::after { content: "Loading photo"; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); padding: 4px 10px; border-radius: 999px; background: rgba(22, 19, 15, .8); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
+.br-soon { position: absolute; inset: 0; display: grid; place-items: center; background: #0d0b09 center / cover no-repeat; }
+.br-soon .label { padding: 10px 16px; border-radius: 999px; background: rgba(22, 19, 15, .8); }
 .br-video video, .br-video img { width: 100%; height: 100%; object-fit: contain; cursor: pointer; }
 .br-video img { cursor: default; }
 .bandrev [hidden] { display: none !important; }
@@ -85,13 +90,17 @@ body.bandrev { background: var(--ink); color: var(--bone); min-height: 100svh; p
 .br-help { margin-top: 24px; opacity: .45; }
 /* Watch, trim, decide, then tag: the verdict sits above the tags at every width, so on phones the sticky bar never covers the chips. */
 .br-player > * { order: 5; }
-.br-back, .br-title { order: 0; } .br-video { order: 1; } .tl { order: 2; } .br-verdict { order: 3; } .br-use { order: 4; }
+.br-bar, .br-title { order: 0; } .br-video { order: 1; } .tl { order: 2; } .br-verdict { order: 3; } .br-use { order: 4; }
 @media (max-width: 900px) {
   .br-main { grid-template-columns: minmax(0, 1fr); }
   .br-list { position: static; max-height: none; }
   body.playing .br-list, body.playing .br-filters, body.playing .br-help { display: none; }
-  .br-back { display: inline-block; }
-  body.playing .br-top h1, body.playing .br-pile { display: none; }
+  body.playing .br-top { display: none; }
+  .br-bar { display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 11; margin: 0 calc(var(--gutter) * -1); padding: calc(8px + env(safe-area-inset-top)) var(--gutter) 8px; background: var(--ink); border-bottom: 1px solid var(--line-d); }
+  .br-pos { font-family: var(--display); font-size: 18px; font-variant-numeric: tabular-nums; }
+  .br-bargig { margin-left: auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; opacity: .6; text-align: right; }
+  .br-title > .label { display: none; }
+  .br-nav button { min-height: 44px; padding: 0 12px; }
   .br-top { padding-bottom: 10px; } .br-sep { display: none; }
   .br-verdict { position: sticky; bottom: 0; z-index: 10; margin: 0 calc(var(--gutter) * -1); padding: 10px var(--gutter) calc(10px + env(safe-area-inset-bottom)); background: var(--ink); border-top: 1px solid var(--line-d); }
   .br-verdict button { justify-content: center; padding: 20px 6px; }
