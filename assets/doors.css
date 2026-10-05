@@ -150,3 +150,11 @@
 }
 .pk-img img[src*="/designkit-"] { object-position: 50% 0; }
 .pk-img img[src*="designkit"] { object-position: 50% 18%; }
+/* the eyebrow keeps label size (.rb-head p would make it 16px); the headline and rows fit at 320 */
+.pks .pk-head .label { font-size: var(--label); }
+@media (max-width: 700px) { .pks .pk-head h2 { font-size: clamp(26px, 8.6vw, 44px); } }
+@media (max-width: 380px) {
+  .pk { grid-template-columns: 62px minmax(0, 1fr) 36px; gap: 6px 12px; }
+  .pk-go { width: 36px; height: 36px; }
+  .pk-cap b { font-size: clamp(15px, 4.9vw, 18px); }
+}

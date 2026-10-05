@@ -283,7 +283,7 @@ def gear():
   <section class="gfs dark" aria-label="In use">{feats}</section>
   <section class="gls light" aria-label="Everything I use">
     <ul class="gl-list" data-glist>{"".join(rows)}</ul>
-    <p class="fine">Amazon links are searches for the exact model. <span class="draft">Draft</span> If they become affiliate links, this line will say so.</p>
+    <p class="fine">Amazon links are searches for the exact model. If they become affiliate links, this line will say so.</p>
     <img class="gl-float" data-gfloat alt="" aria-hidden="true" />
   </section>
   {mk_line("film-motion", "How I film with it", "gear")}"""

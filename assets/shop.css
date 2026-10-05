@@ -344,7 +344,7 @@ button.wk-day:hover { border-color: rgba(244, 240, 231, .5); }
 .gm-list .label { opacity: .5; }
 .gm .gd-form input { color: var(--bone); }
 .gm .pill.solid { background: var(--bone); color: var(--ink); border-color: var(--bone); }
-.gd-bar { position: fixed; z-index: 150; left: 50%; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); width: min(560px, calc(100% - 32px)); display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 10px 10px 10px 20px; border-radius: 999px; background: var(--ink); color: var(--bone); box-shadow: 0 20px 40px -14px rgba(0, 0, 0, .6); font-size: 14px; animation: f-in .5s var(--ease) both; }
+.gd-bar { position: fixed; z-index: 55; left: 0; right: 0; margin-inline: auto; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); width: min(560px, calc(100% - 32px)); display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 10px 10px 10px 20px; border-radius: 999px; background: var(--ink); color: var(--bone); box-shadow: 0 20px 40px -14px rgba(0, 0, 0, .6); font-size: 14px; animation: f-in .5s var(--ease) both; }
 .gd-bar[hidden] { display: none; }
 .gd-bar .pill.solid { background: var(--bone); color: var(--ink); border-color: var(--bone); flex: none; }
 html.gm-lock, html.gm-lock body { overflow: hidden; }

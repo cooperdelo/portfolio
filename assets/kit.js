@@ -98,7 +98,8 @@
     }
     // guide page: step 1 open, the rest outlined and locked; the email ask comes up as a modal
     const steps = $("[data-steps]"), gate = $("[data-gate]"), master = $("[data-master]");
-    if (d.locked) {
+    // A page built without unlock UI (a free guide) never draws the locked view.
+    if (d.locked && d.gate !== "free" && gate) {
       const rest = (k.outline || []).slice(1);
       steps.innerHTML = stepHTML(k.first, 0, false) + rest.map((t, i) => stepHTML(t, i + 1, true)).join("");
       const count = `${Math.max(0, k.count - 1)} more steps and the one prompt`;
@@ -111,8 +112,8 @@
       gm.arm();
       track("gate_view", { kit: slug });
     } else {
-      steps.innerHTML = k.steps.map((s, i) => stepHTML(s, i, false)).join("");
-      gate.hidden = true;
+      steps.innerHTML = (k.steps || []).map((s, i) => stepHTML(s, i, false)).join("");
+      if (gate) gate.hidden = true;
       master.hidden = !k.master_prompt;
       master.innerHTML = masterHTML(k);
       gm.done();
@@ -121,8 +122,15 @@
 
   // The email modal: opens once when someone scrolls into the locked steps, or any time they ask for it.
   const gm = (() => {
-    const el = document.querySelector("[data-gate-modal]"), bar = document.querySelector("[data-gate-bar]");
-    if (!el) return { arm() {}, done() {} };
+    const el = document.querySelector("[data-gate-modal]"), barEl = document.querySelector("[data-gate-bar]");
+    if (!el || !barEl) return { arm() {}, done() {} };
+    // The sticky bar only shows while it's wanted AND nothing it would cover is on screen:
+    // the hero (top of the page, under the nav), the Next cards and the footer.
+    let want = false; const covering = new Set();
+    const sync = () => { barEl.hidden = !want || covering.size > 0; };
+    const bar = { set hidden(v) { want = !v; sync(); } };
+    const watch = new IntersectionObserver((ents) => { ents.forEach((en) => en.isIntersecting ? covering.add(en.target) : covering.delete(en.target)); sync(); });
+    document.querySelectorAll(".gd-hero, .nx, footer").forEach((t) => watch.observe(t));
     const key = "gate-shown:" + slug;
     let last = null, io = null;
     const seen = () => { try { return sessionStorage.getItem(key) === "1"; } catch { return false; } };

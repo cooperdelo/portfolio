@@ -249,6 +249,14 @@ def design_kit():
     page("shop/design-kit", "Design kit", "The references, rules and prompt Cooper Delo uses to build sites that don't look like AI.", body)
 
 # ---------------------------------------------------------------- gated guides on the main site
+def kit_gates():
+    """slug -> free | email | paid, read from api/_lib/shop.mjs KITS so the pages and the API never disagree."""
+    import re
+    src = (ROOT / "api" / "_lib" / "shop.mjs").read_text(encoding="utf-8")
+    return {m.group(1).strip("'\""): m.group(2) for m in re.finditer(r"^\s*('?[\w-]+'?):\s*\{[^}]*gate:\s*'(\w+)'", src, re.M)}
+
+GATES = kit_gates()
+
 GUIDE_DEMO = {"linkedin": demo_linkedin, "music": demo_music, "ai-system": demo_vault, "instagram-tiktok": demo_week, "film-motion": demo_shots}
 
 def guide(slug):
@@ -257,6 +265,9 @@ def guide(slug):
     sys.path.insert(0, str(ROOT / "scripts"))
     from site_data import RES, next_block
     cover = RES[slug][3] if slug in RES else "film"
+    free = GATES.get(slug) == "free"  # free guides carry no unlock UI at all
+    gate_ui = "" if free else f"""
+    <div class="gd-more" data-gate hidden><button type="button" class="pill solid" data-gm-open>Unlock the rest, free {ARROW}</button><p class="label" data-gate-count></p></div>"""
     body = f"""  <section class="gd-hero gd-cover dark" data-kit="{slug}" aria-labelledby="gd-h">
     <img class="gd-bg" src="/img/res/{cover}-1200.webp" srcset="/img/res/{cover}-600.webp 600w, /img/res/{cover}-1200.webp 1200w" sizes="100vw" alt="" aria-hidden="true" />
     <a class="kp-back label" href="/resources">{ARROW} Resources</a>
@@ -267,11 +278,13 @@ def guide(slug):
   </section>
   {demo_html}
   <section class="gd-body light" aria-label="The guide">
-    <ol class="gd-steps" data-steps></ol>
-    <div class="gd-more" data-gate hidden><button type="button" class="pill solid" data-gm-open>Unlock the rest, free {ARROW}</button><p class="label" data-gate-count></p></div>
+    <ol class="gd-steps" data-steps></ol>{gate_ui}
     <div class="gd-master" data-master hidden></div>
   </section>
-  {next_block(slug)}
+  {next_block(slug)}{"" if free else MODAL}"""
+    page(f"resources/guides/{slug}", "Guide", "A free guide from Cooper Delo.", body, css=("/assets/together.css", "/assets/shop.css", "/assets/shop-v2.css"), shop=False)
+
+MODAL = f"""
   <div class="gm" data-gate-modal hidden data-lenis-prevent>
     <div class="gm-scrim" data-gm-close></div>
     <div class="gm-card" role="dialog" aria-modal="true" aria-labelledby="gm-h">
@@ -286,7 +299,6 @@ def guide(slug):
     </div>
   </div>
   <div class="gd-bar" data-gate-bar hidden><span data-bar-count></span><button type="button" class="pill solid" data-gm-open>Unlock free {ARROW}</button></div>"""
-    page(f"resources/guides/{slug}", "Guide", "A free guide from Cooper Delo.", body, css=("/assets/together.css", "/assets/shop.css", "/assets/shop-v2.css"), shop=False)
 
 def resources_shelf():
     """Add a Guides shelf to /resources (QA only), drawn from /api/kit at runtime."""
