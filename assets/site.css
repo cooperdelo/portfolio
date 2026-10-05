@@ -375,6 +375,7 @@ html.seen .intro, html.rm .intro { display: none; }
 .r-sub { font-weight: 700; text-transform: uppercase; font-size: clamp(18px, 1.8vw, 28px); line-height: 1.05; max-width: 22ch; }
 .r-cta { display: flex; flex-wrap: wrap; gap: 10px; }
 .r-h { font-family: var(--display); text-transform: uppercase; font-size: clamp(30px, 6.6vw, 118px); line-height: .84; letter-spacing: -.02em; margin-bottom: clamp(24px, 4vh, 48px); }
+@media (max-width: 340px) { .r-h { font-size: 28px; } } /* 'Experience' clipped at 320px */
 .r-edu, .r-list { padding: clamp(80px, 12vh, 140px) var(--gutter) 0; }
 .r-edu:last-of-type { padding-bottom: clamp(80px, 12vh, 140px); }
 .r-edu .credits { max-width: 980px; }
