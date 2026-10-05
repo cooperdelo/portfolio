@@ -49,10 +49,10 @@ async function hdFiles(key, env = process.env) {
   const map = {}; let page = '';
   for (let i = 0; i < 5; i++) {
     const q = encodeURIComponent(`'${folder}' in parents and name contains '.hd.' and trashed = false`);
-    const res = await fetch(`https://www.googleapis.com/drive/v3/files?q=${q}&fields=nextPageToken,files(id,name)&pageSize=1000&key=${key}${page ? `&pageToken=${page}` : ''}`, { signal: AbortSignal.timeout(8000) });
+    const res = await fetch(`https://www.googleapis.com/drive/v3/files?q=${q}&fields=nextPageToken,files(id,name,size)&pageSize=1000&key=${key}${page ? `&pageToken=${page}` : ''}`, { signal: AbortSignal.timeout(8000) });
     if (!res.ok) break;
     const j = await res.json();
-    for (const f of j.files || []) { const m = /^([0-9a-f-]{36})\.hd\.(jpg|mp4)$/.exec(f.name); if (m) map[m[1]] = f.id; }
+    for (const f of j.files || []) { const m = /^([0-9a-f-]{36})\.hd\.(jpg|mp4)$/.exec(f.name); if (m) map[m[1]] = { id: f.id, size: Number(f.size) || null }; }
     if (!j.nextPageToken) break; page = j.nextPageToken;
   }
   return map;
@@ -121,7 +121,9 @@ export default async function handler(req, res) {
         you: who.n,
         gigs: pile || [...new Set(all.map((a) => a.gig))],
         clips: assets.map((a) => ({ id: a.id, name: a.name, gig: a.gig, kind: photo(a) ? 'photo' : 'video', duration: a.duration, url: (photo(a) ? cdn(a.preview_drive_id, 1600) : drive(a.preview_drive_id)) || urls[a.proxy_path] || null, poster: cdn(a.poster_drive_id, 480) || (!photo(a) && a.proxy_path && urls[poster(a.proxy_path)]) || null,
-          download: dl(hd.map[a.id] || a.preview_drive_id), hd: !!hd.map[a.id] })),
+          download: dl(hd.map[a.id]?.id || a.preview_drive_id), hd: !!hd.map[a.id],
+          // Same file, fetchable by the page (Drive sends CORS for this origin) so phones can hand it to the share sheet / Photos.
+          file: drive(hd.map[a.id]?.id || a.preview_drive_id), size: hd.map[a.id]?.size || null })),
         marks: reviews.filter((r) => ids.has(r.asset_id)).map((r) => mark(r)),
       });
     }

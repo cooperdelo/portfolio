@@ -99,3 +99,6 @@ body.bandrev { background: var(--ink); color: var(--bone); min-height: 100svh; p
   .br-verdict b { font-size: clamp(11px, 3.4vw, 15px); }
   .br-verdict span { display: none; }
 }
+.br-dls { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.br-dls .br-dl { margin-top: 0; font: inherit; background: none; cursor: pointer; }
+.br-dls .br-dl:disabled { opacity: .5; cursor: default; }

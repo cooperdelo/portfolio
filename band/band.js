@@ -54,6 +54,40 @@ function progress() {
 }
 
 function flushNote() { if (noteT) { clearTimeout(noteT); noteT = 0; save(noteId); } }
+// Save to phone: fetch the file, then hand it to the share sheet (iPhone: Save Image / Save Video into Photos).
+// Two taps on purpose: iOS only opens the share sheet straight from a tap, and the fetch can take a while.
+const SAVE_MAX = 200e6; // bigger than this is too heavy to hold in a phone browser; Download instead
+let held = null; // { id, file }
+function saveReset(c) {
+  const b = $("[data-save]"); held = null; b.disabled = false;
+  const canShare = !!(navigator.canShare && window.File);
+  b.hidden = !c.file;
+  b.dataset.id = c.id;
+  b.textContent = c.size && c.size > SAVE_MAX ? "Too long to save to phone · use Download" : canShare ? "Save to phone" : "Save";
+  b.disabled = !!(c.size && c.size > SAVE_MAX);
+}
+async function saveTap() {
+  const b = $("[data-save]"); const c = clips.find((x) => x.id === b.dataset.id); if (!c) return;
+  if (held?.id === c.id && held.file) {
+    try {
+      if (navigator.canShare?.({ files: [held.file] })) { await navigator.share({ files: [held.file] }); b.textContent = "Saved? Tap again to resend"; return; }
+    } catch (e) { if (e.name === "AbortError") return; }
+    const a = document.createElement("a"); a.href = URL.createObjectURL(held.file); a.download = held.file.name; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 60000);
+    b.textContent = "Saved to downloads"; return;
+  }
+  b.disabled = true; b.textContent = "Getting it…";
+  try {
+    const r = await fetch(c.file); if (!r.ok) throw new Error(r.status);
+    const total = Number(r.headers.get("content-length")) || c.size || 0; const reader = r.body.getReader(); const parts = []; let got = 0;
+    for (;;) { const { done, value } = await reader.read(); if (done) break; parts.push(value); got += value.length; if (total) b.textContent = `Getting it… ${Math.round((got / total) * 100)}%`; }
+    if ($("[data-save]").dataset.id !== c.id) return; // moved on to another clip
+    const ext = c.kind === "photo" ? "jpg" : "mp4";
+    const name = `${c.name.replace(/\.[^.]+$/, "")}${c.hd ? "" : "-preview"}.${ext}`;
+    held = { id: c.id, file: new File(parts, name, { type: c.kind === "photo" ? "image/jpeg" : "video/mp4" }) };
+    b.disabled = false; b.textContent = "Tap to save";
+  } catch { b.disabled = false; b.textContent = "Didn't load · try again"; }
+}
+
 function open(i) {
   if (i < 0 || i >= clips.length) return;
   flushNote(); clearTimeout(advT);
@@ -61,6 +95,7 @@ function open(i) {
   $("[data-player]").hidden = false; document.body.classList.add("playing");
   $("[data-gigname]").textContent = c.gig; $("[data-name]").textContent = c.name.replace(/\.[^.]+$/, "");
   const dl = $("[data-dl]"); dl.hidden = !c.download; if (c.download) { dl.href = c.download; dl.textContent = c.hd ? "Download HD" : "Download (preview quality, HD coming)"; }
+  saveReset(c);
   $("[data-note]").value = m.note || "";
   loop = false; v.pause();
   v.hidden = photo; img.hidden = !photo; $("[data-tl]").hidden = photo; $("[data-play]").hidden = photo;
@@ -126,6 +161,7 @@ v.addEventListener("loadedmetadata", paint);
 v.addEventListener("play", () => $("[data-play]").classList.add("gone")); v.addEventListener("pause", () => $("[data-play]").classList.remove("gone"));
 const toggle = () => { if (isPhoto(clips[cur]) || !v.src) return; v.paused ? v.play() : v.pause(); };
 $("[data-play]").addEventListener("click", toggle); v.addEventListener("click", toggle);
+$("[data-save]").addEventListener("click", saveTap);
 $("[data-loop]").addEventListener("click", () => { const m = mk(clips[cur]); if (m.start == null) return status("Drag the handles to set a trim first."); loop = true; v.currentTime = m.start; v.play(); });
 document.querySelectorAll("[data-mark]").forEach((b) => b.addEventListener("click", () => { setTrim(b.dataset.mark, v.currentTime); save(); }));
 $("[data-clear]").addEventListener("click", () => { const c = clips[cur]; marks[c.id] = { ...mk(c), start: null, end: null }; loop = false; paint(); save(); });
