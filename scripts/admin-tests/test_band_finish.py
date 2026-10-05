@@ -118,8 +118,9 @@ class Photos(unittest.TestCase):
         self.assertEqual(b.date_label(dt.date(2026, 8, 26)), "Pi Kapp · Aug 26")
         self.assertEqual(b.date_label(dt.date(2026, 9, 11)), "MAW · Sep 11")
         self.assertEqual(b.date_label(dt.date(2026, 9, 12)), "Chi Phi · Sep 12")
-        self.assertEqual(b.date_label(dt.date(2026, 9, 26)), "Photos · Sep 26")
-        self.assertEqual(b.date_label(dt.date(2026, 10, 2)), "Photos · Oct 2")  # no leading zero
+        self.assertEqual(b.date_label(dt.date(2026, 9, 26)), "Phi Mu · Sep 26")
+        self.assertEqual(b.date_label(dt.date(2026, 10, 2)), "DZ State · Oct 2")
+        self.assertEqual(b.date_label(dt.date(2026, 10, 3)), "Photos · Oct 3")  # no leading zero
         self.assertEqual(b.date_label(dt.date(2026, 9, 9)), "Photos · Sep 9")
 
     def test_exif_date_parse(self):
