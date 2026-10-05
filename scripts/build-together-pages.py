@@ -50,6 +50,7 @@ def page(path, title, desc, body, og="https://cooperdelo.com/img/poster-montage-
   <a class="mail" href="mailto:cooper@plugverse.app" data-rv><span class="line"><span data-fit>cooper@plugverse.app</span></span></a>
   <div class="cta">
     <a class="pill solid" href="{CAL}" target="_blank" rel="noreferrer">Book a call {ARROW}</a>
+    <a class="pill" href="#contact" data-contact>Send me a message</a>
     <a class="pill" href="mailto:cooper@plugverse.app">Email</a>
     <a class="pill" href="https://www.linkedin.com/in/cooperdelo/" target="_blank" rel="noreferrer">LinkedIn</a>
   </div>
