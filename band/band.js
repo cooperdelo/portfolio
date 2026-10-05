@@ -6,6 +6,7 @@ const fmt = (t) => (t == null ? "—" : `${Math.floor(t / 60)}:${(t % 60).toFixe
 const SHOTS = [["wide", "Wide"], ["medium", "Medium"], ["close", "Close"], ["lowangle", "Low angle"], ["pov", "POV"], ["static", "Static"], ["detail", "Detail"]];
 const SUBJECTS = ["band", "crowd", "singer", "guitarist", "bassist", "drummer", "stage", "setup"].map((s) => [s, s[0].toUpperCase() + s.slice(1)]);
 const CHIPS = { shot: SHOTS, subject: SUBJECTS };
+let listY = 0;
 let clips = [], marks = {}, confirmed = {}, show = "all", kind = "", gig = "", cur = -1, you = "", noteT = 0, noteId = "", advT = 0, toastT = 0;
 const stage = $(".br-video");
 const ratio = (w, h) => { if (w > 0 && h > 0) { stage.style.setProperty("--ar", `${w} / ${h}`); stage.style.setProperty("--arn", w / h); } };
@@ -104,6 +105,7 @@ function open(i) {
   if (i < 0 || i >= clips.length) return;
   flushNote(); clearTimeout(advT);
   cur = i; const c = clips[i], m = mk(c), photo = isPhoto(c);
+  if (!document.body.classList.contains("playing")) listY = window.scrollY; // where the list was, for "← All"
   $("[data-player]").hidden = false; document.body.classList.add("playing");
   $("[data-gigname]").textContent = c.gig; $("[data-name]").textContent = c.name.replace(/\.[^.]+$/, "");
   const dl = $("[data-dl]"); dl.hidden = !c.download; if (c.download) { dl.href = c.download; dl.textContent = c.hd ? "Download HD" : "Download (preview quality, HD coming)"; }
@@ -251,7 +253,15 @@ document.querySelectorAll("[data-show]").forEach((b) => b.addEventListener("clic
 document.querySelectorAll("[data-kind]").forEach((b) => b.addEventListener("click", () => { kind = kind === b.dataset.kind ? "" : b.dataset.kind; document.querySelectorAll("[data-kind]").forEach((x) => x.classList.toggle("on", x.dataset.kind === kind)); list(); }));
 $("[data-gig]").addEventListener("change", (e) => { gig = e.target.value; list(); });
 document.querySelectorAll("[data-step]").forEach((b) => b.addEventListener("click", () => step(+b.dataset.step)));
-$("[data-back]").addEventListener("click", () => { flushNote(); clearTimeout(advT); $("[data-player]").hidden = true; document.body.classList.remove("playing"); v.pause(); });
+$("[data-back]").addEventListener("click", () => {
+  flushNote(); clearTimeout(advT); $("[data-player]").hidden = true; document.body.classList.remove("playing"); v.pause();
+  // Back to where you were: the clip you were last on (you may have swiped on), else the list's old scroll position.
+  const id = clips[cur]?.id;
+  requestAnimationFrame(() => {
+    const el = [...document.querySelectorAll(".br-item")].find((b) => b.dataset.id === id);
+    if (el) el.scrollIntoView({ block: "center" }); else window.scrollTo({ top: listY });
+  });
+});
 function step(n) { clearTimeout(advT); const vis = visible(); const i = vis.findIndex((c) => c.id === clips[cur]?.id); const nx = vis[i + n] || vis[n > 0 ? 0 : vis.length - 1]; if (nx) open(clips.indexOf(nx)); }
 document.addEventListener("keydown", (e) => {
   if (e.target.matches("textarea, input, select") || cur < 0 || $("[data-player]").hidden || e.ctrlKey || e.metaKey || e.altKey) return;
