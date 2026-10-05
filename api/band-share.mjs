@@ -86,9 +86,11 @@ export default async function handler(req, res) {
         driveKey = { v, t: Date.now() };
       }
       const drive = (id) => (id && driveKey.v ? `https://www.googleapis.com/drive/v3/files/${id}?alt=media&key=${driveKey.v}` : null);
+      // Stills come from Google's image CDN (no key, no API quota): 110 posters through the API at once trips Google's bot block.
+      const cdn = (id, w) => (id ? `https://lh3.googleusercontent.com/d/${id}=w${w}` : null);
       // Supabase fallback: each preview has a still next to it (<drive id>/poster.jpg) so phones show a real frame in the list.
       const poster = (p) => p.replace(/[^/]+$/, 'poster.jpg');
-      const paths = assets.filter((a) => a.proxy_path).flatMap((a) => [...(drive(a.preview_drive_id) ? [] : [a.proxy_path]), ...(photo(a) || drive(a.poster_drive_id) ? [] : [poster(a.proxy_path)])]);
+      const paths = assets.filter((a) => a.proxy_path).flatMap((a) => [...(drive(a.preview_drive_id) ? [] : [a.proxy_path]), ...(photo(a) || a.poster_drive_id ? [] : [poster(a.proxy_path)])]);
       const urls = {};
       if (paths.length) {
         const r = await fetch(`${BASE}/storage/v1/object/sign/band-review`, { method: 'POST', headers: H, body: JSON.stringify({ expiresIn: 3600, paths }), signal: AbortSignal.timeout(12000) });
@@ -97,7 +99,7 @@ export default async function handler(req, res) {
       return res.status(200).json({
         you: who.n,
         gigs: pile || [...new Set(all.map((a) => a.gig))],
-        clips: assets.map((a) => ({ id: a.id, name: a.name, gig: a.gig, kind: photo(a) ? 'photo' : 'video', duration: a.duration, url: drive(a.preview_drive_id) || urls[a.proxy_path] || null, poster: drive(a.poster_drive_id) || (!photo(a) && a.proxy_path && urls[poster(a.proxy_path)]) || null })),
+        clips: assets.map((a) => ({ id: a.id, name: a.name, gig: a.gig, kind: photo(a) ? 'photo' : 'video', duration: a.duration, url: (photo(a) ? cdn(a.preview_drive_id, 1600) : drive(a.preview_drive_id)) || urls[a.proxy_path] || null, poster: cdn(a.poster_drive_id, 480) || (!photo(a) && a.proxy_path && urls[poster(a.proxy_path)]) || null })),
         marks: reviews.filter((r) => ids.has(r.asset_id)).map((r) => mark(r)),
       });
     }
