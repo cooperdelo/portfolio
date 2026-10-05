@@ -1,5 +1,5 @@
-import {mountShell} from '/admin/_shell/admin-shell.js';
-import {sb,getAdminRole} from '/admin/_shell/supabase.js';
+import {mountShell,isLocalDemo} from '/admin/_shell/admin-shell.js';
+import {sb,getAdminRole,getSession} from '/admin/_shell/supabase.js';
 import {esc} from '/admin/_shell/ui.js';
 import {DIRECTORY} from '/admin/_shell/directory.js';
 import {scopeForTask} from '/admin/_shell/workspace-model.mjs';
@@ -20,16 +20,44 @@ if(mode==='choose') {
   const pv=mode==='plugverse';
   app.innerHTML=head(pv?'Artists first. Real gigs next.':'A little less to keep in your head.',pv?'Your Instagram + email approach and Karthik’s email / LinkedIn experiments, with shared ownership and one history.':'Your personal priorities and decisions. All content remains in the shared Content workspace.')+`<div class="ws-tools">${pv?link('/admin/acquisition/','Your sending queue')+link('/admin/acquisition/?view=results','Compare experiments'):link('/admin/schedule/','Content schedule')+link('/admin/site/','Portfolio visitors')+link('/admin/shop/','Shop')+link('/admin/health/dashboard.html','Health')+link('/admin/academics/','Academics')}${ctx.role==='full'?link('/admin/content/','All content'):''}</div><div class="ws-grid"><section class="ws-card" id="ws-priorities"><h2>What needs you</h2><p class="ws-loading" role="status">Checking the current source…</p></section>${pv?card('Two approaches. One goal.',`<ul class="ws-list"><li><div><strong>Cooper / Instagram + Email</strong><small>Instagram and cooper@plugverse.app, with a fast copy-and-send queue.</small></div></li><li><div><strong>Karthik / Email + LinkedIn</strong><small>Independent experiment. Access and sender-specific copy still need verification.</small></div></li></ul>${link('/admin/acquisition/?view=results','Compare verified outcomes')}`):card('Personal, with room to focus.',`<p>Health, school and finances stay here. Work through what matters, then get back to your day.</p><div class="ws-tools">${link('/admin/finance/','Money')}${link('/admin/life/music.html','Music')}${link('/admin/personal/overview.html','Detailed overview')}</div>`)}<section class="ws-card" id="ws-strategy"><h2>${pv?'Current approved guidance':'Decisions and context'}</h2><p class="ws-loading">Checking source-backed items…</p></section><section class="ws-card" id="ws-health"><h2>Updates needing attention</h2><p class="ws-loading">Checking recent attempts…</p></section></div>`;
   if(ctx.role==='acquisition'){
-    document.querySelector('#ws-priorities').innerHTML='<h2>Your assigned work</h2><p>Acquisition connection has not been verified yet. Private task sources are not loaded.</p>'+link('/admin/acquisition/','Connection status');
-    document.querySelector('#ws-strategy').innerHTML='<h2>Approved guidance</h2><p>Acquisition-scoped guidance becomes available after the contributor adapter is verified.</p>';
-    document.querySelector('#ws-health').innerHTML='<h2>Connection status</h2><span class="ws-state warn">Not connected</span><p>The current board’s source and saved history are required.</p>';
+    document.querySelector('#ws-priorities').innerHTML='<h2>Your assigned work</h2><p class="ws-loading" role="status">Checking the board…</p>';
+    document.querySelector('#ws-strategy').innerHTML='<h2>How to talk to artists</h2><p>Ask about what already happened, never “would you use this”. Write down their exact words. Don’t promise features, prices or dates; anything about money or a first message that isn’t an approved draft goes to Cooper.</p>'+link('/admin/acquisition/?view=replies','The 10-minute feedback call');
+    document.querySelector('#ws-health').innerHTML='<h2>Board</h2><p class="ws-loading">Checking…</p>';
+    await board(document.querySelector('#ws-priorities'),document.querySelector('#ws-health'),false);
   } else if(ctx.role==='full') {
+    if(pv){const c=document.createElement('section');c.className='ws-card';c.innerHTML='<h2>Acquisition board</h2><p class="ws-loading">Checking…</p>';document.querySelector('.ws-grid').prepend(c);board(c,null,true);}
     await Promise.allSettled([priorities(pv),strategy(pv),health()]);
   } else {
     document.querySelector('#ws-priorities').innerHTML='<h2>Existing business tools</h2>'+link('/admin/plugverse/metrics.html','Business metrics');
     document.querySelector('#ws-strategy').innerHTML='<h2>Approved guidance</h2>'+link('/admin/playbook/','Open existing Playbook');
     document.querySelector('#ws-health').innerHTML='<h2>Acquisition integration</h2><p>Not connected. Existing business access is preserved.</p>';
   }
+}
+// Live counts from the acquisition board, each linking to the view where the work happens.
+async function board(el,status,approver){
+ try{
+  let d;
+  if(isLocalDemo())d=await (await import('/admin/_js/acquisition-demo.js')).handle('GET');
+  else{const session=await getSession();
+   const r=await fetch('/api/acquisition',{headers:{Authorization:`Bearer ${session?.access_token||''}`},cache:'no-store'});
+   d=await r.json();if(!r.ok)throw Error(d.error||'Board unavailable');}
+  if(d.connection?.state!=='connected'){
+   el.innerHTML=`<h2>${approver?'Acquisition board':'Your assigned work'}</h2><span class="ws-state warn">Not switched on yet</span><p>The Claude board is still the working copy. This fills in after the cutover.</p>`+link('https://claude.ai/artifact/5SoV39QXz4NghVwKvmzSN6','Open the current board');
+   if(status)status.innerHTML='<h2>Board</h2><span class="ws-state warn">Not connected</span><p>Waiting on the cutover in CLAUDE.md.</p>';
+   return;
+  }
+  const L=d.leads||[],SENT=['contacted','replied','signed_up'],day=864e5,wait={instagram:5,email:4};
+  const draft=l=>l.draft_text||d.drafts?.[l.draft]?.text;
+  const waiting=L.filter(l=>draft(l)&&!l.draft_verdict&&!SENT.includes(l.status)&&l.status!=='rejected').length;
+  const ready=L.filter(l=>l.draft_verdict==='approved'&&!SENT.includes(l.status)&&l.status!=='rejected').length;
+  const due=L.filter(l=>l.status==='contacted'&&l.sent_at&&!l.followup_sent_at&&wait[l.platform]&&Date.now()-Date.parse(l.sent_at)>=wait[l.platform]*day).length;
+  const talked=new Set((d.conversations||[]).map(c=>(c.name||'').toLowerCase()));
+  const unlogged=L.filter(l=>l.status==='replied'&&!talked.has((l.name||'').toLowerCase())).length;
+  const artists=(d.artists?.rows||[]).filter(a=>!talked.has((a.name||'').toLowerCase())).length;
+  const rows=[approver?['Messages waiting for your approval',waiting,'/admin/acquisition/']:null,['Approved, ready to send',ready,'/admin/acquisition/'],['Follow-ups due',due,'/admin/acquisition/?view=replies'],['Replies to log',unlogged,'/admin/acquisition/?view=replies'],['Artists on PlugVerse not talked to yet',artists,'/admin/acquisition/?view=replies']].filter(Boolean);
+  el.innerHTML=`<h2>${approver?'Acquisition board':'Your assigned work'}</h2><ul class="ws-list">${rows.map(([t,n,h])=>`<li><div><strong>${esc(t)}</strong></div><a class="ws-link" href="${h}" style="min-height:0">${n}</a></li>`).join('')}</ul>`;
+  if(status)status.innerHTML='<h2>Board</h2><span class="ws-state">Connected</span><p>Every change is saved with who made it and when.</p>'+link('/admin/acquisition/?view=results','This week, by person');
+ }catch(e){el.innerHTML='<h2>Acquisition board</h2><p>'+esc(e.message)+'</p>';}
 }
 async function priorities(pv){
  const el=document.querySelector('#ws-priorities');
