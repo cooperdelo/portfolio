@@ -642,3 +642,8 @@ html.ct-lock, html.ct-lock body { overflow: hidden; }
   .pill { min-height: 40px; padding: 0 14px; gap: 8px; font-size: 11px; letter-spacing: .05em; }
   .pill svg { width: 12px; height: 12px; }
 }
+
+/* ---------- price labels: free by default (production), paid only when the API reports a paid kit (previews) ---------- */
+.if-paid { display: none !important; }
+html.kit-paid .if-paid { display: revert !important; }
+html.kit-paid .if-free { display: none !important; }

@@ -34,7 +34,7 @@
     <p class="label" data-k-pillar>Design kit</p>
     <h1 id="kp-h" data-k-title>&nbsp;</h1>
     <p class="kp-result" data-k-result></p>
-    <div class="kp-buy" data-buy>
+    <div class="kp-buy" data-buy hidden>
       <p class="kp-price"><b data-k-price>&nbsp;</b><span class="draft" data-k-draft hidden>Draft price</span></p>
       <form class="kp-form" data-checkout><button class="pill solid" type="submit">Get the kit <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1 8h13M9 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></button><label class="kp-code"><span class="label">Promo code</span><input name="code" maxlength="40" autocomplete="off" placeholder="Optional" /></label></form>
       <p class="kp-fine label">Tax calculated at checkout · secure payment by Stripe · instant access</p>
@@ -66,13 +66,14 @@
   <div class="sh-cols label">
     <span>&copy; 2026 Cooper Delo</span>
     <nav aria-label="Elsewhere"><a href="/">Portfolio</a><a href="/resources">Free resources</a><a href="/#contact">Contact</a><a href="/privacy">Privacy</a><a href="/terms">Terms</a></nav>
-    <span>Payments by Stripe. Tax calculated at checkout.</span>
+    <span class="if-paid">Payments by Stripe. Tax calculated at checkout.</span>
   </div>
 </footer>
 <script src="/assets/lenis.min.js" defer></script>
 <script src="/assets/site.js" defer></script>
 <script src="/assets/beacon.js" defer></script>
 <script src="/assets/contact.js" defer></script>
+<script src="/assets/kit-price.js" defer></script>
 <script src="/assets/kit.js" defer></script>
 <script src="/assets/shop-demos.js" defer></script>
 <script src="/assets/shop-v2.js" defer></script>

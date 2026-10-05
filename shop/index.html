@@ -34,7 +34,7 @@
     <div class="sh-copy">
       <p class="label">Shop</p>
       <h1 id="sh-h" data-hero><span class="line"><span>Tools I made</span></span><span class="line"><span>for my own work.</span></span></h1>
-      <p>Kits, prompts and templates from the way I actually design, film, play and build. Try every one before you get it.</p>
+      <p>Kits, prompts and templates from the way I actually design, film, play and build. <span class="if-free">Free for now.</span><span class="if-paid">Try every one before you get it.</span></p>
       <a class="pill solid" href="#folder">See the kits <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1 8h13M9 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></a>
     </div>
   </section>
@@ -44,7 +44,7 @@
     <ol class="kit-shelf"><li><a class="bk" href="/shop/design-kit" data-tilt>
         <span class="bk-3d"><span class="bk-cover"><img src="/img/res/designkit-1200.webp" alt="" loading="lazy" decoding="async" /><span class="bk-sheen" aria-hidden="true"></span>
           <span class="bk-title"><span class="label">Cooper Delo</span><b>Design kit</b></span></span><span class="bk-spine" aria-hidden="true"><b>Design kit</b></span><span class="bk-pages" aria-hidden="true"></span></span>
-        <span class="bk-cap"><b>Design kit</b><span>Sites that don't look like AI.</span><span class="label bk-state">$29</span></span></a></li><li><a class="bk soon" href="/resources/ai-system" data-tilt>
+        <span class="bk-cap"><b>Design kit</b><span>Sites that don't look like AI.</span><span class="label bk-state"><span class="if-free">Free</span><span class="if-paid">$29</span></span></span></a></li><li><a class="bk soon" href="/resources/ai-system" data-tilt>
         <span class="bk-3d"><span class="bk-cover"><img src="/img/res/ai-1200.webp" alt="" loading="lazy" decoding="async" /><span class="bk-sheen" aria-hidden="true"></span>
           <span class="bk-title"><span class="label">Cooper Delo</span><b>AI system kit</b></span></span><span class="bk-spine" aria-hidden="true"><b>AI system kit</b></span><span class="bk-pages" aria-hidden="true"></span></span>
         <span class="bk-cap"><b>AI system kit</b><span>The folder, the rules, the prompt.</span><span class="label bk-state">Coming</span></span></a></li><li><a class="bk soon" href="/resources/guides/music" data-tilt>
@@ -69,7 +69,7 @@
   </section>
 
   <section class="stk-sec" aria-label="Try the free ones">
-    <div class="sh-head"><p class="label">Free, right now</p><h2>Try before you buy anything.</h2></div>
+    <div class="sh-head"><p class="label">Free, right now</p><h2><span class="if-free">Try them right here.</span><span class="if-paid">Try before you buy anything.</span></h2></div>
     <ol class="stk-list">
       <li class="stk-card" style="--i:0"><div class="stk-copy"><p class="label">LinkedIn</p><h3>Score your first line.</h3><p>The four checks I run before I post. Tick what's true.</p><a class="pill" href="/resources/guides/linkedin">Get the guide <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1 8h13M9 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></a></div><div class="stk-demo"><div class="dm dm-li" data-demo="linkedin">
       <div class="li-card">
@@ -109,7 +109,7 @@ Song six (drop d)</textarea></label>
       <details><summary>Do I need to code?</summary><p>No. The prompts do the asking. If you can paste text into an AI tool, you can use them.</p></details>
       <details><summary>Is the free stuff actually free?</summary><p>Yes. Some guides ask for an email so I can send you new ones. The film planner doesn't even ask for that.</p></details>
       <details><summary>Can I use it for client work?</summary><p>Yes. Use it on your own projects and for clients. Just don't resell or share the kit itself.</p></details>
-      <details><summary>Refunds?</summary><p>Full refund within 14 days, no questions asked. Just <a href="#contact" data-contact>send me a message</a>.</p></details>
+      <details class="if-paid"><summary>Refunds?</summary><p>Full refund within 14 days, no questions asked. Just <a href="#contact" data-contact>send me a message</a>.</p></details>
     </div>
   </section>
 </main>
@@ -118,13 +118,14 @@ Song six (drop d)</textarea></label>
   <div class="sh-cols label">
     <span>&copy; 2026 Cooper Delo</span>
     <nav aria-label="Elsewhere"><a href="/">Portfolio</a><a href="/resources">Free resources</a><a href="/#contact">Contact</a><a href="/privacy">Privacy</a><a href="/terms">Terms</a></nav>
-    <span>Payments by Stripe. Tax calculated at checkout.</span>
+    <span class="if-paid">Payments by Stripe. Tax calculated at checkout.</span>
   </div>
 </footer>
 <script src="/assets/lenis.min.js" defer></script>
 <script src="/assets/site.js" defer></script>
 <script src="/assets/beacon.js" defer></script>
 <script src="/assets/contact.js" defer></script>
+<script src="/assets/kit-price.js" defer></script>
 <script src="/assets/kit.js" defer></script>
 <script src="/assets/shop-demos.js" defer></script>
 <script src="/assets/shop-v2.js" defer></script>

@@ -3,7 +3,7 @@
 // POST /api/kit {slug, email}                      email gate: returns a token and the full kit
 // POST /api/kit {slug, session_id}                 after Stripe Checkout: verifies payment, returns a token and the kit
 // POST /api/kit {slug, demo: true}                 QA only, no Stripe key yet: simulates a paid unlock
-import { KITS, loadKits, teaser, full, canRead, grant, EMAIL_RE, demoAllowed, stripe, readBody } from './_lib/shop.mjs';
+import { KITS, gateFor, priceFor, loadKits, teaser, full, canRead, grant, EMAIL_RE, demoAllowed, stripe, readBody } from './_lib/shop.mjs';
 
 const LEADS = 'https://eibtnkaoqsgwiqttiwjo.supabase.co/rest/v1/shop_leads';
 
@@ -23,13 +23,14 @@ export default async function handler(req, res) {
   if (!kits) return res.status(503).json({ error: 'not_configured' });
   if (req.method === 'GET' && req.query?.list) {
     const list = Object.entries(KITS).filter(([k]) => kits[k]).map(([k, m]) => ({ slug: k, title: kits[k].title, pillar: kits[k].pillar,
-      result: kits[k].result, count: kits[k].steps?.length || 0, gate: m.gate, price: m.price || 0, draft: !!m.draft, href: m.shop || m.guide }));
+      result: kits[k].result, count: kits[k].steps?.length || 0, gate: gateFor(k), price: priceFor(k), draft: gateFor(k) === 'paid' && !!m.draft, href: m.shop || m.guide }));
     return res.status(200).json({ kits: list });
   }
   const slug = String((req.method === 'GET' ? req.query?.slug : readBody(req)?.slug) || '');
   const meta = KITS[slug], kit = kits[slug];
   if (!meta || !kit) return res.status(404).json({ error: 'unknown_kit' });
-  const base = { gate: meta.gate, price: meta.price || 0, draft: !!meta.draft };
+  const gate = gateFor(slug);
+  const base = { gate, price: priceFor(slug), draft: gate === 'paid' && !!meta.draft };
 
   if (req.method === 'GET') {
     const token = String(req.headers?.authorization || '').replace(/^Bearer\s+/i, '');
@@ -40,14 +41,14 @@ export default async function handler(req, res) {
   const body = readBody(req);
   if (!body) return res.status(400).json({ error: 'bad_body' });
 
-  if (meta.gate === 'email' && body.email) {
+  if (gate === 'email' && body.email) {
     const email = String(body.email).trim();
     if (!EMAIL_RE.test(email)) return res.status(400).json({ error: 'bad_email' });
     const saved = await saveLead(email, slug);
     return res.status(200).json({ ...base, locked: false, saved, token: grant(slug, 'email', email), kit: full(kit) });
   }
 
-  if (meta.gate === 'paid' && body.session_id) {
+  if (gate === 'paid' && body.session_id) {
     const key = process.env.SHOP_STRIPE_SECRET_KEY;
     if (!key) return res.status(503).json({ error: 'stripe_not_configured' });
     try {
@@ -58,7 +59,7 @@ export default async function handler(req, res) {
     } catch (e) { return res.status(502).json({ error: 'stripe_error' }); }
   }
 
-  if (meta.gate === 'paid' && body.demo) {
+  if (gate === 'paid' && body.demo) {
     if (!demoAllowed()) return res.status(403).json({ error: 'demo_off' });
     return res.status(200).json({ ...base, locked: false, demo: true, token: grant(slug, 'demo', 'qa'), kit: full(kit) });
   }

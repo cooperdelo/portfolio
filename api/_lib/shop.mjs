@@ -14,6 +14,14 @@ export const KITS = {
   music: { title: 'Book gigs, build sets, dial tone', gate: 'email', guide: '/resources/guides/music' },
   startup: { title: 'Shipping PlugVerse solo with AI', gate: 'free', guide: '/resources/guides/startup' },
 };
+// Cooper's ruling 2026-10-05: on production (cooperdelo.com) the Design kit is free. It stays paid ($29, Stripe)
+// only on QA / preview deployments. Every gate and price the API reports goes through gateFor / priceFor.
+export const FREE_IN_PRODUCTION = new Set(['design']);
+export function gateFor(slug, env = process.env) {
+  const m = KITS[slug]; if (!m) return null;
+  return env.VERCEL_ENV === 'production' && FREE_IN_PRODUCTION.has(slug) ? 'free' : m.gate;
+}
+export const priceFor = (slug, env = process.env) => (gateFor(slug, env) === 'paid' ? KITS[slug].price || 0 : 0);
 export const TAX_CODE = 'txcd_10503004'; // Stripe: digital documents, viewable, permanent rights (eligible for Managed Payments)
 
 let cache = null;
@@ -57,11 +65,11 @@ export function grant(kit, how, who, env = process.env) {
   return sign({ kit, how, who: String(who || '').slice(0, 120), iat: Math.floor(Date.now() / 1000), exp: Math.floor(Date.now() / 1000) + 5 * YEAR }, env);
 }
 export function canRead(slug, token, env = process.env) {
-  const meta = KITS[slug]; if (!meta) return false;
-  if (meta.gate === 'free') return true;
+  const gate = gateFor(slug, env); if (!gate) return false;
+  if (gate === 'free') return true;
   const p = verify(token, env);
   if (!p || p.kit !== slug) return false;
-  if (meta.gate === 'paid') return p.how === 'paid' || p.how === 'demo';
+  if (gate === 'paid') return p.how === 'paid' || p.how === 'demo';
   return true; // email gate: any valid grant for this kit
 }
 

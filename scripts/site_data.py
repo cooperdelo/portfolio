@@ -43,10 +43,16 @@ ARROW = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1 8h13M9 3l5 5-5 
 PRICE = {"design-kit": "$29"}
 
 
+def pv(free, paid):
+    """Both labels in the page. Production shows the free one (the Design kit is free on cooperdelo.com);
+    /assets/kit-price.js switches to the paid one only when /api/kit reports a paid kit (QA / preview)."""
+    return (f'<span class="if-free">{free}</span>' if free else "") + f'<span class="if-paid">{paid}</span>'
+
+
 def tag(slug):
-    """Free, or Kit · $29. Never 'with email'."""
+    """Free, or (previews only) Kit · $29. Never 'with email'."""
     acc = RES[slug][5]
-    return f"Kit · {PRICE[slug]}" if acc == "paid" else ACCESS[acc]
+    return pv("Free", f"Kit · {PRICE[slug]}") if acc == "paid" else ACCESS[acc]
 
 
 # Homepage "Start here": what the visitor is trying to do -> the one resource for it.

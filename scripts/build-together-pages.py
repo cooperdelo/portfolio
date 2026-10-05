@@ -74,6 +74,7 @@ def page(path, title, desc, body, og="https://cooperdelo.com/img/poster-montage-
 <script src="/assets/beacon.js" defer></script>
 <script src="/assets/contact.js" defer></script>
 <script src="/assets/together.js" defer></script>
+<script src="/assets/kit-price.js" defer></script>
 </body>
 </html>
 """

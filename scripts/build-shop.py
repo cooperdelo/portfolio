@@ -34,7 +34,7 @@ SHOP_FOOT = f"""<footer class="sh-foot">
   <div class="sh-cols label">
     <span>&copy; 2026 Cooper Delo</span>
     <nav aria-label="Elsewhere"><a href="/">Portfolio</a><a href="/resources">Free resources</a><a href="/#contact">Contact</a><a href="/privacy">Privacy</a><a href="/terms">Terms</a></nav>
-    <span>Payments by Stripe. Tax calculated at checkout.</span>
+    <span class="if-paid">Payments by Stripe. Tax calculated at checkout.</span>
   </div>
 </footer>"""
 
@@ -165,7 +165,7 @@ def demo_shots():
 
 # ---------------------------------------------------------------- kits as objects (ref: 3D Book card + holographic sheen)
 KITS_SHELF = [  # slug, title, line, cover, href, state
-    ("design", "Design kit", "Sites that don't look like AI.", "/img/res/designkit-1200.webp", "/shop/design-kit", "$29"),
+    ("design", "Design kit", "Sites that don't look like AI.", "/img/res/designkit-1200.webp", "/shop/design-kit", '<span class="if-free">Free</span><span class="if-paid">$29</span>'),
     ("ai", "AI system kit", "The folder, the rules, the prompt.", "/img/res/ai-1200.webp", "/resources/ai-system", "Coming"),
     ("band", "Band kit", "Booking link, song notes, set builder.", "/img/res/stage-1200.webp", "/resources/guides/music", "Coming"),
     ("film", "Film kit", "Plan, shoot, grade in one pass.", "/img/res/ch1-1200.webp", "/resources/film-plan", "Coming"),
@@ -197,7 +197,7 @@ def storefront():
     <div class="sh-copy">
       <p class="label">Shop</p>
       <h1 id="sh-h" data-hero><span class="line"><span>Tools I made</span></span><span class="line"><span>for my own work.</span></span></h1>
-      <p>Kits, prompts and templates from the way I actually design, film, play and build. Try every one before you get it.</p>
+      <p>Kits, prompts and templates from the way I actually design, film, play and build. <span class="if-free">Free for now.</span><span class="if-paid">Try every one before you get it.</span></p>
       <a class="pill solid" href="#folder">See the kits {ARROW}</a>
     </div>
   </section>
@@ -214,7 +214,7 @@ def storefront():
   </section>
 
   <section class="stk-sec" aria-label="Try the free ones">
-    <div class="sh-head"><p class="label">Free, right now</p><h2>Try before you buy anything.</h2></div>
+    <div class="sh-head"><p class="label">Free, right now</p><h2><span class="if-free">Try them right here.</span><span class="if-paid">Try before you buy anything.</span></h2></div>
     <ol class="stk-list">
       <li class="stk-card" style="--i:0"><div class="stk-copy"><p class="label">LinkedIn</p><h3>Score your first line.</h3><p>The four checks I run before I post. Tick what's true.</p><a class="pill" href="/resources/guides/linkedin">Get the guide {ARROW}</a></div><div class="stk-demo">{demo_linkedin()}</div></li>
       <li class="stk-card" style="--i:1"><div class="stk-copy"><p class="label">Music</p><h3>Sort a setlist.</h3><p>Paste your set. It groups by tuning so you retune less.</p><a class="pill" href="/resources/guides/music">Get the guide {ARROW}</a></div><div class="stk-demo">{demo_music()}</div></li>
@@ -229,7 +229,7 @@ def storefront():
       <details><summary>Do I need to code?</summary><p>No. The prompts do the asking. If you can paste text into an AI tool, you can use them.</p></details>
       <details><summary>Is the free stuff actually free?</summary><p>Yes. Some guides ask for an email so I can send you new ones. The film planner doesn't even ask for that.</p></details>
       <details><summary>Can I use it for client work?</summary><p>Yes. Use it on your own projects and for clients. Just don't resell or share the kit itself.</p></details>
-      <details><summary>Refunds?</summary><p>Full refund within 14 days, no questions asked. Just <a href="#contact" data-contact>send me a message</a>.</p></details>
+      <details class="if-paid"><summary>Refunds?</summary><p>Full refund within 14 days, no questions asked. Just <a href="#contact" data-contact>send me a message</a>.</p></details>
     </div>
   </section>"""
     page("shop/index", "Shop", "Kits, prompts and templates Cooper Delo made for his own work first.", body)
@@ -242,7 +242,7 @@ def design_kit():
     <p class="label" data-k-pillar>Design kit</p>
     <h1 id="kp-h" data-k-title>&nbsp;</h1>
     <p class="kp-result" data-k-result></p>
-    <div class="kp-buy" data-buy>
+    <div class="kp-buy" data-buy hidden>
       <p class="kp-price"><b data-k-price>&nbsp;</b><span class="draft" data-k-draft hidden>Draft price</span></p>
       <form class="kp-form" data-checkout><button class="pill solid" type="submit">Get the kit {ARROW}</button><label class="kp-code"><span class="label">Promo code</span><input name="code" maxlength="40" autocomplete="off" placeholder="Optional" /></label></form>
       <p class="kp-fine label">Tax calculated at checkout · secure payment by Stripe · instant access</p>

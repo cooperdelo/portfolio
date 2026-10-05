@@ -80,22 +80,23 @@
     const k = d.kit;
     document.title = `${k.title} / Cooper Delo`;
     $("[data-k-title]").textContent = k.title;
-    const pl = $("[data-k-pillar]"); if (pl) pl.textContent = (d.gate === "paid" ? "Kit · " : "Guide · ") + k.pillar;
+    const pl = $("[data-k-pillar]"); if (pl) pl.textContent = ($("[data-buy]") ? "Kit · " : "Guide · ") + k.pillar;
     $("[data-k-result]").textContent = k.result || "";
     const proof = $("[data-k-proof]");
     if (proof) proof.innerHTML = (k.proof_links || []).map((l) => `<a href="${esc(l.url)}"${/^https?:\/\/(www\.)?cooperdelo\.com/.test(l.url) ? "" : ' target="_blank" rel="noreferrer"'}>${esc(l.label)}</a>`).join("");
 
-    if (d.gate === "paid") {                                   // product page
-      $("[data-k-price]").textContent = money(d.price);
-      $("[data-k-draft]").hidden = !d.draft;
+    if ($("[data-buy]")) {                                      // product page (paid on previews, free on production)
+      const paid = d.gate === "paid";
+      if (paid) $("[data-k-price]").textContent = money(d.price);
+      $("[data-k-draft]").hidden = !paid || !d.draft;
       const outline = d.locked ? (k.outline || []) : k.steps.map((s) => s.do);
       $("[data-outline]").innerHTML = outline.map((t, i) => `<li><span class="label">${String(i + 1).padStart(2, "0")}</span><b>${esc(t)}</b>${d.locked ? `<span class="lk">${LOCK}</span>` : ""}</li>`).join("") +
         `<li class="mpl"><span class="label">+</span><b>The one prompt that puts it all together</b>${d.locked ? `<span class="lk">${LOCK}</span>` : ""}</li>`;
-      $("[data-buy]").hidden = !d.locked;
-      $("[data-owned]").hidden = d.locked;
+      $("[data-buy]").hidden = !(paid && d.locked);
+      $("[data-owned]").hidden = !paid || d.locked;
       const fullEl = $("[data-full]");
       fullEl.hidden = d.locked;
-      if (!d.locked) fullEl.innerHTML = `<div class="sh-head"><p class="label">Your kit</p><h2>Here it is.</h2></div><ol class="gd-steps">${k.steps.map((s, i) => stepHTML(s, i, false)).join("")}</ol>${masterHTML(k)}`;
+      if (!d.locked) fullEl.innerHTML = `<div class="sh-head"><p class="label">${paid ? "Your kit" : "Free"}</p><h2>Here it is.</h2></div><ol class="gd-steps">${k.steps.map((s, i) => stepHTML(s, i, false)).join("")}</ol>${masterHTML(k)}`;
       return;
     }
     // guide page: step 1 open, the rest outlined and locked; the email ask comes up as a modal
