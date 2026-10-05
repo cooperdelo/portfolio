@@ -3,7 +3,7 @@
 // fraud, disputes and receipts are Stripe's), promotion codes accepted
 // (or applied up front when a ?code= link is used), receipt emailed by Stripe. Without a Stripe key on QA it
 // answers with a demo URL so the whole flow can still be clicked through. Demo never runs in production.
-import { KITS, TAX_CODE, demoAllowed, checkoutLocked, stripe, readBody, origin } from './_lib/shop.mjs';
+import { KITS, gateFor, TAX_CODE, demoAllowed, checkoutLocked, stripe, readBody, origin } from './_lib/shop.mjs';
 
 export default async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store, private');
@@ -11,7 +11,8 @@ export default async function handler(req, res) {
   const body = readBody(req);
   const slug = String(body?.kit || '');
   const meta = KITS[slug];
-  if (!meta || meta.gate !== 'paid') return res.status(404).json({ error: 'not_for_sale' });
+  // Production: nothing is for sale (the Design kit is free there). Previews: only paid kits.
+  if (!meta || gateFor(slug) !== 'paid') return res.status(404).json({ error: 'not_for_sale' });
   const site = origin(req);
   const page = `${site}${meta.shop}`;
   const key = process.env.SHOP_STRIPE_SECRET_KEY;

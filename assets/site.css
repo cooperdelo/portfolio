@@ -126,6 +126,9 @@ html.seen .intro, html.rm .intro { display: none; }
 .title .copy { position: absolute; z-index: 2; left: var(--gutter); right: var(--gutter); top: 88px; display: flex; justify-content: space-between; gap: 24px; align-items: flex-start; }
 .title h1 { font-weight: 700; text-transform: uppercase; font-size: clamp(22px, 2.9vw, 50px); line-height: 1; letter-spacing: -.015em; max-width: 22ch; text-shadow: 0 1px 30px rgba(0, 0, 0, .25); }
 .title .meta { text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 14px; }
+/* the hero pills sit on moving footage: a frosted ink fill keeps them readable on bright frames */
+.title .meta .pill { background: rgba(16, 12, 8, .64); border-color: rgba(244, 240, 231, .4); -webkit-backdrop-filter: blur(12px) saturate(140%); backdrop-filter: blur(12px) saturate(140%); }
+.title .meta .pill:hover { background: var(--bone); color: var(--ink); border-color: var(--bone); }
 .title .foot { position: absolute; z-index: 2; left: 0; right: 0; bottom: 0; padding: 0 var(--gutter); }
 .title .foot .bar { display: flex; justify-content: space-between; padding-bottom: 10px; }
 .wordmark { font-family: var(--display); text-transform: uppercase; line-height: .78; white-space: nowrap; letter-spacing: -.02em; font-size: 8.4vw; margin: 0; padding-bottom: .03em; }
@@ -133,8 +136,10 @@ html.seen .intro, html.rm .intro { display: none; }
 .wordmark .line > span { transition-duration: 1.6s; }
 .wordmark .m { display: none; }
 @media (max-width: 700px) {
-  .title { height: 92svh; min-height: 560px; }
-  .title .bg img, .title .hero-vid { object-position: 50% 50%; } /* phone montage is already cropped around him */
+  /* the hero is exactly the first screen: 100vh where svh isn't supported, the small viewport (toolbars shown) where it is */
+  .title { height: 100vh; height: 100svh; min-height: 520px; }
+  /* the phone montage is framed tight on him: anchor near the top so his head isn't cropped */
+  .title .bg img, .title .hero-vid { object-position: 50% 12%; }
   .title .copy { top: 72px; bottom: calc(27vw + 30px); flex-direction: column; justify-content: space-between; }
   .title h1 { font-size: 25px; }
   /* pills sit in one row above the wordmark bar so his face stays clear on phones */
@@ -599,3 +604,50 @@ html.ct-lock, html.ct-lock body { overflow: hidden; }
   .stills figure.drop, .renders figure.drop { margin-top: 6vh; }
   .renders figure.turn { grid-column: span 1; width: 100%; }
 }
+
+/* ---------- funnel (2026-10-05): the one next step at the end of a resource, and the line before Next ---------- */
+.nx { padding: clamp(44px, 7vh, 80px) var(--gutter) clamp(72px, 11vh, 128px); }
+.nx-list.n1 { max-width: 980px; }
+.gd-body + .nx > .label, .gd-body + .nx .nx-list { max-width: 980px; margin-inline: auto; }
+.gd-body + .nx, .fp + .nx, .as-next + .nx { padding-top: 0; }
+.nx > .label { opacity: .62; margin-bottom: 16px; }
+.nx-list { list-style: none; display: grid; gap: 12px; }
+.nx .made { margin-top: 0; height: 100%; }
+.made-img img[src*="/designkit-"] { object-position: 50% 0; }
+@media (min-width: 901px) {
+  .nx-list.n2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .nx-list.n2 .made { grid-template-columns: minmax(0, 140px) minmax(0, 1fr) auto; }
+}
+@media (max-width: 700px) {
+  .nx .made { grid-template-columns: 92px minmax(0, 1fr); gap: 14px; padding: 10px; }
+  .nx .made-img { aspect-ratio: 1; }
+  .nx .made-cap b { font-size: 18px; }
+  .nx .made-cap > span:last-child { font-size: 13px; }
+}
+.mk-line { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 10px clamp(16px, 2vw, 32px); min-height: 76px; padding: 20px var(--gutter); background: var(--paper); color: var(--ink); border-top: 1px solid var(--line-l); transition: background-color .5s var(--ease), color .5s var(--ease); }
+.mk-line > .label:first-child { opacity: .62; }
+.mk-line b { font-family: var(--display); font-weight: 700; text-transform: uppercase; font-size: clamp(18px, 2.1vw, 34px); line-height: .9; letter-spacing: -.015em; transition: transform .8s var(--ease); }
+.mk-tag { display: inline-flex; align-items: center; gap: 10px; white-space: nowrap; }
+.mk-tag svg { width: 14px; height: 14px; transition: transform .6s var(--ease); }
+.mk-line:hover { background: var(--ink); color: var(--bone); }
+.dark + .mk-line { background: var(--ink); color: var(--bone); border-top-color: var(--line-d); border-bottom: 1px solid var(--line-d); }
+.dark + .mk-line:hover { background: var(--bone); color: var(--ink); }
+.mk-line:hover b { transform: translateX(8px); }
+.mk-line:hover .mk-tag svg { transform: translateX(4px); }
+@media (max-width: 700px) {
+  .mk-line { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "l l" "b t"; }
+  .mk-line > .label:first-child { grid-area: l; }
+  .mk-line b { grid-area: b; }
+  .mk-tag { grid-area: t; }
+}
+
+/* ---------- phones: compact pills (2026-10-05). Same size everywhere, still a 40px tap target ---------- */
+@media (max-width: 700px) {
+  .pill { min-height: 40px; padding: 0 14px; gap: 8px; font-size: 11px; letter-spacing: .05em; }
+  .pill svg { width: 12px; height: 12px; }
+}
+
+/* ---------- price labels: free by default (production), paid only when the API reports a paid kit (previews) ---------- */
+.if-paid { display: none !important; }
+html.kit-paid .if-paid { display: revert !important; }
+html.kit-paid .if-free { display: none !important; }

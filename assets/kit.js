@@ -72,33 +72,37 @@
     if (locked) return `<li class="st locked"><span class="label no">${String(i + 1).padStart(2, "0")}</span><div><h3>${esc(s)}</h3><div class="cb ghost" aria-hidden="true"><i></i><i></i><i></i></div></div><span class="lk">${LOCK}</span></li>`;
     return `<li class="st"><span class="label no">${String(i + 1).padStart(2, "0")}</span><div><h3>${esc(s.do)}</h3>${s.copy ? block(s.copy) : ""}</div></li>`;
   }
-  const masterHTML = (k) => k.master_prompt ? `<div class="mp"><p class="label">The one prompt</p><h2>Paste this into Claude.</h2>${block(k.master_prompt, "Copy the prompt")}</div>` : "";
+  // Works in any AI tool. Kits that make files or code go to a coding agent; the rest go in any chat.
+  const CODING = new Set(["design", "startup", "ai-system"]);
+  const masterHTML = (k) => k.master_prompt ? `<div class="mp"><p class="label">The one prompt</p><h2>${CODING.has(k.slug) ? "Paste this into your coding agent." : "Paste this into your AI."}</h2><p class="mp-tools">${CODING.has(k.slug) ? "Claude Code, Cursor, Codex or any coding agent." : "Claude, ChatGPT, Gemini or whatever you use."}</p>${block(k.master_prompt, "Copy the prompt")}</div>` : "";
 
   function render(d) {
     const k = d.kit;
     document.title = `${k.title} / Cooper Delo`;
     $("[data-k-title]").textContent = k.title;
-    const pl = $("[data-k-pillar]"); if (pl) pl.textContent = (d.gate === "paid" ? "Kit · " : "Guide · ") + k.pillar;
+    const pl = $("[data-k-pillar]"); if (pl) pl.textContent = ($("[data-buy]") ? "Kit · " : "Guide · ") + k.pillar;
     $("[data-k-result]").textContent = k.result || "";
     const proof = $("[data-k-proof]");
     if (proof) proof.innerHTML = (k.proof_links || []).map((l) => `<a href="${esc(l.url)}"${/^https?:\/\/(www\.)?cooperdelo\.com/.test(l.url) ? "" : ' target="_blank" rel="noreferrer"'}>${esc(l.label)}</a>`).join("");
 
-    if (d.gate === "paid") {                                   // product page
-      $("[data-k-price]").textContent = money(d.price);
-      $("[data-k-draft]").hidden = !d.draft;
+    if ($("[data-buy]")) {                                      // product page (paid on previews, free on production)
+      const paid = d.gate === "paid";
+      if (paid) $("[data-k-price]").textContent = money(d.price);
+      $("[data-k-draft]").hidden = !paid || !d.draft;
       const outline = d.locked ? (k.outline || []) : k.steps.map((s) => s.do);
       $("[data-outline]").innerHTML = outline.map((t, i) => `<li><span class="label">${String(i + 1).padStart(2, "0")}</span><b>${esc(t)}</b>${d.locked ? `<span class="lk">${LOCK}</span>` : ""}</li>`).join("") +
         `<li class="mpl"><span class="label">+</span><b>The one prompt that puts it all together</b>${d.locked ? `<span class="lk">${LOCK}</span>` : ""}</li>`;
-      $("[data-buy]").hidden = !d.locked;
-      $("[data-owned]").hidden = d.locked;
+      $("[data-buy]").hidden = !(paid && d.locked);
+      $("[data-owned]").hidden = !paid || d.locked;
       const fullEl = $("[data-full]");
       fullEl.hidden = d.locked;
-      if (!d.locked) fullEl.innerHTML = `<div class="sh-head"><p class="label">Your kit</p><h2>Here it is.</h2></div><ol class="gd-steps">${k.steps.map((s, i) => stepHTML(s, i, false)).join("")}</ol>${masterHTML(k)}`;
+      if (!d.locked) fullEl.innerHTML = `<div class="sh-head"><p class="label">${paid ? "Your kit" : "Free"}</p><h2>Here it is.</h2></div><ol class="gd-steps">${k.steps.map((s, i) => stepHTML(s, i, false)).join("")}</ol>${masterHTML(k)}`;
       return;
     }
     // guide page: step 1 open, the rest outlined and locked; the email ask comes up as a modal
     const steps = $("[data-steps]"), gate = $("[data-gate]"), master = $("[data-master]");
-    if (d.locked) {
+    // A page built without unlock UI (a free guide) never draws the locked view.
+    if (d.locked && d.gate !== "free" && gate) {
       const rest = (k.outline || []).slice(1);
       steps.innerHTML = stepHTML(k.first, 0, false) + rest.map((t, i) => stepHTML(t, i + 1, true)).join("");
       const count = `${Math.max(0, k.count - 1)} more steps and the one prompt`;
@@ -111,8 +115,8 @@
       gm.arm();
       track("gate_view", { kit: slug });
     } else {
-      steps.innerHTML = k.steps.map((s, i) => stepHTML(s, i, false)).join("");
-      gate.hidden = true;
+      steps.innerHTML = (k.steps || []).map((s, i) => stepHTML(s, i, false)).join("");
+      if (gate) gate.hidden = true;
       master.hidden = !k.master_prompt;
       master.innerHTML = masterHTML(k);
       gm.done();
@@ -121,8 +125,15 @@
 
   // The email modal: opens once when someone scrolls into the locked steps, or any time they ask for it.
   const gm = (() => {
-    const el = document.querySelector("[data-gate-modal]"), bar = document.querySelector("[data-gate-bar]");
-    if (!el) return { arm() {}, done() {} };
+    const el = document.querySelector("[data-gate-modal]"), barEl = document.querySelector("[data-gate-bar]");
+    if (!el || !barEl) return { arm() {}, done() {} };
+    // The sticky bar only shows while it's wanted AND nothing it would cover is on screen:
+    // the hero (top of the page, under the nav), the Next cards and the footer.
+    let want = false; const covering = new Set();
+    const sync = () => { barEl.hidden = !want || covering.size > 0; };
+    const bar = { set hidden(v) { want = !v; sync(); } };
+    const watch = new IntersectionObserver((ents) => { ents.forEach((en) => en.isIntersecting ? covering.add(en.target) : covering.delete(en.target)); sync(); });
+    document.querySelectorAll(".gd-hero, .nx, footer").forEach((t) => watch.observe(t));
     const key = "gate-shown:" + slug;
     let last = null, io = null;
     const seen = () => { try { return sessionStorage.getItem(key) === "1"; } catch { return false; } };

@@ -79,8 +79,9 @@ test('an email cannot unlock the paid kit', async () => {
 
 test('demo unlock and demo checkout only when allowed', async () => {
   process.env.VERCEL_ENV = 'production'; process.env.SHOP_DEMO = '1';
-  assert.equal((await call(kitApi, { method: 'POST', body: { slug: 'design', demo: true } })).code, 403);
-  assert.equal((await call(checkout, { method: 'POST', body: { kit: 'design' } })).code, 503);
+  // production: the Design kit is free there, so a demo unlock has nothing to do (and never grants a paid token)
+  assert.equal((await call(kitApi, { method: 'POST', body: { slug: 'design', demo: true } })).code, 400);
+  assert.equal((await call(checkout, { method: 'POST', body: { kit: 'design' } })).code, 404);
   process.env.VERCEL_ENV = 'preview';
   const d = await call(kitApi, { method: 'POST', body: { slug: 'design', demo: true } });
   assert.equal(d.code, 200); assert.equal(d.body.kit.master_prompt, 'MP');
@@ -137,17 +138,48 @@ test('checkout uses Managed Payments: no automatic_tax or invoice_creation, pinn
   } finally { globalThis.fetch = realFetch; delete process.env.SHOP_STRIPE_SECRET_KEY; }
 });
 
-test('production on a test key: checkout only opens with the test pass', async () => {
+test('production on a test key: the test-pass lock still guards, but nothing is for sale in production', async () => {
   const realFetch = globalThis.fetch;
   globalThis.fetch = async () => new Response(JSON.stringify({ url: 'https://checkout.stripe.com/x' }), { status: 200 });
   process.env.SHOP_STRIPE_SECRET_KEY = 'sk_test_x'; process.env.VERCEL_ENV = 'production';
   try {
     assert.equal(shop.checkoutLocked('nope'), true);
-    const locked = await call(checkout, { method: 'POST', body: { kit: 'design' } });
-    assert.equal(locked.code, 503); assert.equal(locked.body.error, 'checkout_opening_soon');
-    const open = await call(checkout, { method: 'POST', body: { kit: 'design', tp: shop.testPass() } });
-    assert.equal(open.code, 200);
+    const r = await call(checkout, { method: 'POST', body: { kit: 'design', tp: shop.testPass() } });
+    assert.equal(r.code, 404); assert.equal(r.body.error, 'not_for_sale');
     process.env.SHOP_STRIPE_SECRET_KEY = 'rk_live_x';
     assert.equal(shop.checkoutLocked(''), false);
   } finally { globalThis.fetch = realFetch; delete process.env.SHOP_STRIPE_SECRET_KEY; delete process.env.VERCEL_ENV; }
+});
+
+// Cooper's ruling 2026-10-05: the Design kit is free on production, paid ($29) on previews.
+test('production: the Design kit is free everywhere the API reports it', async () => {
+  process.env.VERCEL_ENV = 'production';
+  try {
+    assert.equal(shop.gateFor('design'), 'free'); assert.equal(shop.priceFor('design'), 0);
+    assert.equal(shop.gateFor('linkedin'), 'email'); assert.equal(shop.gateFor('startup'), 'free');
+    const list = await call(kitApi, { query: { list: '1' } });
+    const d = list.body.kits.find((k) => k.slug === 'design');
+    assert.equal(d.gate, 'free'); assert.equal(d.price, 0); assert.equal(d.draft, false);
+    assert.equal(list.body.kits.some((k) => k.gate === 'paid' || k.price > 0), false);
+    const g = await call(kitApi, { query: { slug: 'design' } });
+    assert.equal(g.code, 200); assert.equal(g.body.gate, 'free'); assert.equal(g.body.price, 0);
+    assert.equal(g.body.locked, false); assert.equal(g.body.kit.master_prompt, 'MP');
+    for (const kit of ['design', 'linkedin', 'startup', 'nope']) {
+      const c = await call(checkout, { method: 'POST', body: { kit } });
+      assert.equal(c.code, 404); assert.equal(c.body.error, 'not_for_sale');
+    }
+  } finally { delete process.env.VERCEL_ENV; }
+});
+
+test('preview: the Design kit stays paid at $29 and locked', async () => {
+  process.env.VERCEL_ENV = 'preview';
+  try {
+    assert.equal(shop.gateFor('design'), 'paid'); assert.equal(shop.priceFor('design'), 2900);
+    const list = await call(kitApi, { query: { list: '1' } });
+    const d = list.body.kits.find((k) => k.slug === 'design');
+    assert.equal(d.gate, 'paid'); assert.equal(d.price, 2900);
+    const g = await call(kitApi, { query: { slug: 'design' } });
+    assert.equal(g.body.gate, 'paid'); assert.equal(g.body.locked, true); assert.equal(g.body.kit.master_prompt, undefined);
+    assert.equal(shop.canRead('design', '', process.env), false);
+  } finally { delete process.env.VERCEL_ENV; }
 });

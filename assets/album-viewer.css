@@ -65,6 +65,8 @@ html.av-lock, html.av-lock body { overflow: hidden; }
   .av-flip { right: 14px; bottom: 14px; }
   .av-hint { left: 16px; bottom: 24px; }
   .av-close { top: 14px; right: 14px; }
+  /* compact pills sit over the sleeve on phones: same frosted ink fill as the hero pills */
+  .av-flip, .av-close { background: rgba(16, 12, 8, .64); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); }
 }
 @media (prefers-reduced-motion: reduce) {
   .av-scrim, .av-panel, .av-hint { transition: none; }

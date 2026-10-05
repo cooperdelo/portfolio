@@ -31,10 +31,27 @@
   window.cdTrack = cdTrack;
   cdTrack("page_view");
 
+  // Resource pages: one resource_open per load, carrying where the visitor came from on this site
+  // (picker, next card, case page line, gear) when a funnel link brought them here.
+  const RES_PATH = /^\/(gear|resources\/(film-plan|ai-system|guides\/[a-z-]+)|shop\/design-kit)$/;
+  const here = location.pathname.replace(/\.html$/, "").replace(/\/$/, "");
+  if (RES_PATH.test(here)) {
+    let from = "";
+    try { from = sessionStorage.getItem("cd-from") || ""; sessionStorage.removeItem("cd-from"); } catch (e) { /* storage blocked */ }
+    cdTrack("resource_open", { to: here.split("/").pop(), from });
+  }
+
   // The doors out: book a call, email, PlugVerse, Work with me, the motion starter.
   document.addEventListener("click", (e) => {
     const a = e.target.closest && e.target.closest("a[href]");
     if (!a) return;
+    // Funnel links say where they sit (data-from) and what they open (data-to).
+    if (a.dataset.from) {
+      const to = a.dataset.to || "";
+      cdTrack("cta_click", { target: to === "start" ? "playbooks" : "resource", from: a.dataset.from, to });
+      try { sessionStorage.setItem("cd-from", a.dataset.from); } catch (err) { /* storage blocked */ }
+      return;
+    }
     const h = a.getAttribute("href") || "";
     const target = /cal\.com/.test(h) ? "book_call"
       : /^mailto:/.test(h) ? (/Motion%20starter/i.test(h) ? "starter_interest" : "email")

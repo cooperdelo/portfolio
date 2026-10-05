@@ -18,7 +18,10 @@ function demoRows(){ // invented, for the local ?demo preview only
     if(s%3!==2)push('page_view',pages[1+s%6]);if(s%4===0)push('record_pull','/',{album:['In Rainbows','Vs.','Dirt','Siamese Dream'][s%4?1:s%3]});
     if(s%7===0)push('page_view','/work-with-me');if(s%14===0)push('brief_drafted','/work-with-me',{kind:'Film or motion'});
     if(s%9===0){push('page_view','/resources/film-plan');push('planner_started','/resources/film-plan');if(s%18===0)push('planner_download','/resources/film-plan',{filled:5});}
-    if(s%11===0)push('cta_click','/',{target:s%22?'book_call':'plugverse'});}
+    if(s%11===0)push('cta_click','/',{target:s%22?'book_call':'plugverse'});
+    if(s%4===1){push('cta_click','/',{target:'resource',from:'picker',to:'film-motion'});push('resource_open','/resources/guides/film-motion',{to:'film-motion',from:'picker'});
+      if(s%8===1){push('gate_view','/resources/guides/film-motion',{kit:'film-motion'});if(s%16===1){push('email_submit','/resources/guides/film-motion',{kit:'film-motion'});push('kit_unlock','/resources/guides/film-motion',{kit:'film-motion',how:'email'});
+        if(s%32===1){push('cta_click','/resources/guides/film-motion',{target:'resource',from:'next',to:'design-kit'});push('checkout_start','/shop/design-kit',{kit:'design'});}}}}}
   return out;
 }
 
@@ -56,6 +59,10 @@ if(error){
   const plan=count(r=>r.name==='page_view'&&r.path==='/resources/film-plan');
   const started=count(r=>r.name==='planner_started'),dl=count(r=>r.name==='planner_download');
   const beat=n=>count(r=>r.name==='motion_beat'&&r.props?.beat===n);
+  // Funnel to the kit, strict: a visit counts at a step only if it also hit every earlier step.
+  const STEPS=[['Visited','page_view'],['Opened a resource','resource_open'],['Saw an email gate','gate_view'],['Gave an email','email_submit'],['Started checkout','checkout_start'],['Unlocked a kit','kit_unlock']];
+  const chain=STEPS.map(([l],i)=>[l,visits.filter(v=>STEPS.slice(0,i+1).every(([,n])=>has(v,r=>r.name===n))).length]);
+  const from=f=>count(r=>r.name==='cta_click'&&r.props?.from===f);
   const pulls=rows.filter(r=>r.name==='record_pull'),albums={};pulls.forEach(r=>albums[r.props?.album]=(albums[r.props?.album]||0)+1);
   const src={};visits.forEach(v=>{const r=v[0];const k=r.source?`${r.referrer||'direct'} · ${r.source}`:(r.referrer||'Direct or unknown');src[k]=(src[k]||0)+1;});
   const pages={};views.forEach(r=>pages[r.path]=(pages[r.path]||0)+1);
@@ -68,6 +75,7 @@ if(error){
   <div class="ws-grid">
     <section class="ws-card"><h2>Work → conversation</h2>${funnel([['Visited',visits.length],['Opened a project',work],['Opened Work with me',wwm],['Wrote the brief',brief]])}</section>
     <section class="ws-card"><h2>Resources</h2>${funnel([['Visited Resources',res],['Opened the planner',plan],['Started filling it in',started],['Downloaded a plan',dl]])}<p class="ws-note" style="margin-top:12px">Starter interest clicks: ${fmt(cta('starter_interest'))}</p></section>
+    <section class="ws-card"><h2>Free playbooks → kit</h2>${funnel(chain)}<p class="ws-note" style="margin-top:12px">Each step counts visits that also did every step above it. Any path: ${fmt(count(r=>r.name==='checkout_start'))} started checkout, ${fmt(count(r=>r.name==='kit_unlock'&&r.props?.how==='paid'))} paid unlocks. Clicks from the picker ${fmt(from('picker'))}, Next cards ${fmt(from('next'))}, case pages ${fmt(from('case'))}, hero ${fmt(from('hero'))}.</p></section>
     <section class="ws-card"><h2>How far into Motion</h2>${funnel([['Reached beat 1',beat(1)],['Beat 3, the bio swap',beat(3)],['Beat 5, the end',beat(5)]])}</section>
     <section class="ws-card"><h2>On Repeat</h2><p>${fmt(pulls.length)} records pulled by hand in ${fmt(count(r=>r.name==='record_pull'))} visits.</p>${bars(top(albums),pulls.length)}</section>
     <section class="ws-card"><h2>Where visits came from</h2>${bars(top(src),visits.length)}</section>

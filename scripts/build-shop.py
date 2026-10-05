@@ -34,7 +34,7 @@ SHOP_FOOT = f"""<footer class="sh-foot">
   <div class="sh-cols label">
     <span>&copy; 2026 Cooper Delo</span>
     <nav aria-label="Elsewhere"><a href="/">Portfolio</a><a href="/resources">Free resources</a><a href="/#contact">Contact</a><a href="/privacy">Privacy</a><a href="/terms">Terms</a></nav>
-    <span>Payments by Stripe. Tax calculated at checkout.</span>
+    <span class="if-paid">Payments by Stripe. Tax calculated at checkout.</span>
   </div>
 </footer>"""
 
@@ -91,14 +91,16 @@ def demo_linkedin():
     boxes = "".join(f'<li><label><input type="checkbox" data-check="{k}" /><b>{t}</b><span>{q}</span></label></li>' for k, t, q in checks)
     return f"""<div class="dm dm-li" data-demo="linkedin">
       <div class="li-card">
-        <div class="li-top"><img class="li-av" src="/img/lawn-1280.webp" alt="" loading="lazy" /><div><b>Cooper Delo</b><span>Founder, PlugVerse · 1h</span></div></div>
-        <textarea class="li-text" rows="2" maxlength="300" data-line aria-label="Your first line">Nobody at the pitch cared about my slides. They cared about one number.</textarea>
-        <img class="li-photo" src="/img/res/pitch-1200.webp" alt="Cooper pitching PlugVerse at Innovate Carolina" loading="lazy" />
+        <div class="li-top"><span class="li-av" data-li-you aria-hidden="true"></span><img class="li-av" data-li-me src="/img/lawn-1280.webp" alt="" loading="lazy" hidden /><div><b data-li-name>You</b><span data-li-sub>Your headline · now</span></div></div>
+        <textarea class="li-text" rows="2" maxlength="300" data-line aria-label="Your first line" placeholder="Type the first line of your next post"></textarea>
+        <div class="li-img" data-li-you>Your photo or screenshot</div>
+        <img class="li-photo" data-li-me src="/img/res/pitch-1200.webp" alt="Cooper pitching PlugVerse at Innovate Carolina" loading="lazy" hidden />
       </div>
       <div class="dm-ctl">
         <p class="label">One point each</p>
         <ul class="li-checks">{boxes}</ul>
         <p class="li-verdict" data-verdict aria-live="polite"><b data-li-score>0</b><span data-li-say>Keep the idea, change the wrapper.</span></p>
+        <button type="button" class="dm-mine label" data-mine aria-pressed="false">See mine</button>
       </div>
     </div>"""
 
@@ -113,29 +115,43 @@ def demo_music():
 
 
 def demo_vault():
-    items = [("CLAUDE.md", "The rules Claude reads before anything else. Each one was written after something broke.", "CLAUDE.md"),
+    items = [("CLAUDE.md", "The rules your AI reads before anything else (CLAUDE.md, AGENTS.md or custom instructions). Each one was written after something broke.", "CLAUDE.md"),
              ("Context/", "Who you are, how you write, what you've committed to, and the memory log.", "Context/voice.md"),
-             ("Decisions/", "One dated file per call you make. Claude checks here before it guesses.", "Decisions/YYYY-MM-DD-topic.md"),
+             ("Decisions/", "One dated file per call you make. Your AI checks here before it guesses.", "Decisions/YYYY-MM-DD-topic.md"),
              ("Projects/", "One folder per project, each with one front-door file.", "Projects/[name]/README.md"),
-             ("Skills/", "Step-by-step procedures Claude can run the same way every time.", "Skills/[job]/SKILL.md"),
+             ("Skills/", "Step-by-step procedures your AI can run the same way every time.", "Skills/[job]/SKILL.md"),
              ("Scheduled-Tasks/", "Jobs that run without you, listed on one roster.", "Scheduled-Tasks/TASK-ROSTER.md"),
              ("Daily/", "What happened today. Chats get saved to Inbox when they end.", "Daily/YYYY-MM-DD.md")]
     tree = "".join(f'<li><button type="button" data-v="{i}"{" aria-pressed=\"true\"" if i == 0 else " aria-pressed=\"false\""}><span class="vf">{"&#9500;" if i < len(items) - 1 else "&#9492;"} {E(n)}</span></button></li>' for i, (n, _, _) in enumerate(items))
     panes = "".join(f'<div class="vp" data-vp="{i}"{"" if i == 0 else " hidden"}><p class="label">{E(n)}</p><p class="vd">{E(d)}</p><p class="vx"><span class="label">For example</span><code>{E(x)}</code></p></div>' for i, (n, d, x) in enumerate(items))
     return f"""<div class="dm dm-vault" data-demo="vault">
       <div class="vwin"><div class="win-bar"><i></i><i></i><i></i><span>~/vault</span></div><ul class="vtree">{tree}</ul></div>
-      <div class="dm-ctl" aria-live="polite">{panes}<p class="dm-note">Click a folder. This is the shape of mine.</p></div>
+      <div class="dm-ctl" aria-live="polite">{panes}<p class="dm-note">Click a folder. Yours starts with the same shape.</p></div>
     </div>"""
 
+PILLAR_IDEAS = ["Work", "Study", "Training", "Faith", "Family", "Craft", "Travel", "Food"]
+
 def demo_week():
-    days = "".join(f'<li><button type="button" class="wk-day" data-day="{i}"><span class="label">{d}</span><b data-topic>Pick</b><span class="wk-fmt" data-fmt></span></button></li>' for i, d in enumerate(["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]))
+    """The reader's own pillars first, then their week. Cooper's week is only an example behind 'See mine'."""
+    dn = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+    chips = "".join(f'<button type="button" data-p="{E(t)}" aria-pressed="false">{E(t)}</button>' for t in PILLAR_IDEAS)
+    days = "".join(f'<li><button type="button" class="wk-day" data-day="{i}"><span class="label">{d}</span><b data-topic>&nbsp;</b><span class="wk-fmt" data-fmt></span></button></li>' for i, d in enumerate(dn))
     return f"""<div class="dm dm-week" data-demo="week">
       <div class="wk">
-        <ol class="wk-days"><li><div class="wk-day sun"><span class="label">Sun</span><b>Film + edit</b><span class="wk-fmt">No posting</span></div></li>{days}</ol>
-        <div class="wk-car" role="group" aria-label="Which day is the carousel"><span class="label">Carousel</span>{"".join(f'<button type="button" data-car="{i}" aria-pressed="false">{d}</button>' for i, d in enumerate(["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]))}</div>
-        <p class="dm-note">Tap a day to change its topic.</p>
+        <div class="wk-pp">
+          <p class="label">1 · Your pillars, 2 to 5</p>
+          <p class="wk-hint">The parts of your life you actually want to show.</p>
+          <div class="wk-chips" role="group" aria-label="Pick your pillars" data-chips>{chips}</div>
+          <form class="wk-add" data-add><label><span class="sr">Add your own pillar</span><input name="p" maxlength="24" autocomplete="off" placeholder="Add your own" /></label><button type="submit" class="label">Add</button></form>
+          <div class="wk-main" data-main hidden><span class="label">Main pillar</span><span class="wk-mains" data-mains></span></div>
+        </div>
+        <p class="label wk-step">2 · Your week</p>
+        <ol class="wk-days" data-week><li><div class="wk-day sun"><span class="label">Sun</span><b>Film + edit</b><span class="wk-fmt">No posting</span></div></li>{days}</ol>
+        <div class="wk-car" role="group" aria-label="Which day is the carousel"><span class="label">Carousel</span>{"".join(f'<button type="button" data-car="{i}" aria-pressed="false">{d}</button>' for i, d in enumerate(dn))}</div>
+        <p class="dm-note" data-wk-note>Pick two or more and the week fills in. Tap a day to change it.</p>
       </div>
-      <div class="dm-ctl"><p class="label">The week checks</p><ul class="wk-checks" data-checks></ul></div>
+      <div class="dm-ctl"><p class="label">The week checks</p><ul class="wk-checks" data-checks></ul>
+        <button type="button" class="dm-mine label" data-mine aria-pressed="false">See mine</button></div>
     </div>"""
 
 def demo_shots():
@@ -149,7 +165,7 @@ def demo_shots():
 
 # ---------------------------------------------------------------- kits as objects (ref: 3D Book card + holographic sheen)
 KITS_SHELF = [  # slug, title, line, cover, href, state
-    ("design", "Design kit", "Sites that don't look like AI.", "/img/res/designkit-1200.webp", "/shop/design-kit", "$29 draft"),
+    ("design", "Design kit", "Sites that don't look like AI.", "/img/res/designkit-1200.webp", "/shop/design-kit", '<span class="if-free">Free</span><span class="if-paid">$29</span>'),
     ("ai", "AI system kit", "The folder, the rules, the prompt.", "/img/res/ai-1200.webp", "/resources/ai-system", "Coming"),
     ("band", "Band kit", "Booking link, song notes, set builder.", "/img/res/stage-1200.webp", "/resources/guides/music", "Coming"),
     ("film", "Film kit", "Plan, shoot, grade in one pass.", "/img/res/ch1-1200.webp", "/resources/film-plan", "Coming"),
@@ -181,7 +197,7 @@ def storefront():
     <div class="sh-copy">
       <p class="label">Shop</p>
       <h1 id="sh-h" data-hero><span class="line"><span>Tools I made</span></span><span class="line"><span>for my own work.</span></span></h1>
-      <p>Kits, prompts and templates from the way I actually design, film, play and build. Try every one before you get it.</p>
+      <p>Kits, prompts and templates from the way I actually design, film, play and build. <span class="if-free">Free for now.</span><span class="if-paid">Try every one before you get it.</span></p>
       <a class="pill solid" href="#folder">See the kits {ARROW}</a>
     </div>
   </section>
@@ -198,22 +214,22 @@ def storefront():
   </section>
 
   <section class="stk-sec" aria-label="Try the free ones">
-    <div class="sh-head"><p class="label">Free, right now</p><h2>Try before you buy anything.</h2></div>
+    <div class="sh-head"><p class="label">Free, right now</p><h2><span class="if-free">Try them right here.</span><span class="if-paid">Try before you buy anything.</span></h2></div>
     <ol class="stk-list">
       <li class="stk-card" style="--i:0"><div class="stk-copy"><p class="label">LinkedIn</p><h3>Score your first line.</h3><p>The four checks I run before I post. Tick what's true.</p><a class="pill" href="/resources/guides/linkedin">Get the guide {ARROW}</a></div><div class="stk-demo">{demo_linkedin()}</div></li>
       <li class="stk-card" style="--i:1"><div class="stk-copy"><p class="label">Music</p><h3>Sort a setlist.</h3><p>Paste your set. It groups by tuning so you retune less.</p><a class="pill" href="/resources/guides/music">Get the guide {ARROW}</a></div><div class="stk-demo">{demo_music()}</div></li>
-      <li class="stk-card" style="--i:2"><div class="stk-copy"><p class="label">AI system</p><h3>One folder Claude reads.</h3><p>The setup behind everything on this site.</p><a class="pill" href="/resources/ai-system">See the system {ARROW}</a></div><div class="stk-demo">{demo_vault()}</div></li>
+      <li class="stk-card" style="--i:2"><div class="stk-copy"><p class="label">AI system</p><h3>One folder your AI reads.</h3><p>The setup behind everything on this site.</p><a class="pill" href="/resources/ai-system">See the system {ARROW}</a></div><div class="stk-demo">{demo_vault()}</div></li>
     </ol>
   </section>
 
   <section class="sh-faq" aria-labelledby="fq-h">
     <h2 id="fq-h">What people ask me.</h2>
     <div class="faq">
-      <details><summary>What do I actually get?</summary><p>A page that stays unlocked in your browser with every step, every rule and every prompt, each with a copy button. You paste them into Claude and build.</p></details>
-      <details><summary>Do I need to code?</summary><p>No. The prompts do the asking. If you can paste text into Claude, you can use them.</p></details>
+      <details><summary>What do I actually get?</summary><p>A page that stays unlocked in your browser with every step, every rule and every prompt, each with a copy button. You paste them into Claude, ChatGPT, Gemini or whatever you use, and build.</p></details>
+      <details><summary>Do I need to code?</summary><p>No. The prompts do the asking. If you can paste text into an AI tool, you can use them.</p></details>
       <details><summary>Is the free stuff actually free?</summary><p>Yes. Some guides ask for an email so I can send you new ones. The film planner doesn't even ask for that.</p></details>
-      <details><summary>Can I use it for client work? <span class="draft">Draft</span></summary><p>Answer pending. Cooper sets the license before this goes live.</p></details>
-      <details><summary>Refunds? <span class="draft">Draft</span></summary><p>Policy pending. Cooper sets it before this goes live.</p></details>
+      <details><summary>Can I use it for client work?</summary><p>Yes. Use it on your own projects and for clients. Just don't resell or share the kit itself.</p></details>
+      <details class="if-paid"><summary>Refunds?</summary><p>Full refund within 14 days, no questions asked. Just <a href="#contact" data-contact>send me a message</a>.</p></details>
     </div>
   </section>"""
     page("shop/index", "Shop", "Kits, prompts and templates Cooper Delo made for his own work first.", body)
@@ -226,7 +242,7 @@ def design_kit():
     <p class="label" data-k-pillar>Design kit</p>
     <h1 id="kp-h" data-k-title>&nbsp;</h1>
     <p class="kp-result" data-k-result></p>
-    <div class="kp-buy" data-buy>
+    <div class="kp-buy" data-buy hidden>
       <p class="kp-price"><b data-k-price>&nbsp;</b><span class="draft" data-k-draft hidden>Draft price</span></p>
       <form class="kp-form" data-checkout><button class="pill solid" type="submit">Get the kit {ARROW}</button><label class="kp-code"><span class="label">Promo code</span><input name="code" maxlength="40" autocomplete="off" placeholder="Optional" /></label></form>
       <p class="kp-fine label">Tax calculated at checkout · secure payment by Stripe · instant access</p>
@@ -249,14 +265,25 @@ def design_kit():
     page("shop/design-kit", "Design kit", "The references, rules and prompt Cooper Delo uses to build sites that don't look like AI.", body)
 
 # ---------------------------------------------------------------- gated guides on the main site
+def kit_gates():
+    """slug -> free | email | paid, read from api/_lib/shop.mjs KITS so the pages and the API never disagree."""
+    import re
+    src = (ROOT / "api" / "_lib" / "shop.mjs").read_text(encoding="utf-8")
+    return {m.group(1).strip("'\""): m.group(2) for m in re.finditer(r"^\s*('?[\w-]+'?):\s*\{[^}]*gate:\s*'(\w+)'", src, re.M)}
+
+GATES = kit_gates()
+
 GUIDE_DEMO = {"linkedin": demo_linkedin, "music": demo_music, "ai-system": demo_vault, "instagram-tiktok": demo_week, "film-motion": demo_shots}
 
 def guide(slug):
     demo = GUIDE_DEMO.get(slug)
     demo_html = f'<section class="gd-demo" aria-label="Try it">{demo()}</section>' if demo else ""
     sys.path.insert(0, str(ROOT / "scripts"))
-    from site_data import RES
+    from site_data import RES, next_block
     cover = RES[slug][3] if slug in RES else "film"
+    free = GATES.get(slug) == "free"  # free guides carry no unlock UI at all
+    gate_ui = "" if free else f"""
+    <div class="gd-more" data-gate hidden><button type="button" class="pill solid" data-gm-open>Unlock the rest, free {ARROW}</button><p class="label" data-gate-count></p></div>"""
     body = f"""  <section class="gd-hero gd-cover dark" data-kit="{slug}" aria-labelledby="gd-h">
     <img class="gd-bg" src="/img/res/{cover}-1200.webp" srcset="/img/res/{cover}-600.webp 600w, /img/res/{cover}-1200.webp 1200w" sizes="100vw" alt="" aria-hidden="true" />
     <a class="kp-back label" href="/resources">{ARROW} Resources</a>
@@ -267,10 +294,13 @@ def guide(slug):
   </section>
   {demo_html}
   <section class="gd-body light" aria-label="The guide">
-    <ol class="gd-steps" data-steps></ol>
-    <div class="gd-more" data-gate hidden><button type="button" class="pill solid" data-gm-open>Unlock the rest, free {ARROW}</button><p class="label" data-gate-count></p></div>
+    <ol class="gd-steps" data-steps></ol>{gate_ui}
     <div class="gd-master" data-master hidden></div>
   </section>
+  {next_block(slug)}{"" if free else MODAL}"""
+    page(f"resources/guides/{slug}", "Guide", "A free guide from Cooper Delo.", body, css=("/assets/together.css", "/assets/shop.css", "/assets/shop-v2.css"), shop=False)
+
+MODAL = f"""
   <div class="gm" data-gate-modal hidden data-lenis-prevent>
     <div class="gm-scrim" data-gm-close></div>
     <div class="gm-card" role="dialog" aria-modal="true" aria-labelledby="gm-h">
@@ -281,11 +311,10 @@ def guide(slug):
       <ol class="gm-list" data-gm-outline></ol>
       <form class="gd-form" data-email-gate><label><span class="label">Email</span><input type="email" name="email" required maxlength="254" autocomplete="email" placeholder="you@email.com" /></label><button class="pill solid" type="submit">Open the guide {ARROW}</button></form>
       <p class="kp-msg" data-msg role="status"></p>
-      <p class="gd-fine">I'll only use it to send you new guides. <span class="draft">Draft</span></p>
+      <p class="gd-fine">I'll only use it to send you new guides.</p>
     </div>
   </div>
   <div class="gd-bar" data-gate-bar hidden><span data-bar-count></span><button type="button" class="pill solid" data-gm-open>Unlock free {ARROW}</button></div>"""
-    page(f"resources/guides/{slug}", "Guide", "A free guide from Cooper Delo.", body, css=("/assets/together.css", "/assets/shop.css", "/assets/shop-v2.css"), shop=False)
 
 def resources_shelf():
     """Add a Guides shelf to /resources (QA only), drawn from /api/kit at runtime."""

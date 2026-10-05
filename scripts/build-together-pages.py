@@ -5,6 +5,9 @@
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
+import sys
+sys.path.insert(0, str(ROOT / "scripts"))
+from site_data import next_block, mk_line  # noqa: E402
 ARROW = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1 8h13M9 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>'
 CAL = "https://cal.com/cooper-delo1"
 PV = "https://plugverse.app/?utm_source=cooperdelo&utm_medium=portfolio&utm_campaign=artist_workflow"
@@ -72,6 +75,7 @@ def page(path, title, desc, body, og="https://cooperdelo.com/img/poster-montage-
 <script src="/assets/beacon.js" defer></script>
 <script src="/assets/contact.js" defer></script>
 <script src="/assets/together.js" defer></script>
+<script src="/assets/kit-price.js" defer></script>
 </body>
 </html>
 """
@@ -206,14 +210,15 @@ def film_plan():
     <div class="fp-copy">
       <p class="label">Resources / Film planner</p>
       <h1 id="pg-h" data-hero><span class="line"><span>Hooks that</span></span><span class="line"><span>hold.</span></span></h1>
-      <p class="lede">The hooks, story checks and retention rules I actually use. Paste them into ChatGPT or Claude with your idea, and it writes yours, your way.</p>
+      <p class="lede">The hooks, story checks and retention rules I actually use. Paste them into Claude, ChatGPT, Gemini or whatever you use, with your idea, and it writes yours, your way.</p>
     </div>
   </section>
   <section class="fp light" aria-label="The playbook">
     <div class="fp-cols">{cols}</div>
     <div class="fp-prompt"><p class="label">One paste. Change the highlighted line.</p><div class="cb"><pre>{prompt}</pre><button type="button" class="cp" aria-label="Copy the prompt">Copy</button></div>
       <p class="note">Same rules behind the <a href="/work/plugverse-launch-film">PlugVerse launch film</a>.</p></div>
-  </section>"""
+  </section>
+  {next_block("film-plan")}"""
     page("resources/film-plan", "Film planner", "Cooper Delo's hooks, story checks and retention rules, as one prompt you paste into your AI with your idea.", body, css=("/assets/gear.css",))
 
 
@@ -280,9 +285,10 @@ def gear():
   <section class="gfs dark" aria-label="In use">{feats}</section>
   <section class="gls light" aria-label="Everything I use">
     <ul class="gl-list" data-glist>{"".join(rows)}</ul>
-    <p class="fine">Amazon links are searches for the exact model. <span class="draft">Draft</span> If they become affiliate links, this line will say so.</p>
+    <p class="fine">Amazon links are searches for the exact model. If they become affiliate links, this line will say so.</p>
     <img class="gl-float" data-gfloat alt="" aria-hidden="true" />
-  </section>"""
+  </section>
+  {mk_line("film-motion", "How I film with it", "gear")}"""
     page("gear", "My setup", "The guitars, amp, camera, studio gear and grade Cooper Delo actually uses.", body, css=("/assets/gear.css",))
 
 

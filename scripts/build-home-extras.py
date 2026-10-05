@@ -78,7 +78,7 @@ def records():
 
 # ---------------------------------------------------------------- showcase: one screen, four tabs, one best piece each
 SHOW = [
-    {"tab": "Storytelling", "title": "Chapter One", "line": "Junior year, in 33 seconds.", "stat": "17.6K views on TikTok",
+    {"tab": "Storytelling", "title": "Chapter One", "line": "Junior year, in 33 seconds.", "stat": "0:33 · 2026",
      "cta": ("Watch it", "/work/chapter-one"), "video": "chapter-one", "ar": "16/9"},
     {"tab": "Motion", "title": "Bioswap", "line": "One camera, no cuts. Built in code.", "stat": "Remotion, React, Resolve",
      "cta": ("See how it moves", "/work/bioswap"), "video": "bioswap-final", "ar": "1/1", "webm": True},
@@ -187,7 +187,7 @@ def chapter_films():
     return f'''<section class="ch ch-films light" id="films" aria-labelledby="films-h">
     {_head("films", "01", "Films", "Short films I shoot and cut myself.").replace('class="ch-name"', 'class="ch-name" id="films-h"')}
     <div class="ct-grid">
-      {tile("chapter-one", "chapter-one", "Chapter One", "Junior year, in 33 seconds.", "0:33 · 17.6K views on TikTok", "big")}
+      {tile("chapter-one", "chapter-one", "Chapter One", "Junior year, in 33 seconds.", "0:33 · 2026", "big")}
       {tile("the-start", "the-start", "The Start", "I am terrified of starting.", "0:20 · 2026", "")}
       {tile("plugverse-launch-film", "launch-film", "PlugVerse launch film", "My first short film, made for my startup's launch.", "1:00 · 2026", "")}
     </div>
@@ -258,7 +258,7 @@ def chapters(records_html, diagram):
 # ---------------------------------------------------------------- four doors (plan 2026-10-03): Work, Resources, Shop, Contact
 import sys as _sys, pathlib as _pl
 _sys.path.insert(0, str(_pl.Path(__file__).resolve().parent))
-from site_data import PILLARS, WORK_CARDS, RESOURCES, RES, ACCESS, res_img  # noqa: E402
+from site_data import PILLARS, WORK_CARDS, RESOURCES, RES, ACCESS, res_img, PICKER, tag, pv  # noqa: E402
 
 
 def _work_media(kind, val):
@@ -303,7 +303,7 @@ def res_bento(heading=True, limit=None, exclude=()):
     """Resources as a bento of real covers (ref: Interactive Bento Gallery)."""
     items = [r for r in RESOURCES if r[0] not in exclude][:limit]
     cards = "".join(f'''<li class="rb-{i}"><a class="rb" href="{href}">{res_img(key)}
-        <span class="rb-cap"><span class="label">{ACCESS[acc]}</span><b>{title}</b><span>{line}</span></span><span class="rb-go">{ARROW}</span></a></li>'''
+        <span class="rb-cap"><span class="label">{tag(slug)}</span><b>{title}</b><span>{line}</span></span><span class="rb-go">{ARROW}</span></a></li>'''
                     for i, (slug, title, line, key, href, acc) in enumerate(items))
     head = f'''<div class="rb-head"><h2 data-rv><span class="line"><span>Resources</span></span></h2>
       <p>How I actually make things. Copy what helps, skip what doesn't. <a href="/resources">See all {ARROW}</a></p></div>''' if heading else ""
@@ -313,11 +313,28 @@ def res_bento(heading=True, limit=None, exclude=()):
   </section>'''
 
 
+def start_here():
+    """Homepage Resources, led by a picker: what are you trying to do -> the one resource for it.
+    Everything the picker doesn't name sits under it as one compact line."""
+    rows = "".join(f'''<li><a class="pk" href="{RES[s][4]}" data-from="picker" data-to="{s}">
+        <span class="label pk-no">{i + 1:02d}</span><span class="pk-img">{res_img(RES[s][3], "", "(max-width: 900px) 72px, 160px")}</span>
+        <span class="pk-cap"><b>{ask}</b><span>{RES[s][2]}</span></span><span class="label pk-tag">{tag(s)}</span><span class="pk-go">{ARROW}</span></a></li>'''
+                   for i, (s, ask) in enumerate(PICKER))
+    named = {s for s, _ in PICKER}
+    rest = "".join(f'<li><a href="{r[4]}" data-from="picker_all" data-to="{r[0]}">{r[1]}</a></li>' for r in RESOURCES if r[0] not in named)
+    return f'''<section class="rbs pks light" id="start" aria-labelledby="pk-h">
+    <div class="rb-head pk-head"><div><p class="label">Start here · Free playbooks</p><h2 id="pk-h" data-rv><span class="line"><span>What are you</span></span><span class="line"><span>trying to do?</span></span></h2></div>
+      <p>{pv('Pick one. All five are free.', 'Pick one. Four free guides and one paid kit.')}</p></div>
+    <ol class="pk-list">{rows}</ol>
+    <div class="pk-all"><p class="label">Also free</p><ul>{rest}</ul><a class="pk-allk label" href="/resources">All resources {ARROW}</a></div>
+  </section>'''
+
+
 def shop_teaser():
     d = RES["design-kit"]
     return f'''<section class="sht dark" aria-labelledby="sht-h">
     <a class="sht-card" href="/shop">
       <span class="sht-media">{res_img(d[3], "", "(max-width: 900px) 100vw, 60vw")}</span>
-      <span class="sht-copy"><span class="label">Shop</span><b id="sht-h">Tools I made for my own work.</b><span>Kits, prompts and templates. Try every one before you get it.</span><span class="pill">Open the shop {ARROW}</span></span>
+      <span class="sht-copy"><span class="label">Shop</span><b id="sht-h">Tools I made for my own work.</b><span>Kits, prompts and templates. {pv('Free for now.', 'Try every one before you get it.')}</span><span class="pill">Open the shop {ARROW}</span></span>
     </a>
   </section>'''
