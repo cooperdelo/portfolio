@@ -40,6 +40,24 @@ const list = (v) => [].concat(v ?? []).map((x) => String(x).trim()).filter(Boole
 const photo = (a) => /^image\//.test(a.mime_type || '');
 const noCol = (e) => /column|42703/.test(e.body || ''); // the v2 columns do not exist until the migration is applied
 
+let hd = { map: {}, t: 0 };
+async function hdFiles(key, env = process.env) {
+  const k = env.SUPABASE_ADMIN_SERVICE_ROLE_KEY;
+  const r = await fetch(`${BASE}/rest/v1/automation_secrets?select=value&key=eq.band_previews_folder_id`, { headers: { apikey: k, Authorization: `Bearer ${k}` }, signal: AbortSignal.timeout(8000) });
+  const folder = r.ok ? (await r.json())[0]?.value : null;
+  if (!folder || !/^[\w-]{10,80}$/.test(folder)) return {};
+  const map = {}; let page = '';
+  for (let i = 0; i < 5; i++) {
+    const q = encodeURIComponent(`'${folder}' in parents and name contains '.hd.' and trashed = false`);
+    const res = await fetch(`https://www.googleapis.com/drive/v3/files?q=${q}&fields=nextPageToken,files(id,name)&pageSize=1000&key=${key}${page ? `&pageToken=${page}` : ''}`, { signal: AbortSignal.timeout(8000) });
+    if (!res.ok) break;
+    const j = await res.json();
+    for (const f of j.files || []) { const m = /^([0-9a-f-]{36})\.hd\.(jpg|mp4)$/.exec(f.name); if (m) map[m[1]] = f.id; }
+    if (!j.nextPageToken) break; page = j.nextPageToken;
+  }
+  return map;
+}
+
 export default async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store, private');
   res.setHeader('X-Robots-Tag', 'noindex');
@@ -85,6 +103,9 @@ export default async function handler(req, res) {
         try { v = (await get('automation_secrets?select=value&key=eq.google_drive_api_key'))[0]?.value || null; } catch {}
         driveKey = { v, t: Date.now() };
       }
+      if (driveKey.v && Date.now() - hd.t > 600000) hd = { map: await hdFiles(driveKey.v).catch(() => hd.map), t: Date.now() };
+      // Post-quality files (scripts/build-band-downloads.py) sit next to the previews as <asset id>.hd.jpg|mp4.
+      const dl = (id) => (id ? `https://drive.google.com/uc?export=download&id=${id}` : null);
       const drive = (id) => (id && driveKey.v ? `https://www.googleapis.com/drive/v3/files/${id}?alt=media&key=${driveKey.v}` : null);
       // Stills come from Google's image CDN (no key, no API quota): 110 posters through the API at once trips Google's bot block.
       const cdn = (id, w) => (id ? `https://lh3.googleusercontent.com/d/${id}=w${w}` : null);
@@ -99,7 +120,8 @@ export default async function handler(req, res) {
       return res.status(200).json({
         you: who.n,
         gigs: pile || [...new Set(all.map((a) => a.gig))],
-        clips: assets.map((a) => ({ id: a.id, name: a.name, gig: a.gig, kind: photo(a) ? 'photo' : 'video', duration: a.duration, url: (photo(a) ? cdn(a.preview_drive_id, 1600) : drive(a.preview_drive_id)) || urls[a.proxy_path] || null, poster: cdn(a.poster_drive_id, 480) || (!photo(a) && a.proxy_path && urls[poster(a.proxy_path)]) || null })),
+        clips: assets.map((a) => ({ id: a.id, name: a.name, gig: a.gig, kind: photo(a) ? 'photo' : 'video', duration: a.duration, url: (photo(a) ? cdn(a.preview_drive_id, 1600) : drive(a.preview_drive_id)) || urls[a.proxy_path] || null, poster: cdn(a.poster_drive_id, 480) || (!photo(a) && a.proxy_path && urls[poster(a.proxy_path)]) || null,
+          download: dl(hd.map[a.id] || a.preview_drive_id), hd: !!hd.map[a.id] })),
         marks: reviews.filter((r) => ids.has(r.asset_id)).map((r) => mark(r)),
       });
     }

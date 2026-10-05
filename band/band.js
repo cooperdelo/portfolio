@@ -60,6 +60,7 @@ function open(i) {
   cur = i; const c = clips[i], m = mk(c), photo = isPhoto(c);
   $("[data-player]").hidden = false; document.body.classList.add("playing");
   $("[data-gigname]").textContent = c.gig; $("[data-name]").textContent = c.name.replace(/\.[^.]+$/, "");
+  const dl = $("[data-dl]"); dl.hidden = !c.download; if (c.download) { dl.href = c.download; dl.textContent = c.hd ? "Download HD" : "Download (preview quality, HD coming)"; }
   $("[data-note]").value = m.note || "";
   loop = false; v.pause();
   v.hidden = photo; img.hidden = !photo; $("[data-tl]").hidden = photo; $("[data-play]").hidden = photo;
