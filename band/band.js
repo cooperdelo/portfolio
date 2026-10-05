@@ -7,6 +7,8 @@ const SHOTS = [["wide", "Wide"], ["medium", "Medium"], ["close", "Close"], ["low
 const SUBJECTS = ["band", "crowd", "singer", "guitarist", "bassist", "drummer", "stage", "setup"].map((s) => [s, s[0].toUpperCase() + s.slice(1)]);
 const CHIPS = { shot: SHOTS, subject: SUBJECTS };
 let clips = [], marks = {}, confirmed = {}, show = "all", kind = "", gig = "", cur = -1, you = "", noteT = 0, noteId = "", advT = 0, toastT = 0;
+const stage = $(".br-video");
+const ratio = (w, h) => { if (w > 0 && h > 0) { stage.style.setProperty("--ar", `${w} / ${h}`); stage.style.setProperty("--arn", w / h); } };
 const v = $("[data-video]"), img = $("[data-photo]"), track = $("[data-track]");
 
 const blank = (id) => ({ asset: id, revision: 0, verdict: "unreviewed", note: "", start: null, end: null, band: false, broll: false, shot: null, subject: null });
@@ -45,6 +47,7 @@ function list() {
       <span class="br-thumb">${src ? `<img src="${esc(src)}" alt="" loading="lazy" />` : ""}<i>${m.verdict === "unreviewed" ? "" : m.verdict}</i></span>
       <span class="br-meta"><b>${esc(c.name.replace(/\.[^.]+$/, ""))}</b><span>${photo ? "Photo · " : ""}${esc(c.gig)}${m.start != null ? ` · trim ${fmt(m.start)}–${fmt(m.end)}` : ""}${esc(tagLine(m))}</span>${m.note ? `<em>${esc(m.note)}</em>` : ""}</span></button></li>`;
   }).join("") || '<li class="br-empty label">Nothing here.</li>';
+  if (cur >= 0) pos();
   document.querySelectorAll(".br-item").forEach((b) => b.addEventListener("click", () => open(clips.findIndex((c) => c.id === b.dataset.id))));
 }
 function progress() {
@@ -53,6 +56,7 @@ function progress() {
   $("[data-bar]").style.transform = `scaleX(${clips.length ? done / clips.length : 0})`;
 }
 
+function pos() { const vis = visible(), i = vis.findIndex((c) => c.id === clips[cur]?.id); $("[data-pos]").textContent = i < 0 ? `– / ${vis.length}` : `${i + 1} / ${vis.length}`; }
 function flushNote() { if (noteT) { clearTimeout(noteT); noteT = 0; save(noteId); } }
 // Save to phone: fetch the file, then hand it to the share sheet (iPhone: Save Image / Save Video into Photos).
 // Two taps on purpose: iOS only opens the share sheet straight from a tap, and the fetch can take a while.
@@ -88,6 +92,14 @@ async function saveTap() {
   } catch { b.disabled = false; b.textContent = "Didn't load · try again"; }
 }
 
+// Show the small poster at once (already cached from the list), then swap in the full photo when it has loaded.
+function photoLoad(c) {
+  img.src = c.poster || ""; stage.classList.add("loading");
+  const big = new Image();
+  big.onload = () => { if (clips[cur]?.id === c.id) { img.src = c.url; stage.classList.remove("loading"); } };
+  big.onerror = () => { if (clips[cur]?.id === c.id) { stage.classList.remove("loading"); status("Photo didn't load. Try Download."); } };
+  big.src = c.url;
+}
 function open(i) {
   if (i < 0 || i >= clips.length) return;
   flushNote(); clearTimeout(advT);
@@ -98,10 +110,15 @@ function open(i) {
   saveReset(c);
   $("[data-note]").value = m.note || "";
   loop = false; v.pause();
-  v.hidden = photo; img.hidden = !photo; $("[data-tl]").hidden = photo; $("[data-play]").hidden = photo;
-  if (photo) { v.removeAttribute("src"); v.load(); img.src = c.url || ""; }
-  else { img.removeAttribute("src"); v.poster = c.poster || ""; v.src = c.url || ""; v.currentTime = 0; }
-  status(c.url ? (m.by ? `Last marked by ${m.by}` : "") : "No preview for this clip yet.");
+  stage.classList.remove("loading");
+  const soon = !c.url, sp = $("[data-soon]");
+  v.hidden = photo || soon; img.hidden = !photo || soon; sp.hidden = !soon; $("[data-tl]").hidden = photo || soon; $("[data-play]").hidden = photo || soon;
+  sp.style.backgroundImage = soon && c.poster ? `url("${c.poster}")` : "";
+  ratio(c.width, c.height); if (!(c.width > 0)) ratio(16, 9);
+  if (photo) { v.removeAttribute("src"); v.load(); if (soon) img.removeAttribute("src"); else photoLoad(c); }
+  else { img.removeAttribute("src"); v.poster = c.poster || ""; if (soon) { v.removeAttribute("src"); v.load(); } else { v.src = c.url; v.currentTime = 0; } }
+  status(soon ? "" : (m.by ? `Last marked by ${m.by}` : ""));
+  $("[data-bargig]").textContent = c.gig; pos();
   paint(); list();
   if (matchMedia("(max-width: 900px)").matches) window.scrollTo({ top: 0 });
 }
@@ -157,7 +174,12 @@ function move(e) { const t = timeAt(e.clientX); v.currentTime = t; if (drag !== 
 
 let loop = false;
 v.addEventListener("timeupdate", () => { const m = mk(clips[cur] || {}); if (loop && m.end != null && v.currentTime >= m.end) v.currentTime = m.start; paint(); });
-v.addEventListener("loadedmetadata", paint);
+v.addEventListener("loadedmetadata", () => { ratio(v.videoWidth, v.videoHeight); paint(); });
+img.addEventListener("load", () => ratio(img.naturalWidth, img.naturalHeight));
+// Swipe the stage (touch only): left = next, right = previous. The timeline sits outside the stage, so trim dragging is untouched.
+let sw = null;
+stage.addEventListener("touchstart", (e) => { sw = e.touches.length === 1 ? { x: e.touches[0].clientX, y: e.touches[0].clientY } : null; }, { passive: true });
+stage.addEventListener("touchend", (e) => { if (!sw) return; const t = e.changedTouches[0], dx = t.clientX - sw.x, dy = t.clientY - sw.y; sw = null; if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) step(dx < 0 ? 1 : -1); }, { passive: true });
 v.addEventListener("play", () => $("[data-play]").classList.add("gone")); v.addEventListener("pause", () => $("[data-play]").classList.remove("gone"));
 const toggle = () => { if (isPhoto(clips[cur]) || !v.src) return; v.paused ? v.play() : v.pause(); };
 $("[data-play]").addEventListener("click", toggle); v.addEventListener("click", toggle);
