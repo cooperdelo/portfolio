@@ -3,7 +3,7 @@
 /* ---------- /work ---------- */
 .wg-hero { padding: clamp(150px, 24vh, 240px) var(--gutter) clamp(48px, 8vh, 96px); display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: var(--gutter); align-items: end; }
 .wg-hero > .label { grid-column: 1 / -1; opacity: .62; }
-.wg-hero h1 { grid-column: 1 / 10; font-family: var(--display); font-weight: 700; text-transform: uppercase; font-size: clamp(44px, 9vw, 164px); line-height: .8; letter-spacing: -.03em; }
+.wg-hero h1 { grid-column: 1 / 10; font-family: var(--display); font-weight: 700; text-transform: uppercase; font-size: clamp(44px, 7.3vw, 164px); line-height: .8; letter-spacing: -.03em; }
 .wg-hero .lede { grid-column: 10 / 13; font-size: clamp(15px, 1.15vw, 18px); line-height: 1.45; max-width: 30ch; padding-bottom: .3em; }
 .wg { padding: 0 var(--gutter) clamp(96px, 14vh, 160px); }
 .wg-grid { list-style: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(14px, 1.6vw, 24px); }
@@ -66,6 +66,7 @@
 
 @media (max-width: 900px) {
   .wg-hero h1, .wg-hero .lede, .as-hero h1, .as-hero .lede { grid-column: 1 / -1; }
+  .wg-hero h1 { font-size: clamp(28px, 9.2vw, 164px); }
   .wg-grid { grid-template-columns: minmax(0, 1fr); }
   .as-map { grid-template-columns: minmax(0, 1fr); gap: 18px; }
   .as-src { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -79,7 +80,7 @@
   .as-src li, .as-wires path { animation: none; }
   .as-tree li { animation: none; opacity: 1; transform: none; }
 }
-@media (max-width: 600px) { .wg-hero h1 { font-size: clamp(30px, 8.4vw, 60px); } .as-hero h1 { font-size: clamp(32px, 10vw, 60px); } }
+@media (max-width: 600px) { .wg-hero h1 { font-size: clamp(28px, 8.4vw, 60px); } .as-hero h1 { font-size: clamp(32px, 10vw, 60px); } }
 
 /* AI system, led by real footage of the room it's built in */
 .as-hero { position: relative; display: grid; align-items: end; min-height: clamp(560px, 92vh, 960px); padding: 0 var(--gutter) clamp(40px, 7vh, 80px); overflow: hidden; }
