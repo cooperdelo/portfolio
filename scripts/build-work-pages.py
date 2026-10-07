@@ -396,33 +396,32 @@ INDEX = """{HEAD}
 # LinkedIn title, Rubber Band bookings $70K+ (not PlugVerse), Music minor added, GCA moved to Projects.
 RESUME_ROLES = [
   ("PlugVerse", "Founder and CEO", "Chapel Hill, NC", "Nov 2025 to now", [
-      "Founded PlugVerse LLC and built it solo: a booking and gig management tool for independent artists, launched Sep 2026.",
-      "Full stack on Next.js, Supabase and Stripe Connect. Shipped a live MCP server so AI assistants can read artist data.",
-      "Won $20K at the Luby Pitch Competition and a $1,850 1789 grant, non-dilutive. In Anthropic's Claude for Startups.",
-      "Hired and manage a paid growth contractor. Filed the PLUGVERSE federal trademark myself."], "/work/plugverse-product"),
+      "Built and launched PlugVerse solo: booking and gig tools for independent artists.",
+      "Secured $21.8K in non-dilutive funding, including a $20K Luby Pitch Competition win.",
+      "Shipped the full stack (Next.js, Supabase, Stripe Connect) plus a live MCP server.",
+      "Hired and direct a paid growth contractor running artist outreach."], "/work/plugverse-product"),
   ("@cooperdelo", "Content creator. Instagram, TikTok, LinkedIn, YouTube", "Chapel Hill, NC", "2025 to now", [
-      "Built a personal brand on music, startups and mindset: 700K+ Instagram views (@cooperdelo), 316K+ LinkedIn impressions.",
-      "Shoot, edit and grade everything myself (Sony A7C II, DaVinci Resolve). Built a template system that keeps posts on brand.",
-      "Built a cross-platform analytics pipeline (Supabase, Instagram and TikTok APIs) to track which hooks hold viewers."], None),
+      "Grew @cooperdelo to 700K+ Instagram views and 316K+ LinkedIn impressions.",
+      "Film, edit and grade every piece solo with a custom DaVinci Resolve brand system.",
+      "Built an analytics pipeline across 4 platforms to find the hooks that hold viewers."], None),
   ("Truist Financial", "Systems Engineering Intern (Collaboration & A/V), Technology & Innovation Track", "Charlotte, NC", "May 2026 to Aug 2026", [
-      "Received a return offer to Truist's Leadership Development Program. Declined to build PlugVerse full time.",
-      "Built the Copilot brand kit and prompt library with Truist's Brand and Copilot teams.",
-      "Presented the Copilot rollout to 400+ people. Led an AI workshop for the intern class.",
-      "Final presentation: building tools people actually use by talking to users before building."], None),
+      "Earned a return offer to the Leadership Development Program; declined to build PlugVerse.",
+      "Built the Copilot brand kit and prompt library with the Brand and Copilot teams.",
+      "Presented the Copilot rollout to 400+ people and led an AI workshop for interns."], None),
   ("UNC Kenan-Flagler Business School", "AI Research and Product Assistant", "Chapel Hill, NC", "Jul 2025 to Dec 2025", [
-      "Built an AI resume generator deployed to all incoming Kenan-Flagler students. Demoed to the Associate Dean."], None),
+      "Built an AI resume generator deployed to every incoming Kenan-Flagler student."], None),
   ("CleverCX", "Product Management Intern, early-stage fintech startup", "Charlotte, NC", "May 2025 to Aug 2025", [
-      "Reported 300+ Jira issues, improving QA coverage across 4 user roles.",
-      "Tracked 500+ support cases in an Excel dashboard. Worked with 10+ engineers and PMs."], None),
+      "Logged 300+ Jira issues, expanding QA coverage across 4 user roles.",
+      "Built a dashboard tracking 500+ support cases for a team of 10+ engineers and PMs."], None),
   ("Tootle", "AI/Product Intern", "Charlotte, NC", "Summer 2025", [
       "Ran market research and marketing for the platform."], None),
 ]
 RESUME_PROJECTS = [
   ("Rubber Band", "Guitarist and business manager", "Chapel Hill, NC", "Jul 2025 to now", [
-      "Guitar and vocals for UNC's top event cover band.",
-      "Manage all bookings, client and venue relationships, contracts, negotiations and pricing. Generated $70K+ in cumulative bookings."], "/work/rubber-band"),
-  ("Cooper Delo Music", "Artist, original music", "Spotify", "Ongoing", [
-      "Released original music separate from the band. 40K+ Spotify streams, led by \"Have a Clue\"."], None),
+      "Booked $70K+ in gigs as business manager: contracts, pricing and venue deals.",
+      "Lead guitar and vocals for UNC's top event cover band."], "/work/rubber-band"),
+  ("Cooper Delo Music", "Artist", "Spotify", "Ongoing", [
+      "40K+ Spotify streams on original releases, led by \"Have a Clue\"."], None),
 ]
 
 def resume_rows(items, start):
