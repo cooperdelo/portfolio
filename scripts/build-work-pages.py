@@ -396,9 +396,14 @@ INDEX = """{HEAD}
 # LinkedIn title, Rubber Band bookings $70K+ (not PlugVerse), Music minor added, GCA moved to Projects.
 RESUME_ROLES = [
   ("PlugVerse", "Founder and CEO", "Chapel Hill, NC", "Nov 2025 to now", [
-      "Founded PlugVerse LLC. Sole developer of a full-stack artist and venue booking marketplace.",
-      "Built on Next.js, React, Supabase and Stripe Connect. 8 user roles, 48-suite QA pipeline.",
-      "Won the $20K Luby Pitch Competition and a $1,850 1789 grant. Managing a 4-person intern team."], "/work/plugverse-product"),
+      "Founded PlugVerse LLC and built it solo: a booking and gig management tool for independent artists, launched Sep 2026.",
+      "Full stack on Next.js, Supabase and Stripe Connect. Shipped a live MCP server so AI assistants can read artist data.",
+      "Won $20K at the Luby Pitch Competition and a $1,850 1789 grant, non-dilutive. In Anthropic's Claude for Startups.",
+      "Hired and manage a paid growth contractor. Filed the PLUGVERSE federal trademark myself."], "/work/plugverse-product"),
+  ("@cooperdelo", "Content creator. Instagram, TikTok, LinkedIn, YouTube", "Chapel Hill, NC", "2025 to now", [
+      "Built a personal brand on music, startups and mindset: 700K+ Instagram views (@cooperdelo), 316K+ LinkedIn impressions.",
+      "Shoot, edit and grade everything myself (Sony A7C II, DaVinci Resolve). Built a template system that keeps posts on brand.",
+      "Built a cross-platform analytics pipeline (Supabase, Instagram and TikTok APIs) to track which hooks hold viewers."], None),
   ("Truist Financial", "Systems Engineering Intern (Collaboration & A/V), Technology & Innovation Track", "Charlotte, NC", "May 2026 to Aug 2026", [
       "Built a Copilot brand kit with Truist's Brand and Copilot teams.",
       "Presented the Copilot rollout to 400+ people."], None),
@@ -412,10 +417,8 @@ RESUME_PROJECTS = [
   ("Rubber Band", "Guitarist and business manager", "Chapel Hill, NC", "Jul 2025 to now", [
       "Guitar and vocals for UNC's top event cover band.",
       "Manage all bookings, client and venue relationships, contracts, negotiations and pricing. Generated $70K+ in cumulative bookings."], "/work/rubber-band"),
-  ("Carolina Data Challenge 2025", "Data Analyst", "Chapel Hill, NC", "Sep 2025", [
-      "Modeled risk for the $500B space economy. Presented an investment matrix to industry judges."], None),
-  ("Global Career Accelerator", "Data Analyst Trainee", "Chapel Hill, NC", "May 2025 to Jul 2025", [
-      "Analyzed a 600K+ row Intel dataset in Python and SQL. Completed 20+ analytics assignments."], None),
+  ("Flicker of Time", "Original EP, released as Cooper Delo", "Spotify", "Released", [
+      "Released original music separate from the band. 34K+ Spotify streams."], None),
 ]
 
 def resume_rows(items, start):
@@ -437,8 +440,8 @@ def resume_page():
              ("Class", "May 2028"), ("GPA", "3.867. Dean's List, Fall 2024 and Spring 2025")]
     skills = [("Code", "JavaScript, TypeScript, React, Next.js, Node.js, Python, SQL, Java"),
               ("Stack", "Supabase, PostgreSQL, Stripe API, Vercel, GitHub, PostHog, Azure, Claude AI and API"),
-              ("Tools", "Jira, Miro"),
-              ("Clubs", "1789 Venture Fund, Busi-Tech Club"),
+              ("Tools", "DaVinci Resolve, MCP, Jira, Miro"),
+              ("Clubs", "Chi Phi, 1789 Venture Fund, Busi-Tech Club"),
               ("Certs", "SQL and Python Specialist (UNC GCA), Powering Medicine (NC State)"),
               ("Into", "Cybersecurity, AI, golf, music production, guitar")]
     tr = lambda rows: "".join(f'<tr><th scope="row">{E(k)}</th><td>{E(v)}</td></tr>' for k, v in rows)
@@ -451,7 +454,7 @@ def resume_page():
     <div class="r-copy" data-hero>
       <p class="label">Resume, 2026</p>
       <h1>{lines("Cooper")}{lines("Delo")}</h1>
-      <p class="r-sub">Founder of PlugVerse. CS and Business at UNC Chapel Hill.</p>
+      <p class="r-sub">Founder of PlugVerse. Creator. CS and Business at UNC Chapel Hill.</p>
       <div class="r-cta"><a class="pill solid" href="/Cooper_Delo_Resume_2026.pdf" download>Download PDF {ARROW}</a><a class="pill" href="{CAL}" target="_blank" rel="noreferrer">Book a call</a><a class="pill" href="mailto:{EMAIL}">Email</a></div>
     </div>
   </section>
