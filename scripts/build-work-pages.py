@@ -412,13 +412,15 @@ RESUME_ROLES = [
   ("CleverCX", "Product Management Intern, early-stage fintech startup", "Charlotte, NC", "May 2025 to Aug 2025", [
       "Reported 300+ Jira issues, improving QA coverage across 4 user roles.",
       "Tracked 500+ support cases in an Excel dashboard. Worked with 10+ engineers and PMs."], None),
+  ("Tootle", "AI/Product Intern", "Charlotte, NC", "Summer 2025", [
+      "Ran market research and marketing for the platform."], None),
 ]
 RESUME_PROJECTS = [
   ("Rubber Band", "Guitarist and business manager", "Chapel Hill, NC", "Jul 2025 to now", [
       "Guitar and vocals for UNC's top event cover band.",
       "Manage all bookings, client and venue relationships, contracts, negotiations and pricing. Generated $70K+ in cumulative bookings."], "/work/rubber-band"),
-  ("Flicker of Time", "Original EP, released as Cooper Delo", "Spotify", "Released", [
-      "Released original music separate from the band. 34K+ Spotify streams."], None),
+  ("Cooper Delo Music", "Artist, original music", "Spotify", "Ongoing", [
+      "Released original music separate from the band. 40K+ Spotify streams, led by \"Have a Clue\"."], None),
 ]
 
 def resume_rows(items, start):
@@ -441,9 +443,9 @@ def resume_page():
     skills = [("Code", "JavaScript, TypeScript, React, Next.js, Node.js, Python, SQL, Java"),
               ("Stack", "Supabase, PostgreSQL, Stripe API, Vercel, GitHub, PostHog, Azure, Claude AI and API"),
               ("Tools", "DaVinci Resolve, MCP, Jira, Miro"),
-              ("Clubs", "Chi Phi, 1789 Venture Fund, Busi-Tech Club"),
+              ("Clubs", "1789 Venture Fund, Busi-Tech Club"),
               ("Certs", "SQL and Python Specialist (UNC GCA), Powering Medicine (NC State)"),
-              ("Into", "Cybersecurity, AI, golf, music production, guitar")]
+              ("Into", "Content creation, AI, golf, music production, guitar")]
     tr = lambda rows: "".join(f'<tr><th scope="row">{E(k)}</th><td>{E(v)}</td></tr>' for k, v in rows)
     return f"""{head("Resume / Cooper Delo", "Cooper Delo. Founder of PlugVerse. CS and Business at UNC Chapel Hill.", "https://cooperdelo.com/resume")}
 <body class="resume">
