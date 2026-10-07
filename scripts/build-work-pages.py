@@ -420,7 +420,8 @@ RESUME_PROJECTS = [
       "Lead guitar and vocals for UNC's top event cover band."], "/work/rubber-band"),
   ("AI Operating System and cooperdelo.com", "Builder", "Chapel Hill, NC", "2026", [
       "Built scheduled AI agents that run daily product QA, analytics and market research.",
-      "Designed cooperdelo.com with a private dashboard pulling live finance, social and product data."], None),
+      "Built cooperdelo.com with a private dashboard pulling live finance, social and product data.",
+      "Launched a guides shop with an inbound funnel: DM automation into email-gated guides."], None),
   ("Cooper Delo Music", "Artist", "Spotify", "Ongoing", [
       "40K+ Spotify streams on original releases, led by \"Have a Clue\"."], None),
 ]
