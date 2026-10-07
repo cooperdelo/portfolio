@@ -413,13 +413,14 @@ RESUME_ROLES = [
   ("CleverCX", "Product Management Intern, early-stage fintech startup", "Charlotte, NC", "May 2025 to Aug 2025", [
       "Logged 300+ Jira issues, expanding QA coverage across 4 user roles.",
       "Built a dashboard tracking 500+ support cases for a team of 10+ engineers and PMs."], None),
-  ("Tootle", "AI/Product Intern", "Charlotte, NC", "Summer 2025", [
-      "Ran market research and marketing for the platform."], None),
 ]
 RESUME_PROJECTS = [
   ("Rubber Band", "Guitarist and business manager", "Chapel Hill, NC", "Jul 2025 to now", [
       "Booked $70K+ in gigs as business manager: contracts, pricing and venue deals.",
       "Lead guitar and vocals for UNC's top event cover band."], "/work/rubber-band"),
+  ("AI Operating System and cooperdelo.com", "Builder", "Chapel Hill, NC", "2026", [
+      "Built scheduled AI agents that run daily product QA, analytics and market research.",
+      "Designed cooperdelo.com with a private dashboard pulling live finance, social and product data."], None),
   ("Cooper Delo Music", "Artist", "Spotify", "Ongoing", [
       "40K+ Spotify streams on original releases, led by \"Have a Clue\"."], None),
 ]
