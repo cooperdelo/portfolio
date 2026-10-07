@@ -400,7 +400,7 @@ RESUME_ROLES = [
       "Secured $21.8K in non-dilutive funding, including a $20K Luby Pitch Competition win.",
       "Shipped the full stack (Next.js, Supabase, Stripe Connect) plus a live MCP server.",
       "Hired and direct a paid growth contractor running artist outreach."], "/work/plugverse-product"),
-  ("@cooperdelo", "Content creator. Instagram, TikTok, LinkedIn, YouTube", "Chapel Hill, NC", "2025 to now", [
+  ("@cooperdelo", "Content creator. Instagram, TikTok, LinkedIn, YouTube", "Chapel Hill, NC", "May 2026 to now", [
       "Grew @cooperdelo to 700K+ Instagram views and 316K+ LinkedIn impressions.",
       "Film, edit and grade every piece solo with a custom DaVinci Resolve brand system.",
       "Built an analytics pipeline across 4 platforms to find the hooks that hold viewers."], None),
