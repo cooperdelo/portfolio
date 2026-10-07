@@ -422,7 +422,7 @@ RESUME_PROJECTS = [
       "Built scheduled AI agents that run daily product QA, analytics and market research.",
       "Built cooperdelo.com with a private dashboard pulling live finance, social and product data.",
       "Launched a guides shop with an inbound funnel: DM automation into email-gated guides."], None),
-  ("Cooper Delo Music", "Artist", "Spotify", "Ongoing", [
+  ("Cooper Delo Music", "Artist", "Spotify", "Sep 2023 to Oct 2024", [
       "40K+ Spotify streams on original releases, led by \"Have a Clue\"."], None),
 ]
 
