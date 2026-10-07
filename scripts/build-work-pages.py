@@ -405,8 +405,10 @@ RESUME_ROLES = [
       "Shoot, edit and grade everything myself (Sony A7C II, DaVinci Resolve). Built a template system that keeps posts on brand.",
       "Built a cross-platform analytics pipeline (Supabase, Instagram and TikTok APIs) to track which hooks hold viewers."], None),
   ("Truist Financial", "Systems Engineering Intern (Collaboration & A/V), Technology & Innovation Track", "Charlotte, NC", "May 2026 to Aug 2026", [
-      "Built a Copilot brand kit with Truist's Brand and Copilot teams.",
-      "Presented the Copilot rollout to 400+ people."], None),
+      "Received a return offer to Truist's Leadership Development Program. Declined to build PlugVerse full time.",
+      "Built the Copilot brand kit and prompt library with Truist's Brand and Copilot teams.",
+      "Presented the Copilot rollout to 400+ people. Led an AI workshop for the intern class.",
+      "Final presentation: building tools people actually use by talking to users before building."], None),
   ("UNC Kenan-Flagler Business School", "AI Research and Product Assistant", "Chapel Hill, NC", "Jul 2025 to Dec 2025", [
       "Built an AI resume generator deployed to all incoming Kenan-Flagler students. Demoed to the Associate Dean."], None),
   ("CleverCX", "Product Management Intern, early-stage fintech startup", "Charlotte, NC", "May 2025 to Aug 2025", [
