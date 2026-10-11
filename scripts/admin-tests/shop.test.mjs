@@ -50,7 +50,8 @@ test('demo checkout is impossible in production or with a real key', () => {
   assert.equal(shop.demoAllowed({ VERCEL_ENV: 'production', SHOP_DEMO: '1' }), false);
   assert.equal(shop.demoAllowed({ VERCEL_ENV: 'preview', SHOP_DEMO: '1', SHOP_STRIPE_SECRET_KEY: 'sk_test' }), false);
   assert.equal(shop.demoAllowed({ VERCEL_ENV: 'preview', SHOP_DEMO: '1' }), true);
-  assert.equal(shop.demoAllowed({ VERCEL_ENV: 'preview' }), false);
+  assert.equal(shop.demoAllowed({ VERCEL_ENV: 'preview' }), true);   // 2026-10-11: previews demo by default (no per-branch env access)
+  assert.equal(shop.demoAllowed({}), false);
 });
 
 test('GET returns only the teaser when locked', async () => {

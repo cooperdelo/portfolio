@@ -80,7 +80,8 @@ export const isProd = (env = process.env) => env.VERCEL_ENV === 'production';
 // (?tp= on the shop page), so nobody can unlock the paid kit with Stripe's public test card.
 export const testPass = (env = process.env) => (env.SHOP_TOKEN_SECRET ? createHmac('sha256', env.SHOP_TOKEN_SECRET).update('test-checkout-v1').digest('base64url').slice(0, 16) : null);
 export const checkoutLocked = (pass, env = process.env) => isProd(env) && /^(sk|rk)_test_/.test(env.SHOP_STRIPE_SECRET_KEY || '') && (!testPass(env) || pass !== testPass(env));
-export const demoAllowed = (env = process.env) => !isProd(env) && !env.SHOP_STRIPE_SECRET_KEY && env.SHOP_DEMO === '1';
+// Preview deployments get demo checkout automatically (no env var needed per branch); production never does.
+export const demoAllowed = (env = process.env) => !isProd(env) && !env.SHOP_STRIPE_SECRET_KEY && (env.SHOP_DEMO === '1' || env.VERCEL_ENV === 'preview');
 
 export const STRIPE_VERSION = '2026-09-30.endive';
 export async function stripe(path, { method = 'GET', form = null, key } = {}) {

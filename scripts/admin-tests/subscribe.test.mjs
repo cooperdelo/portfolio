@@ -61,3 +61,21 @@ test('honeypot gets a quiet success and nothing is written', async () => {
 test('only the clock may use /api/subscribe', async () => {
   assert.equal((await call(subscribe, { email: 'a@b.co', source: 'guide', kit: 'music' })).status, 400);
 });
+
+test('fallback limit: the 9th try from one IP in 10 minutes is refused', async () => {
+  const env = { SUPABASE_ADMIN_SERVICE_ROLE_KEY: 'k', SUBSCRIBE_SALT: 's' };
+  const orig = globalThis.fetch;
+  globalThis.fetch = async (url) => (url.includes('/rpc/') ? new Response('{}', { status: 404 }) : new Response('', { status: 201 }));
+  const out = [];
+  for (let i = 0; i < 9; i++) out.push((await saveSignup({ email: `x${i}@b.co`, source: 'clock', kit: '' }, '198.51.100.7', env)).error || 'ok');
+  globalThis.fetch = orig;
+  assert.deepEqual(out.slice(0, 8), Array(8).fill('ok')); assert.equal(out[8], 'rate_limited');
+});
+
+test('demo checkout: previews yes, production never, never with a Stripe key', async () => {
+  const { demoAllowed } = await import('../../api/_lib/shop.mjs');
+  assert.equal(demoAllowed({ VERCEL_ENV: 'preview' }), true);
+  assert.equal(demoAllowed({ VERCEL_ENV: 'production', SHOP_DEMO: '1' }), false);
+  assert.equal(demoAllowed({ VERCEL_ENV: 'preview', SHOP_STRIPE_SECRET_KEY: 'sk_test_x' }), false);
+  assert.equal(demoAllowed({}), false);
+});
