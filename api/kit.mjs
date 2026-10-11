@@ -3,24 +3,16 @@
 // POST /api/kit {slug, email}                      email gate: returns a token and the full kit
 // POST /api/kit {slug, session_id}                 after Stripe Checkout: verifies payment, returns a token and the kit
 // POST /api/kit {slug, demo: true}                 QA only, no Stripe key yet: simulates a paid unlock
-import { KITS, gateFor, priceFor, loadKits, teaser, full, canRead, grant, EMAIL_RE, demoAllowed, stripe, readBody } from './_lib/shop.mjs';
+import { KITS, gateFor, priceFor, loadKits, teaser, full, canRead, grant, demoAllowed, stripe, readBody } from './_lib/shop.mjs';
+import { validateSignup, saveSignup, clientIp } from './_lib/subscribe.mjs';
 
-const LEADS = 'https://eibtnkaoqsgwiqttiwjo.supabase.co/rest/v1/shop_leads';
-
-async function saveLead(email, slug) {
-  const key = process.env.SUPABASE_ADMIN_SERVICE_ROLE_KEY;
-  if (!key) return false;
-  try {
-    const r = await fetch(LEADS, { method: 'POST', headers: { apikey: key, Authorization: `Bearer ${key}`, 'Content-Type': 'application/json', Prefer: 'return=minimal,resolution=ignore-duplicates' },
-      body: JSON.stringify({ email: email.toLowerCase(), kit: slug, source: 'guide-gate' }), signal: AbortSignal.timeout(5000) });
-    return r.ok; // the table may not exist yet; the unlock still works
-  } catch { return false; }
-}
+// Guide emails go to the same list as the /clock (api/_lib/subscribe.mjs): source 'guide', kit = slug.
 
 export default async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store, private');
   const kits = loadKits();
   if (!kits) return res.status(503).json({ error: 'not_configured' });
+  if (req.method === 'HEAD') return res.status(200).end();                   // link checkers: was a 404 (no slug in a HEAD)
   if (req.method === 'GET' && req.query?.list) {
     const list = Object.entries(KITS).filter(([k]) => kits[k]).map(([k, m]) => ({ slug: k, title: kits[k].title, pillar: kits[k].pillar,
       result: kits[k].result, count: kits[k].steps?.length || 0, gate: gateFor(k), price: priceFor(k), draft: gateFor(k) === 'paid' && !!m.draft, href: m.shop || m.guide }));
@@ -41,11 +33,13 @@ export default async function handler(req, res) {
   const body = readBody(req);
   if (!body) return res.status(400).json({ error: 'bad_body' });
 
-  if (gate === 'email' && body.email) {
-    const email = String(body.email).trim();
-    if (!EMAIL_RE.test(email)) return res.status(400).json({ error: 'bad_email' });
-    const saved = await saveLead(email, slug);
-    return res.status(200).json({ ...base, locked: false, saved, token: grant(slug, 'email', email), kit: full(kit) });
+  if (gate === 'email' && (body.email || body.website)) {
+    const v = validateSignup({ ...body, source: 'guide', kit: slug });
+    if (v.spam) return res.status(400).json({ error: 'bad_email' });           // honeypot: no unlock, nothing stored
+    if (v.error) return res.status(400).json({ error: v.error === 'bad_email' ? 'bad_email' : 'bad_body' });
+    const saved = await saveSignup(v.row, clientIp(req));
+    if (!saved.ok && saved.error === 'rate_limited') return res.status(429).json({ error: 'rate_limited' });
+    return res.status(200).json({ ...base, locked: false, saved: !!saved.stored, token: grant(slug, 'email', v.row.email), kit: full(kit) });
   }
 
   if (gate === 'paid' && body.session_id) {

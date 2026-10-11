@@ -186,14 +186,22 @@
     try { render(await getKit(slug)); } catch { $("[data-k-title]").textContent = "This one's almost ready. Check back soon."; }
   }
 
+  // First-touch campaign tags (e.g. ?utm_source=instagram&utm_campaign=clock), kept for this tab.
+  function utm() {
+    const q = new URLSearchParams(location.search), o = {};
+    ["source", "medium", "campaign", "content", "term"].forEach((k) => { const v = q.get("utm_" + k); if (v) o[k] = v.slice(0, 100); });
+    try { if (Object.keys(o).length) sessionStorage.setItem("cd-utm", JSON.stringify(o)); else return JSON.parse(sessionStorage.getItem("cd-utm") || "{}"); } catch { /* storage blocked */ }
+    return o;
+  }
+  utm();
   const gateForm = document.querySelector("[data-email-gate]");
   gateForm?.addEventListener("submit", async (e) => {
     e.preventDefault();
     const email = gateForm.email.value.trim();
     msg("Opening");
     track("email_submit", { kit: slug });
-    const ok = await unlock({ email });
-    msg(ok === true ? "" : ok === "bad_email" ? "That email doesn't look right." : "Something went wrong. Try again.");
+    const ok = await unlock({ email, website: gateForm.website?.value || "", consent: true, utm: utm(), referrer: document.referrer, page: location.pathname });
+    msg(ok === true ? "" : ok === "bad_email" ? "That email doesn't look right." : ok === "rate_limited" ? "Too many tries. Give it a few minutes." : "Something went wrong. Try again.");
   });
 
   const buy = document.querySelector("[data-checkout]");

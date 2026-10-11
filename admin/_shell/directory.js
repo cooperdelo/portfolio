@@ -46,6 +46,7 @@ export const DIRECTORY = [
     { href: '/admin/playbook/',                 label: 'Playbook', ic: 'book-open' },
     { href: '/admin/contacts/',                 label: 'Contacts', ic: 'contact' },
     { href: '/admin/merch/',                    label: 'Merch', ic: 'shirt', roles: ['full'] },
+    { href: '/admin/signups/',                  label: 'Signups', ic: 'contact', roles: ['full'] },
   ]},
   { section: 'System', items: [
     { href: '/admin/integrations/',             label: 'Integrations', ic: 'plug', roles: ['full'] },

@@ -238,6 +238,8 @@ input:checked + .sw::after { transform: translateX(14px); }
 .gd-gate .pill { color: var(--bone); border-color: var(--line-d); }
 .gd-gate .pill.solid { background: var(--bone); color: var(--ink); }
 .gd-fine { font-size: 12px; opacity: .55; }
+.gd-form .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+.gd-fine a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
 .gd-master { max-width: 980px; margin: 0 auto; }
 .gd-shelf { padding: 0 var(--gutter) clamp(72px, 10vh, 120px); }
 .gd-list { list-style: none; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(14px, 1.6vw, 24px); }
