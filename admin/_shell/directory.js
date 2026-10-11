@@ -6,6 +6,7 @@ export const DIRECTORY = [
     { href: '/admin/decisions/',                label: 'Decisions', ic: 'square-check', roles: ['full'] },
     { href: '/admin/vault/',                    label: 'Vault', ic: 'archive', roles: ['full'] },
     { href: '/admin/rituals/',                  label: 'Rituals', ic: 'repeat', roles: ['full'] },
+    { href: '/admin/clock/',                    label: 'Clock', ic: 'clock', roles: ['full'] },
   ]},
   { section: 'Grow', items: [
     { href: '/admin/content/',                  label: 'Content', ic: 'film', roles: ['full'] },
