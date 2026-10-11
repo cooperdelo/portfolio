@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="robots" content="noindex, nofollow, noarchive" />
+<meta name="theme-color" content="#0C0B0A" />
+<link rel="manifest" href="/admin/manifest.json" />
+<link rel="apple-touch-icon" href="/favicon.svg" />
+<title>Clock · CD Admin</title>
+<link rel="preload" href="/admin/_shell/fonts/NimbusSans-Bold.woff2" as="font" type="font/woff2" crossorigin />
+<style>
+  @font-face { font-family: "Nimbus Sans"; src: url("/admin/_shell/fonts/NimbusSans-Bold.woff2") format("woff2"); font-weight: 700; font-display: block; }
+  @font-face { font-family: "Nimbus Sans"; src: url("/admin/_shell/fonts/NimbusSans-Regular.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+  @font-face { font-family: "Geist Mono"; src: url("/admin/_shell/fonts/GeistMono-Regular.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+
+  :root {
+    --ink: #0C0B0A; --bone: #F4F1EA; --silver: #A8A29E;
+    --dim: rgba(168, 162, 158, .55);
+    --line: rgba(244, 241, 234, .09);
+    --ease: cubic-bezier(.22, 1, .44, 1);
+    --metal: linear-gradient(176deg, #FFFFFF 0%, #F4F1EA 30%, #C9C5C0 52%, #9C9792 64%, #E9E6E1 86%, #FFFFFF 100%);
+    --f: "Nimbus Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --mono: "Geist Mono", ui-monospace, monospace;
+    --pad: clamp(18px, 3.2vw, 56px);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; background: var(--ink); color: var(--bone); overflow: hidden; }
+  body { font-family: var(--f); -webkit-font-smoothing: antialiased; user-select: none; cursor: default; }
+  body.idle { cursor: none; }
+
+  /* soft vignette + static grain, same hand as the rest of the admin */
+  .vignette { position: fixed; inset: 0; pointer-events: none;
+    background: radial-gradient(120% 90% at 50% 46%, rgba(244,241,234,.035) 0%, rgba(12,11,10,0) 55%, rgba(0,0,0,.55) 100%); }
+  .grain { position: fixed; inset: -50%; pointer-events: none; opacity: .07;
+    background: url("/admin/_shell/grain.png") repeat; background-size: 240px; mix-blend-mode: overlay; }
+
+  .stage { position: fixed; inset: 0; display: grid; place-items: center; }
+  .float { display: flex; flex-direction: column; align-items: center; animation: drift 19s var(--ease) infinite alternate; will-change: transform; }
+  @keyframes drift {
+    0%   { transform: translate3d(0, 0, 0); }
+    33%  { transform: translate3d(.35vw, -.5vh, 0); }
+    66%  { transform: translate3d(-.3vw, .35vh, 0); }
+    100% { transform: translate3d(.15vw, .55vh, 0); }
+  }
+
+  /* the time */
+  .time { display: flex; align-items: flex-start; font-weight: 700; line-height: 1; letter-spacing: -.035em;
+    font-variant-numeric: tabular-nums; font-feature-settings: "tnum" 1; white-space: nowrap; font-size: 200px; }
+  .slot { position: relative; display: inline-block; overflow: hidden; clip-path: inset(0); contain: paint; height: .8em; width: .545em; text-align: center; }
+  .slot.sep { width: .27em; }
+  .slot span { position: absolute; left: 0; right: 0; top: .025em; display: block;
+    background: var(--metal); -webkit-background-clip: text; background-clip: text; color: transparent;
+    transition: transform .62s var(--ease); }
+  .slot span.in { transform: translateY(100%); }
+  .slot span.out { transform: translateY(-100%); }
+  .sep span { animation: none; }
+  .sec .slot span { background: linear-gradient(176deg, #E9E6E1 0%, #B9B4AE 55%, #8E8984 70%, #D6D2CD 100%);
+    -webkit-background-clip: text; background-clip: text; }
+  .ampm { font-size: .19em; letter-spacing: .02em; margin: .02em 0 0 .16em; color: var(--silver); line-height: 1; }
+
+  .date { margin-top: clamp(18px, 3.4vh, 44px); font-size: clamp(11px, 1.15vw, 22px); letter-spacing: .42em;
+    text-transform: uppercase; color: var(--silver); font-weight: 700; padding-left: .42em; }
+
+  /* corners */
+  .corner { position: fixed; display: flex; align-items: center; gap: 12px; font-size: clamp(9px, .72vw, 13px);
+    letter-spacing: .32em; text-transform: uppercase; font-weight: 700; color: var(--dim); }
+  .tl { top: var(--pad); left: var(--pad); color: var(--silver); }
+  .tr { top: var(--pad); right: var(--pad); }
+  .bl { bottom: var(--pad); left: var(--pad); gap: clamp(10px, .9vw, 16px); }
+  .br { bottom: var(--pad); right: var(--pad); }
+  .pv-mark { height: clamp(22px, 2.1vw, 40px); width: auto; display: block; }
+  .pv-word { height: clamp(10px, .95vw, 18px); width: auto; display: block; opacity: .9; }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--bone); opacity: .25; transition: opacity .9s var(--ease); }
+  .dot.on { opacity: .85; transition: none; }
+
+  /* key hints, only while the mouse is moving and not fullscreen */
+  .hints { position: fixed; left: 50%; bottom: calc(var(--pad) + 2px); transform: translate(-50%, 10px); display: flex; gap: 22px;
+    font-family: var(--mono); font-size: 11px; letter-spacing: .04em; color: var(--dim); opacity: 0;
+    transition: opacity .6s var(--ease), transform .6s var(--ease); pointer-events: none; white-space: nowrap; }
+  .hints b { font-weight: 400; color: var(--bone); border: 1px solid var(--line); border-radius: 5px; padding: 2px 6px; margin-right: 6px; }
+  body.awake:not(.fs) .hints { opacity: 1; transform: translate(-50%, 0); }
+  .back { position: fixed; top: var(--pad); left: 50%; transform: translateX(-50%); font-family: var(--mono); font-size: 11px; color: var(--dim);
+    text-decoration: none; opacity: 0; transition: opacity .6s var(--ease); }
+  body.awake:not(.fs) .back { opacity: 1; }
+  .back:hover { color: var(--bone); }
+
+  .info { position: fixed; right: var(--pad); bottom: calc(var(--pad) + 26px); font-family: var(--mono); font-size: 11px; color: var(--dim);
+    text-align: right; line-height: 1.6; opacity: 0; transition: opacity .5s var(--ease); }
+  body.show-info .info { opacity: 1; }
+
+  /* intro: one slow settle, no fade-swaps afterwards */
+  .float, .corner { opacity: 0; }
+  body.ready .float { opacity: 1; transition: opacity 1.4s var(--ease); }
+  body.ready .corner { opacity: 1; transition: opacity 1.4s var(--ease) .35s; }
+
+  @media (max-width: 640px) { .hints { display: none; } .corner { letter-spacing: .22em; } }
+  @media (prefers-reduced-motion: reduce) { .float { animation: none; } .slot span { transition: none; } }
+</style>
+</head>
+<body>
+  <div class="stage">
+    <div class="float">
+      <div class="time" id="time" aria-live="off"></div>
+      <div class="date" id="date">&nbsp;</div>
+    </div>
+  </div>
+
+  <div class="corner tl">Cooper Delo</div>
+  <div class="corner tr"><span id="mode">Live</span><span class="dot" id="dot"></span></div>
+  <div class="corner bl">
+    <img class="pv-mark" src="/admin/clock/pv-mark.svg" alt="" />
+    <img class="pv-word" src="/admin/clock/pv-wordmark.svg" alt="PlugVerse" />
+  </div>
+  <div class="corner br" id="place">Chapel Hill, NC</div>
+
+  <a class="back" href="/admin/">← admin</a>
+  <div class="info" id="info"></div>
+  <div class="hints">
+    <span><b>F</b>fullscreen</span><span><b>S</b>session</span><span><b>Space</b>start / pause</span><span><b>R</b>reset</span><span><b>I</b>sync</span>
+  </div>
+
+  <div class="vignette"></div>
+  <div class="grain"></div>
+  <script type="module" src="/admin/clock/clock.js"></script>
+</body>
+</html>
