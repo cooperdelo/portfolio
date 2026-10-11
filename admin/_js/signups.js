@@ -6,7 +6,7 @@ import {esc,ago} from '/admin/_shell/ui.js';
 // they came from. Full admin only (RLS on subscribers / shop_leads is is_full_admin()).
 // Reads `subscribers` (20261011-subscribers.sql). Until that migration is applied, it reads shop_leads,
 // where /api/subscribe and /api/kit write in the meantime (source holds "clock:instagram:clock" style tags).
-if(!(await requireFullAdminOrRedirect()))throw new Error('not full admin');
+if(!isLocalDemo()&&!(await requireFullAdminOrRedirect()))throw new Error('not full admin');
 await mountShell({title:'Signups'});
 const app=document.querySelector('#signups');
 const head=`<header class="ws-head"><span class="ws-kicker">Personal / email list</span><h1>Who signed up, and from where.</h1><p>Emails from the free clock and the guide gates. Nothing is emailed to them yet; they get the thing on the page.</p></header>`;
