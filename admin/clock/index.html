@@ -32,7 +32,7 @@
   /* soft vignette + static grain, same hand as the rest of the admin */
   .vignette { position: fixed; inset: 0; pointer-events: none;
     background: radial-gradient(120% 90% at 50% 46%, rgba(244,241,234,.035) 0%, rgba(12,11,10,0) 55%, rgba(0,0,0,.55) 100%); }
-  .grain { position: fixed; inset: -50%; pointer-events: none; opacity: .07;
+  .grain { position: fixed; inset: 0; pointer-events: none; opacity: .07;
     background: url("/admin/_shell/grain.png") repeat; background-size: 240px; mix-blend-mode: overlay; }
 
   .stage { position: fixed; inset: 0; display: grid; place-items: center; }
@@ -62,6 +62,21 @@
 
   .date { margin-top: clamp(18px, 3.4vh, 44px); font-size: clamp(11px, 1.15vw, 22px); letter-spacing: .42em;
     text-transform: uppercase; color: var(--silver); font-weight: 700; padding-left: .42em; }
+
+
+  /* light theme: bone paper, graphite numerals. Colors ease over 1.6s so an
+     auto switch at sunrise/sunset never cuts. */
+  html, body, .corner, .date, .ampm, .hints, .info, .back { transition: background-color 1.6s var(--ease), color 1.6s var(--ease); }
+  body.light { --ink: #EEEAE2; --bone: #0C0B0A; --silver: #4A4541; --dim: rgba(60, 55, 51, .78); --line: rgba(12, 11, 10, .14);
+    --metal: linear-gradient(176deg, #1A1816 0%, #0C0B0A 34%, #23201D 54%, #34302C 64%, #0C0B0A 84%, #0C0B0A 100%); }
+  html:has(body.light) { background: #EEEAE2; }
+  body.light .sec .slot span { background: linear-gradient(176deg, #1C1916 0%, #2E2A27 55%, #45403B 68%, #1C1916 100%);
+    -webkit-background-clip: text; background-clip: text; }
+  body.light .vignette { background: radial-gradient(120% 90% at 50% 46%, rgba(238,234,226,0) 55%, rgba(110,100,90,.2) 100%); }
+  body.light .grain { mix-blend-mode: multiply; opacity: .09; }
+  .pv-word.on-light { display: none; }
+  body.light .pv-word.on-dark { display: none; }
+  body.light .pv-word.on-light { display: block; }
 
   /* corners */
   .corner { position: fixed; display: flex; align-items: center; gap: 14px; font-size: clamp(13px, 1.15vw, 22px);
@@ -111,14 +126,15 @@
   <div class="corner tr"><span id="mode">Live</span><span class="dot" id="dot"></span></div>
   <div class="corner bl">
     <img class="pv-mark" src="/admin/clock/pv-mark.svg" alt="" />
-    <img class="pv-word" src="/admin/clock/pv-wordmark.svg" alt="PlugVerse" />
+    <img class="pv-word on-dark" src="/admin/clock/pv-wordmark.svg" alt="PlugVerse" />
+    <img class="pv-word on-light" src="/admin/clock/pv-wordmark-dark.svg" alt="" />
   </div>
   <div class="corner br" id="place">Chapel Hill, NC</div>
 
   <a class="back" href="/admin/">← admin</a>
   <div class="info" id="info"></div>
   <div class="hints">
-    <span><b>F</b>fullscreen</span><span><b>S</b>session</span><span><b>Space</b>start / pause</span><span><b>R</b>reset</span><span><b>I</b>sync</span>
+    <span><b>F</b>fullscreen</span><span><b>S</b>session</span><span><b>Space</b>start / pause</span><span><b>R</b>reset</span><span><b>T</b>theme · <i id="themeLabel" style="font-style:normal">auto</i></span><span><b>I</b>sync</span>
   </div>
 
   <div class="vignette"></div>

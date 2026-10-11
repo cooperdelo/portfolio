@@ -156,6 +156,36 @@ function setMode(m) {
   lastKey = '';
 }
 
+
+// ---------- theme: auto (light from sunrise to sunset in Chapel Hill), light, dark ----------
+// Sunrise/sunset from the standard NOAA approximation, good to a couple of minutes.
+const LAT = 35.9132, LON = -79.0558;
+function sunTimes(ms) {
+  const rad = Math.PI / 180, d = new Date(ms);
+  const day = Math.floor((Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()) - Date.UTC(d.getUTCFullYear(), 0, 0)) / 864e5);
+  const g = (2 * Math.PI / 365) * (day - 1);
+  const eqt = 229.18 * (0.000075 + 0.001868 * Math.cos(g) - 0.032077 * Math.sin(g) - 0.014615 * Math.cos(2 * g) - 0.040849 * Math.sin(2 * g));
+  const decl = 0.006918 - 0.399912 * Math.cos(g) + 0.070257 * Math.sin(g) - 0.006758 * Math.cos(2 * g) + 0.000907 * Math.sin(2 * g) - 0.002697 * Math.cos(3 * g) + 0.00148 * Math.sin(3 * g);
+  const ha = Math.acos(Math.cos(90.833 * rad) / (Math.cos(LAT * rad) * Math.cos(decl)) - Math.tan(LAT * rad) * Math.tan(decl)) / rad;
+  const noonUTC = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
+  return { rise: noonUTC + (720 - 4 * (LON + ha) - eqt) * 6e4, set: noonUTC + (720 - 4 * (LON - ha) - eqt) * 6e4 };
+}
+let themePref = 'auto';
+try { themePref = localStorage.getItem('cd-clock-theme') || 'auto'; } catch { /* ignore */ }
+function applyTheme() {
+  let light = themePref === 'light';
+  if (themePref === 'auto') { const t = now(), { rise, set } = sunTimes(t); light = t >= rise && t < set; }
+  document.body.classList.toggle('light', light);
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', light ? '#EEEAE2' : '#0C0B0A');
+  const lbl = document.getElementById('themeLabel'); if (lbl) lbl.textContent = themePref;
+}
+function cycleTheme() {
+  themePref = { auto: 'light', light: 'dark', dark: 'auto' }[themePref] || 'auto';
+  try { localStorage.setItem('cd-clock-theme', themePref); } catch { /* ignore */ }
+  applyTheme(); wake();
+}
+setInterval(applyTheme, 30 * 1000);
+
 // ---------- controls ----------
 function toggleFullscreen() {
   if (document.fullscreenElement) document.exitFullscreen();
@@ -170,6 +200,7 @@ addEventListener('keydown', (e) => {
   if (k === 'f') toggleFullscreen();
   else if (k === 's') setMode(mode === 'clock' ? 'session' : 'clock');
   else if (k === 'i') document.body.classList.toggle('show-info');
+  else if (k === 't') cycleTheme();
   else if (k === ' ' ) {
     e.preventDefault();
     if (mode !== 'session') setMode('session');
@@ -200,6 +231,7 @@ setInterval(resync, 5 * 60 * 1000);
 
 // ---------- go ----------
 setMode(mode);
+applyTheme();
 await document.fonts.load('700 200px "Nimbus Sans"').catch(() => {});
 requestAnimationFrame(frame);
 requestAnimationFrame(() => document.body.classList.add('ready'));
