@@ -46,14 +46,13 @@
 
     <form class="gate" id="gate" novalidate>
       <p class="g-title">Make it yours. Free.</p>
-      <p class="g-sub">Put in your email to unlock fullscreen, themes, fonts, timezones and your own labels. The clock stays free either way.</p>
       <label class="hp" aria-hidden="true">Website<input type="text" name="website" tabindex="-1" autocomplete="off" /></label>
       <div class="g-row">
-        <input type="email" name="email" required maxlength="254" autocomplete="email" inputmode="email" placeholder="you@email.com" aria-label="Email" />
+        <input type="email" name="email" required maxlength="254" autocomplete="email" inputmode="email" placeholder="Your email" aria-label="Your email" aria-describedby="gateFine" />
         <button type="submit">Unlock</button>
       </div>
       <p class="g-msg" id="gateMsg" role="status"></p>
-      <p class="g-fine">You'll get the occasional email from me when I make something new. Unsubscribe any time. <a href="/privacy#email" target="_blank" rel="noopener">Privacy</a></p>
+      <p class="g-fine" id="gateFine">Only for new things I make. <a href="/privacy#email" target="_blank" rel="noopener">Privacy</a></p>
     </form>
     <p class="unlocked" id="unlocked" hidden>Unlocked. It's yours.</p>
 

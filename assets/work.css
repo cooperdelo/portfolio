@@ -118,6 +118,7 @@
 .ag-facts b { display: block; font-family: var(--display); font-weight: 700; font-size: clamp(20px, 2vw, 32px); line-height: .9; }
 .ag-facts .label { font-size: 10px; opacity: .65; }
 .as-next .pill.solid { background: var(--ink); color: var(--bone); border-color: var(--ink); }
+.as-next .pill.solid:hover { background: var(--ink-2) !important; color: var(--bone) !important; }
 @media (max-width: 900px) { .as-hero { grid-template-columns: minmax(0, 1fr); padding-top: 110px; } .as-glass { align-self: end; } }
 @media (prefers-reduced-motion: reduce) { .ag-steps li { animation: none; } }
 .as-glass { background: linear-gradient(160deg, rgba(30, 26, 21, .55), rgba(16, 13, 10, .45)); }

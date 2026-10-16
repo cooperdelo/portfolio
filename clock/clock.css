@@ -106,7 +106,6 @@ body.panel-open .panel { transform: none; }
 
 .gate { border: 1px solid rgba(244,241,234,.12); border-radius: 14px; padding: 18px; margin-bottom: 22px; position: relative; }
 .g-title { font-size: 20px; font-weight: 700; letter-spacing: -.01em; }
-.g-sub { margin-top: 6px; font-size: 13.5px; line-height: 1.5; color: #C9C5C0; }
 .g-row { display: flex; gap: 8px; margin-top: 14px; }
 .g-row input { flex: 1; min-width: 0; font: 400 16px/1 var(--f); color: #F4F1EA; background: rgba(244,241,234,.04); border: 1px solid rgba(244,241,234,.14); border-radius: 10px; padding: 12px 12px; }
 .g-row input:focus { outline: none; border-color: var(--orange); }

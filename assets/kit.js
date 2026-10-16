@@ -74,7 +74,7 @@
   }
   // Works in any AI tool. Kits that make files or code go to a coding agent; the rest go in any chat.
   const CODING = new Set(["design", "startup", "ai-system"]);
-  const masterHTML = (k) => k.master_prompt ? `<div class="mp"><p class="label">The one prompt</p><h2>${CODING.has(k.slug) ? "Paste this into your coding agent." : "Paste this into your AI."}</h2><p class="mp-tools">${CODING.has(k.slug) ? "Claude Code, Cursor, Codex or any coding agent." : "Claude, ChatGPT, Gemini or whatever you use."}</p>${block(k.master_prompt, "Copy the prompt")}</div>` : "";
+  const masterHTML = (k) => k.master_prompt ? `<div class="mp"><p class="label">The one prompt</p><h2>${CODING.has(k.slug) ? "Paste this into your coding agent." : "Paste this into your AI."}</h2><p class="mp-tools">Paste it into Claude, ChatGPT, Gemini or whatever you use. If it doesn't know you yet, it asks a few questions first.</p>${block(k.master_prompt, "Copy the prompt")}</div>` : "";
 
   function render(d) {
     const k = d.kit;
@@ -105,12 +105,7 @@
     if (d.locked && d.gate !== "free" && gate) {
       const rest = (k.outline || []).slice(1);
       steps.innerHTML = stepHTML(k.first, 0, false) + rest.map((t, i) => stepHTML(t, i + 1, true)).join("");
-      const count = `${Math.max(0, k.count - 1)} more steps and the one prompt`;
       gate.hidden = false;
-      $("[data-gate-count]").textContent = count;
-      $("[data-gm-count]").textContent = k.title;
-      $("[data-bar-count]").textContent = count;
-      $("[data-gm-outline]").innerHTML = rest.map((t, i) => `<li><span class="label">${String(i + 2).padStart(2, "0")}</span>${esc(t)}</li>`).join("") + '<li><span class="label">+</span>The one prompt</li>';
       master.hidden = true;
       gm.arm();
       track("gate_view", { kit: slug });
@@ -139,12 +134,13 @@
     const seen = () => { try { return sessionStorage.getItem(key) === "1"; } catch { return false; } };
     function open() {
       if (!el.hidden) return;
+      io?.disconnect();                               // opened by hand: don't pop it again on scroll after a dismiss
       last = document.activeElement;
       el.hidden = false; bar.hidden = true;
       requestAnimationFrame(() => el.classList.add("on"));
       document.documentElement.classList.add("gm-lock"); window.cdLenis?.stop();
       try { sessionStorage.setItem(key, "1"); } catch {}
-      setTimeout(() => el.querySelector("input")?.focus({ preventScroll: true }), 250);
+      setTimeout(() => el.querySelector('input[type="email"]')?.focus({ preventScroll: true }), 250);
     }
     function close(showBar = true) {
       if (el.hidden) return;
@@ -155,7 +151,16 @@
       last?.focus?.({ preventScroll: true });
     }
     el.addEventListener("click", (e) => { if (e.target.closest("[data-gm-close]")) close(); });
-    el.addEventListener("keydown", (e) => { if (e.key === "Escape") close(); });
+    // Keep Tab inside the dialog while it's open (the honeypot is tabindex -1, so it's skipped).
+    const tabbable = () => [...el.querySelectorAll('.gm-card button, .gm-card a[href], .gm-card input:not([tabindex="-1"]):not([type="hidden"])')].filter((n) => !n.disabled && n.offsetParent !== null);
+    el.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") { e.preventDefault(); close(); return; }
+      if (e.key !== "Tab") return;
+      const t = tabbable(); if (!t.length) return;
+      const first = t[0], lastEl = t[t.length - 1];
+      if (e.shiftKey && (document.activeElement === first || !el.contains(document.activeElement))) { e.preventDefault(); lastEl.focus(); }
+      else if (!e.shiftKey && (document.activeElement === lastEl || !el.contains(document.activeElement))) { e.preventDefault(); first.focus(); }
+    });
     document.querySelectorAll("[data-gm-open]").forEach((b) => b.addEventListener("click", open));
     document.addEventListener("click", (e) => { if (e.target.closest(".st.locked")) open(); });
     return {
@@ -211,10 +216,14 @@
     track("checkout_start", { kit: slug });
     let tp = new URLSearchParams(location.search).get("tp") || "";
     try { if (tp) sessionStorage.setItem("cd_tp", tp); else tp = sessionStorage.getItem("cd_tp") || ""; } catch {}
-    const [code, d] = await post("/api/shop-checkout", { kit: slug, code: buy.code.value.trim(), tp });
+    // No promo field on the page: Stripe Checkout takes codes itself, and a ?code= link is applied up front.
+    let promo = new URLSearchParams(location.search).get("code") || "";
+    try { if (promo) sessionStorage.setItem("cd_code", promo); else promo = sessionStorage.getItem("cd_code") || ""; } catch {}
+    const [code, d] = await post("/api/shop-checkout", { kit: slug, code: (promo || buy.code?.value || "").trim(), tp });
     if (code === 200 && d.url) { location.href = d.url; return; }
     btn.disabled = false;
-    msg(d.error === "bad_code" ? "That code didn't work." : d.error === "checkout_not_configured" || d.error === "checkout_opening_soon" ? "Checkout opens soon." : "Checkout didn't open. Try again in a moment.");
+    if (d.error === "bad_code") { try { sessionStorage.removeItem("cd_code"); } catch {} history.replaceState(null, "", location.pathname + location.hash); }
+    msg(d.error === "bad_code" ? "That code didn't work. Tap again to check out without it." : d.error === "checkout_not_configured" || d.error === "checkout_opening_soon" ? "Checkout opens soon." : "Checkout didn't open. Try again in a moment.");
   });
 
   start();

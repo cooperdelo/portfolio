@@ -36,8 +36,7 @@
     <p class="kp-result" data-k-result></p>
     <div class="kp-buy" data-buy hidden>
       <p class="kp-price"><b data-k-price>&nbsp;</b><span class="draft" data-k-draft hidden>Draft price</span></p>
-      <form class="kp-form" data-checkout><button class="pill solid" type="submit">Get the kit <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1 8h13M9 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></button><label class="kp-code"><span class="label">Promo code</span><input name="code" maxlength="40" autocomplete="off" placeholder="Optional" /></label></form>
-      <p class="kp-fine label">Tax calculated at checkout · secure payment by Stripe · instant access</p>
+      <form class="kp-form" data-checkout><input type="hidden" name="code" /><button class="pill solid" type="submit">Get the kit <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1 8h13M9 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></button></form>
       <p class="kp-msg" data-msg role="status"></p>
     </div>
     <div class="kp-owned" data-owned hidden><p class="label">Yours</p><p>It stays unlocked in this browser. Stripe emailed your receipt.</p></div>

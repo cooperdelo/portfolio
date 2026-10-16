@@ -244,8 +244,7 @@ def design_kit():
     <p class="kp-result" data-k-result></p>
     <div class="kp-buy" data-buy hidden>
       <p class="kp-price"><b data-k-price>&nbsp;</b><span class="draft" data-k-draft hidden>Draft price</span></p>
-      <form class="kp-form" data-checkout><button class="pill solid" type="submit">Get the kit {ARROW}</button><label class="kp-code"><span class="label">Promo code</span><input name="code" maxlength="40" autocomplete="off" placeholder="Optional" /></label></form>
-      <p class="kp-fine label">Tax calculated at checkout · secure payment by Stripe · instant access</p>
+      <form class="kp-form" data-checkout><input type="hidden" name="code" /><button class="pill solid" type="submit">Get the kit {ARROW}</button></form>
       <p class="kp-msg" data-msg role="status"></p>
     </div>
     <div class="kp-owned" data-owned hidden><p class="label">Yours</p><p>It stays unlocked in this browser. Stripe emailed your receipt.</p></div>
@@ -283,7 +282,7 @@ def guide(slug):
     cover = RES[slug][3] if slug in RES else "film"
     free = GATES.get(slug) == "free"  # free guides carry no unlock UI at all
     gate_ui = "" if free else f"""
-    <div class="gd-more" data-gate hidden><button type="button" class="pill solid" data-gm-open>Unlock the rest, free {ARROW}</button><p class="label" data-gate-count></p></div>"""
+    <div class="gd-more" data-gate hidden><button type="button" class="pill solid" data-gm-open>Get the rest {ARROW}</button></div>"""
     body = f"""  <section class="gd-hero gd-cover dark" data-kit="{slug}" aria-labelledby="gd-h">
     <img class="gd-bg" src="/img/res/{cover}-1200.webp" srcset="/img/res/{cover}-600.webp 600w, /img/res/{cover}-1200.webp 1200w" sizes="100vw" alt="" aria-hidden="true" />
     <a class="kp-back label" href="/resources">{ARROW} Resources</a>
@@ -300,21 +299,20 @@ def guide(slug):
   {next_block(slug)}{"" if free else MODAL}"""
     page(f"resources/guides/{slug}", "Guide", "A free guide from Cooper Delo.", body, css=("/assets/together.css", "/assets/shop.css", "/assets/shop-v2.css"), shop=False)
 
+# The email ask is the headline, one field and one button. The one line under it says what the email is for (consent is recorded as true).
+CLOSE = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 3l10 10M13 3L3 13" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>'
 MODAL = f"""
   <div class="gm" data-gate-modal hidden data-lenis-prevent>
     <div class="gm-scrim" data-gm-close></div>
     <div class="gm-card" role="dialog" aria-modal="true" aria-labelledby="gm-h">
-      <button type="button" class="gm-x label" data-gm-close>Not now</button>
-      <p class="label" data-gm-count></p>
+      <button type="button" class="gm-x" data-gm-close aria-label="Close">{CLOSE}</button>
       <h2 id="gm-h">Get the rest.</h2>
-      <p class="gm-sub">Free. Put in your email and the whole guide opens right here.</p>
-      <ol class="gm-list" data-gm-outline></ol>
-      <form class="gd-form" data-email-gate><label class="hp" aria-hidden="true">Website<input type="text" name="website" tabindex="-1" autocomplete="off" /></label><label><span class="label">Email</span><input type="email" name="email" required maxlength="254" autocomplete="email" placeholder="you@email.com" /></label><button class="pill solid" type="submit">Open the guide {ARROW}</button></form>
+      <form class="gd-form" data-email-gate><label class="hp" aria-hidden="true">Website<input type="text" name="website" tabindex="-1" autocomplete="off" /></label><input type="email" name="email" required maxlength="254" autocomplete="email" inputmode="email" placeholder="Your email" aria-label="Your email" aria-describedby="gm-fine" /><button class="pill solid" type="submit">Unlock {ARROW}</button></form>
       <p class="kp-msg" data-msg role="status"></p>
-      <p class="gd-fine">I'll only use it to send you new guides. <a href="/privacy#email">Privacy</a></p>
+      <p class="gd-fine" id="gm-fine">Only for new things I make. <a href="/privacy#email">Privacy</a></p>
     </div>
   </div>
-  <div class="gd-bar" data-gate-bar hidden><span data-bar-count></span><button type="button" class="pill solid" data-gm-open>Unlock free {ARROW}</button></div>"""
+  <div class="gd-bar" data-gate-bar hidden><button type="button" class="pill solid" data-gm-open>Get the rest {ARROW}</button></div>"""
 
 def resources_shelf():
     """Add a Guides shelf to /resources (QA only), drawn from /api/kit at runtime."""

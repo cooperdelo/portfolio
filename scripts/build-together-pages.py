@@ -175,17 +175,26 @@ PLAYBOOK = [
 
 
 def film_prompt():
+    """Works in an AI that has never heard of you: it checks what it knows, asks what it doesn't, then does the job."""
     rules = "\n\n".join(f"{name.upper()}\n" + "\n".join(f"- {r} {why}" for r, why in items) for name, _, items in PLAYBOOK)
-    return ("I'm making a short video. Below is Cooper Delo's playbook: the hooks, story checks and retention rules he uses. "
+    rules = rules.replace("On my account,", "On Cooper's account,")  # his stat, not the reader's
+    return ("First check what you already know about me from this chat, your memory, or files I've shared. Use it.\n\n"
+            "If you don't know what my video is about, who it's for, what footage I have, where it's going and how I talk on camera, "
+            "ask me these questions first, one message, numbered, and wait for my answers before doing anything else:\n"
+            "1. What happened? The moment, in a line or two.\n"
+            "2. Who is it for, and what should they feel or do after watching?\n"
+            "3. What footage do you have, or can you still get?\n"
+            "4. Where will it go (TikTok, Reels, Shorts) and about how long should it be?\n"
+            "5. Do you talk to camera, do a voiceover, or use text on screen?\n\n"
+            "Then help me make the video. Below is a playbook of hooks, story checks and retention rules from Cooper Delo. "
             "Use it to shape my idea, in my words. It's a toolbox, not a checklist. Use what fits.\n\n"
-            "MY IDEA: [one or two lines. What happened, and what footage you have or can get.]\n\n"
             + rules +
-            "\n\nGIVE ME\n"
-            "1. Three opening lines for my idea, each from a different hook, in my voice. Pick one and say why in a sentence.\n"
+            "\n\nGIVE ME, from my answers\n"
+            "1. Three opening lines, each from a different hook, in my voice. Pick one and say why in a sentence.\n"
             "2. The story in 5 to 7 one-line beats, joined by but or therefore.\n"
             "3. A cut map for the first 10 seconds: what we see, hear and read.\n"
-            "4. A shot list grouped by location, using only what I said I have.\n\n"
-            "Never invent anything about my life or my footage. If I didn't say what actually happened, ask me that one question and nothing else.")
+            "4. A shot list grouped by location, using only the footage in my answers.\n\n"
+            "Never invent anything about my life or my footage. If my answers leave out what actually happened, ask me that one question and nothing else.")
 
 
 def resources():
@@ -204,7 +213,7 @@ def resources():
 def film_plan():
     """Not a form, not an interview. Cooper's playbook on the page, and one prompt that carries it into your AI."""
     cols = "".join(f'''<div class="fp-col"><p class="label">{name}</p><ul>{"".join(f"<li><b>{r}</b><span>{why}</span></li>" for r, why in items)}</ul></div>''' for name, _, items in PLAYBOOK)
-    prompt = html_escape(film_prompt()).replace("MY IDEA: [", '<mark>MY IDEA: [', 1).replace("can get.]", "can get.]</mark>", 1)
+    prompt = html_escape(film_prompt())
     body = f"""  <section class="fp-hero dark" aria-labelledby="pg-h">
     <video class="fp-vid" muted loop playsinline autoplay preload="metadata" poster="/videos/work/launch-film.jpg" aria-hidden="true"><source src="/videos/work/launch-film.mp4" type="video/mp4" /></video>
     <div class="fp-copy">
@@ -215,7 +224,7 @@ def film_plan():
   </section>
   <section class="fp light" aria-label="The playbook">
     <div class="fp-cols">{cols}</div>
-    <div class="fp-prompt"><p class="label">One paste. Change the highlighted line.</p><div class="cb"><pre>{prompt}</pre><button type="button" class="cp" aria-label="Copy the prompt">Copy</button></div>
+    <div class="fp-prompt"><p class="label">One paste. It asks what it needs.</p><div class="cb"><pre>{prompt}</pre><button type="button" class="cp" aria-label="Copy the prompt">Copy</button></div>
       <p class="note">Same rules behind the <a href="/work/plugverse-launch-film">PlugVerse launch film</a>.</p></div>
   </section>
   {next_block("film-plan")}"""
