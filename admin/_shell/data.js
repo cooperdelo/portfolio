@@ -43,7 +43,7 @@ export function groupAccounts(data) {
 /** Posts with their newest metric snapshot attached (reach = impressions or views). */
 export async function postsWithMetrics() {
   const [{ data: posts, error: e1 }, { data: snaps, error: e2 }] = await Promise.all([
-    sb.from('social_posts').select('id,platform,account_handle,caption,posted_at,media_type,media_url,thumbnail_url,permalink,external_id').limit(2000),
+    sb.from('social_posts').select('id,platform,account_handle,caption,posted_at,media_type,media_url,thumbnail_url,permalink,external_id').is('merged_into', null).limit(2000),
     sb.from('social_post_snapshots').select('post_id,as_of,views,reach,impressions,likes,comments,shares,saves,reposts,source').order('as_of', { ascending: false }).limit(5000),
   ]);
   if (e1) throw e1; if (e2) throw e2;
