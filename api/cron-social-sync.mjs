@@ -27,7 +27,8 @@ export default async function handler(req, res) {
       });
       const j = await r.json().catch(() => ({}));
       return { path, ok: r.ok, status: r.status, summary: r.ok
-        ? { handle: j.handle, posts_total: j.posts_total, synced: (j.posts || []).length, error: j.error || null }
+        ? { handle: j.handle, posts_total: j.posts_total, synced: (j.posts || []).length,
+            snapshot_written: j.snapshot_written, error: j.error || (j.errors ? JSON.stringify(j.errors) : null) }
         : { error: j.error || `HTTP ${r.status}` } };
     } catch (e) {
       return { path, ok: false, status: 0, summary: { error: String(e?.message || e) } };
@@ -40,11 +41,14 @@ export default async function handler(req, res) {
   // 'ig-token-refresh' keeps the tokens alive. /api/instagram-sync stays for
   // manual use only; calling it daily created duplicate social_posts rows.
   const tt = await callSync('/api/tiktok-sync');
+  // 2026-10-17 (Answer Desk Q098): PlugVerse KPI snapshot, daily. It was written only on an
+  // admin page visit, so plugverse_kpi_snapshots had no live row after 2026-10-01.
+  const kpi = await callSync('/api/plugverse-kpi');
 
-  const ok = tt.ok;
+  const ok = tt.ok && kpi.ok;
   return res.status(ok ? 200 : 207).json({
     ran_at: new Date().toISOString(),
     ok,
-    results: [tt],
+    results: [tt, kpi],
   });
 }

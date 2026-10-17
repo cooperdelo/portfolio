@@ -205,12 +205,12 @@ async function fetchPosthogKpis() {
 
 // ---------- Snapshot upsert ----------
 
-async function upsertSnapshot(jwt, row) {
+async function upsertSnapshot(jwt, row, key = ADMIN_ANON) {
   const r = await fetch(`${ADMIN_URL}/rest/v1/plugverse_kpi_snapshots`, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${jwt}`,
-      apikey: ADMIN_ANON,
+      apikey: key,
       'Content-Type': 'application/json',
       Prefer: 'resolution=merge-duplicates,return=minimal',
     },
@@ -234,8 +234,18 @@ export default async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store');
 
   const jwt = (req.headers.authorization || '').replace(/^Bearer\s+/i, '');
-  const auth = await verifyAdminJwt(jwt);
-  if (!auth.ok) return res.status(auth.status).json({ error: auth.error });
+  // 2026-10-17 (Answer Desk Q098): daily cron path. cron-social-sync calls this with
+  // x-cron-secret so a snapshot is written every day, not only when someone opens
+  // /admin/plugverse/metrics (no live row since 2026-10-01). The cron path writes with
+  // the admin service role (no user JWT exists) and returns no history.
+  const cronSecret = process.env.CRON_SECRET;
+  const isCron = !!cronSecret && (req.headers['x-cron-secret'] || '') === cronSecret;
+  const svcKey = process.env.SUPABASE_ADMIN_SERVICE_ROLE_KEY;
+  if (isCron && !svcKey) return res.status(500).json({ error: 'SUPABASE_ADMIN_SERVICE_ROLE_KEY not set' });
+  if (!isCron) {
+    const auth = await verifyAdminJwt(jwt);
+    if (!auth.ok) return res.status(auth.status).json({ error: auth.error });
+  }
 
   // Fan out — each source is best-effort so one outage doesn't blank the page.
   const [pv, stripe, posthog] = await Promise.all([
@@ -254,7 +264,7 @@ export default async function handler(req, res) {
   // An outage must not overwrite the last complete observation with nulls.
   let snapshotWritten=false;
   if(errors.length===0) try {
-    await upsertSnapshot(jwt, {
+    await upsertSnapshot(isCron ? svcKey : jwt, {
       date: todayDate(),
       mrr_cents:                   data.mrr_cents ?? null,
       arr_cents:                   data.arr_cents ?? null,
@@ -267,13 +277,13 @@ export default async function handler(req, res) {
       payouts_completed_mtd_cents: data.payouts_completed_mtd_cents ?? null,
       top_events_7d:               data.top_events_7d ?? null,
       raw:                         data,
-    });
+    }, isCron ? svcKey : ADMIN_ANON);
     snapshotWritten=true;
   } catch (e) {
     errors.push({ source: 'snapshot', error: e?.message || String(e) });
   }
 
-  const history = await fetchHistory(jwt);
+  const history = isCron ? [] : await fetchHistory(jwt);
 
   return res.status(200).json({
     captured_at: new Date().toISOString(),
