@@ -13,6 +13,10 @@ process.env.SHOP_TOKEN_SECRET = 'test-secret';
 delete process.env.SHOP_STRIPE_SECRET_KEY;
 
 const shop = await import('../../api/_lib/shop.mjs');
+// 2026-10-16 (Answer Desk Q016): the shipped catalog has no paid kit. The paywall code stays (dormant), so
+// the paywall tests below run against a fixture that flips the Design kit back to paid, $29.
+const SHIPPED = Object.fromEntries(Object.entries(shop.KITS).map(([k, m]) => [k, { ...m }]));
+Object.assign(shop.KITS.design, { gate: 'paid', price: 2900 });
 const kitApi = (await import('../../api/kit.mjs')).default;
 const checkout = (await import('../../api/shop-checkout.mjs')).default;
 
@@ -183,4 +187,13 @@ test('preview: the Design kit stays paid at $29 and locked', async () => {
     assert.equal(g.body.gate, 'paid'); assert.equal(g.body.locked, true); assert.equal(g.body.kit.master_prompt, undefined);
     assert.equal(shop.canRead('design', '', process.env), false);
   } finally { delete process.env.VERCEL_ENV; }
+});
+
+test('shipped catalog: every kit is free or email-gated, none paid (Q016)', () => {
+  for (const [slug, m] of Object.entries(SHIPPED)) {
+    assert.notEqual(m.gate, 'paid', slug);
+    assert.ok(['free', 'email'].includes(m.gate), slug);
+    assert.ok(!m.price, slug);
+  }
+  assert.equal(SHIPPED.design.gate, 'free');
 });

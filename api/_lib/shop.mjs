@@ -6,7 +6,10 @@ import { gunzipSync } from 'node:zlib';
 
 // gate: free | email | paid. draft: true shows a 'Draft price' tag (Design kit set at $29 on 2026-10-05).
 export const KITS = {
-  design: { title: "Sites that don't look like AI", gate: 'paid', price: 2900, shop: '/shop/design-kit' },
+  // Cooper's ruling 2026-10-16 (Answer Desk Q016): no paywall anytime soon. Every kit is free, no buy panel,
+  // no checkout push. The Design kit was 'paid' ($29) on previews only. api/shop-checkout.mjs stays in the
+  // repo, unreferenced: flip this back to gate: 'paid', price: 2900 to bring the paywall back.
+  design: { title: "Sites that don't look like AI", gate: 'free', shop: '/shop/design-kit' },
   'ai-system': { title: 'One folder Claude reads first', gate: 'email', guide: '/resources/guides/ai-system' },
   linkedin: { title: 'LinkedIn posts strangers actually read', gate: 'email', guide: '/resources/guides/linkedin' },
   'instagram-tiktok': { title: 'Short videos from your real week', gate: 'email', guide: '/resources/guides/instagram-tiktok' },
