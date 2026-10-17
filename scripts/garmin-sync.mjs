@@ -33,6 +33,11 @@ for (const f of ['.env.garmin', '.env']) {
 const args = process.argv.slice(2);
 const DRY = args.includes('--dry');
 const DAYS = Math.max(1, Math.min(400, parseInt(args.find(a => /^\d+$/.test(a)) || '10', 10)));
+// 2026-10-17: workouts. --since=YYYY-MM-DD backfills activities from that day (one-time
+// backfill); without it, activities from the same DAYS window are synced. --workouts-only
+// skips the health_daily pass (used for the backfill so wellness rows are not rewritten).
+const SINCE = (args.find(a => a.startsWith('--since=')) || '').slice(8) || null;
+const WORKOUTS_ONLY = args.includes('--workouts-only');
 const EMAIL = process.env.GARMIN_EMAIL, PASS = process.env.GARMIN_PASSWORD;
 const SB_URL = process.env.SUPABASE_ADMIN_URL || 'https://eibtnkaoqsgwiqttiwjo.supabase.co';
 const SB_KEY = process.env.SUPABASE_ADMIN_SERVICE_ROLE_KEY;
@@ -53,7 +58,7 @@ async function main() {
   console.log(`✓ logged in${displayName ? ` (${displayName})` : ''}`);
 
   const rows = [];
-  for (let i = 1; i <= DAYS; i++) {
+  for (let i = 1; i <= (WORKOUTS_ONLY ? 0 : DAYS); i++) {
     const d = new Date(); d.setDate(d.getDate() - i);
     const date = ymd(d);
     const row = { day: date, garmin_synced_at: new Date().toISOString() };
@@ -104,7 +109,7 @@ async function main() {
     else console.log(`  ${date}: no data`);
   }
 
-  if (DRY) { console.log(`\n(dry-run) ${rows.length} day(s) — not written. Remove --dry to sync.`); return; }
+  if (DRY) { console.log(`\n(dry-run) ${rows.length} day(s) — not written. Remove --dry to sync.`); await syncWorkouts(GC); return; }
   if (rows.length) {
     // PostgREST bulk insert requires every object to have identical keys — pad
     // to the union of all keys (missing metrics → null).
@@ -118,6 +123,50 @@ async function main() {
     if (!res.ok) throw new Error(`Supabase upsert ${res.status}: ${await res.text()}`);
   }
   console.log(`✓ upserted ${rows.length} day(s) into health_daily`);
+  await syncWorkouts(GC);
+}
+
+// ---- workouts → health_workout (added 2026-10-17, Answer Desk Q099) ----
+// Until this existed the job never copied a single activity: every health_workout row was
+// hand-typed. One row per Garmin activity, keyed on garmin_activity_id, so re-runs update
+// instead of duplicating. Hand-typed (source='manual') rows are never touched here.
+async function syncWorkouts(GC) {
+  const cutoff = SINCE || (() => { const d = new Date(); d.setDate(d.getDate() - DAYS); return ymd(d); })();
+  const acts = [];
+  for (let start = 0; start < 2000; start += 50) {
+    const page = await GC.getActivities(start, 50);
+    if (!page?.length) break;
+    acts.push(...page);
+    const oldest = String(page[page.length - 1]?.startTimeLocal || '').slice(0, 10);
+    if (oldest && oldest < cutoff) break;
+  }
+  const wrows = acts
+    .filter(a => a?.activityId && String(a.startTimeLocal || '').slice(0, 10) >= cutoff)
+    .map(a => ({
+      garmin_activity_id: a.activityId,
+      day: String(a.startTimeLocal).slice(0, 10),
+      start_time: a.startTimeGMT ? String(a.startTimeGMT).replace(' ', 'T') + 'Z' : null,
+      activity_type: a.activityType?.typeKey ?? null,
+      name: a.activityName ?? null,
+      duration_min: a.duration != null ? Math.round(a.duration / 6) / 10 : null,
+      distance_m: a.distance || null,
+      calories: num(a.calories),
+      avg_hr: num(a.averageHR),
+      max_hr: num(a.maxHR),
+      source: 'garmin',
+      status: 'analyzed',
+    }));
+  for (const w of wrows) console.log(`  workout ${w.day} ${w.activity_type} ${w.duration_min}min (${w.garmin_activity_id})`);
+  if (DRY) { console.log(`(dry-run) ${wrows.length} workout(s) since ${cutoff} — not written.`); return; }
+  if (wrows.length) {
+    const res = await fetch(`${SB_URL}/rest/v1/health_workout?on_conflict=garmin_activity_id`, {
+      method: 'POST',
+      headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`, 'Content-Type': 'application/json', Prefer: 'resolution=merge-duplicates,return=minimal' },
+      body: JSON.stringify(wrows),
+    });
+    if (!res.ok) throw new Error(`Supabase workout upsert ${res.status}: ${await res.text()}`);
+  }
+  console.log(`✓ upserted ${wrows.length} workout(s) since ${cutoff} into health_workout`);
 }
 
 main().catch((e) => { console.error('✗', e.message || e); process.exit(1); });
