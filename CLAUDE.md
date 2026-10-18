@@ -99,6 +99,10 @@ Static HTML portfolio site (Vercel-hosted at cooperdelo.com) plus a private admi
 | `band_media_assets` | Rubber Band media catalog for `/admin/assets` (originals stay in Google Drive). Full-only SELECT; no direct writes from `authenticated`. Migration: `scripts/migrations/20260930-band-review.sql`. | `id`, `drive_file_id` (unique), `name`, `gig`, `mime_type`, `duration`, `proxy_path` (object in `band-review` bucket), `source_observed_at`, `retired_at` |
 | `band_media_reviews` | One review row per asset per reviewer. Written only through `band_review_save(...)` (SECURITY DEFINER, full admin, optimistic `revision` check). | `asset_id` → band_media_assets, `reviewer` (auth uid), `revision`, `verdict` (unreviewed/favorite/reject), `note`, `time_seconds`, `trim_start`, `trim_end`, `updated_at`. PK (asset_id, reviewer) |
 | `band_media_operations` | Idempotency log for `band_review_save` retries (same operation id + payload returns the stored result). | `operation_id` (PK), `reviewer`, `asset_id`, `request`, `result`, `created_at` |
+| `diary_entries` | Cooper's PRIVATE nightly diary + life-story memories, read by `/admin/diary` (full only). Soft-delete only (no DELETE grant). Migration `scripts/migrations/20261017-diary.sql`. Copy two: desktop task DiaryBackup (3:40am) writes the vault's git-excluded `Private/diary/`. | `id` uuid, `entry_date` (ET), `kind` (night/memory/note), `chapter`, `question_id` → life_story_questions, `body`, `for_content` (default false), `source` (web/chat/import), `deleted_at` |
+| `life_story_questions` | ~60 McAdams/StoryCorps life-story prompts for the diary. Full only. An entry with `question_id` marks the question answered via trigger. Rows are NOT in git (repo is public). | `id` text, `chapter`, `sort`, `question`, `why`, `known` (private vault summary), `asked_at` (shown or skipped), `answered_entry_id` |
+
+**DIARY PRIVACY RULE (hard, every agent and task):** read `diary_entries` content ONLY where `for_content = true AND deleted_at IS NULL`, and treat those rows like Cooper's own idea dumps. Never read, quote or summarize any other diary row. Health checks (System Doctor) count rows only and never select `body`. Never copy diary text or `life_story_questions.known` into git, `vault_documents`, emails or reports.
 
 Storage: private bucket `band-review` (50 MB limit; mp4/jpeg/webp/json) holds review proxies. Pages never read it directly; `/api/band-review` returns 15-minute signed URLs.
 
@@ -196,6 +200,7 @@ WHERE slug = 'luby_pitch';
 | `plugverse_kpi_snapshots` | ALL | ALL | none | Plugverse data |
 | `plugverse_contacts` | ALL | ALL | none | Plugverse pipeline |
 | `playbook_items` | ALL | ALL filtered by `scope IN ('plugverse','both')` | none | Personal-brand items hidden |
+| `diary_entries`, `life_story_questions` | SELECT/INSERT/UPDATE (no DELETE) | none | none | Private diary, full only |
 | `band_media_assets`, `band_media_reviews`, `band_media_operations` | SELECT (writes via `band_review_save`) | none | none | Full-only band media review |
 | Any other `public` table, `storage.objects` | per table | per table | none | `limited_role_boundary` denies acquisition everywhere |
 
