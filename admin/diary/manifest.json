@@ -1,0 +1,13 @@
+{
+  "name": "CD Diary",
+  "short_name": "Diary",
+  "description": "Cooper Delo's private nightly diary",
+  "start_url": "/admin/diary/",
+  "scope": "/admin/diary/",
+  "display": "standalone",
+  "background_color": "#0A0908",
+  "theme_color": "#0C0B0A",
+  "icons": [
+    { "src": "/favicon.svg", "type": "image/svg+xml", "sizes": "any", "purpose": "any maskable" }
+  ]
+}

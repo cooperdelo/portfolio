@@ -26,6 +26,7 @@ const NAV = [
   {section: 'Workspaces', items: [
     {href:'/admin/',label:'Choose workspace',ic:'home',roles:['full']},
     {href:'/admin/personal/',label:'Personal',ic:'compass',roles:['full']},
+    {href:'/admin/diary/',label:'Diary',ic:'book-open',roles:['full']},
     {href:'/admin/schedule/',label:'Schedule',ic:'calendar',roles:['full']},
     {href:'/admin/plugverse/',label:'PlugVerse',ic:'workflow',roles:['full','plugverse','acquisition']},
     {href:'/admin/content/',label:'All content',ic:'film',roles:['full']},
@@ -138,6 +139,7 @@ function filterTilesByRole(role) {
 // action from anywhere. The single biggest "get around fast" win.
 // =====================================================================
 const QUICK_ACTIONS = [
+  { label: 'Write tonight\'s diary', href: '/admin/diary/', roles: ['full'], act: true },
   { label: 'Log a meal', href: '/admin/health/log.html', roles: ['full'], act: true },
   { label: 'Log a bathroom trip', href: '/admin/health/log.html', roles: ['full'], act: true },
   { label: 'Log a previous day', href: '/admin/health/log.html', roles: ['full'], act: true },

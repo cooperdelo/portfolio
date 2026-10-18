@@ -34,6 +34,7 @@ export const DIRECTORY = [
     { href: '/admin/finance/fund.html',         label: '1789 Fund', ic: 'briefcase' },
   ]},
   { section: 'Life', items: [
+    { href: '/admin/diary/',                    label: 'Diary', ic: 'book-open', roles: ['full'] },
     { href: '/admin/life/',                     label: 'Weekly review', ic: 'compass', roles: ['full'] },
     { href: '/admin/life/relationships.html',   label: 'Relationships', ic: 'heart', roles: ['full'] },
     { href: '/admin/life/music.html',           label: 'Music', ic: 'music', roles: ['full'] },
