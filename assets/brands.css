@@ -93,12 +93,15 @@
 }
 
 /* Deal terms: typed numbers, shaped like how UGC deals are actually posted (per video, retainer, base + CPM). */
-.br-rate { display: grid; grid-template-columns: 1fr 1fr; gap: 0 18px; margin-top: 4px; }
+.br-rate { display: grid; grid-template-columns: 1fr 1fr; gap: 28px 18px; margin-top: 4px; }
 .br-rate[hidden] { display: none; }
 .br-rate .br-bonus { grid-column: 1 / -1; }
-.br-amt { display: flex; align-items: baseline; gap: 6px; }
-.br-amt > span { font-weight: 700; }
-.br-amt input { flex: 1; min-width: 0; }
+.field > .br-amt { display: flex; align-items: baseline; gap: 4px; margin-bottom: 0; border-bottom: 1px solid var(--line-d); transition: border-color .5s var(--ease); font-size: clamp(17px, 1.4vw, 21px); }
+.light .field > .br-amt { border-bottom-color: var(--line-l); }
+.field > .br-amt:focus-within { border-color: var(--bone); }
+.light .field > .br-amt:focus-within { border-color: var(--ink); }
+.br-amt > span { opacity: .6; }
+.field .br-amt input { flex: 1; min-width: 0; border-bottom: 0; }
 .br-rate input[type=number] { -moz-appearance: textfield; appearance: textfield; }
 .br-rate input[type=number]::-webkit-outer-spin-button, .br-rate input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 @media (max-width: 520px) { .br-rate { grid-template-columns: 1fr; } }
