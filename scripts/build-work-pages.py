@@ -127,7 +127,7 @@ def roll(t):
 NAV = f"""<header class="nav label">
   <a class="mark" href="/" aria-label="Cooper Delo, home">{roll("Cooper Delo")}</a>
   <span class="where">Chapel Hill, NC&nbsp;&nbsp;<span data-clock>--:--</span> ET</span>
-  <nav class="links" aria-label="Primary"><a href="/work">{roll("Work")}</a><a href="/resources">{roll("Resources")}</a><a href="/shop">{roll("Shop")}</a><a href="#contact" data-contact>{roll("Contact")}</a></nav>
+  <nav class="links" aria-label="Primary"><a href="/work">{roll("Work")}</a><a href="/resources">{roll("Resources")}</a><a href="/shop">{roll("Shop")}</a><a href="/brands">{roll("Brands")}</a><a href="#contact" data-contact>{roll("Contact")}</a></nav>
 </header>"""
 
 SCRIPTS = """<script src="/assets/lenis.min.js" defer></script>

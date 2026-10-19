@@ -80,6 +80,9 @@ a:hover > .roll > span, a:focus-visible > .roll > span { transform: translateY(-
 @media (max-width: 700px) { .nav { grid-template-columns: 1fr auto; } .nav .where { display: none; } .nav .links { gap: 16px; } }
 @media (max-width: 480px) { .nav { column-gap: 14px; } .nav .mark { white-space: nowrap; font-size: 11px; } .nav .links { gap: 11px; } .nav .links a { font-size: 10px; letter-spacing: .04em; } .nav .links a[href="/#about"] { display: none; } }
 @media (max-width: 360px) { .nav .mark { font-size: 10px; } .nav .links { gap: 9px; } .nav .links a { font-size: 9px; letter-spacing: .02em; } }
+/* Five links do not fit beside the wordmark on a phone: Brands drops out of the nav there and is reached from the
+   homepage pills, the contact popup and the link in bio (cooperdelo.com/brands). */
+@media (max-width: 760px) { .nav .links a[href="/brands"] { display: none; } }
 /* Phone tap targets: the nav type is 9 to 11px tall, so pad the hit area out to ~40px and pull the margins back so nothing moves. */
 @media (max-width: 700px) { .nav .mark, .nav .links a { padding: 14px 4px; margin: -14px -4px; } }
 

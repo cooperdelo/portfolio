@@ -6,7 +6,7 @@
   const BAND = "https://plugverse.app/a/2499f269-dff2-4025-85a6-cf1ff8991382";
   const ARROW = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1 8h13M9 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>';
   const KINDS = [
-    ["Film or content", "Short films, launch films, content for a brand."],
+    ["Film or content", "Short films and launch films."],
     ["Product or a build", "An app, a site, or a system built with Claude."],
     ["Summer 2027", "Growth, creative or product roles. SF first, NYC too."],
   ];
@@ -21,7 +21,7 @@
         <div class="ct-step" data-step="1">
           <p class="label">Contact</p>
           <h2 id="ct-h">What's it about?</h2>
-          <ul class="ct-kinds">${KINDS.map(([t, d]) => `<li><button type="button" data-kind="${esc(t)}"><b>${t}</b><span>${d}</span><i>${ARROW}</i></button></li>`).join("")}
+          <ul class="ct-kinds"><li><a href="/brands"><b>Brands and UGC</b><span>Short-form video for your brand. Reels, numbers and how to reach me.</span><i>${ARROW}</i></a></li>${KINDS.map(([t, d]) => `<li><button type="button" data-kind="${esc(t)}"><b>${t}</b><span>${d}</span><i>${ARROW}</i></button></li>`).join("")}
             <li><a href="${BAND}" target="_blank" rel="noreferrer"><b>Booking Rubber Band</b><span>Parties, formals, bars, weddings. Book us on PlugVerse.</span><i>${ARROW}</i></a></li></ul>
           <div class="ct-foot"><button type="button" class="ct-mail" data-ct-copy>${EMAIL}<span class="label">Copy</span></button>
             <a class="pill solid" href="${CAL}" target="_blank" rel="noreferrer">Book a call ${ARROW}</a></div>

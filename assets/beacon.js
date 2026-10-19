@@ -57,6 +57,7 @@
       : /^mailto:/.test(h) ? (/Motion%20starter/i.test(h) ? "starter_interest" : "email")
       : /plugverse\.app/.test(h) ? "plugverse"
       : /^\/work-with-me/.test(h) ? "work_with_me"
+      : /^\/brands/.test(h) ? "brands"
       : /linkedin\.com/.test(h) ? "linkedin"
       : /^\/resources\/film-plan/.test(h) ? "planner" : "";
     if (target) cdTrack("cta_click", { target, from: location.pathname });
