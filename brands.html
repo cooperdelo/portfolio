@@ -114,9 +114,14 @@
       <form class="br-form" data-brand-form novalidate>
         <label class="field"><span class="label">Brand or company</span><input name="brand" autocomplete="organization" maxlength="80" required /></label>
         <label class="field"><span class="label">What do you need?</span><textarea name="need" maxlength="1800" required placeholder="Say, three UGC videos for an app launch in November."></textarea></label>
-        <fieldset class="br-budget"><legend class="label">Budget, if you know it</legend>
-          <label class="kind"><input type="radio" name="budget" value="Under $500" /><span>Under $500</span></label><label class="kind"><input type="radio" name="budget" value="$500 to $2,000" /><span>$500 to $2,000</span></label><label class="kind"><input type="radio" name="budget" value="$2,000 and up" /><span>$2,000 and up</span></label><label class="kind"><input type="radio" name="budget" value="Not sure yet" /><span>Not sure yet</span></label>
+        <fieldset class="br-budget"><legend class="label">How do you pay, if you know?</legend>
+          <label class="kind"><input type="radio" name="deal" value="Per video" /><span>Per video</span></label><label class="kind"><input type="radio" name="deal" value="Monthly retainer" /><span>Monthly retainer</span></label><label class="kind"><input type="radio" name="deal" value="Base + CPM" /><span>Base + CPM</span></label><label class="kind"><input type="radio" name="deal" value="Not sure yet" /><span>Not sure yet</span></label>
         </fieldset>
+        <div class="br-rate" data-rate hidden>
+          <label class="field br-money"><span class="label" data-rate-label>Rate per video</span><span class="br-amt"><span aria-hidden="true">$</span><input name="rate" type="number" inputmode="decimal" min="0" max="1000000" step="1" placeholder="150" /></span></label>
+          <label class="field br-count"><span class="label">How many videos</span><input name="videos" type="number" inputmode="numeric" min="1" max="500" step="1" placeholder="4" /></label>
+          <label class="field br-bonus"><span class="label">Bonuses, if any</span><input name="bonus" maxlength="140" placeholder="$1 CPM up to 1M views" /></label>
+        </div>
         <label class="field"><span class="label">Your email</span><input name="email" type="email" autocomplete="email" maxlength="120" required placeholder="you@company.com" /></label>
         <input class="ct-hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" />
         <div class="br-send"><button class="pill solid" type="submit">Send <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1 8h13M9 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></button><p class="note" role="status" data-msg></p></div>

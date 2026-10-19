@@ -28,6 +28,14 @@
   const form = document.querySelector("[data-brand-form]");
   if (!form) return;
   const msg = form.querySelector("[data-msg]"), done = document.querySelector("[data-brand-done]");
+  // Deal terms: pick how they pay, then type the actual numbers. The rate label follows the deal type.
+  const rate = form.querySelector("[data-rate]"), rateLabel = form.querySelector("[data-rate-label]");
+  const RATE_LABEL = { "Per video": "Rate per video", "Monthly retainer": "Retainer per month", "Base + CPM": "Base per video" };
+  form.querySelectorAll("input[name=deal]").forEach((r) => r.addEventListener("change", () => {
+    const known = RATE_LABEL[r.value];
+    rate.hidden = !known;
+    if (known) rateLabel.textContent = known;
+  }));
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     const f = Object.fromEntries(new FormData(form));
@@ -46,7 +54,8 @@
     btn.disabled = false;
   });
   function fallback(f) {
-    const body = `${f.need || ""}\n\nBudget: ${f.budget || "Not sure yet"}\n\n${f.brand || ""}\n${f.email || ""}`;
+    const terms = [f.deal || "Not sure yet", f.rate ? `$${f.rate}` : "", f.videos ? `${f.videos} videos` : "", f.bonus ? `Bonus: ${f.bonus}` : ""].filter(Boolean).join(", ");
+    const body = `${f.need || ""}\n\nTerms: ${terms}\n\n${f.brand || ""}\n${f.email || ""}`;
     const gmail = `https://mail.google.com/mail/?view=cm&fs=1&to=${COLLABS_EMAIL}&su=${encodeURIComponent(SUBJECT + (f.brand ? ": " + f.brand : ""))}&body=${encodeURIComponent(body)}`;
     msg.innerHTML = `That didn't send. <a href="${gmail}" target="_blank" rel="noreferrer">Send it with Gmail</a> or email ${COLLABS_EMAIL}.`;
   }

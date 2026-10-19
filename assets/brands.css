@@ -91,3 +91,14 @@
   .reel-media { aspect-ratio: 4 / 5; }
   .br-mail { padding: 18px 22px 17px; gap: 12px; font-size: clamp(15px, 4.6vw, 19px); }
 }
+
+/* Deal terms: typed numbers, shaped like how UGC deals are actually posted (per video, retainer, base + CPM). */
+.br-rate { display: grid; grid-template-columns: 1fr 1fr; gap: 0 18px; margin-top: 4px; }
+.br-rate[hidden] { display: none; }
+.br-rate .br-bonus { grid-column: 1 / -1; }
+.br-amt { display: flex; align-items: baseline; gap: 6px; }
+.br-amt > span { font-weight: 700; }
+.br-amt input { flex: 1; min-width: 0; }
+.br-rate input[type=number] { -moz-appearance: textfield; appearance: textfield; }
+.br-rate input[type=number]::-webkit-outer-spin-button, .br-rate input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+@media (max-width: 520px) { .br-rate { grid-template-columns: 1fr; } }

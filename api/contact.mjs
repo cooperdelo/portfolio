@@ -1,12 +1,23 @@
 // POST /api/contact {kind, name, reply, message, website}
-// POST /api/contact {kind: 'Brand or UGC', brand, need, budget, email, website}   (the /brands inquiry form)
+// POST /api/contact {kind: 'Brand or UGC', brand, need, deal, rate, videos, bonus, email, website}   (the /brands inquiry form)
 // The contact popup sends here instead of opening anyone's mail app. Messages land in site_messages
 // (admin: Portfolio visitors page). "website" is a honeypot: real people never see or fill it.
 // Optional, not applied yet: scripts/migrations/20261019-brand-inquiries.sql also turns each brand inquiry
 // into a "What needs you" item in the admin.
 const URL_BASE = 'https://eibtnkaoqsgwiqttiwjo.supabase.co/rest/v1/site_messages';
 export const KINDS = ['Film or content', 'Product or a build', 'Summer 2027', 'Brand or UGC', 'Something else'];
-export const BUDGETS = ['Under $500', '$500 to $2,000', '$2,000 and up', 'Not sure yet'];
+export const DEALS = ['Per video', 'Monthly retainer', 'Base + CPM', 'Not sure yet'];
+const RATE_UNIT = { 'Per video': 'per video', 'Monthly retainer': 'per month', 'Base + CPM': 'base per video' };
+const num = (v, max) => { const n = Number(String(v ?? '').replace(/[$,\s]/g, '')); return Number.isFinite(n) && n > 0 && n <= max ? n : null; };
+// Deal terms in one readable line, e.g. "Base + CPM: $45 base per video, 10 videos, bonus: $1 CPM up to 1M views".
+export function dealTerms(b) {
+  const deal = DEALS.includes(b.deal) ? b.deal : '';
+  if (!deal) return '';
+  if (deal === 'Not sure yet') return 'Not sure yet';
+  const rate = num(b.rate, 1000000), videos = num(b.videos, 500), bonus = clean(b.bonus, 140);
+  const parts = [rate ? `$${rate.toLocaleString('en-US')} ${RATE_UNIT[deal]}` : '', videos ? `${Math.round(videos)} videos` : '', bonus ? `bonus: ${bonus}` : ''].filter(Boolean);
+  return parts.length ? `${deal}: ${parts.join(', ')}` : deal;
+}
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const clean = (v, n) => String(v ?? '').replace(/[\u0000-\u0008\u000b-\u001f]/g, '').trim().slice(0, n);
 
@@ -23,14 +34,14 @@ export function validate(b) {
   return { row: { kind, name, reply, message } };
 }
 
-// The /brands form: brand name, what they need, an optional budget range, and a work email to reply to.
+// The /brands form: brand name, what they need, optional deal terms (typed numbers), and a work email to reply to.
 function validateBrand(b) {
   const brand = clean(b.brand, 80), need = clean(b.need, 1800), email = clean(b.email, 120);
-  const budget = BUDGETS.includes(b.budget) ? b.budget : '';
+  const terms = dealTerms(b);
   if (!brand) return { error: 'Add your brand or company name.' };
   if (!EMAIL_RE.test(email)) return { error: 'Add an email so I can reply.' };
   if (need.length < 10) return { error: 'Say a little more about what you need.' };
-  return { row: { kind: 'Brand or UGC', name: brand, reply: email, message: need + (budget ? `\n\nBudget: ${budget}` : '') } };
+  return { row: { kind: 'Brand or UGC', name: brand, reply: email, message: need + (terms ? `\n\nTerms: ${terms}` : '') } };
 }
 
 export default async function handler(req, res) {
